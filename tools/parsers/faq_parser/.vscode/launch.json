@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run faq-parser.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/faq-parser.py",
+            "args": [
+                "--url",
+                "https://helsingborg.se/bo-bygga-och-miljo/bygga-nytt-bygga-om-bygga-till/bygglov-och-anmalan/soka-bygglov-vad-vill-du-gora/",
+                "--class_value",
+                "sidebar-content-area",
+                "--output",
+                "./output/output.md"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
