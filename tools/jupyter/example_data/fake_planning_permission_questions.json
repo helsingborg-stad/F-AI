@@ -1,0 +1,44 @@
+{
+    "questions": [
+        {
+            "id": "q1",
+            "question": "Måste man söka bygglov för flaggstång?"
+        },
+        {
+            "id": "q2",
+            "question": "Måste man söka bygglov för altan?"
+        },
+        {
+            "id": "q3",
+            "question": "Måste man söka bygglov för carport?"
+        },
+        {
+            "id": "q4",
+            "question": "Måste man söka bygglov för solceller?"
+        },
+        {
+            "id": "q5",
+            "question": "Måste man söka bygglov för pool?"
+        },
+        {
+            "id": "q6",
+            "question": "Måste man söka bygglov för attefallshus?"
+        },
+        {
+            "id": "q7",
+            "question": "Måste man söka bygglov för förråd?"
+        },
+        {
+            "id": "q8",
+            "question": "Måste man söka bygglov för uterum?"
+        },
+        {
+            "id": "q9",
+            "question": "Måste man söka bygglov för braskamin?"
+        },
+        {
+            "id": "q10",
+            "question": "Vad är frankrikes huvudstad?"
+        }
+    ]
+}
