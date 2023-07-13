@@ -46,7 +46,7 @@ cp path/to/your/document.pdf ./data/
 
 ### 4 Set up environment variables
 Create a file named .env in the root of the cloned repository for environment variables.
-There is a file named `.env_example` that can be used as a template:
+There is a file named `.env.example` that can be used as a template:
 
 ```text
 OPENAI_API_KEY=YOUR_OPENAI_API_KEY
