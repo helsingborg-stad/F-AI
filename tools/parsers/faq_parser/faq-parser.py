@@ -2,9 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import html2text
 import argparse
-import time
 
-# setup command line arguments
 parser = argparse.ArgumentParser(description='Convert Hbg planning permission FAQ to Markdown')
 parser.add_argument('--url', type=str, help='The URL to parse')
 parser.add_argument('--class_value', type=str, help='The HTML class containing the FAQ')
@@ -25,7 +23,7 @@ element = soup.find('div', {'class': class_value})
 
 # convert the HTML to Markdown
 h = html2text.HTML2Text()
-h.ignore_links = True       # remove all hyperlinks from text
+h.ignore_links = True
 
 markdown = h.handle(element.prettify())
 
