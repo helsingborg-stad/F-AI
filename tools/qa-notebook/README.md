@@ -2,9 +2,9 @@
 
 This Jupyter Notebook is designed to help you in understanding planning permissions using the OpenAI API.
 
-## Prerequisites
+## Requirements
 
-- Python 3.6 or higher
+- Python 3.9.6 or higher
 - git
 - pip
 - Visual Studio Code with plugin [Jupyter](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) installed
@@ -54,6 +54,8 @@ OPENAI_API_KEY=YOUR_OPENAI_API_KEY
 PLANNING_PERMISSION_FILE_PATH=./data/planning_permission_document.pdf
 
 LOGGING_LEVEL=INFO
+
+PLANNING_PERMISSION_QUESTIONS_FILE_PATH=./example_data/fake_planning_permission_questions.json
 ```
 
 #### 4.1 Set Up API Keys
@@ -64,14 +66,18 @@ Add your API key to `.env` by setting variable `"OPENAI_API_KEY=your_api_key_her
 
 Replace your_api_key_here with your actual API key.
 
-#### 4.2 Setup up logging level (optinal)
+#### 4.2 Setup up logging level (optional)
 
 You can also set up logging level by adding setting variable `LOGGING_LEVEL=INFO` in `.env`.
 
 Replace INFO with your desired logging level (e.g. DEBUG, INFO, WARNING, ERROR, CRITICAL).
 
 #### 4.3 Set Up Document Path
-Additionally, you need to specify the file path to your document in the `.env` file by setting variable `"PLANNING_PERMISSION_FILE_PATH=./data/your_document.pdf`.
+Additionally, you need to specify the file path to your document in the `.env` file by setting variable for source and questions.
+
+Source file: `PLANNING_PERMISSION_FILE_PATH=./data/your_document.ext`.
+
+Questions: `PLANNING_PERMISSION_QUESTIONS_FILE_PATH=./example_data/fake_planning_permission_questions.json`.
 
 Replace your_document.ext with your actual document name and extension.
 
@@ -80,7 +86,7 @@ Replace your_document.ext with your actual document name and extension.
 #### 5.1 VS Code
 Open notebook project in VS code. 
 
-Select your previously created virtual environemnt by pressing button "Select Kernel" (top right corner).
+Select your previously created virtual environment by pressing button "Select Kernel" (top right corner).
 
 Press the "Run All" button to run all the cells.
 
