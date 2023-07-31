@@ -10,7 +10,10 @@ class CLI:
 
     def run(self, args: list):
         argument_handler = ArgumentHandler(args, self.title)
-        argument_handler.handle_args(sys.argv)
+        status_code = argument_handler.handle_args(sys.argv)
+        if status_code == ArgumentStatusCodes.EXIT_APPLICATION:
+            sys.exit(0)
+
         print("Run not implemented. Exiting...")
         sys.exit(0)
 

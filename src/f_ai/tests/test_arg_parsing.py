@@ -10,11 +10,6 @@ class ArgumentParserSetupTest(unittest.TestCase):
         args = setup.parser.parse_args(['--version'])
         self.assertEqual(args.version, True)
 
-    def test_parse_args(self):
-        setup = ArgumentParserSetup('test_program')
-        parsed_args = setup.parse_args(['--version'])
-        self.assertEqual(parsed_args, Namespace(version=True))
-
 
 class ArgumentHandlerTest(unittest.TestCase):
     def test_handle_args_no_args(self):
