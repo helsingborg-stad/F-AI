@@ -1,18 +1,16 @@
-# main.py
-
 import sys
-from f_ai.argument_handler.arg_parsing import ArgumentParserSetup, ArgumentHandler
+from f_ai.argument_handler.arg_parsing import ArgumentHandler
 
 CLI_TITLE = "F-AI CLI"
+
 
 class CLI:
     def __init__(self, title=CLI_TITLE):
         self.title = title
 
     def run(self, args: list):
-        parser_setup = ArgumentParserSetup(self.title)
-        parsed_args = parser_setup.parse_args(args)
-        ArgumentHandler(parsed_args, parser_setup.parser, self.title)
+        argument_handler = ArgumentHandler(args, self.title)
+        argument_handler.handle_args(sys.argv)
         print("Run not implemented. Exiting...")
         sys.exit(0)
 

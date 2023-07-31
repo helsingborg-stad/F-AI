@@ -1,5 +1,3 @@
-# arg_parsing.py
-import sys
 from argparse import ArgumentParser, Namespace
 from f_ai.version import __version__
 
@@ -17,16 +15,16 @@ class ArgumentParserSetup:
 
 
 class ArgumentHandler:
-    def __init__(self, args: Namespace, parser: ArgumentParser, title: str):
-        self.args = args
-        self.parser = parser
+    def __init__(self, args: list, title: str):
+        self.parser = ArgumentParserSetup(title)
+        self.args = self.parser.parse_args(args)
         self.title = title
-        self.handle_args()
 
-    def handle_args(self):
-        if len(sys.argv) < 2:
-            self.parser.print_help()
-            sys.exit(0)
+    def handle_args(self, argv: list):
+        if len(argv) < 2:
+            print(self.parser.parser.format_help())
+            exit(0)
+
         if self.args.version:
             print(f"{self.title} {__version__}")
-            sys.exit(0)
+            exit(0)
