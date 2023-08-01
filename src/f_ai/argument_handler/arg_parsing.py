@@ -29,7 +29,7 @@ class ArgumentHandler:
         self.args = self.parser.parse_args(args)
         self.title = title
 
-    def handle_args(self, argv: list):
+    def handle_args(self, argv: list) -> ArgumentStatusCodes:
         if len(argv) < 2:
             print(self.parser.parser.format_help())
             return ArgumentStatusCodes.EXIT_APPLICATION
