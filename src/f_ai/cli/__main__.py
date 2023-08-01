@@ -12,16 +12,18 @@ class CLI:
     def start_command_factory(self, model_name: str, server_type: str):
         # we can have various mode-server types which will have different ways to start them
         # each type is mapped to a corresponding class that knows how to start it
-        command_class_map = {
-            # ('parrot_fml', 'http'): Model1ServerType1Command,
-        }
-
-        command_class = command_class_map.get((model_name, server_type))
+        command_class = self.get_command_class_map().get((model_name, server_type))
         if command_class is None:
             raise ValueError(f"Unknown model-server type combination: {model_name}-{server_type}")
 
-        command_object = command_class()
+        command_object = command_class(model_name, server_type)
+
         return command_object
+
+    def get_command_class_map(self):
+        return {
+            # ('parrot_fml', 'http'): Model1ServerType1Command,
+        }
 
     def run(self, args: list):
         argument_handler = ArgumentHandler(args, self.title)
@@ -47,6 +49,9 @@ def main():
     except KeyboardInterrupt:
         print("\nUser aborted!")
         sys.exit(0)
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        sys.exit(1)
 
 
 if __name__ == '__main__':
