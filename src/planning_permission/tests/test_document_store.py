@@ -1,3 +1,4 @@
+import asyncio
 import unittest
 from typing import AsyncGenerator, Any
 from unittest.mock import patch
@@ -20,6 +21,9 @@ class FakeEmbeddingsDatabase(AbstractEmbeddingsDatabase):
     async def query_embedding(self, embedding, n_results) -> AsyncGenerator[str, Any]:
         for chunk in self.document_chunks[:n_results]:
             yield chunk
+
+    def is_collection_empty(self):
+        return len(self.document_chunks) == 0
 
 
 class FakeEmbeddingsGenerator(AbstractEmbeddingsGenerator):
@@ -56,7 +60,12 @@ class TestDocumentStore(unittest.TestCase):
             results = [res async for res in self.document_store.query("query", 2)]
             self.assertEqual(results, ["chunk1", "chunk2"])
 
-        run_query()
+        asyncio.get_event_loop().run_until_complete(run_query())
+
+    def test_is_collection_empty(self):
+        self.assertTrue(self.document_store.is_collection_empty())
+        self.db.document_chunks = ["chunk1", "chunk2"]
+        self.assertFalse(self.document_store.is_collection_empty())
 
 
 if __name__ == '__main__':
