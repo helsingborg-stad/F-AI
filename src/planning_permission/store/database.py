@@ -103,7 +103,7 @@ class ChromaDB(AbstractEmbeddingsDatabase):
         return self.collection.count() == 0
 
     def add_embeddings(self, document_chunks, embeddings) -> None:
-        self.collection.add(
+        embeddings and self.collection.add(
             documents=document_chunks,
             embeddings=embeddings,
             ids=[str(i) for i, _ in enumerate(document_chunks)],
