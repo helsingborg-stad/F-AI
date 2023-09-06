@@ -1,16 +1,17 @@
 import os
-from typing import Dict, Tuple, List
-from dotenv import load_dotenv
-
-from langstream import debug, Stream
 import chainlit as cl
+from dotenv import load_dotenv
+from typing import Dict, Tuple
 
-from planning_permission.streams.collection import get_scoring_stream, get_query_openai
+from langstream import debug
+from streams.collection import chat_stream_factory, score_stream_factory, document_stream_factory
+
 from store.document_store import DocumentStore
 from utils.embeddings_handler import OpenAIGenerator
 from store.database import ChromaDB
 
 load_dotenv(dotenv_path="./.env")
+
 DB_DIRECTORY = os.environ.get("DB_PATH", "./f-ai.db")
 DB_COLLECTION = os.environ.get("DB_PLANNING_PERMISSION_COLLECTION_NAME", "planning_permission")
 DOCUMENTS_TO_EMBED = os.environ.get("DOCUMENTS_TO_EMBED")
@@ -20,53 +21,42 @@ document_store = DocumentStore(
     embeddings_generator=OpenAIGenerator(),
 )
 
-# Populate database with document embeddings if collection empty
-if document_store.is_collection_empty():
-    document_store.load_document(pathname=DOCUMENTS_TO_EMBED)
-
-
-def stream_with_scoring(query):
-    scoring_stream = get_scoring_stream(query)
-    query_openai = get_query_openai(query)
-
-    documents: List[str] = []
-
-    def append_document(document):
-        nonlocal documents
-        documents.append(document)
-        return document
+def main(q: str):
+    add_document, list_documents = *(lambda documents: (
+        lambda document: (documents.append(document), document)[1], 
+        lambda: [*documents]
+    ))([]),
+              
+    document_stream, score_stream, chat_stream = (
+        document_stream_factory(q, document_store, 10),
+        score_stream_factory(q),
+        chat_stream_factory(q)
+    )
 
     return (
         debug(
-            Stream[str, str](
-                "RetrieveDocumentsStream",
-                lambda query: document_store.query(query=query, n_results=10)
-            )
-            # Store retrieved documents to be used later
-            .map(append_document)
-            # Score each of them using another stream
-            .map(scoring_stream)
-            # Run it all in parallel
+            document_stream
+            .map(add_document)
+            .map(score_stream)
             .gather()
-            # Pair up documents with scores
-            .and_then(
-                lambda scores: zip(documents, [s[0] for s in scores])
-            )
-            # Take the top 4 scored documents
-            .and_then(
-                lambda scored: sorted(list(scored)[0], key=lambda x: x[1], reverse=True)[:4]
-            )
-            # Now use them to build an answer
-            .and_then(query_openai)
+            .and_then(lambda scores: list(zip([*list_documents()], [s[0] for s in scores])))
+            .and_then(lambda docs: sorted(docs[0], key=lambda x: x[1], reverse=True))
+            .and_then(lambda docs: [i[0] for i in docs[0]][:4])
+            .and_then(lambda docs: {"context": docs[0]})
+            .and_then(chat_stream)
         )
-    )(query)
+    )(q)     
 
+@cl.on_chat_start
+async def start():
+    if document_store.is_collection_empty():
+        document_store.load_document(pathname=DOCUMENTS_TO_EMBED)
 
 @cl.on_message
 async def on_message(message: str):
     messages_map: Dict[str, Tuple[bool, cl.Message]] = {}
 
-    async for output in stream_with_scoring(message):
+    async for output in main(message):
         if "@" in output.stream and not output.final:
             continue
         if output.stream in messages_map:
