@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from langstream import debug, Stream
 import chainlit as cl
 
-from planning_permission.streams.collection import get_scoring_stream, get_query_openai
+from streams.collection import get_scoring_stream, get_query_openai
 from store.document_store import DocumentStore
 from utils.embeddings_handler import OpenAIGenerator
 from store.database import ChromaDB
