@@ -3,6 +3,9 @@ from typing import Callable
 from langstream import Stream
 from langstream.contrib import OpenAIChatStream, OpenAIChatMessage, OpenAIChatDelta
 
+class ROLE:
+    SYSTEM = "system"
+    USER = "user"
 
 def get_scoring_stream(query: str) -> Callable:
     def score_document(score: int) -> int:
@@ -12,13 +15,18 @@ def get_scoring_stream(query: str) -> Callable:
         "AnswerStream",
         lambda document: [
             OpenAIChatMessage(
-                role="system",
-                content="You are a scoring systems that classifies documents from 0-100 based on how well they answer a query",
-            ),
-            OpenAIChatMessage(
-                role="user",
-                content=f"Query: {query}\n\nDocument: {document}",
-            ),
+                role=role,
+                content=content.format(query=query, document=document),
+            )
+            for role, content
+            in [
+                [ROLE.SYSTEM, 
+                    "You are a scoring systems that classifies documents from 0-100 based on how well they answer a query"
+                ],
+                [ROLE.USER, 
+                    "Query: {query}\n\nDocument: {document}"
+                ],
+            ]
         ],
         model="gpt-3.5-turbo",
         temperature=0,
@@ -45,7 +53,6 @@ def get_scoring_stream(query: str) -> Callable:
     )
 
     return scoring_stream
-
 
 def get_query_openai(query: str) -> Callable:
     query_openai: OpenAIChatStream[str, OpenAIChatDelta] = OpenAIChatStream[str, OpenAIChatDelta](
