@@ -58,20 +58,20 @@ def get_query_openai(query: str) -> Callable:
     query_openai: OpenAIChatStream[str, OpenAIChatDelta] = OpenAIChatStream[str, OpenAIChatDelta](
         "ChatStream",
         lambda results: [
-            OpenAIChatMessage(
-                role="system",
-                content="You are a helpful AI assistant that helps people with answering questions about planning "
-                        "permission.<br> If you can't find the answer in the search result below, just say (in Swedish) "
-                        "\"Tyvärr kan jag inte svara på det.\" Don't try to make up an answer.<br> If the "
-                        "question is not related to the context, politely respond that you are tuned to only "
-                        "answer questions that are related to the context.<br> The questions are going to be "
-                        "asked in Swedish. Your response must always be in Swedish."
-            ),
-            OpenAIChatMessage(role="user", content=query),
-            OpenAIChatMessage(
-                role="user",
-                content=f"Here are the results of the search:\n\n {' | '.join([doc for doc, _ in list(results)[0]])}"
-            ),
+            OpenAIChatMessage(role=role, content=content.format(query=query, results=' | '.join([doc for doc, _ in list(results)[0]])))
+            for role, content
+            in [
+                [ROLE.SYSTEM, 
+                    "You are a helpful AI assistant that helps people with answering questions about planning "
+                    "permission.<br> If you can't find the answer in the search result below, just say (in Swedish) "
+                    "\"Tyvärr kan jag inte svara på det.\" Don't try to make up an answer.<br> If the "
+                    "question is not related to the context, politely respond that you are tuned to only "
+                    "answer questions that are related to the context.<br> The questions are going to be "
+                    "asked in Swedish. Your response must always be in Swedish."
+                ],
+                [ROLE.USER, "{query}"],
+                [ROLE.USER, "Here are the results of the search:\n\n {results}"],
+            ]
         ],
         model="gpt-4",
         temperature=0,
