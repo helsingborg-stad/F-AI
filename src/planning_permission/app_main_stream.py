@@ -25,7 +25,7 @@ if document_store.is_collection_empty():
     document_store.load_document(pathname=DOCUMENTS_TO_EMBED)
 
 def stream_with_scoring(query):
-    add_document, list_documents = *(lambda documents: (
+    add_document, list_documents = (lambda documents: (
         lambda document: (documents.append(document), document)[1], 
         lambda: [*documents]
     ))([]),
