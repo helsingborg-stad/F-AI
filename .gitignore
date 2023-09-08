@@ -151,3 +151,4 @@ pyrightconfig.json
 # Project specific ignores (add your own here)
 data/
 output/
+*.xlsx

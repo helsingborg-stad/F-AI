@@ -3,6 +3,9 @@ from typing import Callable
 from langstream import Stream
 from langstream.contrib import OpenAIChatStream, OpenAIChatMessage, OpenAIChatDelta
 
+class ROLE:
+    SYSTEM = "system"
+    USER = "user"
 
 def get_scoring_stream(query: str) -> Callable:
     def score_document(score: int) -> int:
@@ -12,13 +15,18 @@ def get_scoring_stream(query: str) -> Callable:
         "AnswerStream",
         lambda document: [
             OpenAIChatMessage(
-                role="system",
-                content="You are a scoring systems that classifies documents from 0-100 based on how well they answer a query",
-            ),
-            OpenAIChatMessage(
-                role="user",
-                content=f"Query: {query}\n\nDocument: {document}",
-            ),
+                role=role,
+                content=content.format(query=query, document=document),
+            )
+            for role, content
+            in [
+                [ROLE.SYSTEM, 
+                    "You are a scoring systems that classifies documents from 0-100 based on how well they answer a query"
+                ],
+                [ROLE.USER, 
+                    "Query: {query}\n\nDocument: {document}"
+                ],
+            ]
         ],
         model="gpt-3.5-turbo",
         temperature=0,
@@ -46,25 +54,24 @@ def get_scoring_stream(query: str) -> Callable:
 
     return scoring_stream
 
-
 def get_query_openai(query: str) -> Callable:
     query_openai: OpenAIChatStream[str, OpenAIChatDelta] = OpenAIChatStream[str, OpenAIChatDelta](
         "ChatStream",
         lambda results: [
-            OpenAIChatMessage(
-                role="system",
-                content="You are a helpful AI assistant that helps people with answering questions about planning "
-                        "permission.<br> If you can't find the answer in the search result below, just say (in Swedish) "
-                        "\"Tyvärr kan jag inte svara på det.\" Don't try to make up an answer.<br> If the "
-                        "question is not related to the context, politely respond that you are tuned to only "
-                        "answer questions that are related to the context.<br> The questions are going to be "
-                        "asked in Swedish. Your response must always be in Swedish."
-            ),
-            OpenAIChatMessage(role="user", content=query),
-            OpenAIChatMessage(
-                role="user",
-                content=f"Here are the results of the search:\n\n {' | '.join([doc for doc, _ in list(results)[0]])}"
-            ),
+            OpenAIChatMessage(role=role, content=content.format(query=query, results=' | '.join([doc for doc, _ in list(results)[0]])))
+            for role, content
+            in [
+                [ROLE.SYSTEM, 
+                    "You are a helpful AI assistant that helps people with answering questions about planning "
+                    "permission.<br> If you can't find the answer in the search result below, just say (in Swedish) "
+                    "\"Tyvärr kan jag inte svara på det.\" Don't try to make up an answer.<br> If the "
+                    "question is not related to the context, politely respond that you are tuned to only "
+                    "answer questions that are related to the context.<br> The questions are going to be "
+                    "asked in Swedish. Your response must always be in Swedish."
+                ],
+                [ROLE.USER, "{query}"],
+                [ROLE.USER, "Here are the results of the search:\n\n {results}"],
+            ]
         ],
         model="gpt-4",
         temperature=0,

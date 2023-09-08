@@ -14,6 +14,8 @@ Simple Python script for extracting information from an FAQ page in the [Hbg pla
 
 3) Run command `python3 faq-parser.py --url https://helsingborg.se/bo-bygga-och-miljo/bygga-nytt-bygga-om-bygga-till/bygglov-och-anmalan/soka-bygglov-vad-vill-du-gora/ --class_value sidebar-content-area --output ./output/output.md` to parse and create Markdown output file in folder `./output/output.md`.
 
+4) Run command `article-parser.py --url https://helsingborg.se/bo-bygga-och-miljo/bygga-nytt-bygga-om-bygga-till/bygglov-och-anmalan/kontakt/ --class_value c-article --output ./output/hbg_planning_permission_contact.md`
+
 There is also a .vscode launcher (.vscode/launch.json) that can be used to running and debugging the script.
 The launcher will run the FAQ parser with arguments:
 ```text
