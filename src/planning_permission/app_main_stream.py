@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 from langstream import debug, Stream
 import chainlit as cl
 
-from streams.collection import get_scoring_stream, get_query_openai
-from store.document_store import DocumentStore
-from utils.embeddings_handler import OpenAIGenerator
-from store.database import ChromaDB
+from planning_permission.streams.collection import get_scoring_stream, get_query_openai
+from planning_permission.store.document_store import DocumentStore
+from planning_permission.utils.embeddings_handler import OpenAIGenerator
+from planning_permission.store.database import ChromaDB
 
 load_dotenv(dotenv_path="./.env")
 DB_DIRECTORY = os.environ.get("DB_PATH", "./f-ai.db")
