@@ -24,12 +24,13 @@ document_store = DocumentStore(
 if document_store.is_collection_empty():
     document_store.load_document(pathname=DOCUMENTS_TO_EMBED)
 
+
 def stream_with_scoring(query):
     add_document, list_documents = (lambda documents: (
-        lambda document: (documents.append(document), document)[1], 
+        lambda document: (documents.append(document), document)[1],
         lambda: [*documents]
-    ))([]),
-    
+    ))([])
+
     scoring_stream = get_scoring_stream(query)
     query_openai = get_query_openai(query)
 
@@ -52,7 +53,7 @@ def stream_with_scoring(query):
 @cl.on_message
 async def on_message(message: str):
     messages_map: Dict[str, Tuple[bool, cl.Message]] = {}
-    
+
     async for output in stream_with_scoring(message):
         if "@" in output.stream and not output.final:
             continue
