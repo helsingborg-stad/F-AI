@@ -1,7 +1,7 @@
 import asyncio
 import os
 import pandas as pd
-from planning_permission.app_main_stream import stream_with_scoring
+from planning_permission.app_main_stream import use_chat_stream
 from langstream import collect_final_output
 
 VERSION = 'v4'
@@ -13,8 +13,9 @@ async def join_stream_result(query: str, stream: callable, map_stream: callable 
     return ''.join(list(map(map_stream, list(result))))
 
 def generate_answer(question: str)-> str:
+    stream, prompts = use_chat_stream(question)
     print(question)
-    return asyncio.run(join_stream_result(question, stream_with_scoring, lambda x: x.content))
+    return asyncio.run(join_stream_result(question, stream, lambda x: x.content))
 
 def main():
     print(f"Input path: {EXCEL_INPUT_PATH} \nOutput path: {EXCEL_OUTPUT_PATH}")
