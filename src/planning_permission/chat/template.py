@@ -1,5 +1,4 @@
 from planning_permission.chat.prompt import UserChatPrompt, SystemChatPrompt
-from planning_permission.chat.settings import OpenAIStreamSettings, SETTINGS_GPT_3_5, SETTINGS_GPT_4
 
 CHAT_PROMPT_TEMPLATE_ARGS = {
     "name": "ChatStream",
@@ -20,7 +19,8 @@ CHAT_PROMPT_TEMPLATE_ARGS = {
         "results": ' | '.join([doc for doc, _ in list(input)[0]['results']])
     },
     "settings": {
-        **SETTINGS_GPT_4,
+        "model": "gpt-4",
+        "temperature": 0
     },
 }
 
@@ -32,7 +32,8 @@ SCORING_PROMPT_TEMPLATE_ARGS = {
     ],
     "input_map_fn": lambda input: {**(input)},
     "settings": {
-        **SETTINGS_GPT_3_5,
+        "model": "gpt-3.5-turbo",
+        "temperature": 0,
         "functions": [
             {
                 "name": "score_document",

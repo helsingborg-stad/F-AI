@@ -1,7 +1,7 @@
 from typing import Literal, Optional
 from chainlit.prompt import Prompt, PromptMessage # type: ignore
 from chainlit.playground.providers.openai import ChatOpenAI # type: ignore
-from planning_permission.chat.settings import OpenAIStreamSettings, GPT_3_5_SETTINGS
+from planning_permission.chat.settings import OpenAIStreamSettings, default_settings
 from langstream.contrib import OpenAIChatMessage
 
 class MessageChatPrompt:
@@ -69,7 +69,7 @@ class ChatPrompt:
         messages (list[MessageChatPrompt], optional): The list of chat prompt messages. Defaults to [].
         settings (OpenAIStreamSettings, optional): The settings for the chat prompt. Defaults to default_settings.
     """
-    def __init__(self, name: str, messages: list[MessageChatPrompt] = [], settings: OpenAIStreamSettings = GPT_3_5_SETTINGS):
+    def __init__(self, name: str, messages: list[MessageChatPrompt] = [], settings: OpenAIStreamSettings = default_settings):
         self.templates = messages
         self.input_vars = {}
         self.settings = settings
