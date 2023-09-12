@@ -1,5 +1,5 @@
 from planning_permission.chat.prompt import ChatPrompt
-from planning_permission.chat.settings import OpenAIStreamSettings, default_settings
+from planning_permission.chat.settings import OpenAIStreamSettings, SETTINGS_GPT_3_5, SETTINGS_GPT_4
 from langstream.contrib import OpenAIChatStream, OpenAIChatMessage
 from typing import Callable, Iterable, Tuple, TypeVar
 
@@ -21,7 +21,7 @@ def create_chat_prompt(prompt_args: dict) -> ChatPrompt:
 def create_chat_stream(
     name: str,
     messages_fn: Callable[[T], Iterable[OpenAIChatMessage]],
-    settings: OpenAIStreamSettings = default_settings,
+    settings: OpenAIStreamSettings = SETTINGS_GPT_3_5,
 ) -> OpenAIChatStream[T, U]:
     """
     Create a chat stream.
@@ -61,7 +61,7 @@ def create_chat_stream_from_prompt(
     prompt = create_chat_prompt({
         "name": prompt_args["name"],
         "messages": prompt_args["messages"],
-        "settings": prompt_args["settings"] if "settings" in prompt_args else default_settings,
+        "settings": prompt_args["settings"] if "settings" in prompt_args else SETTINGS_GPT_3_5,
     })
     
     def messages(p: T) -> Iterable[OpenAIChatMessage]:

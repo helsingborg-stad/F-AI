@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from langstream import debug, Stream
 import chainlit as cl
 
-from planning_permission.streams.collection import get_scoring_stream, get_query_openai
 from planning_permission.store.document_store import DocumentStore
 from planning_permission.utils.embeddings_handler import OpenAIGenerator
 from planning_permission.store.database import ChromaDB
@@ -18,7 +17,7 @@ from langstream.contrib import OpenAIChatDelta
 
 from planning_permission.chat.stream import create_chat_stream_from_prompt
 from planning_permission.chat.prompt import ChatPrompt
-from planning_permission.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
+from planning_permission.chat.templates import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
 
 
 load_dotenv(dotenv_path="./.env")
