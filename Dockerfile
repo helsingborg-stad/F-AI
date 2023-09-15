@@ -9,7 +9,7 @@ ADD /src /app
 ADD /src/planning_permission/requirements.txt /app
 
 # Install any needed packages specified in requirements.txt 
-RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
