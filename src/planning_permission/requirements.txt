@@ -140,7 +140,6 @@ pdoc3==0.10.0
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==10.0.0
--e git+ssh://git@github.com/helsingborg-stad/F-AI.git@0dbfeee9e0b3a34c547abe1601821f0aacb0f982#egg=planning_permission&subdirectory=src
 platformdirs==3.10.0
 pluggy==1.2.0
 posthog==3.0.2

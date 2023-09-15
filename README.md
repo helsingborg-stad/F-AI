@@ -8,6 +8,30 @@ This repository contains a collection of Jupyter notebooks and Python scripts th
 
 The current goal of this project is to create a framework that educates us and provides insights into what is possible and not possible to solve using language models.
 
+## Running Docker with Docker Compose
+
+To run this project using Docker and Docker Compose, follow these steps:
+
+1. Ensure Docker and Docker Compose are installed on your machine. If not, you can download them from the [official Docker website](https://docs.docker.com/get-docker/).
+
+2. Navigate to the project directory in your terminal.
+
+3. Build the Docker image using the following command:
+   ```
+   docker-compose build
+   ```
+   **Apple silicon users (m1, m2, ...) need to set target platform:**
+   ```
+   DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose build
+   ```
+4. Once the image is built, run the Docker container using the following command:
+   ```
+   docker-compose up
+   ```
+5. The application should now be running on your specified port (default is 8888).
+
+Please note that any changes made to the codebase will require a rebuild of the Docker image for the changes to take effect.
+
 ## Contribution Guidelines
 
 We welcome contributions from the community! If you would like to contribute to this project, please follow these steps:
