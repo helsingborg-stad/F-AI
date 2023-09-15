@@ -12,7 +12,7 @@ ADD /src/planning_permission/requirements.txt /app
 RUN pip install -r requirements.txt
 
 # Make port 8888 available to the world outside this container
-EXPOSE 8888
+EXPOSE 80
 
 # Run chainlit when the container launches
 CMD ["python", "-m", "chainlit", "run", "planning_permission/app_main_stream.py"]
