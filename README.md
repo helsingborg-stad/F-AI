@@ -20,6 +20,10 @@ To run this project using Docker and Docker Compose, follow these steps:
    ```
    docker-compose build
    ```
+   **Apple silicon users (m1, m2, ...) need to set target platform:**
+   ```
+   DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose build
+   ```
 4. Once the image is built, run the Docker container using the following command:
    ```
    docker-compose up
