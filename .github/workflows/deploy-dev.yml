@@ -17,6 +17,7 @@ jobs:
 
           gdi-gitops-config-repo: ${{ secrets.GDI_GITOPS_CONFIG_REPO }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          git-checkout-branch: master
 
           gdi-gitops-token: ${{ secrets.GDI_GITOPS_TOKEN }}
           gdi-gitops-app: ${{ secrets.GDI_GITOPS_APP }}
