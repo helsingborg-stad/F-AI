@@ -2,7 +2,7 @@ name: Build and push docker image to github registry and deploy on dev environme
 
 on:
   release:
-    types: [prereleased]
+    types: [released]
 
 jobs:
   deploy:
