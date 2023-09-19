@@ -31,7 +31,6 @@ class ChainlitLoginWithJSONCredentials(AbstractLoginHandler):
     def __init__(self):
         self.users = {}
         users_credentials_file_path = os.environ.get("USER_CREDENTIALS_FILE", "./data/user_credentials.json")
-        print(users_credentials_file_path)
 
         try:
             with open(users_credentials_file_path, 'r') as file:
