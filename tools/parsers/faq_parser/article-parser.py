@@ -3,6 +3,30 @@ from bs4 import BeautifulSoup
 import html2text
 import argparse
 
+class CustomHTML2Text(html2text.HTML2Text):
+    def __init__(self, *args, **kwargs):
+        super(CustomHTML2Text, self).__init__(*args, **kwargs)
+        self.in_anchor = False
+        self.anchor_href = ""
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "a":
+            self.in_anchor = True
+            for attr, val in attrs:
+                if attr == "href":
+                    self.anchor_href = val
+        super(CustomHTML2Text, self).handle_starttag(tag, attrs)
+
+    def handle_endtag(self, tag):
+        if tag == "a":
+            self.in_anchor = False
+        super(CustomHTML2Text, self).handle_endtag(tag)
+
+    def handle_data(self, data):
+        if self.in_anchor and not self.anchor_href.startswith("mailto:"):
+            data = f" {data} ({self.anchor_href})"
+        super(CustomHTML2Text, self).handle_data(data)
+
 parser = argparse.ArgumentParser(description='Convert Hbg planning permission FAQ to Markdown')
 parser.add_argument('--url', type=str, help='The URL to parse')
 parser.add_argument('--class_value', type=str, help='The HTML class containing the FAQ')
@@ -22,7 +46,7 @@ soup = BeautifulSoup(response.text, 'html.parser')
 element = soup.find('article', {'class': class_value})
 
 # convert the HTML to Markdown
-h = html2text.HTML2Text()
+h = CustomHTML2Text()
 #h.ignore_links = True
 
 markdown = h.handle(element.prettify())
