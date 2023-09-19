@@ -1,3 +1,4 @@
+import os
 from planning_permission.chat.prompt import UserChatPrompt, SystemChatPrompt
 
 CHAT_PROMPT_TEMPLATE_ARGS = {
@@ -19,7 +20,7 @@ CHAT_PROMPT_TEMPLATE_ARGS = {
         "results": ' | '.join([doc for doc, _ in list(input)[0]['results']])
     },
     "settings": {
-        "model": "gpt-4",
+        "model": os.environ.get("GPT_4_MODEL_NAME", "gpt-4"),
         "temperature": 0
     },
 }
