@@ -83,13 +83,15 @@ class CommandRegistry:
 if __name__ == '__main__':
    registry = CommandRegistry()
    
-   @registry.command('add')
+   @registry.command('add') # Register command with python decorator syntax
    def add(a: int, b: int) -> str:
        return a + b
    
    @registry.command('greet')
-   def add(name: str, phrase: str = "Hello") -> str:
+   def greet(name: str, phrase: str = "Hello") -> str:
        return f"{phrase}, {name}!"
+   
+   registry.command('hi')(greet)  # Alternative syntax
    
    def default_command(msg: str):
        if msg == 'exit':
