@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 from langstream import debug, Stream
 import chainlit as cl
 
+from login_handler import ChainlitLoginWithJSONCredentials
+
 from planning_permission.store.document_store import DocumentStore
 from planning_permission.utils.embeddings_handler import OpenAIGenerator
 from planning_permission.store.database import ChromaDB
@@ -18,7 +20,6 @@ from langstream.contrib import OpenAIChatDelta
 from planning_permission.chat.stream import create_chat_stream_from_prompt
 from planning_permission.chat.prompt import ChatPrompt
 from planning_permission.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
-
 
 load_dotenv(dotenv_path="./.env")
 DB_DIRECTORY = os.environ.get("DB_PATH", "./f-ai.db")
@@ -36,15 +37,17 @@ if document_store.is_collection_empty():
 
 DEBUG_STREAM = os.environ.get("DEBUG_STREAM", False)
 
-def use_chat_stream(query: str, debug_fn: Optional[Callable] = None )-> tuple[Stream[str, OpenAIChatDelta], Dict[str, ChatPrompt]]:
+
+def use_chat_stream(query: str, debug_fn: Optional[Callable] = None) -> tuple[
+    Stream[str, OpenAIChatDelta], Dict[str, ChatPrompt]]:
     add_document, list_documents = (lambda documents: (
         lambda document: (documents.append(document), document)[1],
         lambda: [*documents]
     ))([])
-    
+
     chat_stream, chat_prompt = create_chat_stream_from_prompt(CHAT_PROMPT_TEMPLATE_ARGS)
     scoring_stream, scoring_prompt = create_chat_stream_from_prompt(SCORING_PROMPT_TEMPLATE_ARGS)
-    
+
     scoring_stream = scoring_stream.map(
         lambda delta: (lambda num: num)(json.loads(delta.content)['score'])
         if delta.role == "function" and delta.name == "score_document"
@@ -67,19 +70,20 @@ def use_chat_stream(query: str, debug_fn: Optional[Callable] = None )-> tuple[St
     )
 
     return (
-        (debug_fn or (lambda x: x))(stream), 
+        (debug_fn or (lambda x: x))(stream),
         {
             chat_prompt.name: chat_prompt,
             scoring_prompt.name: scoring_prompt,
         }
     )
 
+
 @cl.on_message
 async def on_message(message: str):
     stream, prompts = use_chat_stream(message, debug if DEBUG_STREAM else None)
-   
+
     cl_messages_map: Dict[str, cl.Message] = {}
-    
+
     async for output in stream(message):
         if "@" in output.stream and not output.final:
             continue
@@ -93,7 +97,7 @@ async def on_message(message: str):
             if hasattr(output.data, "content"):
                 cl_messages_map[output.stream] = cl.Message(
                     author=output.stream,
-                    content= output.data.content,
+                    content=output.data.content,
                     indent=0 if output.final else 1,
                     prompt=prompts[output.stream].to_prompt() if output.stream in prompts else None
                 )
@@ -102,6 +106,3 @@ async def on_message(message: str):
         if cl_message.prompt:
             cl_message.prompt.completion = cl_message.content or ""
         await cl_message.send()
- 
-            
-
