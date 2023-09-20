@@ -32,7 +32,7 @@ document_store = DocumentStore(
 
 # Populate database with document embeddings if collection empty
 if document_store.is_collection_empty():
-    document_store.load_document(pathname=DOCUMENTS_TO_EMBED)
+    document_store.load_document(pathname=DOCUMENTS_TO_EMBED, max_words=256)
 
 DEBUG_STREAM = os.environ.get("DEBUG_STREAM", False)
 
@@ -54,14 +54,14 @@ def use_chat_stream(query: str, debug_fn: Optional[Callable] = None )-> tuple[St
     stream = (
         Stream[str, str](
             "RetrieveDocumentsStream",
-            lambda query: document_store.query(query=query, n_results=10)
+            lambda query: document_store.query(query=query, n_results=20)
         )
         .map(add_document)
         .map(lambda document: {"query": query, "document": document})
         .map(scoring_stream)
         .gather()
         .and_then(lambda scores: zip(list_documents(), [s[0] for s in scores]))
-        .and_then(lambda scored: sorted(list(scored)[0], key=lambda x: x[1], reverse=True)[:4])
+        .and_then(lambda scored: sorted(list(scored)[0], key=lambda x: x[1], reverse=True)[:6])
         .and_then(lambda results: {"query": query, "results": results[0]})
         .and_then(chat_stream)
     )
