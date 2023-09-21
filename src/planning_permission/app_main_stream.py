@@ -21,21 +21,29 @@ from planning_permission.chat.stream import create_chat_stream_from_prompt
 from planning_permission.chat.prompt import ChatPrompt
 from planning_permission.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
 
+from utils.command_registry import CommandRegistry, ChatCommands
+
 load_dotenv(dotenv_path="./.env")
 DB_DIRECTORY = os.environ.get("DB_PATH", "./f-ai.db")
 DB_COLLECTION = os.environ.get("DB_PLANNING_PERMISSION_COLLECTION_NAME", "planning_permission")
 DOCUMENTS_TO_EMBED = os.environ.get("DOCUMENTS_TO_EMBED")
 
+chromadb = ChromaDB(DB_DIRECTORY, DB_COLLECTION)
 document_store = DocumentStore(
-    db=ChromaDB(DB_DIRECTORY, DB_COLLECTION),
+    db=chromadb,
     embeddings_generator=OpenAIGenerator(),
 )
 
-# Populate database with document embeddings if collection empty
+# populate database with document embeddings if collection empty
 if document_store.is_collection_empty():
     document_store.load_document(pathname=DOCUMENTS_TO_EMBED)
 
 DEBUG_STREAM = os.environ.get("DEBUG_STREAM", False)
+
+
+# register chat commands here
+commands = ChatCommands(CommandRegistry())
+commands.register(chromadb)
 
 
 def use_chat_stream(query: str, debug_fn: Optional[Callable] = None) -> tuple[
@@ -83,6 +91,10 @@ async def on_message(message: str):
     stream, prompts = use_chat_stream(message, debug if DEBUG_STREAM else None)
 
     cl_messages_map: Dict[str, cl.Message] = {}
+
+    if message.startswith("/"):
+        response = commands.registry.execute(message)
+        return await cl.Message(content=response).send()
 
     async for output in stream(message):
         if "@" in output.stream and not output.final:
