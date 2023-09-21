@@ -1,8 +1,12 @@
+import os
 from abc import ABC, abstractmethod
 from typing import Any, AsyncGenerator
 
 import chromadb
 from langstream import as_async_generator
+
+from planning_permission.utils.markdown import MarkdownFormatter
+from planning_permission.utils.command_registry import ICommandSetup, CommandRegistry
 
 
 class AbstractEmbeddingsDatabase(ABC):
@@ -69,7 +73,7 @@ class AbstractEmbeddingsDatabase(ABC):
         pass
 
 
-class ChromaDB(AbstractEmbeddingsDatabase):
+class ChromaDB(AbstractEmbeddingsDatabase, ICommandSetup):
     """
     Concrete class for an embeddings database using ChromaDB.
 
@@ -95,7 +99,10 @@ class ChromaDB(AbstractEmbeddingsDatabase):
     def __init__(self, db_directory: str, collection_name: str):
         self.client = chromadb.PersistentClient(
             path=db_directory,
-            settings=chromadb.Settings(anonymized_telemetry=False)  # opt out of telemetry
+            settings=chromadb.Settings(
+                anonymized_telemetry=False,  # opt out of telemetry
+                allow_reset=True
+            )
         )
         self.collection = self.client.get_or_create_collection(collection_name)
 
@@ -117,3 +124,28 @@ class ChromaDB(AbstractEmbeddingsDatabase):
 
         results = results[0]  # type: ignore
         return as_async_generator(*results)
+
+    def handle_list_collections(self):
+        collections = self.client.list_collections()
+        return MarkdownFormatter.list_to_markdown_table("Collections", collections)
+
+    def handle_reset_collections(self):
+        self.client.reset()
+        return "All collections removed."
+
+    def database_command(self, option: str, parameter: str) -> str:
+        handlers = {
+            "collection": {
+                "list": self.handle_list_collections,
+                "reset": self.handle_reset_collections
+            }
+        }
+        handler = handlers.get(option, {}).get(parameter)
+
+        if handler:
+            return handler()
+
+        return f"Invalid db command: {option} {parameter}"
+
+    def register_commands(self, command_registry):
+        command_registry.command('db')(self.database_command)
