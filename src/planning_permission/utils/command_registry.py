@@ -1,8 +1,17 @@
+from __future__ import annotations
+from abc import ABC, abstractmethod
 import argparse
 import shlex
-from typing import Any, Callable, Dict
+from typing import Callable
 from difflib import get_close_matches
 from planning_permission.utils.terminal_input import user_input
+
+
+class ICommandSetup(ABC):
+    @abstractmethod
+    def register_commands(self, command_registry: CommandRegistry):
+        pass
+
 
 class ErrorCatchingArgumentParser(argparse.ArgumentParser):
     def exit(self, status=0, message=None):
@@ -10,12 +19,13 @@ class ErrorCatchingArgumentParser(argparse.ArgumentParser):
             raise Exception(message)
         exit(status)
 
+
 class CommandRegistry:
-    def __init__(self, exit_on_error = False):
+    def __init__(self, exit_on_error=False):
         self.commands = {}
         self.default_command = None
         self._exit_on_error = exit_on_error
-        
+
     def command(self, name: str):
         def decorator(func: Callable):
             parser = ErrorCatchingArgumentParser(prog=name, add_help=False, exit_on_error=self._exit_on_error)
@@ -38,6 +48,7 @@ class CommandRegistry:
 
             self.commands[name.lower()] = {'function': func, 'parser': parser}
             return func
+
         return decorator
 
     def set_default_command(self, func: Callable):
@@ -80,29 +91,44 @@ class CommandRegistry:
         matches = get_close_matches(command_name, self.commands.keys(), n=1, cutoff=0.7)
         return matches[0] if matches else None
 
+
+class ChatCommands:
+    # TODO: Set default command.
+    def __init__(self, command_registry: CommandRegistry):
+        self.registry = command_registry
+
+    def register(self, command_setup: ICommandSetup):
+        command_setup.register_commands(self.registry)
+
+
 if __name__ == '__main__':
-   registry = CommandRegistry()
-   
-   @registry.command('add') # Register command with python decorator syntax
-   def add(a: int, b: int) -> str:
-       return a + b
-   
-   @registry.command('greet')
-   def greet(name: str, phrase: str = "Hello") -> str:
-       return f"{phrase}, {name}!"
-   
-   registry.command('hi')(greet)  # Alternative syntax
-   
-   def default_command(msg: str):
-       if msg == 'exit':
-           raise KeyboardInterrupt() # Exit
-       return 'Type "/help" to view commands or "exit" to exit.'
-   
-   registry.default_command = default_command
-   
-   while True: 
-       try:
-           print(registry.execute(user_input("Enter command: ")))
-       except(EOFError, KeyboardInterrupt):
-           print("Exiting...")
-           exit(0)
+    registry = CommandRegistry()
+
+
+    @registry.command('add')  # Register command with python decorator syntax
+    def add(a: int, b: int) -> str:
+        return a + b
+
+
+    @registry.command('greet')
+    def greet(name: str, phrase: str = "Hello") -> str:
+        return f"{phrase}, {name}!"
+
+
+    registry.command('hi')(greet)  # Alternative syntax
+
+
+    def default_command(msg: str):
+        if msg == 'exit':
+            raise KeyboardInterrupt()  # Exit
+        return 'Type "/help" to view commands or "exit" to exit.'
+
+
+    registry.default_command = default_command
+
+    while True:
+        try:
+            print(registry.execute(user_input("Enter command: ")))
+        except(EOFError, KeyboardInterrupt):
+            print("Exiting...")
+            exit(0)
