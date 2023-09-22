@@ -1,3 +1,6 @@
+from typing import Collection
+
+
 class MarkdownFormatter:
 
     @staticmethod
@@ -5,10 +8,11 @@ class MarkdownFormatter:
         return "\n".join(f"* {item}" for item in lst)
 
     @staticmethod
-    def list_to_markdown_table(header, lst):
+    def collection_to_markdown_table(header, collection):
+        collection_as_list = list(collection)  # Convert collection to list
         header_line = f"| {header} |"
         separator = "|-" + "-" * len(header) + "-|"
-        rows = "\n".join([f"| {item} |" for item in lst])
+        rows = "\n".join([f"| {item} |" for item in collection_as_list])
         return "\n".join([header_line, separator, rows])
 
     @staticmethod
@@ -17,4 +21,6 @@ class MarkdownFormatter:
 
     @staticmethod
     def header(level, text):
+        if not (1 <= level <= 6):
+            raise ValueError("Header level must be between 1 and 6 inclusive.")
         return f"{'#' * level} {text}"
