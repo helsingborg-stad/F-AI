@@ -72,8 +72,64 @@ class AbstractEmbeddingsDatabase(ABC):
         """
         pass
 
+    @abstractmethod
+    def list_collections(self):
+        """
+        Lists all the collections in the database.
 
-class ChromaDB(AbstractEmbeddingsDatabase, ICommandSetup):
+        Returns
+        -------
+        list[str]
+            A list of names of all collections in the database.
+        """
+        pass
+
+    @abstractmethod
+    def reset_collections(self):
+        """
+        Resets all the collections in the database.
+
+        Note
+        ---
+        This operation will clear all collections, removing all stored embeddings and related documents.
+        """
+        pass
+
+    @abstractmethod
+    def delete_collection(self, collection_name: str):
+        """
+        Deletes a specific collection from the database.
+
+        Parameters
+        ----------
+        collection_name : str
+            The name of the collection to delete.
+
+        Note
+        ----
+        This operation will permanently remove the specified collection and all of its contents.
+        """
+        pass
+
+    @abstractmethod
+    def get_or_create_collection(self, collection_name: str):
+        """
+        Retrieves an existing collection from the database or creates a new one if it does not exist.
+
+        Parameters
+        ----------
+        collection_name : str
+            The name of the collection to retrieve or create.
+
+        Returns
+        -------
+        Collection
+            The collection object corresponding to the specified collection name.
+        """
+        pass
+
+
+class ChromaDB(AbstractEmbeddingsDatabase):
     """
     Concrete class for an embeddings database using ChromaDB.
 
@@ -125,27 +181,14 @@ class ChromaDB(AbstractEmbeddingsDatabase, ICommandSetup):
         results = results[0]  # type: ignore
         return as_async_generator(*results)
 
-    def handle_list_collections(self):
-        collections = self.client.list_collections()
-        return MarkdownFormatter.list_to_markdown_table("Collections", collections)
+    def list_collections(self):
+        return self.client.list_collections()
 
-    def handle_reset_collections(self):
+    def reset_collections(self):
         self.client.reset()
-        return "All collections removed."
 
-    def database_command(self, option: str, parameter: str) -> str:
-        handlers = {
-            "collection": {
-                "list": self.handle_list_collections,
-                "reset": self.handle_reset_collections
-            }
-        }
-        handler = handlers.get(option, {}).get(parameter)
+    def delete_collection(self, collection_name: str):
+        self.client.delete_collection(collection_name)
 
-        if handler:
-            return handler()
-
-        return f"Invalid db command: {option} {parameter}"
-
-    def register_commands(self, command_registry):
-        command_registry.command('db')(self.database_command)
+    def get_or_create_collection(self, collection_name: str):
+        return self.client.get_or_create_collection(collection_name)
