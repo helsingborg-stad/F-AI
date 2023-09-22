@@ -72,9 +72,9 @@ class DocumentStore(ICommandSetup):
     def embedding_commands(self, option: str, parameter: str) -> str:
         handlers = {
             "collection": {
-                "list": lambda: MarkdownFormatter().list_to_markdown_table(
+                "list": lambda: MarkdownFormatter().collection_to_markdown_table(
                     "Collections",
-                    self.embeddings_db.list_collections()
+                    list(self.embeddings_db.list_collections())
                 ),
                 "reset": lambda: (self.embeddings_db.reset_collections(), "Collections reset")[1],
             }
