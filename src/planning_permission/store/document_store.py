@@ -69,21 +69,14 @@ class DocumentStore(ICommandSetup):
         query_as_embedding = self.embeddings_generator.create_embeddings(query)
         return self.embeddings_db.query_embedding(query_as_embedding, n_results)
 
-    def handle_list_collections(self):
-        return MarkdownFormatter().list_to_markdown_table(
-            "Collections",
-            self.embeddings_db.list_collections()
-        )
-
-    def handle_reset_collections(self):
-        self.embeddings_db.reset_collections()
-        return "Resetting collections..."
-
     def embedding_commands(self, option: str, parameter: str) -> str:
         handlers = {
             "collection": {
-                "list": self.handle_list_collections,
-                "reset": self.handle_reset_collections,
+                "list": lambda: MarkdownFormatter().list_to_markdown_table(
+                    "Collections",
+                    self.embeddings_db.list_collections()
+                ),
+                "reset": lambda: (self.embeddings_db.reset_collections(), "Collections reset")[1],
             }
         }
         handler = handlers.get(option, {}).get(parameter)
