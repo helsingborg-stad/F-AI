@@ -40,10 +40,9 @@ if document_store.is_collection_empty():
 
 DEBUG_STREAM = os.environ.get("DEBUG_STREAM", False)
 
-
 # register chat commands here
 commands = ChatCommands(CommandRegistry())
-commands.register(chromadb)
+commands.register(document_store)
 
 
 def use_chat_stream(query: str, debug_fn: Optional[Callable] = None) -> tuple[
