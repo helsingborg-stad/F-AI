@@ -1,4 +1,3 @@
-from __future__ import annotations
 from abc import ABC, abstractmethod
 import argparse
 import shlex
@@ -9,7 +8,7 @@ from planning_permission.utils.terminal_input import user_input
 
 class ICommandSetup(ABC):
     @abstractmethod
-    def register_commands(self, command_registry: CommandRegistry):
+    def register_commands(self, command_registry: 'CommandRegistry'):
         pass
 
 
