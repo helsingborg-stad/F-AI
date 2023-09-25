@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from planning_permission.store.database import AbstractEmbeddingsDatabase
 from planning_permission.store.document_store import DocumentStore
+from planning_permission.utils.command_registry import CommandRegistry
 from planning_permission.utils.embeddings_handler import AbstractEmbeddingsGenerator
 from planning_permission.utils.file_handler import DocumentHandler
 
@@ -13,10 +14,12 @@ class FakeEmbeddingsDatabase(AbstractEmbeddingsDatabase):
     def __init__(self):
         self.document_chunks = []
         self.embeddings = []
+        self.collections = []
 
     def add_embeddings(self, document_chunks, embeddings) -> None:
         self.document_chunks.extend(document_chunks)
         self.embeddings.extend(embeddings)
+        self.collections.extend(document_chunks)  # For testing purposes
 
     async def query_embedding(self, embedding, n_results) -> AsyncGenerator[str, Any]:
         for chunk in self.document_chunks[:n_results]:
@@ -25,6 +28,20 @@ class FakeEmbeddingsDatabase(AbstractEmbeddingsDatabase):
     def is_collection_empty(self):
         return len(self.document_chunks) == 0
 
+    def list_collections(self):
+        return self.collections
+
+    def reset_collections(self):
+        self.collections = []
+
+    def register_commands(self, command_registry: CommandRegistry):
+        pass
+
+    def delete_collection(self, collection_name: str):
+        pass
+
+    def get_or_create_collection(self, collection_name: str):
+        pass
 
 class FakeEmbeddingsGenerator(AbstractEmbeddingsGenerator):
     def create_embeddings(self, query):
@@ -66,6 +83,22 @@ class TestDocumentStore(unittest.TestCase):
         self.assertTrue(self.document_store.is_collection_empty())
         self.db.document_chunks = ["chunk1", "chunk2"]
         self.assertFalse(self.document_store.is_collection_empty())
+
+    def test_embedding_commands_list_collections(self):
+        self.db.add_embeddings(["collection1", "collection2"], ["embedding1", "embedding2"])
+        result = self.document_store.embedding_commands("collection", "list")
+        expected = "| Collections |\n|-------------|\n| collection1 |\n| collection2 |"
+        self.assertEqual(result, expected)
+
+    def test_embedding_commands_reset_collections(self):
+        self.db.add_embeddings(["collection1", "collection2"], ["embedding1", "embedding2"])
+        self.document_store.embedding_commands("collection", "reset")
+        self.assertEqual(len(self.db.list_collections()), 0)  # Ensuring collections are reset
+
+    def test_embedding_commands_invalid(self):
+        result = self.document_store.embedding_commands("invalid_option", "invalid_parameter")
+        expected = "Invalid embeddings command: invalid_option invalid_parameter"
+        self.assertEqual(result, expected)
 
 
 if __name__ == '__main__':

@@ -1,10 +1,13 @@
+import os
 from typing import AsyncGenerator, Any
 from .database import AbstractEmbeddingsDatabase
 from planning_permission.utils.embeddings_handler import AbstractEmbeddingsGenerator, Embeddings
 from planning_permission.utils.file_handler import DocumentHandler, DocumentParserFactory
+from planning_permission.utils.command_registry import ICommandSetup, CommandRegistry
+from planning_permission.utils.markdown import MarkdownFormatter
 
 
-class DocumentStore:
+class DocumentStore(ICommandSetup):
     """
     Class for handling documents and their embeddings in a database.
 
@@ -50,7 +53,7 @@ class DocumentStore:
     def load_document(self, pathname: str, max_words: int = 512):
         file_handler = DocumentHandler()
         chunks = file_handler.convert_docs_to_chunks(pathname, max_words, DocumentParserFactory())
-        print(f"Loaded {len(chunks)} chunks")   # TODO: Remove side effect print
+        print(f"Loaded {len(chunks)} chunks")  # TODO: Remove side effect print
 
         embeddings = self.generate_embeddings(chunks)
         self.add_embeddings(chunks, embeddings)
@@ -65,3 +68,23 @@ class DocumentStore:
     def query(self, query: str, n_results: int) -> AsyncGenerator[str, Any]:
         query_as_embedding = self.embeddings_generator.create_embeddings(query)
         return self.embeddings_db.query_embedding(query_as_embedding, n_results)
+
+    def embedding_commands(self, option: str, parameter: str) -> str:
+        handlers = {
+            "collection": {
+                "list": lambda: MarkdownFormatter().collection_to_markdown_table(
+                    "Collections",
+                    list(self.embeddings_db.list_collections())
+                ),
+                "reset": lambda: (self.embeddings_db.reset_collections(), "Collections reset")[1],
+            }
+        }
+        handler = handlers.get(option, {}).get(parameter)
+
+        if handler:
+            return handler()
+
+        return f"Invalid embeddings command: {option} {parameter}"
+
+    def register_commands(self, command_registry: CommandRegistry):
+        command_registry.command('embeddings')(self.embedding_commands)

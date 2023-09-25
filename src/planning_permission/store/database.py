@@ -1,8 +1,12 @@
+import os
 from abc import ABC, abstractmethod
 from typing import Any, AsyncGenerator
 
 import chromadb
 from langstream import as_async_generator
+
+from planning_permission.utils.markdown import MarkdownFormatter
+from planning_permission.utils.command_registry import ICommandSetup, CommandRegistry
 
 
 class AbstractEmbeddingsDatabase(ABC):
@@ -68,6 +72,62 @@ class AbstractEmbeddingsDatabase(ABC):
         """
         pass
 
+    @abstractmethod
+    def list_collections(self):
+        """
+        Lists all the collections in the database.
+
+        Returns
+        -------
+        list[str]
+            A list of names of all collections in the database.
+        """
+        pass
+
+    @abstractmethod
+    def reset_collections(self):
+        """
+        Resets all the collections in the database.
+
+        Note
+        ---
+        This operation will clear all collections, removing all stored embeddings and related documents.
+        """
+        pass
+
+    @abstractmethod
+    def delete_collection(self, collection_name: str):
+        """
+        Deletes a specific collection from the database.
+
+        Parameters
+        ----------
+        collection_name : str
+            The name of the collection to delete.
+
+        Note
+        ----
+        This operation will permanently remove the specified collection and all of its contents.
+        """
+        pass
+
+    @abstractmethod
+    def get_or_create_collection(self, collection_name: str):
+        """
+        Retrieves an existing collection from the database or creates a new one if it does not exist.
+
+        Parameters
+        ----------
+        collection_name : str
+            The name of the collection to retrieve or create.
+
+        Returns
+        -------
+        Collection
+            The collection object corresponding to the specified collection name.
+        """
+        pass
+
 
 class ChromaDB(AbstractEmbeddingsDatabase):
     """
@@ -95,7 +155,10 @@ class ChromaDB(AbstractEmbeddingsDatabase):
     def __init__(self, db_directory: str, collection_name: str):
         self.client = chromadb.PersistentClient(
             path=db_directory,
-            settings=chromadb.Settings(anonymized_telemetry=False)  # opt out of telemetry
+            settings=chromadb.Settings(
+                anonymized_telemetry=False,  # opt out of telemetry
+                allow_reset=True
+            )
         )
         self.collection = self.client.get_or_create_collection(collection_name)
 
@@ -117,3 +180,15 @@ class ChromaDB(AbstractEmbeddingsDatabase):
 
         results = results[0]  # type: ignore
         return as_async_generator(*results)
+
+    def list_collections(self):
+        return self.client.list_collections()
+
+    def reset_collections(self):
+        self.client.reset()
+
+    def delete_collection(self, collection_name: str):
+        self.client.delete_collection(collection_name)
+
+    def get_or_create_collection(self, collection_name: str):
+        return self.client.get_or_create_collection(collection_name)
