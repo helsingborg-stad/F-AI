@@ -21,7 +21,7 @@ from planning_permission.chat.stream import create_chat_stream_from_prompt
 from planning_permission.chat.prompt import ChatPrompt
 from planning_permission.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
 
-from utils.command_registry import CommandRegistry, ChatCommands
+from planning_permission.utils.command_registry import CommandRegistry, ChatCommands
 
 load_dotenv(dotenv_path="./.env")
 DB_DIRECTORY = os.environ.get("DB_PATH", "./f-ai.db")

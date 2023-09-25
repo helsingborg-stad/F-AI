@@ -3,8 +3,8 @@ from typing import AsyncGenerator, Any
 from .database import AbstractEmbeddingsDatabase
 from planning_permission.utils.embeddings_handler import AbstractEmbeddingsGenerator, Embeddings
 from planning_permission.utils.file_handler import DocumentHandler, DocumentParserFactory
-from ..utils.command_registry import ICommandSetup, CommandRegistry
-from ..utils.markdown import MarkdownFormatter
+from planning_permission.utils.command_registry import ICommandSetup, CommandRegistry
+from planning_permission.utils.markdown import MarkdownFormatter
 
 
 class DocumentStore(ICommandSetup):
