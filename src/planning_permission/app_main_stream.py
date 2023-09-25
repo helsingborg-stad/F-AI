@@ -6,8 +6,7 @@ from dotenv import load_dotenv
 from langstream import debug, Stream
 import chainlit as cl
 
-from utils.login_handler import ChainlitLoginWithJSONCredentials
-
+from planning_permission.utils.login_handler import ChainlitLoginWithJSONCredentials
 from planning_permission.store.document_store import DocumentStore
 from planning_permission.utils.embeddings_handler import OpenAIGenerator
 from planning_permission.store.database import ChromaDB
