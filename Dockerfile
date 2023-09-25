@@ -8,6 +8,11 @@ WORKDIR /app
 ADD /src /app
 ADD /src/planning_permission/requirements.txt /app
 
+RUN apt-get update && \
+    apt-get upgrade -y
+
+RUN pip install --upgrade pip
+
 # Install any needed packages specified in requirements.txt 
 RUN pip install -r requirements.txt
 
