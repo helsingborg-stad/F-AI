@@ -1,23 +1,32 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9
+# 📦 buildtime-image:
+FROM python:3.11 AS buildtime-image
 
-# Set the working directory in the container to /app
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends build-essential gcc
+
+# cache packages for 🕹️ with 👾 virtualenv:
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
 WORKDIR /app
+COPY /src/planning_permission/requirements.txt .
+RUN pip install -q -r requirements.txt
 
-# Add the current directory contents into the container at /app
-ADD /src /app
-ADD /src/planning_permission/requirements.txt /app
+# 🕹️ runtime-image: can be re-built with cached 📦
+FROM python:3.11 AS runtime-image
 
-RUN apt-get update && \
-    apt-get upgrade -y
+COPY --from=buildtime-image /opt/venv /opt/venv
+COPY --from=buildtime-image /app /app
 
-RUN pip install --upgrade pip
+# we shall not forget our 👾 virtualenv:
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Install any needed packages specified in requirements.txt 
-RUN pip install -r requirements.txt
+ARG CHAINLIT_PORT=80
+ENV CHAINLIT_PORT=$CHAINLIT_PORT
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
-
-# Run chainlit when the container launches
-CMD ["python", "-m", "chainlit", "run", "planning_permission/app_main_stream.py", "--port", "80"]
+WORKDIR /app
+COPY /src .
+COPY /src/planning_permission/.chainlit .
+COPY /src/planning_permission/chainlit.md .
+EXPOSE ${CHAINLIT_PORT}
+ENTRYPOINT python -m chainlit run planning_permission/app_main_stream.py -h --port ${CHAINLIT_PORT}
