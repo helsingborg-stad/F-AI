@@ -1,13 +1,5 @@
 # F-AI: Helsingborg Language Model Exploration
 
-## Project Overview
-
-This repository contains a collection of Jupyter notebooks and Python scripts that explore the possibilities of applying large language models to common tasks for the city of Helsingborg.
-
-## Goals
-
-The current goal of this project is to create a framework that educates us and provides insights into what is possible and not possible to solve using language models.
-
 ## Running with Docker locally
 
 To run this project using Docker, follow these steps:
