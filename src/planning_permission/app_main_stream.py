@@ -1,3 +1,4 @@
+import logging
 import os
 import json
 
@@ -6,6 +7,7 @@ from dotenv import load_dotenv
 from langstream import debug, Stream
 import chainlit as cl
 
+from planning_permission.utils.logger_config import LoggerConfig
 from planning_permission.utils.login_handler import ChainlitLoginWithJSONCredentials
 from planning_permission.store.document_store import DocumentStore
 from planning_permission.utils.embeddings_handler import OpenAIGenerator
@@ -21,6 +23,7 @@ from planning_permission.chat.prompt import ChatPrompt
 from planning_permission.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
 
 from planning_permission.utils.command_registry import CommandRegistry, ChatCommands
+from planning_permission.utils.sentry_config import SentryConfig
 
 load_dotenv(dotenv_path="./.env")
 DB_DIRECTORY = os.environ.get("DB_PATH", "./f-ai.db")
@@ -42,6 +45,19 @@ DEBUG_STREAM = os.environ.get("DEBUG_STREAM", False)
 # register chat commands here
 commands = ChatCommands(CommandRegistry())
 commands.register(document_store)
+
+logger_config = LoggerConfig(
+    level=logging.INFO,
+    fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+sentry_config = SentryConfig(
+    dns=os.environ.get("SENTRY_DSN"),
+    level=os.environ.get("SENTRY_LOGGING_LEVEL"),
+    event_level=os.environ.get("SENTRY_EVENT_LEVEL"),
+    trace_sample_rate=float(os.environ.get("SENTRY_TRACE_SAMPLE_RATE", 0.0))
+)
+sentry_config.initialize()
 
 
 def use_chat_stream(query: str, debug_fn: Optional[Callable] = None) -> tuple[
