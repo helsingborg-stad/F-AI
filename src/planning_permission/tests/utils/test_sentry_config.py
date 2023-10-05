@@ -7,7 +7,6 @@ from planning_permission.utils.sentry_config import SentryConfig
 
 
 def fake_sentry_init(dsn=None, integrations=None, traces_sample_rate=None):
-    # return dsn, integrations[0].level, integrations[0].event_level, traces_sample_rate
     return dsn, integrations, traces_sample_rate
 
 
