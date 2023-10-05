@@ -1,5 +1,8 @@
 # F-AI: Helsingborg Language Model Exploration
 
+## Requirements
+- Python 3.11.0
+
 ## Running with Docker locally
 
 To run this project using Docker, follow these steps:
