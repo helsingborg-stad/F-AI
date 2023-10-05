@@ -27,11 +27,12 @@ class SentryConfig:
         Returns the current Sentry configuration.
     """
 
-    def __init__(self, dns: str, level='ERROR', event_level='ERROR', trace_sample_rate=0.0) -> None:
+    def __init__(self, dns: str, level='ERROR', event_level='ERROR', trace_sample_rate=0.0, environment='development') -> None:
         self.dns = dns
         self.level = logging.getLevelName(level)
         self.event_level = logging.getLevelName(event_level)
         self.trace_sample_rate = trace_sample_rate
+        self.environment = environment
 
     def initialize(self) -> None:
         sentry_logging = LoggingIntegration(
@@ -42,7 +43,8 @@ class SentryConfig:
         sentry_sdk.init(
             dsn=self.dns,
             integrations=[sentry_logging],
-            traces_sample_rate=self.trace_sample_rate
+            traces_sample_rate=self.trace_sample_rate,
+            environment=self.environment
         )
 
     def get_config(self) -> dict[str, str]:
