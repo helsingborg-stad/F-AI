@@ -2,6 +2,7 @@ import os
 import json
 from typing import Optional
 from abc import ABC, abstractmethod
+import logging
 from chainlit.types import AppUser
 import chainlit as cl
 
@@ -29,6 +30,8 @@ class ChainlitLoginWithJSONCredentials(AbstractLoginHandler):
     consider using a more secure authentication system with proper hashing and salting of passwords.
     """
     def __init__(self):
+        self.logger = logging.getLogger(self.__class__.__name__)
+
         self.users = {}
         users_credentials_file_path = os.environ.get("USER_CREDENTIALS_FILE", "./data/user_credentials.json")
 
@@ -41,6 +44,8 @@ class ChainlitLoginWithJSONCredentials(AbstractLoginHandler):
             print("Error: users.json contains invalid JSON.")
 
     def login(self, username: str, password: str) -> Optional[dict]:
+        self.logger.info(f"User '{username}' logging in")
+
         user_data = self.users.get(username)
         if user_data and user_data["password"] == password:
             return {"username": username, "role": user_data["role"]}

@@ -43,6 +43,14 @@ To run this project using Docker, follow these steps:
 
 Please note that any changes made to the codebase will require a rebuild of the Docker image for the changes to take effect.
 
+## Analytics and Logging
+
+We use Sentry for error tracking and performance monitoring to ensure the best user experience. Sentry provides real-time monitoring and detailed error reports, which help us detect, triage, and resolve issues faster.
+
+By default, Sentry is **not enabled** in this project. If you wish to enable Sentry logging, ensure you've set the appropriate environment variables as described in the `.env.example` file.
+
+Sentry is an open-source application monitoring platform that helps developers identify and fix crashes in real time. It provides detailed stack traces and environmental context for better issue resolution. For more information, visit [Sentry's official documentation](https://docs.sentry.io/).
+
 ## Contribution Guidelines
 
 We welcome contributions from the community! If you would like to contribute to this project, please follow these steps:
