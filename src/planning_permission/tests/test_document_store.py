@@ -53,7 +53,7 @@ class TestDocumentStore(unittest.TestCase):
     def setUp(self):
         self.db = FakeEmbeddingsDatabase()
         self.embeddings_generator = FakeEmbeddingsGenerator()
-        self.document_store = DocumentStore(self.db, self.embeddings_generator)
+        self.document_store = DocumentStore(self.db, self.embeddings_generator, lambda: "fake_file_callback")
 
     def test_load_document(self):
         with patch.object(DocumentHandler, "convert_docs_to_chunks", return_value=["chunk1", "chunk2"]):
