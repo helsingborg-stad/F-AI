@@ -86,5 +86,17 @@ class DocumentStore(ICommandSetup):
 
         return f"Invalid embeddings command: {option} {parameter}"
 
+    def file_commands(self, option: str) -> str:
+        handlers = {
+            "upload": lambda: (asyncio.run(self.file_loader_callback()), "Upload complete")[1],
+        }
+        handlers = handlers.get(option)
+
+        if handlers:
+            return handlers()
+
+        return f"Invalid file command: {option}"
+
     def register_commands(self, command_registry: CommandRegistry):
         command_registry.command('embeddings')(self.embedding_commands)
+        command_registry.command('file')(self.file_commands)
