@@ -119,7 +119,10 @@ class TestFileUpload(unittest.TestCase):
         with patch.object(self.file_upload, 'save_file') as mock_save_file:
             import asyncio
             loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.file_upload.handle_uploaded_files(file_objects))
+            try:
+                loop.run_until_complete(self.file_upload.handle_uploaded_files(file_objects))
+            finally:
+                loop.close()
 
         mock_save_file.assert_called_once_with(file_objects=file_objects, destination_directory=self.storage_path)
 
