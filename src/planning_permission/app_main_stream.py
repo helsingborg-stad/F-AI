@@ -28,7 +28,7 @@ from planning_permission.utils.sentry_config import SentryConfig
 load_dotenv(dotenv_path="./.env")
 DB_DIRECTORY = os.environ.get("DB_PATH", "./f-ai.db")
 DB_COLLECTION = os.environ.get("DB_PLANNING_PERMISSION_COLLECTION_NAME", "planning_permission")
-DOCUMENTS_TO_EMBED = os.environ.get("DOCUMENTS_TO_EMBED")
+PATH_TO_DOCUMENTS = os.environ.get("PATH_TO_DOCUMENTS")
 
 
 def upload_callback():
@@ -51,7 +51,8 @@ document_store = DocumentStore(
 
 # populate database with document embeddings if collection empty
 if document_store.is_collection_empty():
-    document_store.load_document(pathname=DOCUMENTS_TO_EMBED, max_words=256)
+    all_files_in_path = PATH_TO_DOCUMENTS + '*'
+    document_store.load_document(pathname=all_files_in_path, max_words=256)
 
 DEBUG_STREAM = os.environ.get("DEBUG_STREAM", False)
 
