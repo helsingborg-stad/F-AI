@@ -12,8 +12,8 @@ from planning_permission.utils.login_handler import ChainlitLoginWithJSONCredent
 from planning_permission.store.document_store import DocumentStore
 from planning_permission.utils.embeddings_handler import OpenAIGenerator
 from planning_permission.store.database import ChromaDB
+from planning_permission.utils.file_handler import ChainlitFile, FileUpload
 
-from numpy import add
 from typing import Dict, Callable, Optional
 from langstream import debug, Stream
 from langstream.contrib import OpenAIChatDelta
@@ -28,17 +28,31 @@ from planning_permission.utils.sentry_config import SentryConfig
 load_dotenv(dotenv_path="./.env")
 DB_DIRECTORY = os.environ.get("DB_PATH", "./f-ai.db")
 DB_COLLECTION = os.environ.get("DB_PLANNING_PERMISSION_COLLECTION_NAME", "planning_permission")
-DOCUMENTS_TO_EMBED = os.environ.get("DOCUMENTS_TO_EMBED")
+PATH_TO_DOCUMENTS = os.environ.get("PATH_TO_DOCUMENTS")
+
+
+def upload_callback():
+    return ChainlitFile().upload(
+        accepted_mime_types=["application/pdf", "text/markdown"],
+        uploaded_file_handler=FileUpload(storage_path=os.environ.get("PATH_TO_DOCUMENTS")),
+        max_size_mb=10,
+        max_files=10,
+        timeout=60,
+        rise_on_timeout=True
+    )
+
 
 chromadb = ChromaDB(DB_DIRECTORY, DB_COLLECTION)
 document_store = DocumentStore(
     db=chromadb,
     embeddings_generator=OpenAIGenerator(),
+    file_loader_callback=upload_callback
 )
 
 # populate database with document embeddings if collection empty
 if document_store.is_collection_empty():
-    document_store.load_document(pathname=DOCUMENTS_TO_EMBED, max_words=256)
+    all_files_in_path = PATH_TO_DOCUMENTS + '*'
+    document_store.load_document(pathname=all_files_in_path, max_words=256)
 
 DEBUG_STREAM = os.environ.get("DEBUG_STREAM", False)
 
@@ -55,7 +69,7 @@ sentry_config = SentryConfig(
     dns=os.environ.get("SENTRY_DSN"),
     level=os.environ.get("SENTRY_LOGGING_LEVEL"),
     event_level=os.environ.get("SENTRY_EVENT_LEVEL"),
-    trace_sample_rate=float(os.environ.get("SENTRY_TRACE_SAMPLE_RATE", 0.0),),
+    trace_sample_rate=float(os.environ.get("SENTRY_TRACE_SAMPLE_RATE", 0.0)),
     environment=os.environ.get("SENTRY_ENVIRONMENT", "development")
 )
 sentry_config.initialize()
@@ -108,7 +122,7 @@ async def on_message(message: str):
     cl_messages_map: Dict[str, cl.Message] = {}
 
     if message.startswith("/"):
-        response = commands.registry.execute(message)
+        response = await commands.registry.execute(message)
         return await cl.Message(content=response).send()
 
     async for output in stream(message):

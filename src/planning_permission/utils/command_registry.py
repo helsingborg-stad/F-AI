@@ -1,3 +1,4 @@
+import asyncio
 from abc import ABC, abstractmethod
 import argparse
 import shlex
@@ -53,7 +54,7 @@ class CommandRegistry:
     def set_default_command(self, func: Callable):
         self.default_command = func
 
-    def execute(self, command_string: str) -> str:
+    async def execute(self, command_string: str) -> str:
         if not command_string.startswith('/'):
             if self.default_command:
                 return self.default_command(command_string)
@@ -74,7 +75,10 @@ class CommandRegistry:
 
         try:
             parsed_args = command['parser'].parse_args(command_args)
-            return command['function'](**vars(parsed_args))
+            result = command['function'](**vars(parsed_args))
+            if asyncio.iscoroutine(result):
+                return await result  # await the result if it's a coroutine, handles async functions
+            return result
         except Exception as e:
             return str(e)
 

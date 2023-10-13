@@ -1,4 +1,6 @@
+import asyncio
 import os
+import time
 from typing import AsyncGenerator, Any
 from .database import AbstractEmbeddingsDatabase
 from planning_permission.utils.embeddings_handler import AbstractEmbeddingsGenerator, Embeddings
@@ -43,9 +45,11 @@ class DocumentStore(ICommandSetup):
     def __init__(
             self, db: AbstractEmbeddingsDatabase,
             embeddings_generator: AbstractEmbeddingsGenerator,
+            file_loader_callback
     ):
         self.embeddings_db = db
         self.embeddings_generator = embeddings_generator
+        self.file_loader_callback = file_loader_callback
 
     def is_collection_empty(self):
         return self.embeddings_db.is_collection_empty()
@@ -86,5 +90,17 @@ class DocumentStore(ICommandSetup):
 
         return f"Invalid embeddings command: {option} {parameter}"
 
+    def file_commands(self, option: str) -> str:
+        handlers = {
+            "upload": lambda: (asyncio.run(self.file_loader_callback()), "Upload complete")[1],
+        }
+        handlers = handlers.get(option)
+
+        if handlers:
+            return handlers()
+
+        return f"Invalid file command: {option}"
+
     def register_commands(self, command_registry: CommandRegistry):
         command_registry.command('embeddings')(self.embedding_commands)
+        command_registry.command('file')(self.file_commands)
