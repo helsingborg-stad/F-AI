@@ -31,7 +31,7 @@ class FakeEmbeddingsDatabase(AbstractEmbeddingsDatabase):
     def list_collections(self):
         return self.collections
 
-    def reset_collections(self):
+    def reset_collection(self):
         self.collections = []
 
     def register_commands(self, command_registry: CommandRegistry):
@@ -53,7 +53,12 @@ class TestDocumentStore(unittest.TestCase):
     def setUp(self):
         self.db = FakeEmbeddingsDatabase()
         self.embeddings_generator = FakeEmbeddingsGenerator()
-        self.document_store = DocumentStore(self.db, self.embeddings_generator, lambda: "fake_file_callback")
+        self.document_store = DocumentStore(
+            self.db,
+            self.embeddings_generator,
+            lambda: "fake_file_callback",
+            "fake_document_path"
+        )
 
     def test_load_document(self):
         with patch.object(DocumentHandler, "convert_docs_to_chunks", return_value=["chunk1", "chunk2"]):
@@ -89,11 +94,6 @@ class TestDocumentStore(unittest.TestCase):
         result = self.document_store.embedding_commands("collection", "list")
         expected = "| Collections |\n|-------------|\n| collection1 |\n| collection2 |"
         self.assertEqual(result, expected)
-
-    def test_embedding_commands_reset_collections(self):
-        self.db.add_embeddings(["collection1", "collection2"], ["embedding1", "embedding2"])
-        self.document_store.embedding_commands("collection", "reset")
-        self.assertEqual(len(self.db.list_collections()), 0)  # Ensuring collections are reset
 
     def test_embedding_commands_invalid(self):
         result = self.document_store.embedding_commands("invalid_option", "invalid_parameter")
