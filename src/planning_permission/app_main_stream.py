@@ -46,13 +46,13 @@ chromadb = ChromaDB(DB_DIRECTORY, DB_COLLECTION)
 document_store = DocumentStore(
     db=chromadb,
     embeddings_generator=OpenAIGenerator(),
-    file_loader_callback=upload_callback
+    file_loader_callback=upload_callback,
+    document_path=PATH_TO_DOCUMENTS
 )
 
 # populate database with document embeddings if collection empty
 if document_store.is_collection_empty():
-    all_files_in_path = PATH_TO_DOCUMENTS + '*'
-    document_store.load_document(pathname=all_files_in_path, max_words=256)
+    document_store.load_all_documents_in_path()
 
 DEBUG_STREAM = os.environ.get("DEBUG_STREAM", False)
 
