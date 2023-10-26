@@ -1,3 +1,4 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Any, AsyncGenerator
@@ -85,7 +86,7 @@ class AbstractEmbeddingsDatabase(ABC):
         pass
 
     @abstractmethod
-    def reset_collections(self):
+    def reset_collection(self):
         """
         Resets all the collections in the database.
 
@@ -128,6 +129,18 @@ class AbstractEmbeddingsDatabase(ABC):
         """
         pass
 
+    @abstractmethod
+    def create_collection(self, collection_name: str):
+        """
+        Creates a new collection in the database.
+
+        Parameters
+        ----------
+        collection_name : str
+            The name of the collection to create.
+        """
+        pass
+
 
 class ChromaDB(AbstractEmbeddingsDatabase):
     """
@@ -160,7 +173,8 @@ class ChromaDB(AbstractEmbeddingsDatabase):
                 allow_reset=True
             )
         )
-        self.collection = self.client.get_or_create_collection(collection_name)
+        self.collection_name = collection_name
+        self.collection = self.client.get_or_create_collection(self.collection_name)
 
     def is_collection_empty(self):
         return self.collection.count() == 0
@@ -184,11 +198,15 @@ class ChromaDB(AbstractEmbeddingsDatabase):
     def list_collections(self):
         return self.client.list_collections()
 
-    def reset_collections(self):
+    def reset_collection(self):
         self.client.reset()
+        self.collection = self.client.get_or_create_collection(self.collection_name)
 
     def delete_collection(self, collection_name: str):
         self.client.delete_collection(collection_name)
 
     def get_or_create_collection(self, collection_name: str):
         return self.client.get_or_create_collection(collection_name)
+
+    def create_collection(self, collection_name: str):
+        self.client.create_collection(collection_name)

@@ -1,9 +1,7 @@
 import asyncio
-import os
-import time
 from typing import AsyncGenerator, Any
 from .database import AbstractEmbeddingsDatabase
-from planning_permission.utils.embeddings_handler import AbstractEmbeddingsGenerator, Embeddings
+from planning_permission.utils.embeddings_handler import AbstractEmbeddingsGenerator, Embeddings, OpenAIGenerator
 from planning_permission.utils.file_handler import DocumentHandler, DocumentParserFactory
 from planning_permission.utils.command_registry import ICommandSetup, CommandRegistry
 from planning_permission.utils.markdown import MarkdownFormatter
@@ -40,16 +38,24 @@ class DocumentStore(ICommandSetup):
 
     query(query: str, n_results: int) -> AsyncGenerator[str, Any]:
         Queries the database with the given query and returns the results as an async generator.
+
+    load_all_documents_in_path() -> None:
+        Loads all documents in the document path into the database.
+
+    reload_documents() -> None:
+        Reloads all documents in the document path into the database.
     """
 
     def __init__(
             self, db: AbstractEmbeddingsDatabase,
             embeddings_generator: AbstractEmbeddingsGenerator,
-            file_loader_callback
+            file_loader_callback,
+            document_path: str
     ):
         self.embeddings_db = db
         self.embeddings_generator = embeddings_generator
         self.file_loader_callback = file_loader_callback
+        self.document_path = document_path
 
     def is_collection_empty(self):
         return self.embeddings_db.is_collection_empty()
@@ -73,6 +79,14 @@ class DocumentStore(ICommandSetup):
         query_as_embedding = self.embeddings_generator.create_embeddings(query)
         return self.embeddings_db.query_embedding(query_as_embedding, n_results)
 
+    def load_all_documents_in_path(self) -> None:
+        all_dokuments_in_path = self.document_path + '*'
+        self.load_document(pathname=all_dokuments_in_path, max_words=256)
+
+    def reload_documents(self) -> None:
+        self.embeddings_db.reset_collection()
+        self.load_all_documents_in_path()
+
     def embedding_commands(self, option: str, parameter: str) -> str:
         handlers = {
             "collection": {
@@ -80,7 +94,7 @@ class DocumentStore(ICommandSetup):
                     "Collections",
                     list(self.embeddings_db.list_collections())
                 ),
-                "reset": lambda: (self.embeddings_db.reset_collections(), "Collections reset")[1],
+                "reload": lambda: (self.reload_documents(), "Reloaded documents into database")[1],
             }
         }
         handler = handlers.get(option, {}).get(parameter)
