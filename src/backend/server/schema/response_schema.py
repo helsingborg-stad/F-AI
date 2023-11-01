@@ -1,25 +1,28 @@
-from ..common.output import OutputTimestamp
+from datetime import datetime
+from pydantic import BaseModel, Field
+from typing import List
 
 
-from pydantic import BaseModel
-
-
-from typing import List, Optional
+class OutputTimestamp(BaseModel):
+    created: datetime = Field(default_factory=datetime.now)
+    modified: datetime = Field(default_factory=datetime.now)
 
 
 class OutputFeedback(BaseModel):
     user: str
     rating: str
-    comment: Optional[str] = None
+    comment: str = Field(default=None)
     timestamp: OutputTimestamp = OutputTimestamp()
+
 
 class OutputMessageUserPermission(BaseModel):
     can_feedback: bool = False
 
+
 class OutputMessage(BaseModel):
     user: str
     content: str
-    feedback: Optional[List[OutputFeedback]] = []
+    feedback: List[OutputFeedback] = Field(default=[])
     timestamp: OutputTimestamp = OutputTimestamp()
     user_permissions: OutputMessageUserPermission = OutputMessageUserPermission()
 
@@ -36,5 +39,6 @@ class OutputConversation(BaseModel):
     participants: List[str]
     messages: List[OutputMessage]
     timestamp: OutputTimestamp = OutputTimestamp()
-    user_permissions: OutputConversationUserPermissions = OutputConversationUserPermissions()
-    
+    user_permissions: OutputConversationUserPermissions = (
+        OutputConversationUserPermissions()
+    )

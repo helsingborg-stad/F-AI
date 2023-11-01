@@ -1,13 +1,14 @@
 from dataclasses import dataclass
-from pydantic import BaseModel
-from .model.conversation import ConversationRepositoryModel
+from .model.conversation_repository import ConversationRepositoryModel
 from .mongodb_conversation import ConversationRepository as MongoConversationRepository
 
+
 @dataclass
-class Repository():
+class Repository:
     conversations: ConversationRepositoryModel
-    
-def create_repository()->Repository:
+
+
+def create_repository() -> Repository:
     return Repository(
         conversations=MongoConversationRepository(),
     )

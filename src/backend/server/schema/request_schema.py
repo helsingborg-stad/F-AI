@@ -1,19 +1,18 @@
+from pydantic import BaseModel, Field
 
 
-from pydantic import BaseModel
-
-
-from typing import List, Optional
+from typing import List
 
 
 class InputFeedback(BaseModel):
-    comment: Optional[str] = None
+    comment: str = Field(default=None)
     rating: str
+
 
 class InputMessage(BaseModel):
     user: str
     content: str
 
+
 class InputConversation(BaseModel):
     messages: List[InputMessage]
-
