@@ -67,8 +67,8 @@ logger_config = LoggerConfig(
 
 sentry_config = SentryConfig(
     dns=os.environ.get("SENTRY_DSN"),
-    level=os.environ.get("SENTRY_LOGGING_LEVEL"),
-    event_level=os.environ.get("SENTRY_EVENT_LEVEL"),
+    level=os.environ.get("SENTRY_LOGGING_LEVEL", "ERROR"),
+    event_level=os.environ.get("SENTRY_EVENT_LEVEL", "ERROR"),
     trace_sample_rate=float(os.environ.get("SENTRY_TRACE_SAMPLE_RATE", 0.0)),
     environment=os.environ.get("SENTRY_ENVIRONMENT", "development")
 )
