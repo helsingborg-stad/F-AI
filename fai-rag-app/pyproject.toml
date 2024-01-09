@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "fai-rag-app"
+version = "0.1.0"
+description = ""
+authors = ["Nikolas Ramstedt <nikolas.ramstedt@helsingborg.se>", "Ehsan Zilaei <ehsan.zilaei@helsingborg.se>"]
+readme = "README.md"
+
+[tool.ruff]
+line-length = 120
+extend-select = ["Q", "RUF100", "UP", "I"]
+flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
+format.quote-style = "single"
+target-version = "py311"
+
+[tool.pyright]
+include = ["fai-backend/fai_backend"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "fai-backend/tests"
+]
+
+[tool.coverage.run]
+source = ["fai-backend"]
+omit = []
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fai-backend = { path = "./fai-backend" }
+ruff = "^0.1.11"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

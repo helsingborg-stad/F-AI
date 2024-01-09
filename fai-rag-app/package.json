@@ -1,0 +1,17 @@
+{
+  "name": "fai-rag-app",
+  "author": "Nikolas Ramstedt <nikolas.ramstedt@helsingborg.se> (https://github.com/helsingborg-stad/)",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "fai-frontend"
+  ],
+  "scripts": {
+    "dev": "npm run --woorkspace=fai-frontend dev",
+    "build": "npm run --woorkspace=fai-frontend build",
+    "watch": "npm run --woorkspace=fai-frontend watch",
+    "preview": "npm run --woorkspace=fai-frontend preview",
+    "check": "npm run --woorkspace=fai-frontend check"
+  },
+  "license": "ISC"
+}
