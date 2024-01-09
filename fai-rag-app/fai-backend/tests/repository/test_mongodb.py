@@ -2,8 +2,9 @@ import pytest
 import pytest_asyncio
 from beanie import Document, init_beanie
 from bson import ObjectId
-from fai_backend.repository.mongodb import MongoDBRepo
 from mongomock_motor import AsyncMongoMockClient
+
+from fai_backend.repository.mongodb import MongoDBRepo
 
 
 class SampleDocument(Document):

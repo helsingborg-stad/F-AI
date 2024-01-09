@@ -1,18 +1,18 @@
-from typing import Dict, Generic, Optional, TypeVar, Type, List
+from typing import Generic, Optional, TypeVar
 
 from beanie import Document, PydanticObjectId
 from bson.errors import InvalidId
 
 from fai_backend.repository.interface import IAsyncRepo
 
-T = TypeVar("T", bound=Document)
+T = TypeVar('T', bound=Document)
 
 
 class MongoDBRepo(Generic[T], IAsyncRepo[T]):
-    def __init__(self, document_model: Type[T]):
+    def __init__(self, document_model: type[T]):
         self.model = document_model
 
-    async def list(self) -> List[T]:
+    async def list(self) -> list[T]:
         return await self.model.all().to_list()
 
     async def create(self, item: T) -> T:
@@ -27,7 +27,7 @@ class MongoDBRepo(Generic[T], IAsyncRepo[T]):
         except InvalidId:
             return None
 
-    async def update(self, item_id: str, item_data: Dict) -> Optional[T]:
+    async def update(self, item_id: str, item_data: dict) -> Optional[T]:
         object_id = self._str_to_object_id(item_id)
         item = await self.model.find_one(self.model.id == object_id)
         if item:

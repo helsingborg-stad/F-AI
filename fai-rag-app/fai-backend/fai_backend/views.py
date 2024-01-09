@@ -1,25 +1,26 @@
-from fastui import AnyComponent, components as c
+from fastui import AnyComponent
+from fastui import components as c
 from fastui.events import GoToEvent
 
 
 def page_template(
-    *components: AnyComponent,
-    title: str | None = None,
+        *components: AnyComponent,
+        title: str | None = None,
 ) -> list[AnyComponent]:
     return [
-        c.PageTitle(text=f"FastUI Demo — {title}" if title else "FastUI Demo"),
+        c.PageTitle(text=f'FastUI Demo — {title}' if title else 'FastUI Demo'),
         c.Navbar(
-            title="Folkets Ai",
-            title_event=GoToEvent(url="/"),
+            title='Folkets Ai',
+            title_event=GoToEvent(url='/'),
             links=[
                 c.Link(
-                    components=[c.Text(text="Conversations")],
-                    on_click=GoToEvent(url="/conversations"),
-                    active="startswith:/components",
+                    components=[c.Text(text='Conversations')],
+                    on_click=GoToEvent(url='/conversations'),
+                    active='startswith:/components',
                 ),
                 c.Link(
-                    components=[c.Text(text="Logga ut")],
-                    on_click=GoToEvent(url="/logout"),
+                    components=[c.Text(text='Logga ut')],
+                    on_click=GoToEvent(url='/logout'),
                 ),
             ],
         ),
@@ -30,7 +31,7 @@ def page_template(
             ],
         ),
         c.Footer(
-            extra_text="Folkets AI",
+            extra_text='Folkets AI',
             links=[],
         ),
     ]

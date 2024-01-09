@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import BaseModel, Field
 
 from fai_backend.schema import Timestamp
@@ -19,7 +17,7 @@ class ResponseMessageUserPermission(BaseModel):
 class ResponseMessage(BaseModel):
     user: str
     content: str
-    feedback: List[ResponseFeedback] = Field(default=[])
+    feedback: list[ResponseFeedback] = Field(default=[])
     timestamp: Timestamp = Timestamp()
     user_permissions: ResponseMessageUserPermission = ResponseMessageUserPermission()
 
@@ -33,8 +31,8 @@ class ResponseConversationUserPermissions(BaseModel):
 class ResponseConversation(BaseModel):
     id: str
     created_by: str
-    participants: List[str]
-    messages: List[ResponseMessage]
+    participants: list[str]
+    messages: list[ResponseMessage]
     timestamp: Timestamp = Timestamp()
     user_permissions: ResponseConversationUserPermissions = (
         ResponseConversationUserPermissions()
@@ -52,5 +50,5 @@ class RequestMessage(BaseModel):
 
 
 class RequestConversation(BaseModel):
-    messages: List[RequestMessage]
+    messages: list[RequestMessage]
     project_id: str

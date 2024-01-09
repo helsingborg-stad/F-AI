@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -14,13 +14,13 @@ class InputFeedbackModel(BaseModel):
 class InputMessageModel(BaseModel):
     user: str
     content: str
-    feedback: Optional[List[InputFeedbackModel]] = []
+    feedback: Optional[list[InputFeedbackModel]] = []
 
 
 class InputConversationModel(BaseModel):
     created_by: str
-    messages: List[InputMessageModel]
-    participants: List[str]
+    messages: list[InputMessageModel]
+    participants: list[str]
 
 
 class FeedbackModel(BaseModel):
@@ -33,13 +33,13 @@ class FeedbackModel(BaseModel):
 class MessageModel(BaseModel):
     user: str
     content: str
-    feedback: Optional[List[FeedbackModel]] = []
+    feedback: Optional[list[FeedbackModel]] = []
     timestamp: Timestamp = Timestamp()
 
 
 class ConversationModel(BaseModel):
     id: str
     created_by: str
-    participants: List[str]
-    messages: List[MessageModel]
+    participants: list[str]
+    messages: list[MessageModel]
     timestamp: Timestamp = Timestamp()

@@ -1,11 +1,11 @@
 from typing import Optional
 
 from fai_backend.projects.schema import (
+    Project,
     ProjectCreateRequest,
     ProjectUpdateRequest,
-    Project,
 )
-from fai_backend.repositories import ProjectRepository, ProjectModel
+from fai_backend.repositories import ProjectModel, ProjectRepository
 
 
 class ProjectService:
@@ -24,15 +24,15 @@ class ProjectService:
         return await self.repo.get(project_id)
 
     async def update_project(self, project_id: str, project: ProjectUpdateRequest):
-        ignore_keys = ["id", "timestamp"]
+        ignore_keys = ['id', 'timestamp']
         return await self.repo.update(
             project_id,
             {
                 key: project.model_dump()[key]
                 for key in filter(
-                    lambda key: key not in ignore_keys,
-                    project.model_dump().keys(),
-                )
+                lambda key: key not in ignore_keys,
+                project.model_dump().keys(),
+            )
             },
         )
 

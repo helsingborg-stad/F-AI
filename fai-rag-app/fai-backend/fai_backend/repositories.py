@@ -1,5 +1,5 @@
 import time
-from typing import Protocol, Optional
+from typing import Optional, Protocol
 
 from beanie import Document, Indexed
 from pydantic import BaseModel, EmailStr, Field
@@ -7,14 +7,15 @@ from pydantic import BaseModel, EmailStr, Field
 from fai_backend.conversations.models import ConversationModel
 from fai_backend.projects.schema import Project
 from fai_backend.repository.composite import CompositeRepo
-from fai_backend.repository.factory import factory as repo_factory, create_repo_from_env
+from fai_backend.repository.factory import create_repo_from_env
+from fai_backend.repository.factory import factory as repo_factory
 from fai_backend.repository.interface import IAsyncRepo
-from fai_backend.schema import User, ProjectUserRole
+from fai_backend.schema import ProjectUserRole, User
 
 
 class ProjectModel(Document, Project):
     class Settings:
-        name = "projects"
+        name = 'projects'
         use_state_management = True
 
 
@@ -48,7 +49,7 @@ class UserRepoImp(UserRepository, CompositeRepo[ProjectModel]):
         ]
 
         def user_projects_to_user_roles(
-            project_list: list[Project],
+                project_list: list[Project],
         ) -> list[ProjectUserRole]:
             return [
                 ProjectUserRole(
@@ -58,13 +59,13 @@ class UserRepoImp(UserRepository, CompositeRepo[ProjectModel]):
                         for member in project.members
                         if member.email == email
                     ),
-                    permissions=(project.model_dump())["roles"][
+                    permissions=(project.model_dump())['roles'][
                         next(
                             member.role
                             for member in project.members
                             if member.email == email
                         )
-                    ]["permissions"],
+                    ]['permissions'],
                 )
                 for project in project_list
             ]
@@ -95,7 +96,7 @@ class PinCodeModel(Document):
     )
 
     class Settings:
-        name = "pin"
+        name = 'pin'
 
 
 class PinCodeRepository(IAsyncRepo[PinCodeModel]):
@@ -104,7 +105,7 @@ class PinCodeRepository(IAsyncRepo[PinCodeModel]):
 
 class ConversationDocument(ConversationModel, Document):
     class Settings:
-        name = "conversations"
+        name = 'conversations'
 
 
 class ConversationRepository(IAsyncRepo[ConversationDocument]):

@@ -1,7 +1,6 @@
 from datetime import datetime
-from typing import Dict
 
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class Timestamp(BaseModel):
@@ -12,7 +11,7 @@ class Timestamp(BaseModel):
 class ProjectUserRole(BaseModel):
     role: str
     project_id: str
-    permissions: Dict[str, bool] = Field(..., default_factory=dict)
+    permissions: dict[str, bool] = Field(..., default_factory=dict)
 
 
 class User(BaseModel):
@@ -24,4 +23,4 @@ class ProjectUser(BaseModel):
     email: EmailStr
     role: str
     project_id: str
-    permissions: Dict[str, bool] = Field(..., default_factory=dict)
+    permissions: dict[str, bool] = Field(..., default_factory=dict)

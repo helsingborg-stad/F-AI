@@ -5,15 +5,15 @@ from pydantic import EmailStr, SecretStr
 
 from fai_backend.auth.schema import ResponseToken
 from fai_backend.auth.security import (
-    get_password_hash,
-    verify_password,
+    access_security,
     create_access_token,
     create_refresh_token,
     generate_pin_code,
-    access_security,
+    get_password_hash,
     refresh_security,
+    verify_password,
 )
-from fai_backend.repositories import UserRepository, PinCodeRepository, PinCodeModel
+from fai_backend.repositories import PinCodeModel, PinCodeRepository, UserRepository
 
 
 class AuthService:
@@ -40,7 +40,7 @@ class AuthService:
                 hashed_pin=get_password_hash(generated_pin),
             )
         )
-        return session.model_dump()["id"]
+        return session.model_dump()['id']
 
     async def validate_pin(self, session_id, pin: SecretStr):
         session = await self.pins_repo.get(session_id)
@@ -50,7 +50,7 @@ class AuthService:
         return False
 
     async def exchange_pin_for_token(
-        self, session_id, pin: SecretStr, response: Optional[Response] = None
+            self, session_id, pin: SecretStr, response: Optional[Response] = None
     ) -> Optional[ResponseToken]:
         session = (
             await self.pins_repo.get(session_id)
@@ -65,7 +65,7 @@ class AuthService:
         return None
 
     async def create_token(self, email, response: Optional[Response] = None):
-        subject = {"email": email}
+        subject = {'email': email}
         token = ResponseToken(
             access_token=create_access_token(subject),
             refresh_token=create_refresh_token(subject),

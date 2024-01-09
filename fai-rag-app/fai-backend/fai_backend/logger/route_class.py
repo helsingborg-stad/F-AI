@@ -1,8 +1,8 @@
 import json
 import logging
-from typing import Callable
+from collections.abc import Callable
 
-from fastapi import Response, Request
+from fastapi import Request, Response
 from fastapi.routing import APIRoute
 from starlette.background import BackgroundTask
 from starlette.responses import StreamingResponse
@@ -10,7 +10,7 @@ from starlette.responses import StreamingResponse
 
 class APIRouter(APIRoute):
     def __init__(self, *args, **kwargs):
-        self.logger = logging.getLogger("rich")
+        self.logger = logging.getLogger('rich')
         super().__init__(*args, **kwargs)
 
     def get_route_handler(self) -> Callable:
@@ -40,14 +40,14 @@ class APIRouter(APIRoute):
         return custom_route_handler
 
     async def handle_streaming_response(
-        self, request: Request, response: StreamingResponse
+            self, request: Request, response: StreamingResponse
     ) -> Response:
         async def log_streaming_response(response_body: bytes):
             # This function will log the streaming response
             self.logger.info(f'Streaming Response: {response_body.decode("utf-8")}')
 
         # Create a background task for logging the streaming response
-        task = BackgroundTask(log_streaming_response, response_body=b"")
+        task = BackgroundTask(log_streaming_response, response_body=b'')
         return StreamingResponse(
             content=response.body_iterator,
             status_code=response.status_code,

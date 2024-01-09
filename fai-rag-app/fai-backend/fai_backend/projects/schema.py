@@ -1,6 +1,5 @@
-from typing import List, Dict
 
-from pydantic import BaseModel, Field, EmailStr, SecretStr, field_serializer
+from pydantic import BaseModel, EmailStr, Field, SecretStr, field_serializer
 
 from fai_backend.schema import Timestamp
 
@@ -11,30 +10,30 @@ class ProjectMember(BaseModel):
 
 
 class ProjectRole(BaseModel):
-    permissions: Dict[str, bool] = Field(..., default_factory=dict)
+    permissions: dict[str, bool] = Field(..., default_factory=dict)
 
 
 class Project(BaseModel):
     id: str
     name: str
-    type: str = "project"
+    type: str = 'project'
     creator: EmailStr
-    description: str = ""
+    description: str = ''
     timestamp: Timestamp = Timestamp()
-    members: List[ProjectMember] = Field(..., default_factory=list)
-    roles: Dict[str, ProjectRole] = Field(..., default_factory=dict)
-    secrets: Dict[str, SecretStr] = Field(..., default_factory=dict)
-    meta: Dict[str, str] = Field(..., default_factory=dict)
+    members: list[ProjectMember] = Field(..., default_factory=list)
+    roles: dict[str, ProjectRole] = Field(..., default_factory=dict)
+    secrets: dict[str, SecretStr] = Field(..., default_factory=dict)
+    meta: dict[str, str] = Field(..., default_factory=dict)
 
 
 class ProjectCreateRequest(BaseModel):
     name: str
-    description: str = ""
+    description: str = ''
     creator: EmailStr
-    members: List[ProjectMember] = Field(..., default_factory=list)
-    roles: Dict[str, ProjectRole] = Field(..., default_factory=dict)
-    secrets: Dict[str, SecretStr] = Field(..., default_factory=dict)
-    meta: Dict[str, str] = Field(..., default_factory=dict)
+    members: list[ProjectMember] = Field(..., default_factory=list)
+    roles: dict[str, ProjectRole] = Field(..., default_factory=dict)
+    secrets: dict[str, SecretStr] = Field(..., default_factory=dict)
+    meta: dict[str, str] = Field(..., default_factory=dict)
 
 
 class ProjectResponse(BaseModel):
@@ -42,14 +41,14 @@ class ProjectResponse(BaseModel):
     name: str
     type: str
     creator: EmailStr
-    description: str = ""
+    description: str = ''
     timestamp: Timestamp
-    members: List[ProjectMember] = Field(..., default_factory=list)
-    roles: Dict[str, ProjectRole] = Field(..., default_factory=dict)
-    secrets: Dict[str, SecretStr] = Field(..., default_factory=dict)
-    meta: Dict[str, str] = Field(..., default_factory=dict)
+    members: list[ProjectMember] = Field(..., default_factory=list)
+    roles: dict[str, ProjectRole] = Field(..., default_factory=dict)
+    secrets: dict[str, SecretStr] = Field(..., default_factory=dict)
+    meta: dict[str, str] = Field(..., default_factory=dict)
 
-    @field_serializer("secrets", when_used="json")
+    @field_serializer('secrets', when_used='json')
     def dump_secret(self, v):
         return {k: v[k].get_secret_value() for k in v}
 

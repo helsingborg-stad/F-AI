@@ -12,8 +12,8 @@ from fai_backend.schema import User
 
 
 async def try_get_authenticated_user(
-    payload: Optional[TokenPayload] = Security(try_get_access_token_payload),
-    auth_service: AuthService = Depends(get_auth_service),
+        payload: Optional[TokenPayload] = Security(try_get_access_token_payload),
+        auth_service: AuthService = Depends(get_auth_service),
 ) -> Optional[User]:
     try:
         return await auth_service.users_repo.get_user_by_email(payload.email)
@@ -22,8 +22,8 @@ async def try_get_authenticated_user(
 
 
 async def get_authenticated_user(
-    user: Optional[User] = Depends(try_get_authenticated_user),
+        user: Optional[User] = Depends(try_get_authenticated_user),
 ) -> User:
     if not user:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+        raise HTTPException(status_code=401, detail='Unauthorized')
     return user

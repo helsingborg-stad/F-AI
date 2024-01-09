@@ -1,12 +1,12 @@
-from typing import List, Dict, Optional, TypeVar, Generic
+from typing import Generic, Optional, TypeVar
 
 from fai_backend.repository.interface import IAsyncRepo
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class CompositeRepo(Generic[T], IAsyncRepo[T]):
-    def __init__(self, repos: List[IAsyncRepo[T]]):
+    def __init__(self, repos: list[IAsyncRepo[T]]):
         self._repos = repos
 
     async def get(self, item_id: str) -> Optional[T]:
@@ -16,7 +16,7 @@ class CompositeRepo(Generic[T], IAsyncRepo[T]):
                 return item
         return None
 
-    async def list(self) -> List[T]:
+    async def list(self) -> list[T]:
         all_items = []
         for repo in self._repos:
             items = await repo.list()
@@ -31,7 +31,7 @@ class CompositeRepo(Generic[T], IAsyncRepo[T]):
                 continue
         return None
 
-    async def update(self, item_id: str, item: Dict) -> Optional[T]:
+    async def update(self, item_id: str, item: dict) -> Optional[T]:
         for repo in self._repos:
             try:
                 updated_item = await repo.update(item_id, item)

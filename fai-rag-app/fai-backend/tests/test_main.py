@@ -1,5 +1,6 @@
-from fai_backend.main import app
 from fastapi.testclient import TestClient
+
+from fai_backend.main import app
 
 app.dependency_overrides = {'jwt_access_auth_old': lambda: 'lol'}
 client = TestClient(app)

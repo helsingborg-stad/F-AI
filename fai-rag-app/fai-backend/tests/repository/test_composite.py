@@ -1,7 +1,8 @@
 import pytest
+from pydantic import BaseModel
+
 from fai_backend.repository.composite import CompositeRepo
 from fai_backend.repository.memory import InMemoryRepo
-from pydantic import BaseModel
 
 
 class Item(BaseModel):

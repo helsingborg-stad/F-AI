@@ -8,9 +8,9 @@ from fai_backend.logger.console import console
 
 def setup_logger():
     logging.basicConfig(
-        level="DEBUG",
-        format=" %(message)s",
-        datefmt="[%X]",
+        level='DEBUG',
+        format=' %(message)s',
+        datefmt='[%X]',
         handlers=[
             RichHandler(
                 show_time=False, console=console, tracebacks_suppress=[bcrypt._bcrypt]
@@ -18,4 +18,4 @@ def setup_logger():
         ],
     )
 
-    return logging.getLogger("rich")
+    return logging.getLogger('rich')

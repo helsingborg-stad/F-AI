@@ -11,6 +11,8 @@ async def remove_trailing_slash(request: Request, call_next):
                 new_path += f'?{request.query_params}'
             return RedirectResponse(url=new_path, status_code=301)
         else:
-            raise HTTPException(status_code=307, detail='Trailing slash on non-GET request not allowed')
+            raise HTTPException(
+                status_code=307, detail='Trailing slash on non-GET request not allowed'
+            )
     response = await call_next(request)
     return response
