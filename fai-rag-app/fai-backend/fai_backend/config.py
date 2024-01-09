@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic_settings import BaseSettings
 
 
@@ -12,7 +10,7 @@ class Settings(BaseSettings):
 
     MONGO_DB_NAME: str
     MONGO_DB_URI: str = 'mongodb://localhost:27017'
-    FIXED_PIN: Optional[int]
+    FIXED_PIN: int | None = None
 
     APP_PROJECT_NAME: str
     APP_ADMIN_EMAIL: str

@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import TypeVar, Union
+from typing import TypeVar
 
 from fai_backend.config import settings
 from fai_backend.repository.interface import IAsyncRepo
@@ -15,7 +15,7 @@ class RepositoryFactory:
 
     def register_builder(
             self,
-            builder_info: Union[dict[type[T], Callable[[], T]], type[T], Callable[[], T]],
+            builder_info: dict[type[T], Callable[[], T]] | type[T] | Callable[[], T],
     ):
         if isinstance(builder_info, dict):
             for type_, builder in builder_info.items():

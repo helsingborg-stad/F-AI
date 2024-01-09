@@ -1,4 +1,4 @@
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from fai_backend.repository.interface import IAsyncRepo
 
@@ -16,13 +16,13 @@ class InMemoryRepo(Generic[T], IAsyncRepo[T]):
         self._items[self._current_id] = item
         return item
 
-    async def get(self, item_id: str) -> Optional[T]:
+    async def get(self, item_id: str) -> T | None:
         return self._items.get(int(item_id))
 
     async def list(self) -> list[T]:
         return list(self._items.values())
 
-    async def update(self, item_id: str, item_data: dict) -> Optional[T]:
+    async def update(self, item_id: str, item_data: dict) -> T | None:
         if int(item_id) in self._items:
             item = self._items[int(item_id)]
             for key, value in item_data.items():
@@ -30,5 +30,5 @@ class InMemoryRepo(Generic[T], IAsyncRepo[T]):
             return item
         return None
 
-    async def delete(self, item_id: str) -> Optional[T]:
+    async def delete(self, item_id: str) -> T | None:
         return self._items.pop(int(item_id), None)

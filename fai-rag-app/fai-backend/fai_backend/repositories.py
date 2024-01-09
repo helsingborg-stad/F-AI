@@ -1,5 +1,5 @@
 import time
-from typing import Optional, Protocol
+from typing import Protocol
 
 from beanie import Document, Indexed
 from pydantic import BaseModel, EmailStr, Field
@@ -40,7 +40,7 @@ class UserRepoImp(UserRepository, CompositeRepo[ProjectModel]):
             for member in project.members
         ]
 
-    async def get_user_by_email(self, email: str) -> Optional[User]:
+    async def get_user_by_email(self, email: str) -> User | None:
         projects = await self.list()
         user_projects = [
             project

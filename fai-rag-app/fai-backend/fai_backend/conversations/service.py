@@ -1,4 +1,3 @@
-from typing import Optional
 
 from pydantic import EmailStr
 
@@ -22,7 +21,7 @@ class ConversationService:
     ) -> ResponseConversation:
         pass
 
-    async def add_feedback(self, message, email, body) -> Optional[ResponseFeedback]:
+    async def add_feedback(self, message, email, body) -> ResponseFeedback | None:
         pass
 
     async def add_message(self, param, email, body) -> list[ResponseMessage]:
@@ -30,7 +29,7 @@ class ConversationService:
 
     async def get_conversation_by_id(
             self, conversation_id
-    ) -> Optional[ResponseConversation]:
+    ) -> ResponseConversation | None:
         pass
 
     async def list_conversations(self) -> list[ResponseConversation]:

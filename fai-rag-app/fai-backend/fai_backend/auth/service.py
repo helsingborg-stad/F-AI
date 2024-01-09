@@ -1,4 +1,3 @@
-from typing import Optional
 
 from fastapi import Response
 from pydantic import EmailStr, SecretStr
@@ -50,8 +49,8 @@ class AuthService:
         return False
 
     async def exchange_pin_for_token(
-            self, session_id, pin: SecretStr, response: Optional[Response] = None
-    ) -> Optional[ResponseToken]:
+            self, session_id, pin: SecretStr, response: Response | None = None
+    ) -> ResponseToken | None:
         session = (
             await self.pins_repo.get(session_id)
             if self.session_exists(session_id)
@@ -64,7 +63,7 @@ class AuthService:
 
         return None
 
-    async def create_token(self, email, response: Optional[Response] = None):
+    async def create_token(self, email, response: Response | None = None):
         subject = {'email': email}
         token = ResponseToken(
             access_token=create_access_token(subject),
@@ -75,5 +74,5 @@ class AuthService:
             refresh_security.set_refresh_cookie(response, token.refresh_token)
         return token
 
-    async def refresh_token(self, email, response: Optional[Response] = None):
+    async def refresh_token(self, email, response: Response | None = None):
         return await self.create_token(email, response)

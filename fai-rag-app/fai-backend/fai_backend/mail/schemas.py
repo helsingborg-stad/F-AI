@@ -1,4 +1,3 @@
-from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
@@ -12,7 +11,7 @@ class EmailSender(BaseModel):
 
 class EmailRecipient(BaseModel):
     email: EmailStr
-    name: Optional[str] = None
+    name: str | None = None
 
 
 class EmailPayload(BaseModel):

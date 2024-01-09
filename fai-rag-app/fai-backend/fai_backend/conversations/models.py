@@ -1,4 +1,3 @@
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -8,13 +7,13 @@ from fai_backend.schema import Timestamp
 class InputFeedbackModel(BaseModel):
     user: str
     rating: str
-    comment: Optional[str] = None
+    comment: str | None = None
 
 
 class InputMessageModel(BaseModel):
     user: str
     content: str
-    feedback: Optional[list[InputFeedbackModel]] = []
+    feedback: list[InputFeedbackModel] | None = []
 
 
 class InputConversationModel(BaseModel):
@@ -26,14 +25,14 @@ class InputConversationModel(BaseModel):
 class FeedbackModel(BaseModel):
     user: str
     rating: str
-    comment: Optional[str] = None
+    comment: str | None = None
     timestamp: Timestamp = Timestamp()
 
 
 class MessageModel(BaseModel):
     user: str
     content: str
-    feedback: Optional[list[FeedbackModel]] = []
+    feedback: list[FeedbackModel] | None = []
     timestamp: Timestamp = Timestamp()
 
 

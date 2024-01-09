@@ -1,4 +1,3 @@
-from typing import Optional
 
 from fai_backend.projects.schema import (
     Project,
@@ -14,7 +13,7 @@ class ProjectService:
     def __init__(self, repo: ProjectRepository):
         self.repo = repo
 
-    async def create_project(self, project: ProjectCreateRequest) -> Optional[Project]:
+    async def create_project(self, project: ProjectCreateRequest) -> Project | None:
         return await self.repo.create(ProjectModel.model_validate(project.model_dump()))
 
     async def read_projects(self, skip: int = 0, limit: int = 100):

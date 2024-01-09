@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import Depends, Form, HTTPException, Response, Security
 from fastapi_jwt import JwtAuthorizationCredentials
@@ -26,13 +26,13 @@ async def get_auth_service() -> AuthService:
     return AuthService(users_repo=users_repo, pins_repo=pins_repo)
 
 
-def try_get_valid_api_key(api_key: str = Security(api_key_header)) -> Optional[str]:
+def try_get_valid_api_key(api_key: str = Security(api_key_header)) -> str | None:
     return api_key if api_key in api_keys else None
 
 
 async def try_get_valid_access_token(
-        credentials: Optional[JwtAuthorizationCredentials] = Security(access_security),
-) -> Optional[JwtAuthorizationCredentials]:
+        credentials: JwtAuthorizationCredentials | None = Security(access_security),
+) -> JwtAuthorizationCredentials | None:
     return credentials
 
 
@@ -43,28 +43,28 @@ async def try_get_valid_refresh_token(
 
 
 def try_get_access_token_payload(
-        credentials: Optional[JwtAuthorizationCredentials] = Security(
+        credentials: JwtAuthorizationCredentials | None = Security(
             try_get_valid_access_token
         ),
-) -> Optional[TokenPayload]:
+) -> TokenPayload | None:
     if credentials:
         return TokenPayload.model_validate(credentials.subject)
     return None
 
 
 def try_get_refresh_token_payload(
-        credentials: Optional[JwtAuthorizationCredentials] = Security(
+        credentials: JwtAuthorizationCredentials | None = Security(
             try_get_valid_access_token
         ),
-) -> Optional[TokenPayload]:
+) -> TokenPayload | None:
     if credentials:
         return TokenPayload.model_validate(credentials.subject)
     return None
 
 
 async def valid_user_email(
-        body: Optional[RequestPin] = None,
-        email: Annotated[Optional[EmailStr], Form()] = None,
+        body: RequestPin | None = None,
+        email: Annotated[EmailStr | None, Form()] = None,
         auth_service: AuthService = Depends(get_auth_service),
 ) -> EmailStr:
     email = body.email if body else email
@@ -75,9 +75,9 @@ async def valid_user_email(
 
 
 async def valid_session_id(
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
         auth_service: AuthService = Depends(get_auth_service),
-) -> Optional[str]:
+) -> str | None:
     if session_id:
         if await auth_service.session_exists(session_id):
             return session_id
@@ -96,9 +96,9 @@ async def make_temporary_pin(
 
 async def try_exchange_pin_for_token(
         response: Response,
-        session_id: Annotated[Optional[str], Form()] = '',
-        pin: Annotated[Optional[SecretStr], Form()] = '',
-        body: Optional[RequestPinVerification] = None,
+        session_id: Annotated[str | None, Form()] = '',
+        pin: Annotated[SecretStr | None, Form()] = '',
+        body: RequestPinVerification | None = None,
         auth_service: AuthService = Depends(get_auth_service),
 ) -> ResponseToken:
     session_id = body.session_id if body else session_id

@@ -1,4 +1,3 @@
-from typing import Optional
 
 from fastapi import Depends, Response
 from fastui import AnyComponent
@@ -81,8 +80,8 @@ def verify_handler(
 
 
 def login_page(
-        session_id: Optional[str] = Depends(valid_session_id),
-        user: Optional[User] = Depends(try_get_authenticated_user),
+        session_id: str | None = Depends(valid_session_id),
+        user: User | None = Depends(try_get_authenticated_user),
 ) -> list[AnyComponent]:
     if user:
         return [c.FireEvent(event=GoToEvent(url='/'))]
@@ -106,7 +105,7 @@ def login_page(
 
 def logout_handler(
         response: Response,
-        user: Optional[User] = Depends(try_get_authenticated_user),
+        user: User | None = Depends(try_get_authenticated_user),
 ) -> list[AnyComponent]:
     if not user:
         return [c.FireEvent(event=GoToEvent(url='/login'))]
