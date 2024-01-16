@@ -106,6 +106,7 @@ async def try_exchange_pin_for_token(
         token = await auth_service.exchange_pin_for_token(session_id, pin, response)
         if not token:
             raise HTTPException(status_code=401, detail='Invalid credentials')
+        return token
     except Exception:
         raise HTTPException(status_code=401, detail='Invalid credentials')
 
