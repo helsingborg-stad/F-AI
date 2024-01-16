@@ -79,7 +79,7 @@ def login_view(
                             components=[
                                 c.Heading(
                                     text='Login',
-                                    class_name='card-title text-4xl font-extrabold text-center mb-2',
+                                    class_name='text-4xl font-extrabold text-center mb-2',
                                 ),
                                 *render_form()
                             ],
