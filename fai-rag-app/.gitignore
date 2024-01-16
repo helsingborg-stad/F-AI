@@ -189,3 +189,4 @@ cython_debug/
 #.idea/
 
 node_modules
+!/fai-frontend/src/lib/
