@@ -1,6 +1,6 @@
 <script lang="ts">
     import type {IComponentDef, IRenderableComponent} from '../types';
-    import toRenderable from '../ComponentFactory';
+    import toRenderable from '../component-factory';
     import {writable} from 'svelte/store';
 
     export let components: IComponentDef[] = [];

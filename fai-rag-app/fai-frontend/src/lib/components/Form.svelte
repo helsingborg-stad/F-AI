@@ -1,7 +1,7 @@
 <script lang="ts">
     import type {IRenderableComponent} from "../types";
     import {createForm} from 'felte';
-    import pageDataStore from "../store/page";
+    import {pageDataStore} from "../store";
 
 
     const responseToFormErrorAdapter = (error: any) => ({
@@ -34,7 +34,7 @@
     let className: string | undefined
 
     export {className as class}
-    export let action: str | undefined
+    export let action: string | undefined
     export let method: "post" | "get" | undefined
     export let components: IRenderableComponent[] = [];
     export let footer: IRenderableComponent[] | undefined = undefined;
