@@ -4,12 +4,10 @@ import type {SvelteComponent} from "svelte";
  * IComponentDef interface represents a base component definition (fetched from server as json).
  * @interface
  * @property {string} type - The type of the component.
- * @property {string} [className] - The optional class name of the component.
  * @property {IComponentDef[]} [components] - The optional array of child component definitions.
  */
 export interface IComponentDef {
     type: string;
-    className?: string;
     components?: IComponentDef[];
 }
 

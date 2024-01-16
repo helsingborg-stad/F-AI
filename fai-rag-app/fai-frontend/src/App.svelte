@@ -1,5 +1,7 @@
 <script lang="ts" context="module">
-    async function fetchRouteData(path: string, searchParams: URLSearchParams) {
+    import type {IComponentDef} from "./lib/types";
+
+    async function fetchRouteData(path: string, searchParams: URLSearchParams): Promise<IComponentDef[]> {
         const response = await fetch(`/api${path + (searchParams?.toString() ? '?' + searchParams.toString() : '')}`);
         if (!response.ok) {
             throw new Error(`Error: ${response.status}`);
@@ -11,7 +13,6 @@
 <script lang="ts">
     import {path, searchParams} from 'elegua';
     import {writable} from "svelte/store";
-    import type {IComponentDef} from "./lib/types";
     import RenderPage from "./lib/components/RenderPage.svelte";
 
     import {pageDataStore} from "./lib/store";
