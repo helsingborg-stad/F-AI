@@ -1,8 +1,17 @@
-from fastapi import APIRouter, Depends
-from fastui import AnyComponent, FastUI
+from fastapi import APIRouter, Depends, Response
 
-from fai_backend.auth.views import login_handler, login_page, logout_handler, verify_handler
+from fai_backend.auth.dependencies import (
+    make_temporary_pin,
+    try_exchange_pin_for_token,
+    valid_session_id,
+)
+from fai_backend.auth.schema import ResponsePin, ResponseToken
+from fai_backend.auth.security import access_security, refresh_security
+from fai_backend.dependencies import try_get_authenticated_user
+from fai_backend.framework import components as c
+from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
+from fai_backend.schema import User
 
 router = APIRouter(
     prefix='/api',
@@ -11,29 +20,100 @@ router = APIRouter(
 )
 
 
-@router.get('/login', response_model=FastUI, response_model_exclude_none=True)
+@router.get('/login', response_model=list, response_model_exclude_none=True)
 def login_view(
-        view: list[AnyComponent] = Depends(login_page),
-) -> list[AnyComponent]:
-    return view
+        session_id: str | None = Depends(valid_session_id),
+        authenticated_user: User | None = Depends(try_get_authenticated_user),
+) -> list:
+    if authenticated_user:
+        return [c.FireEvent(event=e.GoToEvent(url='/'))]
+
+    if session_id == '':
+        return [c.FireEvent(event=e.GoToEvent(url='/login', query={'session_id': None}))]
+
+    render_form = ({
+        'request_pin': lambda: [
+            c.Form(
+                submit_url='/api/login',
+                method='POST',
+                components=[
+                    c.InputField(
+                        name='email',
+                        title='Email',
+                        placeholder='Enter email',
+                        required=True,
+                        html_type='email',
+                    ),
+                ],
+            ),
+        ],
+        'verify_pin': lambda: [
+            c.Form(
+                submit_url='/api/login/verify',
+                method='POST',
+                components=[
+                    c.InputField(
+                        name='session_id',
+                        title='',
+                        html_type='hidden',
+                        initial=session_id,
+                        hidden=True,
+                    ),
+                    c.InputField(
+                        name='pin',
+                        title='PIN',
+                        required=True,
+                        html_type='password',
+                    ),
+                ],
+            ),
+        ]
+    }['verify_pin' if session_id is not None else 'request_pin'])
+
+    return [
+        c.Div(
+            components=[
+                c.Div(
+                    components=[
+                        c.Div(
+                            components=[
+                                c.Heading(
+                                    text='Login',
+                                    class_name='card-title text-4xl font-extrabold text-center mb-2',
+                                ),
+                                *render_form()
+                            ],
+                            class_name='card-body',
+                        )
+                    ],
+                    class_name='card bg-base-200 w-full max-w-sm mx-auto',
+                )
+            ],
+            class_name='h-screen flex justify-center items-center',
+        )
+    ]
 
 
-@router.get('/logout', response_model=FastUI, response_model_exclude_none=True)
-def logout(
-        on_logout: list[AnyComponent] = Depends(logout_handler),
-) -> list[AnyComponent]:
-    return on_logout
+@router.post('/login', response_model=list, response_model_exclude_none=True)
+def request_pin_handler(
+        session_info: ResponsePin = Depends(make_temporary_pin),
+) -> list:
+    return [c.FireEvent(event=e.GoToEvent(url='/login', query={'session_id': session_info.session_id}))]
 
 
-@router.post('/login', response_model=FastUI, response_model_exclude_none=True)
-def login(
-        on_login: list[AnyComponent] = Depends(login_handler),
-) -> list[AnyComponent]:
-    return on_login
+@router.post('/login/verify', response_model=list, response_model_exclude_none=True)
+async def verify_pin_handler(
+        token: ResponseToken = Depends(try_exchange_pin_for_token),
+) -> list:
+    return [c.FireEvent(event=e.GoToEvent(url='/'))]
 
 
-@router.post('/login/verify', response_model=FastUI, response_model_exclude_none=True)
-def verify(
-        on_verify: list[AnyComponent] = Depends(verify_handler),
-) -> list[AnyComponent]:
-    return on_verify
+@router.get('/logout', response_model=list, response_model_exclude_none=True)
+def logout_handler(
+        response: Response,
+        user: User | None = Depends(try_get_authenticated_user),
+) -> list:
+    if user:
+        access_security.unset_access_cookie(response)
+        refresh_security.unset_refresh_cookie(response)
+    return [c.FireEvent(event=e.GoToEvent(url='/login'))]
