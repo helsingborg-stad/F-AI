@@ -1,6 +1,9 @@
 # Stage 1: Build the frontend
 FROM node:16 as frontend-builder
 
+WORKDIR /app
+COPY fai-backend/ .
+
 WORKDIR /app/fai-frontend
 
 # Copy frontend package.json and package-lock.json
