@@ -1,4 +1,3 @@
-
 from fastapi import Response
 from pydantic import EmailStr, SecretStr
 
@@ -53,7 +52,7 @@ class AuthService:
     ) -> ResponseToken | None:
         session = (
             await self.pins_repo.get(session_id)
-            if self.session_exists(session_id)
+            if await self.session_exists(session_id)
             else None
         )
         if session and verify_password(pin.get_secret_value(), session.hashed_pin):
