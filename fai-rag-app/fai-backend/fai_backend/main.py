@@ -1,4 +1,4 @@
-from contextlib import asynccontextmanager  # noqa: I001
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import FastAPI, Form, Request
@@ -6,10 +6,10 @@ from fastapi import FastAPI, Form, Request
 from fai_backend.auth.router import router as auth_router
 from fai_backend.config import settings
 from fai_backend.framework.frontend import get_frontend_environment
+from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
 from fai_backend.projects.router import router as projects_router
-from logger.console import console
-from setup import setup_db, setup_project
+from fai_backend.setup import setup_db, setup_project
 
 
 @asynccontextmanager
