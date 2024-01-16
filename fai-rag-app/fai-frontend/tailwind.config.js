@@ -2,11 +2,11 @@
 export default {
     content: [
         "./index.html",
-        "./src/**/*.{svelte,js,ts,jsx,tsx}",
+        "./src/**/**/*.{svelte,js,ts,jsx,tsx}"
     ],
     theme: {
         extend: {},
     },
-    plugins: [require("daisyui")],
+    plugins: [require("@tailwindcss/typography"), require("daisyui"), require('autoprefixer')],
 }
 
