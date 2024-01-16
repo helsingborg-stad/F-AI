@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import FastAPI, Form, Request
+from starlette.responses import HTMLResponse
 
 from fai_backend.auth.router import router as auth_router
 from fai_backend.config import settings
@@ -190,7 +191,7 @@ async def set_404(request: Request):
     return {'404': 'Not Found'}
 
 
-@app.get('/{path:path}')
+@app.get('/{path:path}', response_class=HTMLResponse)
 async def catch_all(request: Request):
     return await frontend.serve(request)
 
