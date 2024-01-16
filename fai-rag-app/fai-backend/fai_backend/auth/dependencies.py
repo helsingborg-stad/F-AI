@@ -71,7 +71,13 @@ async def valid_user_email(
     if await auth_service.email_exists(email):
         return email
     else:
-        raise HTTPException(status_code=404, detail='User not found')
+        raise HTTPException(status_code=404, detail=[
+            {
+                'loc': ['body', 'email'],
+                'msg': 'User with this email does not exist',
+                'type': 'value_error',
+            }
+        ])
 
 
 async def valid_session_id(
@@ -104,7 +110,9 @@ async def try_exchange_pin_for_token(
     session_id = body.session_id if body else session_id
     pin = body.pin if body else pin
     try:
-        return await auth_service.exchange_pin_for_token(session_id, pin, response)
+        token = await auth_service.exchange_pin_for_token(session_id, pin, response)
+        if not token:
+            raise HTTPException(status_code=401, detail='Invalid credentials')
     except Exception:
         raise HTTPException(status_code=401, detail='Invalid credentials')
 
