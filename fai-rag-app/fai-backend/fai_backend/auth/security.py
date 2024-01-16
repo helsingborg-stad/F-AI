@@ -1,7 +1,6 @@
 import random
 from datetime import timedelta
 
-from fastapi.security import APIKeyHeader
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearerCookie
 from passlib.context import CryptContext
 
@@ -45,5 +44,3 @@ def create_pin_factory_from_env():
 
 
 generate_pin_code = create_pin_factory_from_env()
-
-api_key_header = APIKeyHeader(name='X-API-Key', auto_error=False)

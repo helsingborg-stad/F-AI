@@ -13,21 +13,14 @@ from fai_backend.auth.schema import (
 )
 from fai_backend.auth.security import (
     access_security,
-    api_key_header,
     refresh_security,
 )
 from fai_backend.auth.service import AuthService
 from fai_backend.repositories import pins_repo, users_repo
 
-api_keys = ['test']
-
 
 async def get_auth_service() -> AuthService:
     return AuthService(users_repo=users_repo, pins_repo=pins_repo)
-
-
-def try_get_valid_api_key(api_key: str = Security(api_key_header)) -> str | None:
-    return api_key if api_key in api_keys else None
 
 
 async def try_get_valid_access_token(
