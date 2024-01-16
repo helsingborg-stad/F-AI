@@ -1,12 +1,30 @@
+from contextlib import asynccontextmanager  # noqa: I001
 from typing import Annotated
 
 from fastapi import FastAPI, Form, Request
 
+from fai_backend.auth.router import router as auth_router
 from fai_backend.config import settings
-from fai_backend.frontend import get_frontend_environment
+from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.middleware import remove_trailing_slash
+from fai_backend.projects.router import router as projects_router
+from logger.console import console
+from setup import setup_db, setup_project
 
-app = FastAPI(title='LLM Chat Assistant Platform', redirect_slashes=True)
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    console.log('Mounting app')
+    await setup_db()
+    await setup_project()
+    yield
+    console.log('Unmounting app')
+
+
+app = FastAPI(title='FAI RAG App', redirect_slashes=True, lifespan=lifespan)
+app.include_router(auth_router)
+app.include_router(projects_router)
+
 app.middleware('http')(remove_trailing_slash)
 
 frontend = get_frontend_environment(settings.ENV_MODE)
@@ -35,6 +53,10 @@ async def contact():
                 {
                     'name': 'Contact',
                     'url': '/contact'
+                },
+                {
+                    'name': 'Logout',
+                    'url': '/logout'
                 },
             ],
             'components': [
@@ -93,6 +115,10 @@ async def about():
                     'name': 'Contact',
                     'url': '/contact'
                 },
+                {
+                    'name': 'Logout',
+                    'url': '/logout'
+                },
             ],
             'components': [
                 {
@@ -132,6 +158,10 @@ async def root():
                 {
                     'name': 'Contact',
                     'url': '/contact'
+                },
+                {
+                    'name': 'Logout',
+                    'url': '/logout'
                 },
             ],
             'components': [
