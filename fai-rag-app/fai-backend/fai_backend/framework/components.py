@@ -17,34 +17,35 @@ __all__ = (
 from fai_backend.framework import events as e
 
 
-class Div(BaseModel):
+class Div(BaseModel, extra='forbid'):
     type: Literal['Div'] = 'Div'
     class_name: str | None = Field(None, serialization_alias='class')
     components: 'list[AnyUI]'
 
 
-class Heading(BaseModel):
+class Heading(BaseModel, extra='forbid'):
     type: Literal['Heading'] = 'Heading'
     text: str
     class_name: str | None = Field(None, serialization_alias='class')
 
 
-class Button(BaseModel):
+class Button(BaseModel, extra='forbid'):
     type: Literal['Button'] = 'Button'
     text: str
     html_type: Literal['submit', 'button'] = 'button'
     class_name: str | None = Field(None, serialization_alias='class')
 
 
-class Form(BaseModel):
+class Form(BaseModel, extra='forbid'):
     submit_url: str = Field(None, serialization_alias='action')
     type: Literal['Form'] = 'Form'
     class_name: str | None = Field(None, serialization_alias='class')
     components: 'list[AnyUI]'
     method: Literal['POST', 'GET']
+    submit_text: str | None = None
 
 
-class InputField(BaseModel):
+class InputField(BaseModel, extra='forbid'):
     type: Literal['InputField'] = 'InputField'
     name: str
     title: str | None = None
@@ -54,14 +55,16 @@ class InputField(BaseModel):
     initial: str | None = Field(None, serialization_alias='value')
     hidden: bool = None
     class_name: str | None = Field(None, serialization_alias='class')
+    autocomplete: str | None = None
+    readonly: bool | None = None
 
 
-class Page(BaseModel):
+class Page(BaseModel, extra='forbid'):
     type: Literal['Page'] = 'Page'
     components: 'list[AnyUI]'
 
 
-class FireEvent(BaseModel):
+class FireEvent(BaseModel, extra='forbid'):
     type: Literal['FireEvent'] = 'FireEvent'
     event: 'e.AnyEvent'
 

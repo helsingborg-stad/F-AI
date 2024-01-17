@@ -5,7 +5,7 @@
     export let components: IRenderableComponent[] = [];
 </script>
 
-<div class={['container', 'mx-auto', 'px-4',className].join(' ')}>
+<div class={['container', 'mx-auto', 'px-6',className].join(' ')}>
     <slot>
         {#each components as component}
             <svelte:component this={component.type} {...component.props}/>

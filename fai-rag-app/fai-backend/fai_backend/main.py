@@ -187,7 +187,7 @@ async def root():
 
 
 @app.get('/api/{path:path}', status_code=404)
-async def set_404(request: Request):
+async def set_404():
     return {'404': 'Not Found'}
 
 

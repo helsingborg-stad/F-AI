@@ -11,7 +11,6 @@
         $renderables = components.map(toRenderable)
     }
 
-
     $: components && setRenderables(components)
 </script>
 

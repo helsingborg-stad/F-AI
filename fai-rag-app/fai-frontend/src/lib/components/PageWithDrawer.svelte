@@ -13,7 +13,7 @@
 <div class="drawer lg:drawer-open">
     {#if links.length > 0}
         <input id="my-drawer-2" type="checkbox" class="drawer-toggle"/>
-        <div class="drawer-side">
+        <div class="drawer-side z-10">
             <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
             <aside class="bg-base-200 min-h-screen w-80">
                 <div class="bg-base-200 sticky top-0 z-20 flex items-center px-4 py-2">
@@ -31,10 +31,10 @@
     {/if}
     <div class="drawer-content flex flex-col">
         {#if links.length > 0}
-            <nav class="navbar fixed">
-                <div class="container mx-auto">
+            <nav class="navbar fixed bg-opacity-60 bg-base-100 backdrop-blur px-0">
+                <div class="px-2 w-full">
                     <div class="flex-1">
-                        <a class="btn btn-ghost text-xl lg:hidden">{title}</a>
+                        <a class="btn btn-ghost btm-nav-sm text-xl lg:hidden">{title}</a>
                     </div>
                     <div class="flex-none">
                         <label for="my-drawer-2" class="btn btn-square btn-ghost drawer-button lg:hidden">
@@ -48,10 +48,12 @@
                 </div>
             </nav>
         {/if}
-        <slot>
-            {#each components as component}
-                <svelte:component this={component.type} {...component.props}/>
-            {/each}
-        </slot>
+        <div class="mt-16">
+            <slot>
+                {#each components as component}
+                    <svelte:component this={component.type} {...component.props}/>
+                {/each}
+            </slot>
+        </div>
     </div>
 </div>

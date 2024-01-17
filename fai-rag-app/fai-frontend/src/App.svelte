@@ -11,7 +11,7 @@
 </script>
 
 <script lang="ts">
-    import {path, searchParams} from 'elegua';
+    import {path, searchParams, url} from 'elegua';
     import {writable} from "svelte/store";
     import RenderPage from "./lib/components/RenderPage.svelte";
 
@@ -20,11 +20,10 @@
     const error = writable<any>(null)
 
     $: {
-        $path
-        $searchParams
+        $url
         error.set(null)
         fetchRouteData($path, $searchParams)
-            .then((responseData: IComponentDef[]) => pageDataStore.set(responseData))
+            .then((responseData: IComponentDef[]) => $pageDataStore = responseData)
             .catch((e) => error.set(e.message))
     }
 </script>
@@ -41,3 +40,4 @@
         <p class="text-center text-xl text-info">Loading...</p>
     </div>
 {/if}
+

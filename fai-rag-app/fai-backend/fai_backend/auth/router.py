@@ -36,6 +36,7 @@ def login_view(
             c.Form(
                 submit_url='/api/login',
                 method='POST',
+                submit_text='Send One-time PIN',
                 components=[
                     c.InputField(
                         name='email',
@@ -51,19 +52,24 @@ def login_view(
             c.Form(
                 submit_url='/api/login/verify',
                 method='POST',
+                submit_text='Authenticate',
                 components=[
+                    c.InputField(
+                        name='pin',
+                        title='PIN',
+                        placeholder='Enter One-time PIN',
+                        required=True,
+                        html_type='password',
+                        autocomplete='one-time-code',
+                    ),
                     c.InputField(
                         name='session_id',
                         title='',
                         html_type='hidden',
                         initial=session_id,
-                        hidden=True,
-                    ),
-                    c.InputField(
-                        name='pin',
-                        title='PIN',
                         required=True,
-                        html_type='password',
+                        hidden=True,
+                        readonly=True,
                     ),
                 ],
             ),
@@ -78,15 +84,15 @@ def login_view(
                         c.Div(
                             components=[
                                 c.Heading(
-                                    text='Login',
-                                    class_name='text-4xl font-extrabold text-center mb-2',
+                                    text='PIN' if session_id is not None else 'Login',
+                                    class_name='text-4xl font-extrabold text-center mb-6 mt-0',
                                 ),
-                                *render_form()
+                                *render_form(),
                             ],
                             class_name='card-body',
                         )
                     ],
-                    class_name='card bg-base-200 w-full max-w-sm mx-auto',
+                    class_name='card bg-base-200 w-full max-w-sm mx-auto pt-6',
                 )
             ],
             class_name='h-screen flex justify-center items-center',
