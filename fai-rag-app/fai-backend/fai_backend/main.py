@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import FastAPI, Form, Request
+from fastapi import FastAPI, Form, Header, Request
 from starlette.responses import HTMLResponse
 
 from fai_backend.auth.router import router as auth_router
@@ -10,7 +10,10 @@ from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
 from fai_backend.projects.router import router as projects_router
+from fai_backend.qaf import router as qaf_router
 from fai_backend.setup import setup_db, setup_project
+from phrase import phrase as _
+from views import page_template
 
 
 @asynccontextmanager
@@ -25,6 +28,7 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(title='FAI RAG App', redirect_slashes=True, lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(projects_router)
+app.include_router(qaf_router)
 
 app.middleware('http')(remove_trailing_slash)
 
@@ -39,46 +43,7 @@ async def health_check():
 
 @app.get('/api/contact', include_in_schema=True)
 async def contact():
-    return [
-        {
-            'type': 'PageWithDrawer',
-            'links': [
-                {
-                    'name': 'Home',
-                    'url': '/'
-                },
-                {
-                    'name': 'About',
-                    'url': '/about'
-                },
-                {
-                    'name': 'Contact',
-                    'url': '/contact'
-                },
-                {
-                    'name': 'Logout',
-                    'url': '/logout'
-                },
-            ],
-            'components': [
-                {
-                    'type': 'Container',
-                    'components': [
-                        {
-                            'type': 'Heading',
-                            'level': 1,
-                            'text': 'contact'
-                        },
-                        {
-                            'type': 'Paragraph',
-                            'level': 1,
-                            'text': 'Sint ad duis amet non. Aliqua aliquip nostrud aliquip deserunt eiusmod labore officia.'
-                        },
-                    ]
-                }
-            ],
-        }
-    ]
+    return page_template(*[], page_title=(_('contact', 'Contact')))
 
 
 @app.get('/api/submit-question')
@@ -109,90 +74,12 @@ async def submit_question_post(question: Annotated[str, Form()], arrand_id: Anno
 
 @app.get('/api/about', include_in_schema=True)
 async def about():
-    return [
-        {
-            'type': 'PageWithDrawer',
-            'links': [
-                {
-                    'name': 'Home',
-                    'url': '/'
-                },
-                {
-                    'name': 'About',
-                    'url': '/about'
-                },
-                {
-                    'name': 'Contact',
-                    'url': '/contact'
-                },
-                {
-                    'name': 'Logout',
-                    'url': '/logout'
-                },
-            ],
-            'components': [
-                {
-                    'type': 'Container',
-                    'components': [
-                        {
-                            'type': 'Heading',
-                            'level': 1,
-                            'text': 'about'
-                        },
-                        {
-                            'type': 'Paragraph',
-                            'level': 1,
-                            'text': 'Sint ad duis amet non. Aliqua aliquip nostrud aliquip deserunt eiusmod labore officia.'
-                        },
-                    ]
-                }
-            ],
-        }
-    ]
+    return page_template(*[], page_title=(_('about', 'About')))
 
 
 @app.get('/api', include_in_schema=True)
 async def root():
-    return [
-        {
-            'type': 'PageWithDrawer',
-            'links': [
-                {
-                    'name': 'Home',
-                    'url': '/'
-                },
-                {
-                    'name': 'About',
-                    'url': '/about'
-                },
-                {
-                    'name': 'Contact',
-                    'url': '/contact'
-                },
-                {
-                    'name': 'Logout',
-                    'url': '/logout'
-                },
-            ],
-            'components': [
-                {
-                    'type': 'Container',
-                    'components': [
-                        {
-                            'type': 'Heading',
-                            'level': 1,
-                            'text': 'Root'
-                        },
-                        {
-                            'type': 'Paragraph',
-                            'level': 1,
-                            'text': 'Sint ad duis amet non. Aliqua aliquip nostrud aliquip deserunt eiusmod labore officia.'
-                        },
-                    ]
-                }
-            ],
-        }
-    ]
+    return page_template(*[], page_title=(_('submit_question', 'Submit a question')))
 
 
 @app.get('/api/{path:path}', status_code=404)
