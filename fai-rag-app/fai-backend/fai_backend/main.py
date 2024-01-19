@@ -92,6 +92,15 @@ async def submit_question():
     ]
 
 
+@app.get('/greet')
+async def greet(language: str = Header(default='en')):
+    # Set the language based on the 'language' header
+    _.set_language(language)
+
+    # Return the translated greeting
+    return {'message': _('greeting')}
+
+
 @app.post('/api/submit-question')
 async def submit_question_post(question: Annotated[str, Form()], arrand_id: Annotated[str, Form()]):
     print(question)
