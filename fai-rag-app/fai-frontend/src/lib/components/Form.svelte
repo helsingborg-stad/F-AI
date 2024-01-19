@@ -9,13 +9,9 @@
         message: error?.msg || error.body || 'An error occurred',
     });
 
-
-    const shouldReceiveFormProps = ({type, props}: IRenderableComponent) => true
-
     export let components: IRenderableComponent[] = [];
     let fields = writable<IRenderableComponent[]>([])
-
-
+    
     let {form, errors, touched, isSubmitting, interacted, setTouched, isDirty} = createForm({
         onError: async (errors: any, context) =>
             (context.setTouched({}) == null) && [...(await errors.response.json())?.detail || []]
@@ -50,8 +46,6 @@
             }
         ))
     }
-
-
     export let className: string | undefined = ""
     export {className as class}
     export let action: string | undefined
@@ -69,8 +63,6 @@
             "class": ["form", "space-y-6", "group", className].filter(c => c).join(" "),
         }
     }
-
-
 </script>
 
 {#key $$props}

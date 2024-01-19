@@ -16,7 +16,6 @@
 
     let attributes = writable({});
     $: $attributes = {
-
         name,
         id,
         title,
@@ -31,9 +30,11 @@
 </script>
 
 <div class:hidden={html_type === 'hidden'} class:mt-0={html_type === 'hidden'}>
-    <input class={['input', 'input-bordered', 'w-full', className].filter(c => c).join(' ')}
-           class:input-error={error}
-           {...$attributes}/>
+    <input
+            class:input-error={error}
+            class={['input', 'input-bordered', 'w-full', className].filter(c => c).join(' ')}
+            {...$attributes}
+    />
     {#if error}
         <div class="label label-text text-error mt-1">{error}</div>
     {/if}

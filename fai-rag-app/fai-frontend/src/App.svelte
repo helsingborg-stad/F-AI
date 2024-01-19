@@ -13,7 +13,7 @@
 <script lang="ts">
     import {path, searchParams, url} from 'elegua';
     import {writable} from "svelte/store";
-    import RenderPage from "./lib/components/RenderPage.svelte";
+    import Render from "./lib/components/Render.svelte";
 
     import {pageDataStore} from "./lib/store";
 
@@ -34,7 +34,7 @@
         <p class="text-center text-xl text-error">{$error}</p>
     </div>
 {:else if $pageDataStore}
-    <RenderPage bind:components={$pageDataStore}/>
+    <Render bind:components={$pageDataStore}/>
 {:else}
     <div class="h-screen flex flex-col items-center justify-center">
         <p class="text-center text-xl text-info">Loading...</p>

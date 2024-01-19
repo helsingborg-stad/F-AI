@@ -20,6 +20,7 @@ export interface IComponentDef {
 export interface IRenderableComponent {
     type: typeof SvelteComponent;
     props: any;
+    components?: IComponentDef[];
 }
 
 export interface IEventDef {
