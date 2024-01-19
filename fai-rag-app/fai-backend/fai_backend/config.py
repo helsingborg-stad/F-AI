@@ -17,9 +17,24 @@ class Settings(BaseSettings):
     BREVO_API_URL: str
     BREVO_API_KEY: str
     LOG_LEVEL: str = 'INFO'
+    DEFAULT_LANGUAGE: str = 'en'
 
     class Config:
         env_file = '.env'
 
 
-settings = Settings()
+settings = None
+
+try:
+    env_settings = Settings()
+    if env_settings.ENV_MODE == 'testing':
+        raise Exception('Testing mode is enabled')
+    else:
+        settings = env_settings
+except Exception:
+    class TestSettings(Settings):
+        class Config:
+            env_file = '.env.test'
+
+
+    settings = TestSettings()
