@@ -11,6 +11,7 @@ __all__ = (
     'FireEvent',
     'Form',
     'InputField',
+    'Textarea',
     'AppShell',
     'AppDrawer',
     'AppContent',
@@ -160,6 +161,6 @@ class AppFooter(UIComponent):
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading | Page |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
-     PageContent | Menu | Link),
+     PageContent | Menu | Link | Textarea),
     Field(discriminator='type')
 ]

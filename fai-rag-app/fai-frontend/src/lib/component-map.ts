@@ -19,6 +19,7 @@ import AppFooter from "./components/AppFooter.svelte";
 import PageHeader from "./components/PageHeader.svelte";
 import PageContent from "./components/PageContent.svelte";
 import Button from "./components/Button.svelte";
+import Textarea from "./components/Textarea.svelte";
 
 export const componentMap: Record<string, typeof SvelteComponent> = {
     PageWithDrawer,
