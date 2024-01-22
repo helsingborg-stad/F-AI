@@ -2,7 +2,7 @@ import time
 from typing import Protocol
 
 from beanie import Document, Indexed
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import EmailStr, Field
 
 from fai_backend.conversations.models import ConversationModel
 from fai_backend.projects.schema import Project
@@ -78,14 +78,6 @@ class UserRepoImp(UserRepository, CompositeRepo[ProjectModel]):
             if len(user_projects) > 0
             else None
         )
-
-
-class UserPin(BaseModel):
-    email: EmailStr
-    hashed_pin: str
-    expiry: float = Field(
-        default_factory=lambda: time.time() + 900  # 15 minutes expiry
-    )
 
 
 class PinCodeModel(Document):
