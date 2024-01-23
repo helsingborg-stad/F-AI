@@ -1,15 +1,19 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from conversations.dependencies import create_conversation_request, get_conversation_request, list_conversations_request
-from conversations.schema import ConversationResponse
+from fai_backend.conversations.dependencies import (
+    create_conversation_request,
+    get_conversation_request,
+    list_conversations_request,
+)
+from fai_backend.conversations.schema import ConversationResponse
 from fai_backend.dependencies import try_get_authenticated_user
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
+from fai_backend.phrase import phrase as _
 from fai_backend.schema import User
-from phrase import phrase as _
-from views import page_template
+from fai_backend.views import page_template
 
 router = APIRouter(
     prefix='/api',
@@ -24,6 +28,15 @@ def submit_question_view(
 ) -> list:
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
+
+    if len(authenticated_user.projects) == 0:
+        return [
+            c.Text(
+                text=_('no_projects', 'You are not a member of any proj.. wait a mintue, how did you login? 😱'),
+                class_name='bg-error text-center font-black text-3xl text-warning h-screen flex  items-center justify-center leading-relaxed',
+                element='h1'
+            ),
+        ]
 
     return page_template(
         c.Form(
@@ -40,10 +53,8 @@ def submit_question_view(
                 ),
                 c.InputField(
                     name='project_id',
-                    title=_('input_label_errand_id', 'Errand ID'),
-                    placeholder=_('input_label_errand_id', 'Errand ID'),
                     html_type='hidden',
-                    value='656072f07e40734f134a99f9',
+                    value=authenticated_user.projects[0].project_id,
                 ),
                 c.InputField(
                     name='metadata.errand_id',
