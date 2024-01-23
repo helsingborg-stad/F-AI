@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from fai_backend.config import settings
 from fai_backend.repositories import (
-    ConversationDocument,
+    ConversationModel,
     PinCodeModel,
     ProjectModel,
     projects_repo,
@@ -82,5 +82,5 @@ async def setup_db():
     client = AsyncIOMotorClient(settings.MONGO_DB_URI)
     await init_beanie(
         database=client[settings.MONGO_DB_NAME],
-        document_models=[ProjectModel, PinCodeModel, ConversationDocument],
+        document_models=[ProjectModel, PinCodeModel, ConversationModel],
     )

@@ -6,7 +6,7 @@ from fai_backend.conversations.dependencies import (
     add_message_request,
 )
 from fai_backend.conversations.schema import (
-    ResponseConversation,
+    ConversationResponse,
     ResponseMessage,
 )
 from fai_backend.conversations.views import (
@@ -39,12 +39,12 @@ async def add_message(
 
 @router.put(
     '/conversations/{conversation_id}/messages/{message_id}/feedback',
-    response_model=ResponseConversation,
+    response_model=ConversationResponse,
     dependencies=[Security(get_authenticated_user)],
 )
 async def add_feedback(
-        conversation: ResponseConversation = Depends(add_feedback_request),
-) -> ResponseConversation:
+        conversation: ConversationResponse = Depends(add_feedback_request),
+) -> ConversationResponse:
     return conversation
 
 

@@ -4,7 +4,7 @@ from typing import Protocol
 from beanie import Document, Indexed
 from pydantic import EmailStr, Field
 
-from fai_backend.conversations.models import ConversationModel
+from fai_backend.conversations.models import Conversation
 from fai_backend.projects.schema import Project
 from fai_backend.repository.composite import CompositeRepo
 from fai_backend.repository.factory import create_repo_from_env
@@ -95,12 +95,12 @@ class PinCodeRepository(IAsyncRepo[PinCodeModel]):
     pass
 
 
-class ConversationDocument(ConversationModel, Document):
+class ConversationModel(Document, Conversation):
     class Settings:
         name = 'conversations'
 
 
-class ConversationRepository(IAsyncRepo[ConversationDocument]):
+class ConversationRepository(IAsyncRepo[ConversationModel]):
     pass
 
 
@@ -109,7 +109,7 @@ repo_factory.register_builder(
         ProjectRepository: lambda: create_repo_from_env(ProjectModel),
         UserRepository: lambda: UserRepoImp([create_repo_from_env(ProjectModel)]),
         PinCodeRepository: lambda: create_repo_from_env(PinCodeModel),
-        ConversationRepository: lambda: create_repo_from_env(ConversationDocument),
+        ConversationRepository: lambda: create_repo_from_env(ConversationModel),
     }
 )
 

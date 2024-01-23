@@ -1,11 +1,11 @@
 from fastapi import Depends, HTTPException
 
 from fai_backend.conversations.schema import (
-    RequestConversation,
-    RequestFeedback,
-    RequestMessage,
-    ResponseConversation,
-    ResponseFeedback,
+    ConversationResponse,
+    CreateConversationRequest,
+    CreateFeedbackRequest,
+    CreateMessageRequest,
+    FeedbackResponse,
     ResponseMessage,
 )
 from fai_backend.conversations.service import ConversationService
@@ -20,10 +20,10 @@ async def get_conversation_service() -> ConversationService:
 
 async def list_conversations_request(
         service: ConversationService = Depends(get_conversation_service),
-) -> list[ResponseConversation]:
+) -> list[ConversationResponse]:
     conversations = await service.list_conversations() or []
     return [
-        ResponseConversation.model_validate(conversation.model_dump())
+        ConversationResponse.model_validate(conversation.model_dump())
         for conversation in conversations
     ]
 
@@ -31,17 +31,17 @@ async def list_conversations_request(
 async def get_conversation_request(
         conversation_id: str,
         service: ConversationService = Depends(get_conversation_service),
-) -> ResponseConversation:
+) -> ConversationResponse:
     conversation = await service.get_conversation_by_id(conversation_id)
     if not conversation:
         raise HTTPException(status_code=404, detail='Conversation not found')
-    return conversation
+    return ConversationResponse.model_validate(conversation.model_dump())
 
 
 async def get_message_request(
         conversation=Depends(get_conversation_request),
         message_id: str = '',
-) -> ResponseConversation:
+) -> ConversationResponse:
     message = conversation.messages.get(message_id)
     if not message:
         raise HTTPException(status_code=404, detail='Message not found')
@@ -49,15 +49,16 @@ async def get_message_request(
 
 
 async def create_conversation_request(
-        body: RequestConversation,
+        body: CreateConversationRequest,
         user: User = Depends(get_authenticated_user),
         service: ConversationService = Depends(get_conversation_service),
-) -> ResponseConversation:
-    return await service.create_conversation(user.email, body)
+) -> ConversationResponse:
+    created_conversation = await service.create_conversation(user.email, body)
+    return ConversationResponse.model_validate(created_conversation.model_dump())
 
 
 async def add_message_request(
-        body: RequestMessage,
+        body: CreateMessageRequest,
         conversation=Depends(get_conversation_request),
         user: User = Depends(get_authenticated_user),
         service: ConversationService = Depends(get_conversation_service),
@@ -66,9 +67,9 @@ async def add_message_request(
 
 
 async def add_feedback_request(
-        body: RequestFeedback,
+        body: CreateFeedbackRequest,
         message: ResponseMessage = Depends(get_message_request),
         user: User = Depends(get_authenticated_user),
         service: ConversationService = Depends(get_conversation_service),
-) -> ResponseFeedback:
+) -> FeedbackResponse:
     return await service.add_feedback(message, user.email, body)
