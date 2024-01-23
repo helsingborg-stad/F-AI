@@ -11,6 +11,7 @@ from fai_backend.dependencies import try_get_authenticated_user
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
+from fai_backend.phrase import phrase as _
 from fai_backend.schema import User
 
 router = APIRouter(
@@ -36,28 +37,32 @@ def login_view(
             c.Form(
                 submit_url='/api/login',
                 method='POST',
-                submit_text='Send One-time PIN',
                 components=[
                     c.InputField(
                         name='email',
-                        title='Email',
-                        placeholder='Enter email',
+                        title=_('input_email_label', 'Email'),
+                        placeholder=_('input_email_placeholder', 'Enter email'),
                         required=True,
                         html_type='email',
                     ),
-                ],
+                    c.Button(
+                        state='neutral',
+                        label=_('request_pin_submit_button', 'Send One-time PIN'),
+                        html_type='submit',
+                        block=True,
+                    )
+                ]
             ),
         ],
         'verify_pin': lambda: [
             c.Form(
                 submit_url='/api/login/verify',
                 method='POST',
-                submit_text='Authenticate',
                 components=[
                     c.InputField(
                         name='pin',
-                        title='PIN',
-                        placeholder='Enter One-time PIN',
+                        title=_('input_pin_label', 'PIN'),
+                        placeholder=_('input_pin_placeholder', 'Enter One-time PIN'),
                         required=True,
                         html_type='password',
                         autocomplete='one-time-code',
@@ -71,6 +76,12 @@ def login_view(
                         hidden=True,
                         readonly=True,
                     ),
+                    c.Button(
+                        state='neutral',
+                        label=_('verify_pin_submit_button', 'Authenticate'),
+                        html_type='submit',
+                        block=True,
+                    )
                 ],
             ),
         ]

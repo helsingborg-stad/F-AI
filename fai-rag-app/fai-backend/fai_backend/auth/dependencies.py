@@ -1,8 +1,6 @@
-from typing import Annotated
-
-from fastapi import Depends, Form, HTTPException, Response, Security
+from fastapi import Depends, HTTPException, Response, Security
 from fastapi_jwt import JwtAuthorizationCredentials
-from pydantic import EmailStr, SecretStr
+from pydantic import EmailStr
 
 from fai_backend.auth.schema import (
     RequestPin,
@@ -56,13 +54,11 @@ def try_get_refresh_token_payload(
 
 
 async def valid_user_email(
-        body: RequestPin | None = None,
-        email: Annotated[EmailStr | None, Form()] = None,
+        body: RequestPin,
         auth_service: AuthService = Depends(get_auth_service),
 ) -> EmailStr:
-    email = body.email if body else email
-    if await auth_service.email_exists(email):
-        return email
+    if await auth_service.email_exists(body.email):
+        return body.email
     else:
         raise HTTPException(status_code=404, detail=[
             {
@@ -95,15 +91,11 @@ async def make_temporary_pin(
 
 async def try_exchange_pin_for_token(
         response: Response,
-        session_id: Annotated[str | None, Form()] = '',
-        pin: Annotated[SecretStr | None, Form()] = '',
-        body: RequestPinVerification | None = None,
+        body: RequestPinVerification,
         auth_service: AuthService = Depends(get_auth_service),
 ) -> ResponseToken:
-    session_id = body.session_id if body else session_id
-    pin = body.pin if body else pin
     try:
-        token = await auth_service.exchange_pin_for_token(session_id, pin, response)
+        token = await auth_service.exchange_pin_for_token(body.session_id, body.pin, response)
         if not token:
             raise HTTPException(status_code=401, detail='Invalid credentials')
         return token
