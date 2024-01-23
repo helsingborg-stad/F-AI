@@ -21,9 +21,17 @@ class Phrase:
 
 
 language_mappings = {
-    'en': {'greeting': 'Hello'},
-    'sv': {'greeting': 'Hej', 'logout_button_text': 'Logga ut', 'my_questions': 'Mina frågor',
-           'submit_a_question': 'Ställ en fråga', 'submit_question': 'Ställ en fråga', 'questions': 'Frågor'},
+    'sv': {
+        'greeting': 'Hej',
+        'logout_button_text': 'Logga ut',
+        'my_questions': 'Mina frågor',
+        'submit_a_question': 'Ställ en fråga',
+        'submit_question': 'Ställ en fråga',
+        'questions': 'Frågor',
+        'input_pin_placeholder': 'Ange engångskod',
+        'input_email_placeholder': 'Ange E-postadress',
+        'request_pin_submit_button': 'Skicka engångskod'
+    }
 }
 
 phrase = Phrase(language_mappings, settings.DEFAULT_LANGUAGE)
