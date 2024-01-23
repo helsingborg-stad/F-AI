@@ -20,7 +20,8 @@ __all__ = (
     'PageContent',
     'Menu',
     'Link',
-
+    'Text',
+    'Table',
     # then `AnyComponent` itself
     'AnyUI',
 )
@@ -40,18 +41,25 @@ class Div(UIComponent):
     type: Literal['Div'] = 'Div'
 
 
-class Heading(UIComponent):
-    type: Literal['Heading'] = 'Heading'
-    level: Literal[1, 2, 3, 4, 5, 6] = 1
+class Text(UIComponent):
+    type: Literal['Text'] = 'Text'
     text: str
-    icon: str | None = None
+    element: Literal['p', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] = 'span'
+
+    icon_src: str | None = Field(None, serialization_alias='iconSrc')
     icon_state: Literal[
                     'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = Field(
-        False, serialization_alias='iconState')
+        None, serialization_alias='iconState')
     badge: str | int | None = None
     badge_state: Literal[
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = Field(
-        False, serialization_alias='badgeState')
+        None, serialization_alias='badgeState')
+
+
+class Heading(Text):
+    type: Literal['Heading'] = 'Heading'
+    level: Literal[1, 2, 3, 4] = 2
+    element: None = Field(None, exclude=True)
 
 
 class Button(UIComponent):
@@ -93,6 +101,22 @@ class InputField(BaseModel):
     readonly: bool | None = None
     input_state: Literal[
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
+    value: str | None = None
+
+
+class Textarea(UIComponent):
+    type: Literal['Textarea'] = 'Textarea'
+    name: str
+    title: str | None = None
+    placeholder: str | None = None
+    required: bool | None = None
+    initial: str | None = Field(None, serialization_alias='value')
+    hidden: bool = None
+    class_name: str | None = Field(None, serialization_alias='class')
+    autocomplete: str | None = None
+    readonly: bool | None = None
+    state: Literal[
+               'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success'] | None = None
 
 
 class Page(UIComponent):
@@ -161,6 +185,6 @@ class AppFooter(UIComponent):
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading | Page |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
-     PageContent | Menu | Link | Textarea),
+     PageContent | Menu | Link | Textarea | Text | Table),
     Field(discriminator='type')
 ]

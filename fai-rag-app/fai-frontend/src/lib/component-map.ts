@@ -20,6 +20,8 @@ import PageHeader from "./components/PageHeader.svelte";
 import PageContent from "./components/PageContent.svelte";
 import Button from "./components/Button.svelte";
 import Textarea from "./components/Textarea.svelte";
+import Text from "./components/Text.svelte";
+import Table from "./components/Table.svelte";
 
 export const componentMap: Record<string, typeof SvelteComponent> = {
     PageWithDrawer,
@@ -41,7 +43,10 @@ export const componentMap: Record<string, typeof SvelteComponent> = {
     AppFooter,
     PageHeader,
     PageContent,
-    Button
-};
+    Button,
+    Textarea,
+    Text,
+    Table
+}
 
 export default componentMap
