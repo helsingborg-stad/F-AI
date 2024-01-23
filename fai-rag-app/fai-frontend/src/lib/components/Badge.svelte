@@ -1,8 +1,8 @@
 <script lang="ts">
 
-    export let text: string | null = null;
-    export let className: string | null;
-    export {className as class};
+    export let text: string | null = null
+    export let className: string | null
+    export {className as class}
     export let variants: 'ghost' | 'outline' | null = null
     export let state: 'neutral' | 'primary' | 'secondary' | 'accent' | 'success' | 'info' | 'warning' | 'error' | null = null
     export let size: 'xs' | 'sm' | 'md' | 'lg' | null = null

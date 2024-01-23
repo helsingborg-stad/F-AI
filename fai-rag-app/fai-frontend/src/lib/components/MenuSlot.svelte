@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import type {IRenderableComponent} from "../types";
+    import type {IRenderableComponent} from "../types"
 
     export let components: IRenderableComponent[] = []
 </script>

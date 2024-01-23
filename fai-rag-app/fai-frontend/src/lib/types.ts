@@ -20,7 +20,7 @@ export interface IComponentDef {
 export interface IRenderableComponent {
     type: typeof SvelteComponent;
     props: any;
-    components?: IComponentDef[];
+    components?: IRenderableComponent[];
 }
 
 export interface IEventDef {
@@ -30,7 +30,7 @@ export interface IEventDef {
 export interface GoToEvent extends IComponentDef {
     type: 'GoToEvent';
     url: string;
-    query: Record<string, any> | undefined | null;
+    query: Record<string, any> | null;
 }
 
 

@@ -1,20 +1,15 @@
 <script lang="ts">
-    import type {IComponentDef, IRenderableComponent} from '../types';
-    import toRenderable from '../component-factory';
-    import {writable} from 'svelte/store';
+    import type {IComponentDef, IRenderableComponent} from '../types'
+    import toRenderable from '../component-factory'
+    import {writable} from 'svelte/store'
 
-    export let components: IComponentDef[] | IRenderableComponent[] = [];
+    export let components: IComponentDef[] | IRenderableComponent[] = []
+    let renderables = writable<IRenderableComponent[]>([])
 
-    let renderables = writable<IRenderableComponent[]>([]);
-
-    const setRenderables = (components: IComponentDef[] | IRenderableComponent[]) => {
+    $: {
+        components
         $renderables = components.map(toRenderable)
     }
-
-    const isNamedSlot = ({props}: IRenderableComponent) => props?.slot
-    const isNotNamedSlot = (c: IRenderableComponent) => !isNamedSlot(c)
-
-    $: components && setRenderables(components)
 </script>
 
 {#each $renderables as Component}

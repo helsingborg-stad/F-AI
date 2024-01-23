@@ -1,12 +1,12 @@
 <script lang="ts">
-    import InlineSvgIcon from "./SVG.svelte";
-    import Badge from "./Badge.svelte";
+    import InlineSvgIcon from "./SVG.svelte"
+    import Badge from "./Badge.svelte"
 
-    export let className: string | null;
-    export {className as class};
-    export let disabled: boolean = false;
-    export let active: boolean = false;
-    export let type: 'button' | 'submit' | 'reset' = 'button';
+    export let className: string | null
+    export {className as class}
+    export let disabled: boolean = false
+    export let active: boolean = false
+    export let html_type: 'button' | 'submit' | 'reset' = 'button'
     export let variants: 'ghost' | 'outline' | 'link' | 'glass' | null = null
     export let state: 'neutral' | 'primary' | 'secondary' | 'accent' | 'success' | 'info' | 'warning' | 'error' | null = null
     export let size: 'xs' | 'sm' | 'md' | 'lg' | null = null
@@ -25,6 +25,7 @@
 
 <button
         class="btn {className}"
+        class:btn={true}
         class:btn-block={block}
         class:btn-wide={wide}
         class:btn-circle={circle}
@@ -42,13 +43,14 @@
         class:btn-secondary={state === 'secondary'}
         class:btn-accent={state === 'accent'}
         class:btn-success={state === 'success'}
+        class:btn-neutral={state === 'neutral'}
         class:btn-info={state === 'info'}
         class:btn-warning={state === 'warning'}
         class:btn-error={state === 'error'}
         class:btn-active={active}
         class:btn-disabled={disabled}
         disabled={disabled}
-        type={type}
+        type={html_type}
         on:click={onClick}
 >
     {#if iconSrc}

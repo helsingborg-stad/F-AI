@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type {IRenderableComponent} from "../types";
-    import Container from "./Container.svelte";
+    import type {IRenderableComponent} from "../types"
+    import Container from "./Container.svelte"
 
-    export let components: IRenderableComponent[] = [];
+    export let components: IRenderableComponent[] = []
 </script>
 
 <div>

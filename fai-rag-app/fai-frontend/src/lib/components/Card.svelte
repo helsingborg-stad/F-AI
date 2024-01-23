@@ -1,14 +1,14 @@
 <script>
-    export let title = "";
-    export let description = "";
-    export let imageSrc = "";
-    export let imageAlt = "";
-    export let compact = false;
-    export let badge = "";
-    export let actionText = "Buy Now";
-    export let cardStyle = "";
-    export let badgeStyle = "";
-    export let centered = false;
+    export let title = ""
+    export let description = ""
+    export let imageSrc = ""
+    export let imageAlt = ""
+    export let compact = false
+    export let badge = ""
+    export let actionText = "Buy Now"
+    export let cardStyle = ""
+    export let badgeStyle = ""
+    export let centered = false
     export let noImage = false;
     export let customColor = false;
     export let neutralColor = false;

@@ -65,8 +65,11 @@ class Heading(Text):
 class Button(UIComponent):
     type: Literal['Button'] = 'Button'
     label: str
+    state: Literal[
+               'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
     html_type: Literal['submit', 'button'] = 'button'
-    class_name: str | None = Field(None, serialization_alias='class')
+    block: bool | None = None
+
     icon_src: str | None = Field(None, serialization_alias='iconSrc')
     icon_state: Literal[
                     'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = Field(
@@ -75,19 +78,17 @@ class Button(UIComponent):
     badge_state: Literal[
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = Field(
         None, serialization_alias='badgeState')
-    block: bool = False
 
 
-class Form(BaseModel):
-    submit_url: str = Field(None, serialization_alias='action')
+class Form(UIComponent):
     type: Literal['Form'] = 'Form'
-    class_name: str | None = Field(None, serialization_alias='class')
+    submit_url: str = Field(None, serialization_alias='action')
     components: 'list[AnyUI]'
     method: Literal['POST', 'GET']
     submit_text: str | None = None
 
 
-class InputField(BaseModel):
+class InputField(UIComponent):
     type: Literal['InputField'] = 'InputField'
     name: str
     title: str | None = None
@@ -96,7 +97,6 @@ class InputField(BaseModel):
     html_type: Literal['text', 'password', 'hidden', 'number', 'email', 'tel'] = 'text'
     initial: str | None = Field(None, serialization_alias='value')
     hidden: bool = None
-    class_name: str | None = Field(None, serialization_alias='class')
     autocomplete: str | None = None
     readonly: bool | None = None
     input_state: Literal[
@@ -124,11 +124,6 @@ class Page(UIComponent):
     components: 'list[AnyUI]'
 
 
-class FireEvent(UIComponent):
-    type: Literal['FireEvent'] = 'FireEvent'
-    event: 'e.AnyEvent'
-
-
 class AppShell(UIComponent):
     type: Literal['AppShell'] = 'AppShell'
     hasDrawer: bool | None = None
@@ -143,26 +138,17 @@ class Menu(UIComponent):
     type: Literal['Menu'] = 'Menu'
     title: str | None = None
     variant: Literal['vertical', 'horizontal'] = 'vertical'
-    sub_menu: bool = Field(False, serialization_alias='subMenu')
+    sub_menu: bool | None = Field(None, serialization_alias='subMenu')
     size: Literal['xs', 'sm', 'md', 'lg'] | None = None
 
 
-class Link(UIComponent):
+class Link(Text):
     type: Literal['Link'] = 'Link'
-    title: str
     url: str | None = Field(None, serialization_alias='href')
+    element: None = Field(None, exclude=True)
     state: Literal['primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success'] | None = None
     underline: Literal['on-hover', 'always', 'never'] | bool | None = None
     active: bool = False
-    icon: str | None = Field(
-        None, serialization_alias='iconSrc')
-    icon_state: Literal[
-                    'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = Field(
-        False, serialization_alias='iconState')
-    badge: str | int | None = None
-    badge_state: Literal[
-                     'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = Field(
-        False, serialization_alias='badgeState')
 
 
 class AppContent(UIComponent):
@@ -171,7 +157,6 @@ class AppContent(UIComponent):
 
 class PageHeader(UIComponent):
     type: Literal['PageHeader'] = 'PageHeader'
-    fixed: bool = False
 
 
 class PageContent(UIComponent):
@@ -180,6 +165,19 @@ class PageContent(UIComponent):
 
 class AppFooter(UIComponent):
     type: Literal['AppFooter'] = 'AppFooter'
+
+
+class FireEvent(UIComponent):
+    type: Literal['FireEvent'] = 'FireEvent'
+    event: 'e.AnyEvent'
+
+
+class Table(UIComponent):
+    type: Literal['Table'] = 'Table'
+    data: list[dict]
+    columns: list[dict]
+    row_class: str | None = Field(None, serialization_alias='rowClass')
+    header_class: str | None = Field(None, serialization_alias='headerClass')
 
 
 AnyUI = Annotated[

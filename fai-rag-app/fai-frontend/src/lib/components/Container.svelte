@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {IRenderableComponent} from "../types";
+    import type {IRenderableComponent} from "../types"
 
     export let className: string = '';
     export let components: IRenderableComponent[] = [];

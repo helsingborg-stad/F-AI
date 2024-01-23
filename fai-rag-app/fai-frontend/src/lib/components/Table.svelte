@@ -1,19 +1,27 @@
 <script lang="ts">
-    export let columns: { key: string; title: string }[] = [];
-    export let data: { [key: string]: any }[] = [];
-    export let tableClass: string = 'table'; // default class
-    export let headerClass: string = '';
-    export let rowClass: string = '';
-    export let cellClass: string = '';
+    import Link from "./Link.svelte";
+
+    let className: string | null = null
+    export {className as class}
+
+    export let columns: {
+        key: string
+        label: string
+        link_text?: string
+    }[] = []
+    export let data: { [key: string]: any }[] = []
+    export let headerClass: string = ''
+    export let rowClass: string = ''
+    export let cellClass: string = ''
 </script>
 
 {#if columns.length > 0}
-    <table class={tableClass}>
+    <table class:table={true}>
         <thead>
         <tr class={headerClass}>
             {#each columns as column}
                 <th>
-                    <slot name="header" column={column}>{column.title}</slot>
+                    <slot name="header" class="border" column={column}>{column.label}</slot>
                 </th>
             {/each}
         </tr>
@@ -23,9 +31,15 @@
         {#each data as rowData, rowIndex}
             <tr class={rowClass}>
                 {#each columns as column, colIndex}
-                    <td class={cellClass}>
+                    <td class={cellClass} class:text-right={column.link_text}>
                         <slot name="cell" rowData={rowData} column={column} rowIndex={rowIndex} colIndex={colIndex}>
-                            {rowData[column.key]}
+                            {#if column.link_text}
+                                <Link class="btn btn-neutral" href={rowData[column.key]}>{column.link_text}</Link>
+                            {/if}
+
+                            {#if !column.link_text}
+                                {rowData[column.key]}
+                            {/if}
                         </slot>
                     </td>
                 {/each}

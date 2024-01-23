@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Table from "./Table.svelte";
+    import Table from "./Table.svelte"
     import Dropdown from "./Dropdown.svelte";
 
 

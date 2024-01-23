@@ -1,13 +1,13 @@
 <script lang="ts">
-    import {onMount} from 'svelte';
+    import {onMount} from 'svelte'
 
-    export let title: string = 'Dropdown';
-    export let position: 'top' | 'bottom' | 'left' | 'right' = 'bottom';
-    export let openOnHover: boolean = false;
-    export let className: string | null;
-    export {className as class};
-    export let buttonClass: string = 'btn';
-    export let contentClass: string = '';
+    export let title: string = 'Dropdown'
+    export let position: 'top' | 'bottom' | 'left' | 'right' = 'bottom'
+    export let openOnHover: boolean = false
+    export let className: string | null
+    export {className as class}
+    export let buttonClass: string = 'btn'
+    export let contentClass: string = ''
 
     let isOpen = false;
 

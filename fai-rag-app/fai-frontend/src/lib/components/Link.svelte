@@ -1,8 +1,10 @@
 <script lang="ts">
-    import InlineSvgIcon from "./SVG.svelte";
-    import Badge from "./Badge.svelte";
+    import InlineSvgIcon from "./SVG.svelte"
+    import Badge from "./Badge.svelte"
 
-    export let title: string | null = null
+    let className = ''
+    export {className as class}
+    export let text: string | null = null
     export let href: string = ''
     export let active: boolean = false
     export let disabled: boolean = false
@@ -23,8 +25,19 @@
 
 </script>
 
-<a {href} class:link={['always', true, 'on-hover'].includes(underline)}
-   class:link-hover={underline === 'on-hover'} class={stateClass}
+<a {href}
+   class:link={['always', true, 'on-hover'].includes(underline)}
+   class:link-hover={underline === 'on-hover'}
+   class:link-active={active}
+   class:link-disabled={disabled}
+   class:link-primary={state === 'primary'}
+   class:link-secondary={state === 'secondary'}
+   class:link-accent={state === 'accent'}
+   class:link-success={state === 'success'}
+   class:link-info={state === 'info'}
+   class:link-warning={state === 'warning'}
+   class:link-error={state === 'error'}
+   class={className ?? null}
 >
     {#if iconSrc}
         <InlineSvgIcon
@@ -32,7 +45,7 @@
                 src={iconSrc}/>
     {/if}
 
-    <slot>{title}</slot>
+    <slot>{text}</slot>
 
     {#if badge}
         <Badge state={badgeState}>{badge}</Badge>

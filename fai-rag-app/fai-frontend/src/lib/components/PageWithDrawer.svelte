@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {IRenderableComponent} from "../types";
+    import type {IRenderableComponent} from "../types"
     import Container from "./Container.svelte";
     import Card from "./Card.svelte";
 
