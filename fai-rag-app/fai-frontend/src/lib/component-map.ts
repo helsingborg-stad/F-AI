@@ -22,6 +22,7 @@ import Button from "./components/Button.svelte";
 import Textarea from "./components/Textarea.svelte";
 import Text from "./components/Text.svelte";
 import Table from "./components/Table.svelte";
+import Pagination from "./components/Pagination.svelte";
 
 export const componentMap: Record<string, typeof SvelteComponent> = {
     PageWithDrawer,
@@ -46,7 +47,8 @@ export const componentMap: Record<string, typeof SvelteComponent> = {
     Button,
     Textarea,
     Text,
-    Table
+    Table,
+    Pagination
 }
 
 export default componentMap

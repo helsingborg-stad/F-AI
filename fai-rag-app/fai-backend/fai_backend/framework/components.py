@@ -22,6 +22,7 @@ __all__ = (
     'Link',
     'Text',
     'Table',
+    'Pagination',
     # then `AnyComponent` itself
     'AnyUI',
 )
@@ -39,6 +40,7 @@ class UIComponent(BaseModel, extra='forbid'):
 
 class Div(UIComponent):
     type: Literal['Div'] = 'Div'
+    style: str | None = None
 
 
 class Text(UIComponent):
@@ -181,9 +183,17 @@ class Table(UIComponent):
     header_class: str | None = Field(None, serialization_alias='headerClass')
 
 
+class Pagination(UIComponent):
+    type: Literal['Pagination'] = 'Pagination'
+    current: int
+    total: int
+    limit: int = 5
+    query_var: str = 'page'
+
+
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading | Page |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
-     PageContent | Menu | Link | Textarea | Text | Table),
+     PageContent | Menu | Link | Textarea | Text | Table | Pagination),
     Field(discriminator='type')
 ]
