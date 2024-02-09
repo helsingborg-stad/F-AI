@@ -19,8 +19,5 @@ class User(BaseModel):
     projects: list[ProjectUserRole] = Field(..., default_factory=list)
 
 
-class ProjectUser(BaseModel):
+class ProjectUser(ProjectUserRole):
     email: EmailStr
-    role: str
-    project_id: str
-    permissions: dict[str, bool] = Field(..., default_factory=dict)
