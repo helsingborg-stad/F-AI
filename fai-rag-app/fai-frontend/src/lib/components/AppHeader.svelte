@@ -4,7 +4,7 @@
     export let components: IRenderableComponent[] = []
 </script>
 
-<nav class="navbar top-0 sticky w-full bg-opacity-60 bg-base-100 backdrop-blur px-0 shadow border-b border-neutral z-10">
+<nav class="navbar tracking-tight top-0 sticky w-full bg-opacity-40 bg-base-100 backdrop-blur px-0 border-neutral border-opacity-25 border-b z-50">
     <div class="px-4 w-full">
         <div class="flex-1 lg:flex-none lg:hidden">
             <label for="my-drawer-2" aria-label="open sidebar" class="btn btn-square btn-ghost">

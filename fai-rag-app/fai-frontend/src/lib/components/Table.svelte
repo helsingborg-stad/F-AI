@@ -16,12 +16,12 @@
 </script>
 
 {#if columns.length > 0}
-    <table class:table={true}>
+    <table class:table={true} class:border={false} class={className}>
         <thead>
         <tr class={headerClass}>
             {#each columns as column}
-                <th>
-                    <slot name="header" class="border" column={column}>{column.label}</slot>
+                <th class={cellClass}>
+                    <slot name="header" column={column}>{column.label}</slot>
                 </th>
             {/each}
         </tr>
@@ -31,10 +31,11 @@
         {#each data as rowData, rowIndex}
             <tr class={rowClass}>
                 {#each columns as column, colIndex}
-                    <td class={cellClass} class:text-right={column.link_text}>
+                    <td class={cellClass}>
                         <slot name="cell" rowData={rowData} column={column} rowIndex={rowIndex} colIndex={colIndex}>
                             {#if column.link_text}
-                                <Link class="btn btn-neutral" href={rowData[column.key]}>{column.link_text}</Link>
+                                <Link underline="always"
+                                      href={rowData[column.key]}>{column.link_text}</Link>
                             {/if}
 
                             {#if !column.link_text}

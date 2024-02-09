@@ -9,7 +9,7 @@
             aria-label="close sidebar"
             class="drawer-overlay"></label>
     <aside
-            class="bg-base-200 min-h-screen w-80  border-r border-neutral shadow">
+            class="bg-base-100 min-h-screen w-80  border-r  border-neutral border-opacity-25 shadow">
         <slot/>
     </aside>
 </div>
