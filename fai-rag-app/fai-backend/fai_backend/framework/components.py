@@ -177,6 +177,7 @@ class Table(UIComponent):
     data: list[dict]
     columns: list[dict]
     row_class: str | None = Field(None, serialization_alias='rowClass')
+    cell_class: str | None = Field(None, serialization_alias='cellClass')
     header_class: str | None = Field(None, serialization_alias='headerClass')
 
 
