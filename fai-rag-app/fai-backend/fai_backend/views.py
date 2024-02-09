@@ -74,7 +74,7 @@ def page_template(*components, page_title: str = None) -> list:
     def page_title_component() -> list:
         return [c.Heading(
             text=page_title,
-            class_name='flex-1 lg:flex-none',
+            class_name='flex-1 lg:flex-none font-semibold text-base-content',
         )] if page_title else []
 
     return [

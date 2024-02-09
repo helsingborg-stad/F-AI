@@ -15,6 +15,7 @@ class Feedback(BaseModel):
 class Message(BaseModel):
     user: str
     content: str
+    type: str = 'message'
     feedback: list[Feedback] | None = Field(default_factory=list)
     timestamp: Timestamp = Timestamp()
     metadata: dict | None = Field(default_factory=dict)

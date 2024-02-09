@@ -46,6 +46,7 @@ class CreateFeedbackRequest(BaseModel):
 class CreateMessageRequest(BaseModel):
     user: str = None
     content: str = None
+    type: str = 'message'
     metadata: dict = Field(default_factory=dict)
 
 

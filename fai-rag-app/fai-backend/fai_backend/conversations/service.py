@@ -27,8 +27,9 @@ class ConversationService:
         })
         conversation.created_by = user_email
         conversation.participants.append(user_email)
-        return await self.conversations_repo.create(
-            ConversationModel.model_validate(conversation.model_dump(exclude={'id'})))
+        return Conversation.model_validate((await self.conversations_repo.create(
+            ConversationModel.model_validate(conversation.model_dump(exclude={'id'}))
+        )).model_dump())
 
     async def add_feedback(self, message, email, body) -> FeedbackResponse | None:
         pass
@@ -39,7 +40,9 @@ class ConversationService:
     async def get_conversation_by_id(
             self, conversation_id: str
     ) -> Conversation | None:
-        return await self.conversations_repo.get(conversation_id)
+        conversation = await self.conversations_repo.get(conversation_id)
+        return Conversation.model_validate(conversation.model_dump()) if conversation else None
 
     async def list_conversations(self) -> list[Conversation]:
-        return await self.conversations_repo.list()
+        return [Conversation.model_validate(conversation.model_dump()) for conversation in
+                await self.conversations_repo.list()]
