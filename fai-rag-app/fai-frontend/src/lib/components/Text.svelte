@@ -31,7 +31,7 @@
     <slot {...$$props}>{text}</slot>
 
     {#if badge}
-        <Badge state={badgeState}>{badge}</Badge>
+        <Badge class="align-top" state={badgeState}>{badge}</Badge>
     {/if}
 
     <slot {...$$props} name="after"/>
