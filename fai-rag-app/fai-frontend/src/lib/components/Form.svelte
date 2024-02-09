@@ -20,12 +20,13 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            }).then(async r => {
-                if (!r.ok) {
-                    throw await r.json();
-                }
-                return r.json();
             })
+                .then(async r => {
+                    if (!r.ok) {
+                        throw await r.json();
+                    }
+                    return r.json();
+                })
         },
         onError: async (errors: any, context) => {
             return (context.setTouched({}) == null) && [...(errors?.detail || [])]
@@ -44,8 +45,6 @@
             }
         },
     })
-
-    $: console.log($data)
 
     $: {
         components && $errors && $isSubmitting && $interacted
