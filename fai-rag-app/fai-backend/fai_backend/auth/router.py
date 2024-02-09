@@ -95,18 +95,21 @@ def login_view(
                         c.Div(
                             components=[
                                 c.Heading(
-                                    text='PIN' if session_id is not None else 'Login',
+                                    text='PIN' if session_id is not None else 'Folkets Ai',
                                     class_name='text-4xl font-extrabold text-center mb-6 mt-0',
+                                    badge=_('test', 'test') if session_id is None else None,
+                                    badge_state='warning' if session_id is None else None,
                                 ),
                                 *render_form(),
                             ],
                             class_name='card-body',
                         )
                     ],
-                    class_name='card bg-base-200 w-full max-w-sm mx-auto pt-6',
+                    class_name='card bg-base-100 shadow-2xl drop-shadow-4xl bg-opacity-80 z-50 w-full max-w-sm mx-auto pt-6',
                 )
             ],
-            class_name='h-screen flex justify-center items-center',
+            class_name='h-screen flex justify-center items-center border-neutral border-opacity-25 border-4',
+            style='background-image: url("data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.31\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zM6 5v1H5z\'/%3E%3C/g%3E%3C/svg%3E");'
         )
     ]
 

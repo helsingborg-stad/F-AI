@@ -9,5 +9,11 @@ export default {
         extend: {},
     },
     plugins: [require("@tailwindcss/typography"), require("daisyui"), require('autoprefixer')],
+    daisyui: {
+        themes: [
+            "corporate",
+            "business"
+        ],
+    },
 }
 
