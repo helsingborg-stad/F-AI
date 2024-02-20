@@ -47,6 +47,8 @@ class Text(UIComponent):
     type: Literal['Text'] = 'Text'
     text: str
     element: Literal['p', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] = 'span'
+    state: Literal[
+               'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
 
     icon_src: str | None = Field(None, serialization_alias='iconSrc')
     icon_state: Literal[

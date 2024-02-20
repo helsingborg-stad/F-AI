@@ -20,6 +20,14 @@
 <svelte:element
         this={element}
         class={className}
+        class:text-primary={state === 'primary'}
+        class:text-secondary={state === 'secondary'}
+        class:text-accent={state === 'accent'}
+        class:text-success={state === 'success'}
+        class:text-info={state === 'info'}
+        class:text-warning={state === 'warning'}
+        class:text-error={state === 'error'}
+
         {...$$restProps}
 >
     <slot {...$$props} name="before"/>
