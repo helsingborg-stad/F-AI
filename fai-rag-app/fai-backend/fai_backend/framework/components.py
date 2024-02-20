@@ -23,6 +23,7 @@ __all__ = (
     'Text',
     'Table',
     'Pagination',
+    'Select',
     # then `AnyComponent` itself
     'AnyUI',
 )
@@ -197,9 +198,28 @@ class Pagination(UIComponent):
     query_var: str = 'page'
 
 
+class Select(BaseModel):
+    type: Literal['Select'] = 'Select'
+    id: str | None = None
+    class_name: str | None = Field(None, serialization_alias='class')
+    name: str
+    title: str | None = None
+    placeholder: str | None = None
+    required: bool | None = None
+
+    initial: str | None = Field(None, serialization_alias='value')
+    hidden: bool = None
+
+    readonly: bool | None = None
+    input_state: Literal[
+                     'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
+    value: str | None = None
+    options: list[tuple[str, str | None]] | None = None
+
+
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading | Page |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
-     PageContent | Menu | Link | Textarea | Text | Table | Pagination),
+     PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select),
     Field(discriminator='type')
 ]
