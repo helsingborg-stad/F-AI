@@ -19,34 +19,33 @@
 </script>
 
 <div>
-    <textarea
-            {name}
-            {id}
-            {title}
-            {placeholder}
-            {required}
-            {value}
-            {autocomplete}
-            {rows}
-            {cols}
-            {disabled}
-            {readonly}
-            class:textarea={true}
-            class:textarea-bordered={variant === 'bordered'}
-            class:textarea-ghost={variant === 'ghost'}
-            class:textarea-warning={state === 'warning'}
-            class:textarea-success={state === 'success'}
-            class:textarea-info={state === 'info'}
-            class:textarea-accent={state === 'accent'}
-            class:textarea-primary={state === 'primary'}
-            class:textarea-secondary={state === 'secondary'}
-            class:textarea-error={error || (state === 'error')}
-            class:w-full={true}
-            class={className}></textarea>
+<textarea
+        {name}
+        {id}
+        {title}
+        {placeholder}
+        {required}
+        {value}
+        {autocomplete}
+        {rows}
+        {cols}
+        {disabled}
+        {readonly}
+        class:textarea={true}
+        class:textarea-bordered={variant === 'bordered'}
+        class:textarea-ghost={variant === 'ghost'}
+        class:textarea-warning={state === 'warning'}
+        class:textarea-success={state === 'success'}
+        class:textarea-info={state === 'info'}
+        class:textarea-accent={state === 'accent'}
+        class:textarea-primary={state === 'primary'}
+        class:textarea-secondary={state === 'secondary'}
+        class:textarea-error={error || (state === 'error')}
+        class:w-full={true}
+        class={className}></textarea>
     {#if error}
         <div class="label label-text text-error mt-1">{error}</div>
     {/if}
 </div>
-
 
 

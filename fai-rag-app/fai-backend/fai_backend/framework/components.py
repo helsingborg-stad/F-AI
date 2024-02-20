@@ -115,10 +115,12 @@ class Textarea(UIComponent):
     placeholder: str | None = None
     required: bool | None = None
     initial: str | None = Field(None, serialization_alias='value')
+    variant: Literal['ghost', 'bordered'] | None = None
     hidden: bool = None
     class_name: str | None = Field(None, serialization_alias='class')
     autocomplete: str | None = None
     readonly: bool | None = None
+    rows: int | None = None
     state: Literal[
                'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success'] | None = None
 
