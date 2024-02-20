@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import FastAPI, Form, Header, Request
-from starlette.responses import HTMLResponse
+from fastapi import Depends, FastAPI, Form, Header, Request
+from starlette.responses import HTMLResponse, RedirectResponse
 
+from dependencies import get_project_user
 from fai_backend.auth.router import router as auth_router
 from fai_backend.config import settings
 from fai_backend.framework.frontend import get_frontend_environment
@@ -13,6 +14,7 @@ from fai_backend.projects.router import router as projects_router
 from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.setup import setup_db, setup_project
 from phrase import phrase as _
+from schema import ProjectUser
 from views import page_template
 
 
@@ -78,8 +80,8 @@ async def about():
 
 
 @app.get('/api', include_in_schema=True)
-async def root():
-    return page_template(*[], page_title=(_('submit_question', 'Submit a question')))
+async def root(project_user: ProjectUser = Depends(get_project_user)):
+    return RedirectResponse(url='/api/questions', status_code=302)
 
 
 @app.get('/api/{path:path}', status_code=404)

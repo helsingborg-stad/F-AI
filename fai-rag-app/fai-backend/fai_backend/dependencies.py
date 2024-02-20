@@ -23,19 +23,25 @@ async def get_authenticated_user(
         user: User | None = Depends(try_get_authenticated_user),
 ) -> User:
     if not user:
-        raise HTTPException(status_code=401, detail='Unauthorized')
+        raise HTTPException(status_code=302, detail='Unauthorized', headers={'Location': '/api/login'})
     return user
 
 
-async def get_project_user(
-        user: User = Depends(get_authenticated_user),
-) -> ProjectUser:
-    if len(user.projects) == 0:
-        raise HTTPException(status_code=401, detail='Unauthorized')
-
-    return ProjectUser(
+async def try_get_project_user(
+        user: User | None = Depends(try_get_authenticated_user),
+) -> ProjectUser | None:
+    return None if not user or len(user.projects) == 0 else ProjectUser(
         email=user.email,
         role=user.projects[0].role,
         project_id=user.projects[0].project_id,
         permissions=user.projects[0].permissions,
     )
+
+
+async def get_project_user(
+        user: ProjectUser | None = Depends(try_get_project_user),
+) -> ProjectUser:
+    if not user:
+        raise HTTPException(status_code=302, detail='Unauthorized', headers={'Location': '/api/login'})
+
+    return user
