@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from datetime import datetime
 from typing import TypeVar
 
 T = TypeVar('T')
@@ -19,3 +20,33 @@ def try_get_first_match(objects: list[T], condition: Callable[[T], bool]) -> T |
         if condition(obj):
             return obj
     return None
+
+
+def format_datetime_human_readable(specified_datetime, threshold_days):
+    """
+    Converts a datetime to a human-readable format based on the specified criteria.
+
+    Args:
+    - specified_datetime: The datetime to convert.
+    - threshold_days: The threshold in days for showing just the date.
+
+    Returns:
+    A string representing the time difference in a human-readable format or just the date.
+    """
+    now = datetime.now()
+    difference = now - specified_datetime
+    days = difference.days
+    hours, remainder = divmod(difference.seconds, 3600)
+    minutes, _ = divmod(remainder, 60)
+
+    if days > threshold_days:
+        return specified_datetime.strftime('%B %d, %Y')
+    elif days == 1 or (
+            days < 1 and hours > 23):  # Adjusting for edge case where difference is just under 24 hours but on 'yesterday'
+        return 'Yesterday'
+    elif days > 1:
+        return f'{days} days ago'
+    elif hours >= 1:
+        return f'{hours} hours, {minutes} minutes ago'
+    else:
+        return f'{minutes} minutes ago'
