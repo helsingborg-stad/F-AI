@@ -5,9 +5,10 @@
 </script>
 
 <main
-        class:drawer-content={true}
+        class:min-h-screen={true}
         class:flex={true}
-        class:flex-col={true} {...$$restProps}>
+        class:flex-col={true}
+        class:drawer-content={true} {...$$restProps}>
     <slot>
         {#each components as component}
             <svelte:component this={component.type} {...component.props}/>
