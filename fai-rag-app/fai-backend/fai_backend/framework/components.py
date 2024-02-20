@@ -71,6 +71,8 @@ class Button(UIComponent):
                'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
     html_type: Literal['submit', 'button'] = 'button'
     block: bool | None = None
+    variant: Literal['outline', 'ghost'] | None = None
+    on_click: e.AnyEvent | None = Field(None, serialization_alias='onClick')
 
     icon_src: str | None = Field(None, serialization_alias='iconSrc')
     icon_state: Literal[
