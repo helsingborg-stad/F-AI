@@ -20,7 +20,7 @@ async def mongo_repo():
     client = AsyncMongoMockClient()
     db = client.test_db
     await init_beanie(database=db, document_models=[SampleDocument])
-    yield MongoDBRepo(SampleDocument)
+    yield MongoDBRepo(SampleDocument, SampleDocument)
     await SampleDocument.get_motor_collection().drop()
 
 
@@ -67,15 +67,17 @@ async def test_get_non_existing_document(mongo_repo):
 
 @pytest.mark.asyncio
 async def test_update_existing_document(mongo_repo):
-    sample_document = await SampleDocument(name='Eve', age=45).insert()
-
+    created = await mongo_repo.create(SampleDocument(name='Eve', age=45))
+    document = await mongo_repo.get(str(created.id))
+    saved_id = str(document.id)
     updated_document = await mongo_repo.update(
-        str(sample_document.id), {'name': 'Eve Updated', 'age': 50}
+        str(document.id), {'name': 'Eve Updated', 'age': 50}
     )
 
     assert updated_document is not None
     assert updated_document.name == 'Eve Updated'
     assert updated_document.age == 50
+    assert str(updated_document.id) == saved_id
 
 
 @pytest.mark.asyncio
