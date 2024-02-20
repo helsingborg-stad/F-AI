@@ -1,12 +1,12 @@
-from typing import Annotated
 
-from pydantic import BaseModel, BeforeValidator, Field
+from pydantic import BaseModel, Field
 
-from schema import Timestamp
+from fai_backend.schema import Timestamp
 
 
 class Feedback(BaseModel):
     user: str
+    created_by: str
     rating: str
     comment: str | None = None
     timestamp: Timestamp = Timestamp()
@@ -15,6 +15,7 @@ class Feedback(BaseModel):
 class Message(BaseModel):
     user: str
     content: str
+    created_by: str
     type: str = 'message'
     feedback: list[Feedback] | None = Field(default_factory=list)
     timestamp: Timestamp = Timestamp()
@@ -22,7 +23,8 @@ class Message(BaseModel):
 
 
 class Conversation(BaseModel):
-    id: Annotated[str, BeforeValidator(str)]
+    id: str
+    type: str = 'conversation'
     created_by: str
     participants: list[str]
     messages: list[Message]

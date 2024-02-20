@@ -32,17 +32,16 @@ class RepositoryFactory:
 
 
 factory = RepositoryFactory()
-M = TypeVar('M')
+T = TypeVar('T')
+T_DB = TypeVar('T_DB')
 
 
-def create_repo_from_env(model: type[M], app_db: str = settings.APP_DB) -> IAsyncRepo[M]:
-    def create_repo_factory_map(
-            db_model: type[M],
-    ) -> dict[str, Callable[[], IAsyncRepo[M]]]:
+def create_repo_from_env(model_type: type[T], db_type: type[T_DB], app_db: str = settings.APP_DB) -> IAsyncRepo[T]:
+    def create_repo_factory_map() -> dict[str, Callable[[], IAsyncRepo[T]]]:
         return {
-            'mongodb': lambda: MongoDBRepo[M](db_model),
-            'memory': lambda: InMemoryRepo[M](),
+            'mongodb': lambda: MongoDBRepo[T, T_DB](model_type, db_type),
+            'memory': lambda: InMemoryRepo[T](),
         }
 
-    repo_factory_map = create_repo_factory_map(model)
+    repo_factory_map = create_repo_factory_map()
     return repo_factory_map[app_db]()

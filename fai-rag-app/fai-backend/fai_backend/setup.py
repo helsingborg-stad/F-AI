@@ -4,12 +4,7 @@ from fastapi.routing import APIRoute
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from fai_backend.config import settings
-from fai_backend.repositories import (
-    ConversationModel,
-    PinCodeModel,
-    ProjectModel,
-    projects_repo,
-)
+from fai_backend.repositories import ConversationDocument, PinCodeModel, ProjectModel, projects_repo
 
 
 def use_route_names_as_operation_ids(app: FastAPI) -> None:
@@ -82,5 +77,5 @@ async def setup_db():
     client = AsyncIOMotorClient(settings.MONGO_DB_URI)
     await init_beanie(
         database=client[settings.MONGO_DB_NAME],
-        document_models=[ProjectModel, PinCodeModel, ConversationModel],
+        document_models=[ProjectModel, PinCodeModel, ConversationDocument],
     )

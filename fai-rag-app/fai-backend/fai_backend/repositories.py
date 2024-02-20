@@ -95,21 +95,22 @@ class PinCodeRepository(IAsyncRepo[PinCodeModel]):
     pass
 
 
-class ConversationModel(Document, Conversation):
+class ConversationDocument(Document, Conversation):
     class Settings:
         name = 'conversations'
+        use_state_management = True
 
 
-class ConversationRepository(IAsyncRepo[ConversationModel]):
+class ConversationRepository(IAsyncRepo[Conversation]):
     pass
 
 
 repo_factory.register_builder(
     {
-        ProjectRepository: lambda: create_repo_from_env(ProjectModel),
-        UserRepository: lambda: UserRepoImp([create_repo_from_env(ProjectModel)]),
-        PinCodeRepository: lambda: create_repo_from_env(PinCodeModel),
-        ConversationRepository: lambda: create_repo_from_env(ConversationModel),
+        ProjectRepository: lambda: create_repo_from_env(ProjectModel, ProjectModel),
+        UserRepository: lambda: UserRepoImp([create_repo_from_env(ProjectModel, ProjectModel)]),
+        PinCodeRepository: lambda: create_repo_from_env(PinCodeModel, PinCodeModel),
+        ConversationRepository: lambda: create_repo_from_env(Conversation, ConversationDocument),
     }
 )
 
