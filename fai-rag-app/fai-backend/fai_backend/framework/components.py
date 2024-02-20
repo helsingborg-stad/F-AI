@@ -3,9 +3,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, Field
 
 __all__ = (
-    'UIComponent',
     'Div',
-    'Page',
     'Heading',
     'Button',
     'FireEvent',
@@ -35,8 +33,7 @@ class UIComponent(BaseModel, extra='forbid'):
     type: str
     id: str | None = None
     class_name: str | None = Field(None, serialization_alias='class')
-    components: 'list[AnyUI] | None' = None
-    slot: str | None = None
+    components: 'list[AnyUI] | None' = Field(None, serialization_alias='renderProps.components')
 
 
 class Div(UIComponent):
@@ -90,8 +87,7 @@ class Button(UIComponent):
 class Form(UIComponent):
     type: Literal['Form'] = 'Form'
     submit_url: str = Field(None, serialization_alias='action')
-    components: 'list[AnyUI]'
-    method: Literal['POST', 'GET']
+    method: Literal['POST', 'GET'] = 'POST'
     submit_text: str | None = None
 
 
@@ -128,11 +124,6 @@ class Textarea(UIComponent):
                'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success'] | None = None
 
 
-class Page(UIComponent):
-    type: Literal['Page'] = 'Page'
-    components: 'list[AnyUI]'
-
-
 class AppShell(UIComponent):
     type: Literal['AppShell'] = 'AppShell'
     hasDrawer: bool | None = None
@@ -149,6 +140,7 @@ class Menu(UIComponent):
     variant: Literal['vertical', 'horizontal'] = 'vertical'
     sub_menu: bool | None = Field(None, serialization_alias='subMenu')
     size: Literal['xs', 'sm', 'md', 'lg'] | None = None
+    components: 'list[AnyUI] | None' = Field(None, serialization_alias='renderProps.components')
 
 
 class Link(Text):
@@ -218,7 +210,7 @@ class Select(BaseModel):
 
 
 AnyUI = Annotated[
-    (Div | Form | InputField | Button | FireEvent | Heading | Page |
+    (Div | Form | InputField | Button | FireEvent | Heading |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
      PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select),
     Field(discriminator='type')
