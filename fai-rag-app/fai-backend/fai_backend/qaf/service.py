@@ -1,8 +1,16 @@
-from conversations.schema import CreateConversationRequest, CreateMessageRequest
-from conversations.service import ConversationService
-from fai_backend.qaf.schema import QuestionResponse, SubmitQuestionRequest
-from schema import ProjectUser
-from utils import try_get_first_match
+from fai_backend.conversations.models import Conversation, Feedback, Message
+from fai_backend.logger.console import console
+from fai_backend.qaf.schema import (
+    ApproveAnswerPayload,
+    GenerateAnswerPayload,
+    QuestionDetails,
+    QuestionEntry,
+    RejectAnswerPayload,
+    SubmitAnswerPayload,
+)
+from fai_backend.repositories import ConversationRepository, conversation_repo
+from fai_backend.schema import ProjectUser
+from fai_backend.utils import try_get_first_match
 
 
 def user_can_submit_question(project_user: ProjectUser) -> bool:
@@ -11,102 +19,114 @@ def user_can_submit_question(project_user: ProjectUser) -> bool:
 
 
 class QAFService:
-    conversation_service: ConversationService
+    conversations: ConversationRepository
 
-    def __init__(self, conversation_service: ConversationService):
-        self.conversation_service = conversation_service
+    def __init__(self, conversations: ConversationRepository):
+        self.conversations = conversations
 
     async def submit_question(
             self,
             project_user: ProjectUser,
-            payload: SubmitQuestionRequest
-    ) -> QuestionResponse | None:
-        try:
-            if not user_can_submit_question(project_user):
-                raise PermissionError('User does not have permission to submit a question')
+            question: str,
+            meta: dict,
+    ) -> QuestionDetails:
+        conversation = await self.conversations.create(
+            Conversation(
+                id='temp_id',
+                created_by=project_user.email,
+                participants=[project_user.email],
+                type='question',
+                messages=[
+                    Message(
+                        user='user',
+                        created_by=project_user.email,
+                        content=question,
+                        type='question'
+                    )
+                ],
+                metadata=meta
+            )
+        )
 
-            new_conversation = await self.conversation_service.create_conversation(
-                project_user.email,
-                CreateConversationRequest(
-                    project_id=project_user.project_id,
-                    messages=[
-                        CreateMessageRequest(
-                            user=project_user.email,
-                            content=payload.question,
-                            type='question'
-                        )
-                    ],
-                    metadata={
-                        'subject': payload.subject,
-                        'errand_id': payload.errand_id
-                    }
+        return QuestionDetails(**conversation.model_dump()) if conversation else None
+
+    async def my_questions(self, project_user: ProjectUser) -> list[QuestionEntry]:
+        return [QuestionEntry(**conversation.model_dump()) for conversation in await self.conversations.list() if
+                conversation.type == 'question' and project_user.email in conversation.created_by]
+
+    async def my_question_details(self, project_user: ProjectUser, question_id: str) -> QuestionDetails | None:
+        conversation = await self.conversations.get(question_id)
+        if conversation.created_by != project_user.email:
+            raise PermissionError('User does not have permission to view this question')
+        return QuestionDetails(**conversation.model_dump()) if conversation else None
+
+    async def submitted_questions(self, project_user: ProjectUser) -> list[QuestionEntry]:
+        return [QuestionEntry(**conversation.model_dump()) for conversation in await self.conversations.list() if
+                conversation.type == 'question' and project_user.email in conversation.created_by]
+
+    async def submitted_question_details(self, project_user: ProjectUser,
+                                         question_id: str) -> QuestionDetails | None:
+        conversation = await self.conversations.get(question_id)
+        if conversation.created_by != project_user.email:
+            raise PermissionError('User does not have permission to view this question')
+        return QuestionDetails(**conversation.model_dump()) if conversation else None
+
+    async def add_message(self, project_user: ProjectUser,
+                          payload: SubmitAnswerPayload | GenerateAnswerPayload) -> QuestionDetails | None:
+        try:
+            conversation = (await self.conversations.get(payload.question_id)).model_copy()
+
+            {
+                'user': lambda: conversation.messages.append(
+                    Message(
+                        user='user',
+                        content=payload.answer,
+                        type='answer',
+                        created_by=project_user.email
+                    )
+                ),
+                'assistant': lambda: conversation.messages.append(
+                    Message(
+                        user='assistant',
+                        content=payload.answer,
+                        type='generated_answer',
+                        created_by=project_user.email
+                    )
+                )
+            }['assistant' if isinstance(payload, GenerateAnswerPayload) else 'user']()
+
+            result = await self.conversations.update(str(conversation.id), {'messages': conversation.messages})
+            return QuestionDetails(**result.model_dump())
+        except Exception:
+            console.print_exception(show_locals=False)
+
+    async def add_feedback(self, project_user: ProjectUser,
+                           payload: ApproveAnswerPayload | RejectAnswerPayload) -> QuestionDetails | None:
+        try:
+            conversation = (await self.conversations.get(payload.question_id)).model_copy()
+            answer = try_get_first_match(
+                conversation.messages,
+                lambda message: message.type == 'generated_answer' and len(message.feedback) == 0
+            )
+
+            if answer is None:
+                raise ValueError('Answer not found')
+
+            answer.feedback.append(
+                Feedback(
+                    user=project_user.email,
+                    created_by=project_user.email,
+                    rating=payload.rating,
+                    comment=payload.comment
                 )
             )
 
-            if new_conversation is None:
-                raise ValueError('Failed to submit question')
+            result = await self.conversations.update(str(conversation.id), {'messages': conversation.messages})
+            return QuestionDetails(**result.model_dump())
+        except Exception:
+            console.print_exception(show_locals=False)
+            raise
 
-            return QuestionResponse(
-                id=new_conversation.id,
-                question=new_conversation.messages[0].content,
-                subject=new_conversation.metadata['subject'],
-                errand_id=new_conversation.metadata['errand_id'],
-                created_by=new_conversation.created_by,
-                answer=''
-            )
-
-        except Exception as e:
-            raise e
-
-    async def list_questions(self, project_user: ProjectUser) -> list[QuestionResponse]:
-        try:
-            return [QuestionResponse(
-                id=conversation.id,
-                question=conversation.messages[0].content,
-                subject=conversation.metadata['subject'],
-                errand_id=conversation.metadata['errand_id'],
-                created_by=conversation.created_by,
-                answer=''
-            ) for conversation in [*await self.conversation_service.list_conversations()] if
-                conversation.created_by == project_user.email]
-        except Exception as e:
-            raise e
-
-    async def get_question(self, project_user: ProjectUser, question_id: str) -> QuestionResponse:
-        try:
-            conversation = await self.conversation_service.get_conversation_by_id(question_id)
-            if conversation is None:
-                raise ValueError('Question not found')
-
-            if conversation.created_by != project_user.email:
-                raise PermissionError('User does not have permission to view this question')
-
-            if conversation.messages[0].type != 'question':
-                raise ValueError('Conversation type is not a question')
-
-            answer = try_get_first_match(
-                conversation.messages,
-                lambda message:
-                message.type == 'generated_answer'
-                and try_get_first_match(
-                    message.feedback or [],
-                    lambda feedback:
-                    feedback.rating == 'approved')
-                is not None
-            )
-
-            answer = answer if answer is not None else try_get_first_match(
-                conversation.messages,
-                lambda message: message.type == 'answer'
-            )
-
-            return QuestionResponse(
-                id=conversation.id,
-                question=conversation.messages[0].content,
-                subject=conversation.metadata['subject'],
-                errand_id=conversation.metadata['errand_id'],
-                created_by=conversation.created_by,
-                answer=answer if answer is not None else ''
-            )
-        except Exception as e:
-            raise e
+    @staticmethod
+    def factory() -> 'QAFService':
+        return QAFService(conversations=conversation_repo)
