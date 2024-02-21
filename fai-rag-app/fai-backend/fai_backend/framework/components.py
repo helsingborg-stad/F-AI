@@ -22,6 +22,7 @@ __all__ = (
     'Table',
     'Pagination',
     'Select',
+    'ChatBubble',
     # then `AnyComponent` itself
     'AnyUI',
 )
@@ -209,9 +210,19 @@ class Select(BaseModel):
     options: list[tuple[str, str | None]] | None = None
 
 
+class ChatBubble(UIComponent):
+    type: Literal['ChatBubble'] = 'ChatBubble'
+    image_src: str | None = Field(None, serialization_alias='imageSrc')
+    user: str | None = None
+    content: str
+    time: str | None = None
+    is_self: bool | None = Field(None, serialization_alias='isSelf')
+    footer: 'list[AnyUI] | None' = Field(None, serialization_alias='slot.footer')
+
+
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
-     PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select),
+     PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | ChatBubble),
     Field(discriminator='type')
 ]
