@@ -1,18 +1,25 @@
 from fastapi import APIRouter, Depends
 
-from fai_backend.conversations.dependencies import (
-    get_conversation_request,
-)
-from fai_backend.conversations.schema import ConversationResponse
-from fai_backend.dependencies import try_get_authenticated_user
+from fai_backend.conversations.models import Conversation, Message
+from fai_backend.dependencies import get_authenticated_user, get_project_user, try_get_authenticated_user
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
+from fai_backend.framework.components import AnyUI
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
-from fai_backend.qaf.dependencies import create_question_request, list_questions_request
-from fai_backend.qaf.schema import QuestionResponse
-from fai_backend.schema import User
+from fai_backend.qaf.dependencies import (
+    list_my_questions_request,
+    my_question_details_request,
+    submit_answer_request,
+    submit_feedback_request,
+    submit_question_request,
+    submitted_question_details_request,
+    submitted_questions_request,
+)
+from fai_backend.qaf.schema import QuestionDetails
+from fai_backend.schema import ProjectUser, User
 from fai_backend.views import page_template
+from utils import format_datetime_human_readable
 
 router = APIRouter(
     prefix='/api',
@@ -23,11 +30,8 @@ router = APIRouter(
 
 @router.get('/questions/create', response_model=list, response_model_exclude_none=True)
 def submit_question_view(
-        authenticated_user: User | None = Depends(try_get_authenticated_user)
+        authenticated_user: User = Depends(get_authenticated_user)
 ) -> list:
-    if not authenticated_user:
-        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
-
     if len(authenticated_user.projects) == 0:
         return [
             c.Text(
@@ -69,21 +73,19 @@ def submit_question_view(
 
 
 @router.post('/questions/create', response_model=list, response_model_exclude_none=True)
-def submit_question_handler(
-        created_question: QuestionResponse = Depends(create_question_request)
+def create_question_handler(
+        question: QuestionDetails = Depends(submit_question_request)
 ) -> list:
-    print(created_question)
     return page_template(
-        c.Link(text='Successfully submitted question', url=f'/questions/{created_question.id}'),
+        c.FireEvent(event=e.GoToEvent(url=f'/questions/{question.id}')),
         page_title=_('submit_a_question', 'Create Question'''),
     )
 
 
 @router.get('/questions', response_model=list, response_model_exclude_none=True)
 def questions_index_view(
-        page: int | None = 1,
         authenticated_user: User | None = Depends(try_get_authenticated_user),
-        questions: list[QuestionResponse] = Depends(list_questions_request),
+        questions: list[Conversation] = Depends(list_my_questions_request),
 ) -> list:
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
@@ -94,15 +96,15 @@ def questions_index_view(
                 c.Table(
                     data=[
                         {
-                            'id': question.id,
-                            'subject': question.subject,
+                            'subject': question.metadata['subject'],
+                            'status': question.status,
                             'link': f'/questions/{question.id}',
                         }
                         for question in questions
                     ],
                     columns=[
-                        {'key': 'id', 'label': 'ID'},
                         {'key': 'subject', 'label': 'Subject'},
+                        {'key': 'status', 'label': 'Status'},
                         {'key': 'link', 'label': '', 'link_text': 'View'},
                     ],
 
@@ -115,14 +117,172 @@ def questions_index_view(
 
 
 @router.get('/questions/{conversation_id}', response_model=list, response_model_exclude_none=True)
-def question_details_view(
+async def question_details_view(
+        authenticated_user: ProjectUser | None = Depends(get_project_user),
+        question: QuestionDetails = Depends(my_question_details_request)
+) -> list:
+    if not question:
+        return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
+    if not authenticated_user:
+        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
+
+    def message_factory(message: Message) -> AnyUI:
+        return c.Div(components=[
+            {
+                'user': lambda: c.ChatBubble(content=message.content,
+                                             is_self=message.created_by == authenticated_user.email,
+                                             user=message.user.capitalize(),
+                                             image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
+                                             time=format_datetime_human_readable(message.timestamp.created, 3)),
+                'assistant': lambda: c.ChatBubble(content=message.content,
+                                                  is_self=False,
+                                                  user=message.user.capitalize(),
+                                                  image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWJvdCI+PHBhdGggZD0iTTEyIDhWNEg4Ii8+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiB4PSI0IiB5PSI4IiByeD0iMiIvPjxwYXRoIGQ9Ik0yIDE0aDIiLz48cGF0aCBkPSJNMjAgMTRoMiIvPjxwYXRoIGQ9Ik0xNSAxM3YyIi8+PHBhdGggZD0iTTkgMTN2MiIvPjwvc3ZnPg==',
+                                                  time=format_datetime_human_readable(
+                                                      message.timestamp.created, 3)
+
+                                                  ),
+            }[message.user if message.user == 'assistant' else 'user']()
+        ])
+
+    return page_template(
+        *[message_factory(question.question), *([message_factory(question.answer)] if question.answer else []), ],
+        page_title='Conversation: ' + str(question.subject),
+    )
+
+
+@router.get('/reviews', response_model=list, response_model_exclude_none=True)
+def reviews_index_view(
         authenticated_user: User | None = Depends(try_get_authenticated_user),
-        conversation: ConversationResponse = Depends(get_conversation_request),
+        questions: list[QuestionDetails] = Depends(submitted_questions_request),
 ) -> list:
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
     return page_template(
-        c.Text(text='This is the questions page'),
-        page_title=_('my_questions', 'My Questions') + ' - Question ID: ' + conversation.id,
+        c.Div(components=[
+            c.Div(components=[
+                c.Table(
+                    data=[
+                        {
+                            'subject': question.subject,
+                            'link': f'/reviews/{question.id}',
+                        }
+                        for question in questions
+                    ],
+                    columns=[
+                        {'key': 'subject', 'label': 'Subject'},
+                        {'key': 'link', 'label': '', 'link_text': 'View'},
+                    ],
+
+                    class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
+                ),
+            ], class_name='overflow-x-auto space-y-4'),
+        ], class_name='card bg-base-100 w-full max-w-6xl'),
+        page_title=_('Inbox', 'Inbox'),
+    )
+
+
+@router.get('/reviews/{conversation_id}', response_model=list, response_model_exclude_none=True)
+async def review_details_view(
+        authenticated_user: ProjectUser | None = Depends(get_project_user),
+        question: QuestionDetails = Depends(submitted_question_details_request),
+) -> list:
+    if not question:
+        return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
+
+    def message_factory(message: Message) -> AnyUI:
+        return {
+            'user': lambda: c.ChatBubble(content=message.content,
+                                         is_self=message.created_by == authenticated_user.email,
+                                         user=message.user.capitalize(),
+                                         image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
+                                         time=format_datetime_human_readable(message.timestamp.created, 3)),
+            'assistant': lambda: c.ChatBubble(content=message.content,
+                                              is_self=message.created_by == authenticated_user.email,
+                                              user=message.user.capitalize(),
+                                              image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
+                                              time=format_datetime_human_readable(message.timestamp.created, 3)),
+        }[message.user if message.user == 'assistant' else 'user']()
+
+    components = [
+        *[message_factory(message) for message in question.messages],
+    ]
+
+    render_form = ({
+        'feedback_form': lambda: [
+            c.Form(
+                submit_url=f'/api/reviews/{question.id}/feedback',
+                method='POST',
+                submit_text=_('create_question_submit_button', 'Submit'),
+                components=[
+                    c.Text(text=_('feedback', 'Feedback')),
+                    c.InputField(html_type='hidden', name='question_id', value=question.id, hidden=True),
+                    c.Select(
+                        name='rating',
+                        title=_('rating', 'Rating'),
+                        options=[
+                            ('approved', 'Approved'),
+                            ('rejected', 'Rejected'),
+                        ],
+                    ),
+                    c.Textarea(
+                        name='comment',
+                        title=_('comment', 'Comment'),
+                        placeholder=_('input_comment_placeholder', 'Enter a comment here'),
+                        required=True,
+                    ),
+                ],
+            ),
+        ],
+        'answer_form': lambda: [
+            c.Form(
+                submit_url=f'/api/reviews/{question.id}/answer',
+                method='POST',
+                submit_text=_('create_question_submit_button', 'Submit'),
+                components=[
+                    c.Text(text=_('answer', 'Answer')),
+                    c.InputField(html_type='hidden', name='question_id', value=question.id, hidden=True),
+                    c.Textarea(
+                        name='answer',
+                        title=_('answer', 'Answer'),
+                        placeholder=_('input_comment_placeholder', 'Enter correct answer'),
+                        required=True,
+                    ),
+                ],
+            )
+        ],
+        'null': lambda: [],
+    }[
+        'feedback_form' if question.review_status is None
+        else 'answer_form' if question.review_status == 'rejected' and question.answer is None
+        else 'null'
+    ])
+
+    return page_template(
+        *components,
+        *render_form(),
+        page_title='Review: ' + str(question.subject),
+    )
+
+
+@router.post('/reviews/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)
+def submit_feedback_handler(
+        conversation_id: str,
+        review: QuestionDetails = Depends(submit_feedback_request)
+) -> list:
+    return page_template(
+        c.FireEvent(event=e.GoToEvent(url=f'/reviews/{review.id}')),
+        page_title=_('submit_a_question', 'Create Question'''),
+    )
+
+
+@router.post('/reviews/{conversation_id}/answer', response_model=list, response_model_exclude_none=True)
+def submit_answer_handler(
+        conversation_id: str,
+        review: QuestionDetails = Depends(submit_answer_request)
+) -> list:
+    return page_template(
+        c.FireEvent(event=e.GoToEvent(url=f'/reviews/{review.id}')),
+        page_title=_('submit_a_question', 'Create Question'''),
     )
