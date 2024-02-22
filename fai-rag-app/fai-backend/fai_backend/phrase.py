@@ -1,4 +1,4 @@
-from config import settings
+from fai_backend.config import settings
 
 
 class Phrase:
