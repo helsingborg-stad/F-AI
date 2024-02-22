@@ -2,8 +2,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, computed_field
 
-from conversations.models import Message
-from utils import try_get_first_match
+from fai_backend.conversations.models import Message
+from fai_backend.utils import try_get_first_match
 
 
 class QuestionEntry(BaseModel):

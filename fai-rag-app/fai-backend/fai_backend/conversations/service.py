@@ -1,12 +1,12 @@
 from pydantic import EmailStr
 
-from conversations.models import Conversation
+from fai_backend.conversations.models import Conversation
 from fai_backend.conversations.schema import (
     CreateConversationRequest,
     FeedbackResponse,
     ResponseMessage,
 )
-from fai_backend.repositories import ConversationModel, ConversationRepository
+from fai_backend.repositories import ConversationRepository
 
 
 class ConversationService:
@@ -28,7 +28,7 @@ class ConversationService:
         conversation.created_by = user_email
         conversation.participants.append(user_email)
         return Conversation.model_validate((await self.conversations_repo.create(
-            ConversationModel.model_validate(conversation.model_dump(exclude={'id'}))
+            Conversation.model_validate(conversation.model_dump(exclude={'id'}))
         )).model_dump())
 
     async def add_feedback(self, message, email, body) -> FeedbackResponse | None:

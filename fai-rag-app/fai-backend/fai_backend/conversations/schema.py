@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from conversations.models import Conversation
+from fai_backend.conversations.models import Conversation
 from fai_backend.schema import Timestamp
 
 
@@ -19,6 +19,7 @@ class ResponseMessageUserPermission(BaseModel):
 class ResponseMessage(BaseModel):
     user: str
     content: str
+    type: str = 'message'
     feedback: list[FeedbackResponse] = Field(default=[])
     timestamp: Timestamp = Timestamp()
     user_permissions: ResponseMessageUserPermission = ResponseMessageUserPermission()
@@ -45,6 +46,7 @@ class CreateFeedbackRequest(BaseModel):
 
 class CreateMessageRequest(BaseModel):
     user: str = None
+    created_by: str = None
     content: str = None
     type: str = 'message'
     metadata: dict = Field(default_factory=dict)

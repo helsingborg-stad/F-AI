@@ -18,8 +18,8 @@ from fai_backend.qaf.dependencies import (
 )
 from fai_backend.qaf.schema import QuestionDetails
 from fai_backend.schema import ProjectUser, User
+from fai_backend.utils import format_datetime_human_readable
 from fai_backend.views import page_template
-from utils import format_datetime_human_readable
 
 router = APIRouter(
     prefix='/api',

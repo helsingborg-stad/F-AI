@@ -1,8 +1,7 @@
 from fastapi.testclient import TestClient
 
 from fai_backend.main import app
-from fai_backend.phrase import phrase
-from phrase import Phrase, language_mappings
+from fai_backend.phrase import Phrase, language_mappings, phrase
 
 client = TestClient(app)
 
