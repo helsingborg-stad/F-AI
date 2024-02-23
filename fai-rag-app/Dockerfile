@@ -1,11 +1,8 @@
 # Stage 1: Build the frontend
-FROM node:16 as frontend-builder
-
-WORKDIR /app
-# Make backend directory available for tailwindcss preprocessing
-COPY fai-backend/ .
+FROM node:16-bullseye as frontend-builder
 
 WORKDIR /app/fai-frontend
+
 # Copy frontend package.json and package-lock.json
 COPY fai-frontend/package*.json ./
 
@@ -15,11 +12,17 @@ RUN npm install
 # Copy the rest of the frontend source code
 COPY fai-frontend/ .
 
+# Copy & make backend directory available for tailwindcss preprocessing
+COPY fai-backend/fai_backend ./src/fai_backend
+
 # Build the frontend
 RUN npm run build
 
+# Clean up backend directory
+RUN rm -rf ./src/fai_backend
+
 # Stage 2: Set up the backend
-FROM python:3.11
+FROM python:3.11-bullseye
 
 WORKDIR /app
 

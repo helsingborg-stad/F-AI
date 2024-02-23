@@ -2,8 +2,9 @@
 export default {
     content: [
         "./index.html",
-        "./src/**/**/*.{svelte,js,ts,jsx,tsx}",
-        "../fai-backend/fai_backend/**/**/*.py",
+        "./src/**/**/*.{svelte,js,ts,jsx,tsx,py}",
+        "./src/fai_backend/*/*.{svelte,js,ts,jsx,tsx,py}",
+        "../fai-backend/fai_backend/*/*.py",
     ],
     theme: {
         extend: {},
