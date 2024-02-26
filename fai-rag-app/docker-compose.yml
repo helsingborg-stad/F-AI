@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8888:80"
+    environment:
+      SECRET_KEY: "your_secret_key"
+      MONGO_DB_NAME: "fai"
+      MONGO_DB_URI: "mongodb://mongo:27017"
+      FIXED_PIN: 1234
+      APP_PROJECT_NAME: "your_project_name"
+      APP_ADMIN_EMAIL: "admin@helsingborg.io"
+      MAIL_CLIENT: "console"
+      MAIL_SENDER_EMAIL: "no-reply@helsingborg.io"
+      MAIL_SENDER_NAME: "Folkets AI App"
+      BREVO_API_URL: "your_brevo_api_url"
+      BREVO_API_KEY: "your_brevo_api_key"
+      LOG_LEVEL: "debug"
+      ENV_MODE: "production"
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

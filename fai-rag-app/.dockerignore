@@ -1,0 +1,16 @@
+# General
+**/.DS_Store
+**/node_modules
+**/__pycache__
+**/*.pyo
+**/*.pyd
+**/.Python
+**/db.sqlite3
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/.example-env
+**/.git
+**/.gitignore
