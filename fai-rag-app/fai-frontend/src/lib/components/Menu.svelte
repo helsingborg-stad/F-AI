@@ -2,6 +2,7 @@
     import MenuSlot from "./MenuSlot.svelte"
     import type {IRenderableComponent} from "../types"
     import AsComponent, {type component} from "./common/AsComponent.svelte"
+    import InlineSvgIcon from "./SVG.svelte";
 
     export let title: string | null = null
     export let subMenu: boolean | null = null
@@ -11,6 +12,10 @@
     export let size: 'xs' | 'sm' | 'md' | 'lg' | null = null
     export let components: IRenderableComponent[] = []
     let template: component | null = null
+
+    export let iconSrc: string | null = null
+    export let iconState: 'primary' | 'secondary' | 'accent' | 'success' | 'info' | 'warning' | 'error' | null = null
+
 
     $: {
         isOpen
@@ -33,6 +38,11 @@
 {#if subMenu}
     <details class:group={subMenu} {open}>
         <summary>
+            {#if iconSrc}
+                <InlineSvgIcon
+                        state={iconState}
+                        src={iconSrc}/>
+            {/if}
             <slot name="title">{title}</slot>
         </summary>
         <ul>
