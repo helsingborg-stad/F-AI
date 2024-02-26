@@ -1,21 +1,23 @@
+from typing import Literal
+
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_PROJECT_NAME: str = 'fai-rag-app'
     APP_ADMIN_EMAIL: str
-    APP_DB: str = 'mongodb'
     SECRET_KEY: str
+    BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
+    BREVO_API_KEY: str = 'api-key'
+    APP_PROJECT_NAME: str = 'fai-rag-app'
+    APP_DB: Literal['memory', 'mongodb'] = 'mongodb'
     ALGORITHM: str = 'HS256'
-    ENV_MODE: str = 'production'
+    ENV_MODE: Literal['testing', 'development', 'production'] = 'production'
     MONGO_DB_NAME: str = 'fai-rag-app'
     MONGO_DB_URI: str = 'mongodb://localhost:27017'
     FIXED_PIN: int | None = None
-    MAIL_CLIENT: str
-    MAIL_SENDER_EMAIL: str
-    MAIL_SENDER_NAME: str
-    BREVO_API_URL: str
-    BREVO_API_KEY: str
+    MAIL_CLIENT: Literal['console', 'brevo'] = 'console'
+    MAIL_SENDER_NAME: str = 'FAI App'
+    MAIL_SENDER_EMAIL: str = 'no-reply@localhost.dev'
     LOG_LEVEL: str = 'INFO'
     DEFAULT_LANGUAGE: str = 'en'
 
