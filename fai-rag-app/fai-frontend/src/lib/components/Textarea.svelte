@@ -18,7 +18,8 @@
     export let autocomplete: HTMLInputElement['autocomplete'] | null = null;
 </script>
 
-<div>
+<div
+        class:form-control={1}>
 <textarea
         {name}
         {id}
