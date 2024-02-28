@@ -5,6 +5,8 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     APP_ADMIN_EMAIL: str
+    APP_VECTOR_DB: str = 'chromadb'
+    APP_VECTOR_DB_PATH: str = 'vector_db'
     SECRET_KEY: str
     BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
     BREVO_API_KEY: str = 'api-key'
