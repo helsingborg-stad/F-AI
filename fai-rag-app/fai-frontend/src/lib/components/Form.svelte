@@ -1,49 +1,99 @@
 <script lang="ts">
-    import type {IRenderableComponent} from "../types"
+    import type {IComponentDef, IRenderableComponent} from "../types"
     import {createForm} from 'felte'
-    import {pageDataStore} from "../store"
     import {writable} from "svelte/store"
+    import {pageDataStore} from "../store";
 
-    const responseToFormErrorAdapter = (error: any) => ({
-        path: (error?.loc || [null, 'this'])[1],
-        message: error?.msg || error.body || 'An error occurred',
-    })
 
     export let components: IRenderableComponent[] = []
     let fields = writable<IRenderableComponent[]>([])
 
-    let {form, errors, touched, isSubmitting, interacted, setTouched, isDirty, data} = createForm({
-        onSubmit(values, context) {
-            return fetch(action || "", {
-                method: method || "post",
-                body: JSON.stringify(values),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then(async r => {
-                    if (!r.ok) {
-                        throw await r.json();
-                    }
-                    return r.json();
-                })
-        },
-        onError: async (errors: any, context) => {
-            return (context.setTouched({}) == null) && [...(errors?.detail || [])]
-                .reduce((acc: any, error: any) => {
-                    const {path, message} = responseToFormErrorAdapter(error)
-                    return {
-                        ...acc,
-                        [path]: message,
-                    }
-                }, {})
-        },
-        onSuccess: async (response: any, context) => {
-            const components_response = [...[...(response || [])].filter((item) => item.type)]
-            if (components_response.length > 0) {
-                $pageDataStore = components_response
+    export let submitAs: "json" | "form" = "json"
+
+    const tryRenderComponentsFromResponse = (components: IComponentDef[]) => {
+        const components_response = [...[...(components || [])].filter((item) => item.type)]
+        if (components_response.length > 0) {
+            $pageDataStore = components_response
+        }
+    }
+
+    const tryMapErrorResponseToFormFields = (error: any) => ({
+        path: (error?.loc || [null, 'this'])[1],
+        message: error?.msg || error.body || 'An error occurred',
+    })
+
+    const parseErrorResponseObjects = (errors: object[] = []) => [...(errors)]
+        .reduce((acc: any, error: any) => {
+            const {path, message} = tryMapErrorResponseToFormFields(error)
+            return {
+                ...acc,
+                [path]: message,
             }
-        },
+        }, {})
+
+
+    const formHandlerFactory = (submitType: 'json' | 'form'): {
+        createFormConfiguration: any,
+        successHandler: any,
+        errorHandler: any,
+    } => (
+        {
+            createFormConfiguration: {
+                'json': () => ({
+                    onSubmit: (values: any, context: any) => fetch(action || "", {
+                        method: method || "post",
+                        body: JSON.stringify(values),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }).then(async r => {
+                        if (!r.ok) {
+                            throw r;
+                        }
+                        return r.json();
+                    }),
+                    onError: async (response: any, context: any) => {
+                        const isJson = response.headers.get('content-type').includes('application/json')
+                        const fieldErrors = (isJson ? await response.json() : null)?.detail || []
+                        return parseErrorResponseObjects(fieldErrors)
+                    },
+                    onSuccess: async (response: any, context: any) => {
+                        console.log(response)
+                        const components_response = [...[...(response || [])].filter((item) => item.type)]
+                        if (components_response.length > 0) {
+                            $pageDataStore = components_response
+                        }
+                    },
+                }),
+                'form': () => ({})
+            }[submitType],
+            successHandler: {
+                'json': undefined,
+                'form': async (e: CustomEvent<any>) => {
+                    const isJson = e.detail.response.headers.get('content-type').includes('application/json')
+                    isJson && tryRenderComponentsFromResponse(await e.detail.response.json())
+                },
+            }[submitType],
+            errorHandler: {
+                'json': undefined,
+                'form': async ({detail: {error: {response}}}: CustomEvent<any>) => {
+                    const {detail} = response
+                        .headers
+                        .get('content-type').includes('application/json')
+                        ? await response.json()
+                        : {detail: []}
+
+                    return parseErrorResponseObjects(detail || [])
+                },
+            }[submitType]
+        }
+    )
+
+
+    const {createFormConfiguration, successHandler, errorHandler} = formHandlerFactory(submitAs)
+
+    let {form, errors, touched, isSubmitting, interacted, setTouched, isDirty, data} = createForm({
+        ...createFormConfiguration(),
     })
 
     $: {
@@ -68,12 +118,15 @@
     const attributes = writable({})
 </script>
 
+
 {#key $$props}
     <form
             {id}
             {action}
             {method}
             use:form
+            on:felteerror={errorHandler}
+            on:feltesuccess={successHandler}
             class:has-interacted={$interacted}
             class:is-dirty={$isDirty}
             class:is-submitting={$isSubmitting}

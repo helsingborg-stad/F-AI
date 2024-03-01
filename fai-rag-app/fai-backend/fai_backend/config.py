@@ -22,7 +22,8 @@ class Settings(BaseSettings):
     MAIL_SENDER_EMAIL: str = 'no-reply@localhost.dev'
     LOG_LEVEL: str = 'INFO'
     DEFAULT_LANGUAGE: str = 'en'
-
+    FILE_UPLOAD_PATH: str = 'uploads'
+    
     class Config:
         env_file = '.env'
 

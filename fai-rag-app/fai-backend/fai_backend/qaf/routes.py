@@ -49,6 +49,29 @@ async def llm_raq_question_endpoint(question: str):
         raise HTTPException(status_code=500, detail=str(exception))
 
 
+def two_column_layout(page_title: str, left: list[AnyUI], right: list[AnyUI]) -> list[AnyUI]:
+    return page_template(
+        c.Div(
+            components=[
+                c.Div(
+                    components=left,
+                    class_name='flex-1 overflow-y-scroll'
+                ),
+                c.Div(components=[
+                    c.Div(components=[
+                        c.Div(
+                            components=right,
+                            class_name='card-body'
+                        )
+                    ], class_name='card sticky top-0')
+                ], class_name='flex-1 max-w-md border-l'),
+            ],
+            class_name='grow flex max-h-[calc(100vh-65px)]'
+        ),
+        page_title=page_title,
+    )
+
+
 @router.get('/questions/create', response_model=list, response_model_exclude_none=True)
 def submit_question_view(
         authenticated_user: User = Depends(get_authenticated_user)
@@ -63,32 +86,36 @@ def submit_question_view(
         ]
 
     return page_template(
-        c.Form(
-            submit_url='/api/questions/create',
-            method='POST',
-            submit_text=_('create_question_submit_button', 'Submit'),
-            components=[
-                c.InputField(
-                    name='subject',
-                    title=_('input_subject_label', 'Subject'),
-                    placeholder=_('input_subject_placeholder', 'Subject'),
-                    required=True,
-                    html_type='text',
-                ),
-                c.InputField(
-                    name='errand_id',
-                    title=_('input_label_errand_id', 'Errand ID'),
-                    placeholder=_('input_label_errand_id', 'Errand ID'),
-                    html_type='text',
-                ),
-                c.Textarea(
-                    name='question',
-                    title=_('input_label_question', 'Question'),
-                    placeholder=_('input_question_placeholder', 'Enter your question here'),
-                    required=True,
-                ),
-            ],
-        ),
+        c.Div(components=[
+            c.Div(components=[
+                c.Form(
+                    submit_url='/api/questions/create',
+                    method='POST',
+                    submit_text=_('create_question_submit_button', 'Submit'),
+                    components=[
+                        c.InputField(
+                            name='subject',
+                            title=_('input_subject_label', 'Subject'),
+                            placeholder=_('input_subject_placeholder', 'Subject'),
+                            required=True,
+                            html_type='text',
+                        ),
+                        c.InputField(
+                            name='errand_id',
+                            title=_('input_label_errand_id', 'Errand ID'),
+                            placeholder=_('input_label_errand_id', 'Errand ID'),
+                            html_type='text',
+                        ),
+                        c.Textarea(
+                            name='question',
+                            title=_('input_label_question', 'Question'),
+                            placeholder=_('input_question_placeholder', 'Enter your question here'),
+                            required=True,
+                        ),
+                    ],
+                )
+            ], class_name='card-body'),
+        ], class_name='card'),
         page_title=_('submit_a_question', 'Create Question'),
     )
 
@@ -166,9 +193,10 @@ async def question_details_view(
             }[message.user if message.user == 'assistant' else 'user']()
         ])
 
-    return page_template(
-        *[message_factory(question.question), *([message_factory(question.answer)] if question.answer else []), ],
+    return two_column_layout(
         page_title='Conversation: ' + str(question.subject),
+        left=[message_factory(question.question), *([message_factory(question.answer)] if question.answer else []), ],
+        right=[],
     )
 
 
@@ -237,7 +265,7 @@ async def review_details_view(
                 method='POST',
                 submit_text=_('create_question_submit_button', 'Submit'),
                 components=[
-                    c.Text(text=_('feedback', 'Feedback')),
+                    c.Text(text=_('review_answer', 'Review answer'), element='h2', class_name='text-lg'),
                     c.InputField(html_type='hidden', name='question_id', value=question.id, hidden=True),
                     c.Select(
                         name='rating',
@@ -280,10 +308,10 @@ async def review_details_view(
         else 'null'
     ])
 
-    return page_template(
-        *components,
-        *render_form(),
+    return two_column_layout(
         page_title='Review: ' + str(question.subject),
+        left=components,
+        right=[*render_form()],
     )
 
 

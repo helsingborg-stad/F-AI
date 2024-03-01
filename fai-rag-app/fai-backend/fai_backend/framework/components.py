@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ByteSize, Field
 
 __all__ = (
     'Div',
@@ -23,6 +23,7 @@ __all__ = (
     'Pagination',
     'Select',
     'ChatBubble',
+    'FileInput',
     # then `AnyComponent` itself
     'AnyUI',
 )
@@ -90,6 +91,7 @@ class Form(UIComponent):
     submit_url: str = Field(None, serialization_alias='action')
     method: Literal['POST', 'GET'] = 'POST'
     submit_text: str | None = None
+    submit_as: Literal['json', 'form'] | None = Field('json', serialization_alias='submitAs')
 
 
 class InputField(UIComponent):
@@ -98,14 +100,36 @@ class InputField(UIComponent):
     title: str | None = None
     placeholder: str | None = None
     required: bool | None = None
-    html_type: Literal['text', 'password', 'hidden', 'number', 'email', 'tel'] = 'text'
+    html_type: Literal['text', 'password', 'hidden', 'number', 'email', 'tel', 'file'] = 'text'
     initial: str | None = Field(None, serialization_alias='value')
     hidden: bool = None
+    disabled: bool | None = None
     autocomplete: str | None = None
     readonly: bool | None = None
     input_state: Literal[
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
     value: str | None = None
+
+
+class FileInput(InputField):
+    type: Literal['FileInput'] = 'FileInput'
+    name: str
+    title: str | None = None
+    required: bool | None = None
+    accept: str | None = None
+    min_size: ByteSize | None = None
+    max_size: ByteSize | None = None
+    multiple: bool | None = None
+
+    # Remove the following fields from the base class
+    placeholder: None = None
+    initial: None = None
+    hidden: None = None
+    autocomplete: None = None
+    readonly: None = None
+    input_state: None = None
+    value: None = None
+    html_type: None = None
 
 
 class Textarea(UIComponent):
@@ -142,6 +166,10 @@ class Menu(UIComponent):
     sub_menu: bool | None = Field(None, serialization_alias='subMenu')
     size: Literal['xs', 'sm', 'md', 'lg'] | None = None
     components: 'list[AnyUI] | None' = Field(None, serialization_alias='renderProps.components')
+    icon_src: str | None = Field(None, serialization_alias='iconSrc')
+    icon_state: Literal[
+                    'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = Field(
+        None, serialization_alias='iconState')
 
 
 class Link(Text):
@@ -223,6 +251,6 @@ class ChatBubble(UIComponent):
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
-     PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | ChatBubble),
+     PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | ChatBubble | FileInput),
     Field(discriminator='type')
 ]

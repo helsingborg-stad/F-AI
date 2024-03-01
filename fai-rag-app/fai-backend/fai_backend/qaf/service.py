@@ -56,7 +56,7 @@ class QAFService:
 
     async def my_question_details(self, project_user: ProjectUser, question_id: str) -> QuestionDetails | None:
         conversation = await self.conversations.get(question_id)
-        if conversation.created_by != project_user.email:
+        if conversation and conversation.created_by != project_user.email:
             raise PermissionError('User does not have permission to view this question')
         return QuestionDetails(**conversation.model_dump()) if conversation else None
 

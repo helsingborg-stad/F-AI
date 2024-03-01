@@ -1,5 +1,5 @@
 <script lang="ts">
-
+    import SvelteMarkdown from "svelte-markdown";
 
     import Text from "./Text.svelte";
 
@@ -23,7 +23,8 @@
     </div>
 
     <div class:bg-primary={isSelf}
-         class="chat-bubble bg-transparent text-base-content px-0 prose">{content}
+         class="chat-bubble bg-transparent text-base-content px-0 prose">
+        <SvelteMarkdown source={content}/>
         <slot name="below-content"/>
     </div>
 
