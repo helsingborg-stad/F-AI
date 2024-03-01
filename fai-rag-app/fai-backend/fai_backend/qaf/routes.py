@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Any
+
+from fastapi import APIRouter, Depends, HTTPException
 
 from fai_backend.conversations.models import Conversation, Message
 from fai_backend.dependencies import get_authenticated_user, get_project_user, try_get_authenticated_user
@@ -20,12 +22,31 @@ from fai_backend.qaf.schema import QuestionDetails
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
 from fai_backend.views import page_template
+from fai_backend.llm.service import ask_llm_question, ask_llm_raq_question
 
 router = APIRouter(
     prefix='/api',
     tags=['QAF'],
     route_class=LoggingAPIRouter,
 )
+
+
+@router.get('/llm-question', response_model=Any)
+async def llm_question_endpoint(question: str):
+    try:
+        response = await ask_llm_question(question)
+        return {"response": response}
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=str(exception))
+
+
+@router.get('/llm-raq-question', response_model=Any)
+async def llm_raq_question_endpoint(question: str):
+    try:
+        response = await ask_llm_raq_question(question)
+        return {"response": response}
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=str(exception))
 
 
 @router.get('/questions/create', response_model=list, response_model_exclude_none=True)
