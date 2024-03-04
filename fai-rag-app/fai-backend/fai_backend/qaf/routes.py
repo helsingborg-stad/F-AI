@@ -7,6 +7,7 @@ from fai_backend.dependencies import get_authenticated_user, get_project_user, t
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.framework.components import AnyUI
+from fai_backend.llm.service import ask_llm_question, ask_llm_raq_question
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
 from fai_backend.qaf.dependencies import (
@@ -14,7 +15,7 @@ from fai_backend.qaf.dependencies import (
     my_question_details_request,
     submit_answer_request,
     submit_feedback_request,
-    submit_question_request,
+    submit_question_and_generate_answer_request,
     submitted_question_details_request,
     submitted_questions_request,
 )
@@ -22,7 +23,6 @@ from fai_backend.qaf.schema import QuestionDetails
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
 from fai_backend.views import page_template
-from fai_backend.llm.service import ask_llm_question, ask_llm_raq_question
 
 router = APIRouter(
     prefix='/api',
@@ -35,7 +35,7 @@ router = APIRouter(
 async def llm_question_endpoint(question: str):
     try:
         response = await ask_llm_question(question)
-        return {"response": response}
+        return {'response': response}
     except Exception as exception:
         raise HTTPException(status_code=500, detail=str(exception))
 
@@ -44,7 +44,7 @@ async def llm_question_endpoint(question: str):
 async def llm_raq_question_endpoint(question: str):
     try:
         response = await ask_llm_raq_question(question)
-        return {"response": response}
+        return {'response': response}
     except Exception as exception:
         raise HTTPException(status_code=500, detail=str(exception))
 
@@ -122,7 +122,7 @@ def submit_question_view(
 
 @router.post('/questions/create', response_model=list, response_model_exclude_none=True)
 def create_question_handler(
-        question: QuestionDetails = Depends(submit_question_request)
+        question: QuestionDetails = Depends(submit_question_and_generate_answer_request)
 ) -> list:
     return page_template(
         c.FireEvent(event=e.GoToEvent(url=f'/questions/{question.id}')),

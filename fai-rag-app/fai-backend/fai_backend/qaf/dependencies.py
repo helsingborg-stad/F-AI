@@ -12,10 +12,10 @@ from fai_backend.qaf.schema import (
 )
 from fai_backend.qaf.service import QAFService
 from fai_backend.schema import ProjectUser
+from llm.service import ask_llm_raq_question
 
 
 async def submit_question_request(
-        # background_tasks: BackgroundTasks,
         body: SubmitQuestionPayload,
         service: QAFService = Depends(QAFService.factory),
         user: ProjectUser = Depends(get_project_user),
@@ -26,16 +26,19 @@ async def submit_question_request(
         body.model_dump(exclude={'question'}),
     )
 
+    return question
+
+
+async def submit_question_and_generate_answer_request(
+        question: QuestionDetails = Depends(submit_question_request),
+        service: QAFService = Depends(QAFService.factory),
+        user: ProjectUser = Depends(get_project_user),
+) -> QuestionDetails:
+    response = await ask_llm_raq_question(question.question.content)
     await service.add_message(
         user,
-        GenerateAnswerPayload(question_id=question.id, answer=question.question.content)
+        GenerateAnswerPayload(question_id=question.id, answer=response)
     )
-
-    # background_tasks.add_task(
-    #     service.add_message,
-    #     user,
-    #     GenerateAnswerPayload(question_id=question.id, answer=question.question.content)
-    # )
 
     return question
 
