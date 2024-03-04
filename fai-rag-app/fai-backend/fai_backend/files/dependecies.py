@@ -1,5 +1,5 @@
-from config import settings
-from files.service import FileUploadService
+from fai_backend.config import settings
+from fai_backend.files.service import FileUploadService
 
 
 def get_file_upload_service() -> FileUploadService:

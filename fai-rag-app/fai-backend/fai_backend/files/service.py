@@ -6,7 +6,7 @@ from datetime import datetime
 from fastapi import UploadFile
 from pydantic import ByteSize
 
-from files.models import FileInfo
+from fai_backend.files.models import FileInfo
 
 
 class FileUploadService:

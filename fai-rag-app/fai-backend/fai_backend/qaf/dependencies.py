@@ -1,6 +1,7 @@
 from fastapi import Depends
 
 from fai_backend.dependencies import get_project_user
+from fai_backend.llm.service import ask_llm_raq_question
 from fai_backend.logger.console import console
 from fai_backend.qaf.schema import (
     FeedbackPayload,
@@ -12,7 +13,6 @@ from fai_backend.qaf.schema import (
 )
 from fai_backend.qaf.service import QAFService
 from fai_backend.schema import ProjectUser
-from llm.service import ask_llm_raq_question
 
 
 async def submit_question_request(
