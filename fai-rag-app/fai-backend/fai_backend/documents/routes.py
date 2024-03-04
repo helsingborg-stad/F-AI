@@ -63,7 +63,7 @@ def upload_view(
                 c.FileInput(
                     name='files',
                     title=_('file', 'File'),
-                    required=False,
+                    required=True,
                     multiple=True,
                 ),
                 c.Button(
