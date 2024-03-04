@@ -1,4 +1,5 @@
 import random
+from collections.abc import Callable
 from datetime import timedelta
 
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearerCookie
@@ -37,10 +38,8 @@ def create_refresh_token(subject: dict):
     return refresh_security.create_refresh_token(subject=subject)
 
 
-def create_pin_factory_from_env():
-    return (
-        lambda: str(settings.FIXED_PIN) if settings.FIXED_PIN else lambda: str(random.randint(1000, 9999))
-    )
+def create_pin_factory_from_env() -> Callable[[], str]:
+    return (lambda: str(settings.FIXED_PIN)) if settings.FIXED_PIN else (lambda: str(random.randint(1000, 9999)))
 
 
 generate_pin_code = create_pin_factory_from_env()

@@ -11,16 +11,21 @@ from fai_backend.auth.security import (
     refresh_security,
     verify_password,
 )
+from fai_backend.config import settings
+from fai_backend.mail.client import MailClient
+from fai_backend.mail.schemas import EmailPayload, EmailRecipient, EmailSender
 from fai_backend.repositories import PinCodeModel, PinCodeRepository, UserRepository
 
 
 class AuthService:
     users_repo: UserRepository
     user_pin_repo: PinCodeRepository
+    mail_client: MailClient
 
-    def __init__(self, users_repo: UserRepository, pins_repo: PinCodeRepository):
+    def __init__(self, users_repo: UserRepository, pins_repo: PinCodeRepository, mail_client: MailClient):
         self.pins_repo = pins_repo
         self.users_repo = users_repo
+        self.mail_client = mail_client
 
     async def email_exists(self, email: EmailStr) -> bool:
         user = await self.users_repo.get_user_by_email(email)
@@ -38,6 +43,19 @@ class AuthService:
                 hashed_pin=get_password_hash(generated_pin),
             )
         )
+
+        self.mail_client.send_mail(
+            EmailPayload(
+                sender=EmailSender(
+                    name=settings.MAIL_SENDER_NAME,
+                    email=settings.MAIL_SENDER_EMAIL,
+                ),
+                to=[EmailRecipient(email=email)],
+                subject='Your Login PIN',
+                body=f'<html><head></head><body><p>Hello,</p><p>Login with this pin: {generated_pin}</p></body></html>',
+            )
+        )
+
         return session.model_dump()['id']
 
     async def validate_pin(self, session_id, pin: SecretStr):
@@ -55,6 +73,7 @@ class AuthService:
             if await self.session_exists(session_id)
             else None
         )
+
         if session and verify_password(pin.get_secret_value(), session.hashed_pin):
             email = session.email
             await self.pins_repo.delete(session_id)
