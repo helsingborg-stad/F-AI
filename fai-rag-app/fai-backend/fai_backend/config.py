@@ -4,14 +4,15 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    APP_PROJECT_NAME: str = 'fai-rag-app'
     APP_ADMIN_EMAIL: str
-    APP_VECTOR_DB: str = 'chromadb'
+    APP_DB: Literal['memory', 'mongodb'] = 'mongodb'
+    APP_VECTOR_DB: Literal['memory', 'chromadb'] = 'chromadb'
     APP_VECTOR_DB_PATH: str = 'vector_db'
+    APP_MESSAGE_BROKER: Literal['memory', 'redis_queue'] = 'redis_queue'
     SECRET_KEY: str
     BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
     BREVO_API_KEY: str = 'api-key'
-    APP_PROJECT_NAME: str = 'fai-rag-app'
-    APP_DB: Literal['memory', 'mongodb'] = 'mongodb'
     ALGORITHM: str = 'HS256'
     ENV_MODE: Literal['testing', 'development', 'production'] = 'production'
     MONGO_DB_NAME: str = 'fai-rag-app'
