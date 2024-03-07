@@ -1,19 +1,32 @@
-from typing import Any, Callable
+from typing import Any, Callable, Optional
+
+
+class Job:
+    id: Optional[str] = None
+
+
+class JobStatus:
+    FINISHED = "finished"
+    QUEUED = "queued"
+    STARTED = "started"
+    FAILED = "failed"
+    DEFERRED = "deferred"
+    CANCELED = "canceled"
 
 
 class IMessageQueue:
-    def enqueue(self, func: Callable, *args, **kwargs) -> Any:
+    def enqueue(self, func: Callable, *args, **kwargs) -> Job:
         """
         Enqueue a task for background execution.
 
         :param func: The function to be executed as a background task.
         :param args: Positional arguments to pass to the function.
         :param kwargs: Keyword arguments to pass to the function.
-        :return: An identifier or reference for the enqueued task.
+        :return: The created job.
         """
         raise NotImplementedError
 
-    def get_status(self, job_id: Any) -> str:
+    def get_status(self, job_id: str) -> Job:
         """
         Retrieve the status of a specific task.
 
@@ -22,7 +35,7 @@ class IMessageQueue:
         """
         raise NotImplementedError
 
-    def get_result(self, job_id: Any) -> Any:
+    def get_result(self, job_id: str) -> Optional[Any]:
         """
         Retrieve the result of a completed task.
 
