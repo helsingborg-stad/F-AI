@@ -29,7 +29,8 @@ WORKDIR /app
 # Copy the backend code and the built frontend from the first stage
 COPY --from=frontend-builder /app/fai-frontend/dist ./fai-frontend/dist
 COPY fai-backend/ ./fai-backend/
-COPY pyproject.toml poetry.lock* ./
+
+WORKDIR /app/fai-backend
 
 # Install poetry and backend dependencies
 RUN pip install poetry && \
@@ -39,6 +40,8 @@ RUN pip install poetry && \
 # Set environment variables for FastAPI
 ENV HOST=0.0.0.0
 ENV PORT=80
+
+WORKDIR /app
 
 # Copy frontend build to static directory
 RUN cp -r ./fai-frontend/dist ./fai-backend/fai_backend/static
