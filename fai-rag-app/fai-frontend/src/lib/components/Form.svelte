@@ -3,6 +3,7 @@
     import {createForm} from 'felte'
     import {writable} from "svelte/store"
     import {pageDataStore} from "../store";
+    import Button from "./Button.svelte";
 
 
     export let components: IRenderableComponent[] = []
@@ -142,7 +143,7 @@
 
         <slot name="footer">
             {#if submit_text}
-                <button class="btn btn-neutral" type="submit">{submit_text}</button>
+                <Button html_type="submit" state="neutral">{submit_text}</Button>
             {/if}
 
             {#if $errors['this']}

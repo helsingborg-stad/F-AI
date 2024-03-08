@@ -57,6 +57,9 @@
         type={html_type}
         on:click={onClick}
 >
+    {#if html_type === 'submit'}
+        <span class="loading loading-spinner hidden group-[.is-submitting]:block"></span>
+    {/if}
     {#if iconSrc}
         <InlineSvgIcon
                 width="24"
