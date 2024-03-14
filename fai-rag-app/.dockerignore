@@ -14,3 +14,5 @@
 **/.example-env
 **/.git
 **/.gitignore
+fai-frontend/src/**/*.js
+fai-frontend/src/**/*.js.map
