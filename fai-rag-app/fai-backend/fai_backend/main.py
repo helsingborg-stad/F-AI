@@ -19,11 +19,13 @@ from fai_backend.setup import setup_db, setup_project
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    console.log('Mounting app')
+    console.log(settings)
+    console.log('Try setup db')
     await setup_db()
+    console.log('Try setup initial project ')
     await setup_project()
     yield
-    console.log('Unmounting app')
+    console.log('😴 Unmounting app ...')
 
 
 app = FastAPI(title='FAI RAG App', redirect_slashes=True, lifespan=lifespan)
