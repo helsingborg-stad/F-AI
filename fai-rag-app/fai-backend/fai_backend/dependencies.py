@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 from fastapi import Depends, HTTPException, Security
 
 from fai_backend.auth.dependencies import (
@@ -7,6 +10,7 @@ from fai_backend.auth.dependencies import (
 from fai_backend.auth.schema import TokenPayload
 from fai_backend.auth.service import AuthService
 from fai_backend.schema import ProjectUser, User
+from fai_backend.views import mock_menu, page_template, questions_menu, reviewer_menu
 
 
 async def try_get_authenticated_user(
@@ -45,3 +49,18 @@ async def get_project_user(
         raise HTTPException(status_code=302, detail='Unauthorized', headers={'Location': '/api/login'})
 
     return user
+
+
+async def get_page_template_for_logged_in_users(project_user: ProjectUser = Depends(get_project_user)) \
+        -> Callable[[list[Any] | Any, str | None], list[Any]]:
+    permissions = list(map(lambda x: x[0], filter(lambda x: x[1], project_user.permissions.items())))
+
+    return (lambda components, page_title: page_template(
+        *components if isinstance(components, list) else [components],
+        page_title=page_title,
+        menus=[
+            *questions_menu(user_permissions=permissions),
+            *reviewer_menu(user_permissions=permissions),
+            *mock_menu(user_permissions=permissions),
+        ]
+    ))

@@ -1,9 +1,15 @@
+from collections.abc import Callable
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from fai_backend.conversations.models import Conversation, Message
-from fai_backend.dependencies import get_authenticated_user, get_project_user, try_get_authenticated_user
+from fai_backend.dependencies import (
+    get_authenticated_user,
+    get_page_template_for_logged_in_users,
+    get_project_user,
+    try_get_authenticated_user,
+)
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.framework.components import AnyUI
@@ -22,7 +28,6 @@ from fai_backend.qaf.dependencies import (
 from fai_backend.qaf.schema import QuestionDetails
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
-from fai_backend.views import page_template
 
 router = APIRouter(
     prefix='/api',
@@ -49,8 +54,8 @@ async def llm_raq_question_endpoint(question: str):
         raise HTTPException(status_code=500, detail=str(exception))
 
 
-def two_column_layout(page_title: str, left: list[AnyUI], right: list[AnyUI]) -> list[AnyUI]:
-    return page_template(
+def two_column_layout(left: list[AnyUI], right: list[AnyUI]) -> list[AnyUI]:
+    return [
         c.Div(
             components=[
                 c.Div(
@@ -67,13 +72,13 @@ def two_column_layout(page_title: str, left: list[AnyUI], right: list[AnyUI]) ->
                 ], class_name='flex-1 max-w-md border-l'),
             ],
             class_name='grow flex max-h-[calc(100vh-65px)]'
-        ),
-        page_title=page_title,
-    )
+        )
+    ]
 
 
 @router.get('/questions/create', response_model=list, response_model_exclude_none=True)
 def submit_question_view(
+        view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
         authenticated_user: User = Depends(get_authenticated_user)
 ) -> list:
     if len(authenticated_user.projects) == 0:
@@ -85,8 +90,8 @@ def submit_question_view(
             ),
         ]
 
-    return page_template(
-        c.Div(components=[
+    return view(
+        [c.Div(components=[
             c.Div(components=[
                 c.Form(
                     submit_url='/api/questions/create',
@@ -115,18 +120,19 @@ def submit_question_view(
                     ],
                 )
             ], class_name='card-body'),
-        ], class_name='card'),
-        page_title=_('submit_a_question', 'Create Question'),
+        ], class_name='card')],
+        _('submit_a_question', 'Create Question'),
     )
 
 
 @router.post('/questions/create', response_model=list, response_model_exclude_none=True)
 def create_question_handler(
-        question: QuestionDetails = Depends(submit_question_and_generate_answer_request)
+        question: QuestionDetails = Depends(submit_question_and_generate_answer_request),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
-    return page_template(
-        c.FireEvent(event=e.GoToEvent(url=f'/questions/{question.id}')),
-        page_title=_('submit_a_question', 'Create Question'''),
+    return view(
+        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{question.id}'))],
+        _('submit_a_question', 'Create Question'''),
     )
 
 
@@ -134,12 +140,13 @@ def create_question_handler(
 def questions_index_view(
         authenticated_user: User | None = Depends(try_get_authenticated_user),
         questions: list[Conversation] = Depends(list_my_questions_request),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
-    return page_template(
-        c.Div(components=[
+    return view(
+        [c.Div(components=[
             c.Div(components=[
                 c.Table(
                     data=[
@@ -159,15 +166,16 @@ def questions_index_view(
                     class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
                 ),
             ], class_name='overflow-x-auto space-y-4'),
-        ], class_name='card bg-base-100 w-full max-w-6xl'),
-        page_title=_('my_questions', 'My Questions'),
+        ], class_name='card bg-base-100 w-full max-w-6xl')],
+        _('my_questions', 'My Questions'),
     )
 
 
 @router.get('/questions/{conversation_id}', response_model=list, response_model_exclude_none=True)
 async def question_details_view(
         authenticated_user: ProjectUser | None = Depends(get_project_user),
-        question: QuestionDetails = Depends(my_question_details_request)
+        question: QuestionDetails = Depends(my_question_details_request),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     if not question:
         return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
@@ -193,10 +201,13 @@ async def question_details_view(
             }[message.user if message.user == 'assistant' else 'user']()
         ])
 
-    return two_column_layout(
-        page_title='Conversation: ' + str(question.subject),
-        left=[message_factory(question.question), *([message_factory(question.answer)] if question.answer else []), ],
-        right=[],
+    return view(
+        two_column_layout(
+            left=[message_factory(question.question),
+                  *([message_factory(question.answer)] if question.answer else []), ],
+            right=[],
+        ),
+        'Conversation: ' + str(question.subject)
     )
 
 
@@ -204,12 +215,13 @@ async def question_details_view(
 def reviews_index_view(
         authenticated_user: User | None = Depends(try_get_authenticated_user),
         questions: list[QuestionDetails] = Depends(submitted_questions_request),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
-    return page_template(
-        c.Div(components=[
+    return view(
+        [c.Div(components=[
             c.Div(components=[
                 c.Table(
                     data=[
@@ -227,8 +239,8 @@ def reviews_index_view(
                     class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
                 ),
             ], class_name='overflow-x-auto space-y-4'),
-        ], class_name='card bg-base-100 w-full max-w-6xl'),
-        page_title=_('Inbox', 'Inbox'),
+        ], class_name='card bg-base-100 w-full max-w-6xl')],
+        _('Inbox', 'Inbox'),
     )
 
 
@@ -236,6 +248,7 @@ def reviews_index_view(
 async def review_details_view(
         authenticated_user: ProjectUser | None = Depends(get_project_user),
         question: QuestionDetails = Depends(submitted_question_details_request),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     if not question:
         return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
@@ -308,20 +321,23 @@ async def review_details_view(
         else 'null'
     ])
 
-    return two_column_layout(
-        page_title='Review: ' + str(question.subject),
-        left=components,
-        right=[*render_form()],
+    return view(
+        two_column_layout(
+            left=components,
+            right=[*render_form()],
+        ),
+        'Review: ' + str(question.subject)
     )
 
 
 @router.post('/reviews/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)
 def submit_feedback_handler(
         conversation_id: str,
-        review: QuestionDetails = Depends(submit_feedback_request)
+        review: QuestionDetails = Depends(submit_feedback_request),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
-    return page_template(
-        c.FireEvent(event=e.GoToEvent(url=f'/reviews/{review.id}')),
+    return view(
+        [c.FireEvent(event=e.GoToEvent(url=f'/reviews/{review.id}'))],
         page_title=_('submit_a_question', 'Create Question'''),
     )
 
@@ -329,9 +345,10 @@ def submit_feedback_handler(
 @router.post('/reviews/{conversation_id}/answer', response_model=list, response_model_exclude_none=True)
 def submit_answer_handler(
         conversation_id: str,
-        review: QuestionDetails = Depends(submit_answer_request)
+        review: QuestionDetails = Depends(submit_answer_request),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
-    return page_template(
-        c.FireEvent(event=e.GoToEvent(url=f'/reviews/{review.id}')),
-        page_title=_('submit_a_question', 'Create Question'''),
+    return view(
+        [c.FireEvent(event=e.GoToEvent(url=f'/reviews/{review.id}'))],
+        _('submit_a_question', 'Create Question'''),
     )

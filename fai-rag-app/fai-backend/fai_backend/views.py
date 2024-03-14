@@ -1,8 +1,33 @@
+from collections.abc import Callable
+from functools import wraps
+from typing import Any, TypeVar, cast
+
 from fai_backend.documents.menu import menu_items as document_menu_items
 from fai_backend.framework import components as c
 from fai_backend.phrase import phrase as _
 
+T = TypeVar('T', bound=Callable[..., list[Any]])
 
+
+def permission_required(required_permissions: list[str]) -> Callable[[T], T]:
+    def decorator(func: T) -> T:
+        @wraps(func)
+        def wrapper(*args, user_permissions: list[str] | None = None, **kwargs) -> Any:
+            if not user_permissions:
+                user_permissions = []
+
+            if not required_permissions or all(
+                    (permission in user_permissions) for permission in required_permissions):
+                return func(*args, **kwargs)
+            else:
+                return []
+
+        return cast(T, wrapper)
+
+    return decorator
+
+
+@permission_required(['can_ask_questions'])
 def questions_menu() -> list:
     return [
         c.Menu(
@@ -31,6 +56,7 @@ def questions_menu() -> list:
     ]
 
 
+@permission_required(['can_review_answers'])
 def reviewer_menu() -> list:
     return [
         c.Menu(
@@ -49,6 +75,7 @@ def reviewer_menu() -> list:
     ]
 
 
+@permission_required(['can_edit_questions_and_answers'])
 def mock_menu() -> list:
     return [
         c.Menu(
@@ -70,7 +97,7 @@ def mock_menu() -> list:
                 ),
                 c.Link(
                     text=_('users', 'Users'),
-                    url='/',
+                    url='/users',
                     icon_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXJzLXJvdW5kIj48cGF0aCBkPSJNMTggMjFhOCA4IDAgMCAwLTE2IDAiLz48Y2lyY2xlIGN4PSIxMCIgY3k9IjgiIHI9IjUiLz48cGF0aCBkPSJNMjIgMjBjMC0zLjM3LTItNi41LTQtOGE1IDUgMCAwIDAtLjQ1LTguMyIvPjwvc3ZnPg=='
                 )
 
@@ -79,7 +106,7 @@ def mock_menu() -> list:
     ]
 
 
-def app_drawer() -> list:
+def app_drawer(menus: list | None = None) -> list:
     return [
         c.AppDrawer(
             title='Folkets AI',
@@ -87,7 +114,7 @@ def app_drawer() -> list:
                 *questions_menu(),
                 *reviewer_menu(),
                 *mock_menu(),
-            ]
+            ] if not menus else menus
         )
     ]
 
@@ -120,7 +147,7 @@ def app_footer() -> list:
     ]
 
 
-def page_template(*components, page_title: str = None) -> list:
+def page_template(*components, page_title: str = None, menus: list | None = None) -> list:
     def page_title_component() -> list:
         return [c.Heading(
             text=page_title,
@@ -131,7 +158,7 @@ def page_template(*components, page_title: str = None) -> list:
         c.AppShell(
             hasDrawer=True,
             components=[
-                *app_drawer(),
+                *app_drawer(menus),
                 c.AppContent(
                     components=[
                         c.PageHeader(

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile
 
-from fai_backend.dependencies import get_project_user
+from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
 from fai_backend.files.dependecies import get_file_upload_service
 from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
@@ -8,7 +8,6 @@ from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
 from fai_backend.schema import ProjectUser
-from fai_backend.views import page_template
 
 router = APIRouter(
     prefix='/api',
@@ -21,9 +20,10 @@ router = APIRouter(
 def list_view(
         file_service: FileUploadService = Depends(get_file_upload_service),
         project_user: ProjectUser = Depends(get_project_user),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     documents = file_service.list_files(project_user.project_id)
-    return page_template(
+    return view(
         c.Div(components=[
             c.Div(components=[
                 c.Table(
@@ -47,15 +47,16 @@ def list_view(
                 ),
             ], class_name='overflow-x-auto space-y-4'),
         ], class_name='card bg-base-100 w-full max-w-6xl'),
-        page_title=_('documents', 'Documents'),
+        _('documents', 'Documents'),
     )
 
 
 @router.get('/documents/upload', response_model=list, response_model_exclude_none=True)
 def upload_view(
         project_user: ProjectUser = Depends(get_project_user),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
-    return page_template(
+    return view(
         c.Form(
             submit_as='form',
             submit_url='/api/documents/upload',
@@ -74,7 +75,7 @@ def upload_view(
             ],
             class_name='card bg-base-100 w-full max-w-6xl',
         ),
-        page_title=_('upload_documents', 'Upload documents'),
+        _('upload_documents', 'Upload documents'),
     )
 
 
@@ -83,10 +84,11 @@ def upload_handler(
         files: list[UploadFile],
         project_user: ProjectUser = Depends(get_project_user),
         file_service: FileUploadService = Depends(get_file_upload_service),
+        view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     file_service.save_files(project_user.project_id, files)
 
-    return page_template(
+    return view(
         c.FireEvent(event=e.GoToEvent(url='/documents')),
-        page_title=_('submit_a_question', 'Create Question'''),
+        _('submit_a_question', 'Create Question'''),
     )
