@@ -1,5 +1,6 @@
 from typing import Literal
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings
 
 
@@ -10,9 +11,9 @@ class Settings(BaseSettings):
     APP_VECTOR_DB: Literal['memory', 'chromadb'] = 'chromadb'
     APP_VECTOR_DB_PATH: str = 'vector_db'
     APP_MESSAGE_BROKER: Literal['memory', 'redis_queue'] = 'redis_queue'
-    SECRET_KEY: str
+    SECRET_KEY: SecretStr
     BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
-    BREVO_API_KEY: str = 'api-key'
+    BREVO_API_KEY: SecretStr = 'api-key'
     ALGORITHM: str = 'HS256'
     ENV_MODE: Literal['testing', 'development', 'production'] = 'production'
     MONGO_DB_NAME: str = 'fai-rag-app'
@@ -24,7 +25,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = 'INFO'
     DEFAULT_LANGUAGE: str = 'en'
     FILE_UPLOAD_PATH: str = 'uploads'
-    
+
     class Config:
         env_file = '.env'
 

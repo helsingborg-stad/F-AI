@@ -10,13 +10,13 @@ from fai_backend.config import settings
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 access_security = JwtAccessBearerCookie(
-    secret_key='SECRET_KEY',
+    secret_key=settings.SECRET_KEY.get_secret_value(),
     auto_error=False,
     access_expires_delta=timedelta(hours=12),
 )
 
 refresh_security = JwtRefreshBearerCookie(
-    secret_key='SECRET_KEY',
+    secret_key=settings.SECRET_KEY.get_secret_value(),
     auto_error=True,
     refresh_expires_delta=timedelta(days=2),
 )

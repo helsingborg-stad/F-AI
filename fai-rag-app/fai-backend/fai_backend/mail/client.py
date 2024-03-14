@@ -33,7 +33,7 @@ def create_mail_client() -> MailClient:
             url = settings.BREVO_API_URL
             headers = {
                 'accept': 'application/json',
-                'api-key': settings.BREVO_API_KEY,
+                'api-key': settings.BREVO_API_KEY.get_secret_value(),
                 'content-type': 'application/json',
             }
 
@@ -49,3 +49,6 @@ def create_mail_client() -> MailClient:
         'console': ConsoleMailClient,
         'brevo': BrevoMailClient,
     }[settings.MAIL_CLIENT]()
+
+
+mail_client = create_mail_client()
