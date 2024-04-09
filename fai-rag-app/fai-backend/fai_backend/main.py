@@ -19,7 +19,6 @@ from fai_backend.setup import setup_db, setup_project
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    console.log(settings)
     console.log('Try setup db')
     await setup_db()
     console.log('Try setup initial project ')
