@@ -71,3 +71,6 @@ class BaseVectorDB(IVector):
 
     def reset(self) -> bool:
         return self.client.reset()
+
+    def create_collection(self, collection_name: str):
+        return self.client.create_collection(collection_name)

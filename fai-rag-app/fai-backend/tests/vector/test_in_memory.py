@@ -111,3 +111,14 @@ async def test_query_service_multiple_users(memory_vector_db):
     )
 
     assert result["ids"] == [['id3']]
+
+
+@pytest.mark.asyncio
+async def test_add_two_collections_then_correctly_list_all_added_collections(memory_vector_db):
+    collection1_vector_service = VectorService(vector_db=memory_vector_db, collection_name="collection1")
+    collection2_vector_service = VectorService(vector_db=memory_vector_db, collection_name="collection2")
+
+    listed_collections = collection1_vector_service.list_collections()
+    assert set(listed_collections) == {"collection1", "collection2"}
+
+

@@ -12,6 +12,8 @@ class VectorService:
         self.vector_db = vector_db
         self.collection_name = collection_name
 
+        self.vector_db.create_collection(collection_name=self.collection_name)
+
     @staticmethod
     def _generate_metadata(user_email: str, project_id: str, metadata_version: str = "1.0.0") -> Dict:
         delimiter = "|"
@@ -60,3 +62,6 @@ class VectorService:
             n_results=n_results,
             where=where_filter,
         )
+
+    def list_collections(self):
+        return self.vector_db.list_collections()
