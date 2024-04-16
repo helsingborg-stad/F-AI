@@ -6,7 +6,7 @@ authors = ["Nikolas Ramstedt <nikolas.ramstedt@helsingborg.se>", "Ehsan Zilaei <
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.12"
 fastapi = { extras = ["all"], version = "^0.108.0" }
 pydantic = { extras = ["email"], version = "^2.5.3" }
 uvicorn = { extras = ["standard"], version = "^0.25.0" }
@@ -30,6 +30,7 @@ rq = "^1.16.0"
 fakeredis = "^2.21.1"
 langstream = "^0.3.1"
 openai = "^1.13.3"
+unstructured = { version = "^0.13.2", extras = ["pdf", "md"]}
 
 [build-system]
 requires = ["poetry-core"]
