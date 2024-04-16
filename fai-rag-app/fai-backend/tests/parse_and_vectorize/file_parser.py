@@ -37,4 +37,4 @@ def test_parse_and_vectorize_then_query_correct_result(document_elements):
         n_results=1
     )
 
-    assert results["ids"] == [[str(0)]], f"The query did not return the expected document id {expected_doc_id}."
+    assert results["ids"] == [[expected_doc_id]], f"The query did not return the expected document id {expected_doc_id}."
