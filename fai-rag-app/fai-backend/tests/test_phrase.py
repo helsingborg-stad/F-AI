@@ -15,7 +15,7 @@ def test_greeting_swedish():
 def test_greeting_nonexistent_key():
     phrase.set_language('en')
     assert phrase('nonexistent') == 'nonexistent'
-    
+
 
 def test_non_string_key():
     try:
