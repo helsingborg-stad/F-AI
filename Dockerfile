@@ -1,7 +1,10 @@
 # 📦 buildtime-image:
 FROM python:3.11 AS buildtime-image
 
-RUN apt-get update
+# RUN apt-get update
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get update
 RUN apt-get install -y --no-install-recommends build-essential gcc
 
 # cache packages for 🕹️ with 👾 virtualenv:
