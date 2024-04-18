@@ -1,3 +1,5 @@
+from random import random
+
 import pytest
 
 from fai_backend.vector.memory import InMemoryVectorDB
@@ -16,7 +18,7 @@ async def test_add(memory_vector_db):
     collection_name = "test_collection"
     memory_vector_db.add(
         collection_name=collection_name,
-        embeddings=[[1.2, 2.3, 4.5], [6.7, 8.2, 9.2]],
+        embeddings=[[random() for _ in range(384)] for _ in range(2)],
         documents=["This is a document", "This is another document"],
         metadatas=[{"source": "my_source"}, {"source": "my_source"}],
         ids=["id1", "id2"]
