@@ -1,9 +1,4 @@
-from asyncio import sleep
-
-import pytest
-
 from fai_backend.message_broker.memory import MemoryQueue
-from fai_backend.message_broker.redis_queue import RedisQueue
 
 
 def echo(value):

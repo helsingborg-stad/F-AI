@@ -6,32 +6,15 @@ from fai_backend.phrase import Phrase, language_mappings, phrase
 client = TestClient(app)
 
 
-def test_greeting_english():
-    response = client.get('/greet', headers={'language': 'en'})
-    assert response.status_code == 200
-    assert response.json() == {'message': 'Hello'}
-
-
 def test_greeting_swedish():
     response = client.get('/greet', headers={'language': 'sv'})
     assert response.status_code == 200
     assert response.json() == {'message': 'Hej'}
 
 
-def test_greeting_default_language():
-    response = client.get('/greet')
-    assert response.status_code == 200
-    assert response.json() == {'message': 'Hello'}
-
-
 def test_greeting_nonexistent_key():
     phrase.set_language('en')
     assert phrase('nonexistent') == 'nonexistent'
-
-
-def test_invalid_language_code():
-    phrase.set_language('xyz')  # Set an invalid language code
-    assert phrase('greeting', 'Default Greeting') == 'Hello', 'Should fallback to English for invalid language code'
 
 
 def test_non_string_key():

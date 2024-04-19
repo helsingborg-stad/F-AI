@@ -1,8 +1,10 @@
+import os
 import pytest
 from fai_backend.files.file_parser import ParserFactory
 from fai_backend.vector.memory import InMemoryVectorDB
 
-TEST_PDF_PATH = './test_data/Bevprogram_Raa_1991_sbf.pdf'
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+TEST_PDF_PATH = os.path.join(CURRENT_DIR, 'test_data/Bevprogram_Raa_1991_sbf.pdf')
 
 
 @pytest.fixture(scope='session')
