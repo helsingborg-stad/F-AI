@@ -6,6 +6,7 @@ from datetime import datetime
 from fastapi import UploadFile
 from pydantic import ByteSize
 
+from fai_backend.files.file_parser import ParserFactory
 from fai_backend.files.models import FileInfo
 
 
@@ -67,3 +68,22 @@ class FileUploadService:
         latest_directory = sorted(project_directories, key=lambda x: (x.split('_')[2], x.split('_')[3]), reverse=True)[
             0]
         return os.path.join(self.upload_dir, latest_directory)
+
+    def parse_uploaded_files(self, project_id: str) -> list:
+        parsed_files = []
+
+        latest_upload_path = self.get_latest_upload_path(project_id)
+        if not latest_upload_path:
+            return parsed_files
+
+        uploaded_files = []
+        for file_name in os.listdir(latest_upload_path):
+            file_path = os.path.join(latest_upload_path, file_name)
+            if os.path.isfile(file_path):
+                uploaded_files.append(file_path)
+
+        for file in uploaded_files:
+            parser = ParserFactory.get_parser(file)
+            parsed_files.append(parser.parse(file))
+
+        return parsed_files
