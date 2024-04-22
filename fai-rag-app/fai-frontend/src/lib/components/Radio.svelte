@@ -15,7 +15,7 @@
 </script>
 
 <div class="flex flex-col gap-2">
-    <Text>{title}</Text>
+    <Text class="font-bold">{title}</Text>
     {#each options as [value, label]}
         <div class="flex gap-2 px-4">
             <input id={value} type="radio" value={value} name={name} required={required}/>

@@ -118,7 +118,7 @@ def submit_question_view(
                             required=True,
                         ),
                         c.Radio(
-                            name='quality_tag',
+                            name='tags[0]',
                             title=_('input_quality_tag',
                                     'How is the AI expected to be able to respond to this question?'),
                             required=True,
