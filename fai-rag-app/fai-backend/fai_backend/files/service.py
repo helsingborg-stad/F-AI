@@ -76,14 +76,10 @@ class FileUploadService:
         if not latest_upload_path:
             return parsed_files
 
-        uploaded_files = []
-        for file_name in os.listdir(latest_upload_path):
-            file_path = os.path.join(latest_upload_path, file_name)
-            if os.path.isfile(file_path):
-                uploaded_files.append(file_path)
+        uploaded_files = self.list_files(project_id)
 
         for file in uploaded_files:
-            parser = ParserFactory.get_parser(file)
-            parsed_files.append(parser.parse(file))
+            parser = ParserFactory.get_parser(file.path)
+            parsed_files.append(parser.parse(file.path))
 
         return parsed_files
