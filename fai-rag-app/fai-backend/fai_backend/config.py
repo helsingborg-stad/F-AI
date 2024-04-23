@@ -1,7 +1,12 @@
 from typing import Literal
 
+from dotenv import load_dotenv
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings
+
+from fai_backend.logger.console import console
+
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -25,6 +30,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = 'INFO'
     DEFAULT_LANGUAGE: str = 'en'
     FILE_UPLOAD_PATH: str = 'uploads'
+    OPENAI_API_KEY: str | None = None
 
     class Config:
         env_file = '.env'
@@ -38,7 +44,10 @@ try:
         raise Exception('Testing mode is enabled')
     else:
         settings = env_settings
-except Exception:
+except Exception as e:
+    console.log('Failed to load settings:', e)
+
+
     class TestSettings(Settings):
         class Config:
             env_file = '.env.test'
