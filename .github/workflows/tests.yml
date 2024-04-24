@@ -41,7 +41,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./fai-rag-app/fai-backend/.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+          key: venv-${{ hashFiles('fai-rag-app/fai-backend/poetry.lock') }}
 
       - name: install dependencies
         run: poetry install
