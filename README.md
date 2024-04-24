@@ -1,13 +1,17 @@
 # F-AI: Helsingborg Language Model Exploration
 
+![tests badge](https://github.com/helsingborg-stad/F-AI/actions/workflows/tests.yml/badge.svg)
+
 ## Requirements
+
 - Python 3.11.0
 
 ## Running with Docker locally
 
 To run this project using Docker, follow these steps:
 
-1. Ensure Docker are installed on your machine. If not, you can download them from the [official Docker website](https://docs.docker.com/get-docker/).
+1. Ensure Docker are installed on your machine. If not, you can download them from
+   the [official Docker website](https://docs.docker.com/get-docker/).
 
 2. Navigate to the project directory in your terminal.
 
@@ -18,7 +22,7 @@ To run this project using Docker, follow these steps:
    # with --platform ⛳️ (apple silicon/m1):
    $ docker build --platform linux/amd64 -t f-ai-pp:local .
    ```
-  
+
 4. Once the image is built, run the Docker container using the following command:
    ```shell
    # for local development using docker (with mount and port 8001)
@@ -36,15 +40,20 @@ To run this project using Docker, follow these steps:
    ```
 5. The application should now be running on your specified port (8001 or 80).
 
-Please note that any changes made to the codebase will require a rebuild of the Docker image for the changes to take effect.
+Please note that any changes made to the codebase will require a rebuild of the Docker image for the changes to take
+effect.
 
 ## Analytics and Logging
 
-We use Sentry for error tracking and performance monitoring to ensure the best user experience. Sentry provides real-time monitoring and detailed error reports, which help us detect, triage, and resolve issues faster.
+We use Sentry for error tracking and performance monitoring to ensure the best user experience. Sentry provides
+real-time monitoring and detailed error reports, which help us detect, triage, and resolve issues faster.
 
-By default, Sentry is **not enabled** in this project. If you wish to enable Sentry logging, ensure you've set the appropriate environment variables as described in the `.env.example` file.
+By default, Sentry is **not enabled** in this project. If you wish to enable Sentry logging, ensure you've set the
+appropriate environment variables as described in the `.env.example` file.
 
-Sentry is an open-source application monitoring platform that helps developers identify and fix crashes in real time. It provides detailed stack traces and environmental context for better issue resolution. For more information, visit [Sentry's official documentation](https://docs.sentry.io/).
+Sentry is an open-source application monitoring platform that helps developers identify and fix crashes in real time. It
+provides detailed stack traces and environmental context for better issue resolution. For more information,
+visit [Sentry's official documentation](https://docs.sentry.io/).
 
 ## Contribution Guidelines
 
