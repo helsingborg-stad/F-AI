@@ -1,0 +1,50 @@
+name: Run tests
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+
+  push:
+    branches:
+      - master
+
+jobs:
+  backend:
+    name: backend tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./fai-rag-app/fai-backend
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: install poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.7"
+
+      # create a local environment to use for GitHub Actions caching
+      - name: setup poetry
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+
+      - name: cache
+        uses: actions/cache@v3
+        with:
+          path: ./fai-rag-app/fai-backend/.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+
+      - name: install dependencies
+        run: poetry install
+
+      - name: Run tests
+        run: poetry run pytest -v
