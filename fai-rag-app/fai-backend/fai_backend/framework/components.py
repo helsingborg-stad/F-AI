@@ -22,6 +22,7 @@ __all__ = (
     'Table',
     'Pagination',
     'Select',
+    'Radio',
     'ChatBubble',
     'FileInput',
     # then `AnyComponent` itself
@@ -238,6 +239,14 @@ class Select(BaseModel):
     options: list[tuple[str, str | None]] | None = None
 
 
+class Radio(UIComponent):
+    type: Literal['Radio'] = 'Radio'
+    name: str
+    title: str | None = None
+    required: bool | None = None
+    options: list[tuple[str, str | None]] | None = None
+
+
 class ChatBubble(UIComponent):
     type: Literal['ChatBubble'] = 'ChatBubble'
     image_src: str | None = Field(None, serialization_alias='imageSrc')
@@ -251,6 +260,6 @@ class ChatBubble(UIComponent):
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
-     PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | ChatBubble | FileInput),
+     PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | Radio | ChatBubble | FileInput),
     Field(discriminator='type')
 ]

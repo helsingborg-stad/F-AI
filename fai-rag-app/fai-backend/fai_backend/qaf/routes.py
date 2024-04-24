@@ -117,6 +117,18 @@ def submit_question_view(
                             placeholder=_('input_question_placeholder', 'Enter your question here'),
                             required=True,
                         ),
+                        c.Radio(
+                            name='tags[0]',
+                            title=_('input_quality_tag',
+                                    'How is the AI expected to be able to respond to this question?'),
+                            required=True,
+                            options=[
+                                ('quality.good',
+                                 _('question_quality_good', '✅ AI is expected to answer the question correctly')),
+                                ('quality.ok', _('question_quality_ok', '🟡 AI might not be able to answer')),
+                                ('quality.bad', _('question_quality_bad', '❌ AI is not expected to provide an answer')),
+                            ],
+                        )
                     ],
                 )
             ], class_name='card-body'),

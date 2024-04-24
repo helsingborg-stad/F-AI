@@ -20,6 +20,7 @@ import Table from "./components/Table.svelte";
 import Pagination from "./components/Pagination.svelte";
 import ChatBubble from "./components/ChatBubble.svelte";
 import Select from "./components/Select.svelte";
+import Radio from "./components/Radio.svelte";
 import FileInput from "./components/FileInput.svelte";
 
 
@@ -45,6 +46,7 @@ export const componentMap: Record<string, typeof SvelteComponent> = {
     Pagination,
     ChatBubble,
     Select,
+    Radio,
     FileInput
 }
 

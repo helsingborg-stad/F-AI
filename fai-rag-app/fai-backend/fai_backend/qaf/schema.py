@@ -73,6 +73,7 @@ class SubmitQuestionPayload(BaseModel):
     subject: str
     question: str
     errand_id: str
+    tags: list[str]
 
 
 class SubmitAnswerPayload(BaseModel):
