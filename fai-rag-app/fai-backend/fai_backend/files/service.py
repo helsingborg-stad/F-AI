@@ -90,8 +90,12 @@ class FileUploadService:
         if not os.path.isabs(dest_directory_path):
             raise ValueError("Destination path must be absolute")
 
-        os.makedirs(dest_directory_path, exist_ok=True)
+        if not dest_file_name.endswith('.json'):
+            dest_file_name += '.json'
+
         file_path = os.path.join(dest_directory_path, dest_file_name + '.json')
+        os.makedirs(dest_directory_path, exist_ok=True)
+
         if os.path.exists(file_path):
             raise FileExistsError(f"The file {file_path} already exists.")
 
