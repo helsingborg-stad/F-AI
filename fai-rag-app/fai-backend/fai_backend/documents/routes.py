@@ -92,3 +92,18 @@ def upload_handler(
         c.FireEvent(event=e.GoToEvent(url='/documents')),
         _('submit_a_question', 'Create Question'''),
     )
+
+
+@router.get('documents/parse_and_save', response_model=list, response_model_exclude_none=True)
+def parse_documents(
+        src_directory_path: str,
+        dest_directory_path: str,
+        dest_file_name: str,
+        file_service: FileUploadService = Depends(get_file_upload_service),
+) -> list:
+    parsed_files = file_service.parse_files(src_directory_path)
+    stringify_parsed_files = [str(elem) for elem in parsed_files]
+
+    file_service.dump_list_to_json(stringify_parsed_files, dest_directory_path, dest_file_name)
+
+    return []
