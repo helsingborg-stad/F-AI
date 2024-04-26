@@ -25,6 +25,7 @@ __all__ = (
     'Radio',
     'ChatBubble',
     'FileInput',
+    'SSEChat',
     # then `AnyComponent` itself
     'AnyUI',
 )
@@ -257,9 +258,15 @@ class ChatBubble(UIComponent):
     footer: 'list[AnyUI] | None' = Field(None, serialization_alias='slot.footer')
 
 
+class SSEChat(UIComponent):
+    type: Literal['SSEChat'] = 'SSEChat'
+    endpoint: str
+
+
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
-     PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | Radio | ChatBubble | FileInput),
+     PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | Radio |
+     ChatBubble | FileInput | SSEChat),
     Field(discriminator='type')
 ]

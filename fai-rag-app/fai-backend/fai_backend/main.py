@@ -1,6 +1,9 @@
 from contextlib import asynccontextmanager
+from datetime import datetime
 
 from fastapi import Depends, FastAPI, Header, Request
+from fastapi.middleware.cors import CORSMiddleware
+from sse_starlette import EventSourceResponse
 from starlette.responses import HTMLResponse, RedirectResponse
 
 from fai_backend.auth.router import router as auth_router
@@ -9,6 +12,7 @@ from fai_backend.dependencies import get_project_user
 from fai_backend.documents.routes import router as documents_router
 from fai_backend.vector.routes import router as vector_router
 from fai_backend.framework.frontend import get_frontend_environment
+from fai_backend.llm.protocol import ParrotLLM, SSESerializer, LLMMessage
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
 from fai_backend.phrase import phrase as _, set_language
@@ -37,8 +41,45 @@ app.include_router(vector_router)
 
 app.middleware('http')(remove_trailing_slash)
 
+# Add Cross Origin Resource Sharing middleware to the app
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 frontend = get_frontend_environment(settings.ENV_MODE)
 frontend.configure(app)
+
+
+@app.get('/chat-stream')
+async def chat_stream(question: str):
+    console.log(f"{question=}")
+
+    llm = ParrotLLM()
+
+    # uncomment to use OpenAI llm instead
+    # llm = OpenAILLM(template=SYSTEM_TEMPLATE)
+
+    serializer = SSESerializer()
+
+    async def generator():
+        async for output in llm.run(question):
+            if isinstance(output.data, str):
+                yield serializer.serialize(LLMMessage(
+                    type="message",
+                    date=datetime.now(),
+                    source="Chat AI",
+                    content=output.data
+                ))
+        yield serializer.serialize(LLMMessage(
+            type="message_end",
+            date=datetime.now()
+        ))
+
+    return EventSourceResponse(generator())
 
 
 @app.get('/health', include_in_schema=False)

@@ -182,6 +182,26 @@ def questions_index_view(
     )
 
 
+@router.get('/chat', response_model=list, response_model_exclude_none=True)
+def chat_index_view(
+        authenticated_user: User | None = Depends(try_get_authenticated_user),
+        view=Depends(get_page_template_for_logged_in_users),
+) -> list:
+    if not authenticated_user:
+        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
+
+    return view(
+        [c.Div(components=[
+            c.Div(components=[
+                c.SSEChat(
+                    endpoint='http://localhost:8000/chat-stream'
+                )
+            ], class_name='px-6')
+        ])],
+        _('chat', 'Chat'),
+    )
+
+
 @router.get('/questions/{conversation_id}', response_model=list, response_model_exclude_none=True)
 async def question_details_view(
         authenticated_user: ProjectUser | None = Depends(get_project_user),
