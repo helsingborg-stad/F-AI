@@ -2,9 +2,9 @@ from typing import Callable, TypeVar, Dict, Type
 
 from fai_backend.config import settings
 
-from fai_backend.vector.chromadb import ChromaDBVector
+from fai_backend.vector.chromadb import ChromaDB
 from fai_backend.vector.interface import IVector
-from fai_backend.vector.memory import InMemoryVectorDB
+from fai_backend.vector.memory import InMemoryChromaDB
 
 T = TypeVar('T', bound=IVector)  # Ensure that all registered types adhere to the IVector interface
 
@@ -39,12 +39,12 @@ class VectorDBFactory:
 
 @VectorDBFactory.register('chromadb')
 def create_chromadb_vector() -> IVector:
-    return ChromaDBVector(db_directory=settings.APP_VECTOR_DB_PATH)
+    return ChromaDB(db_directory=settings.APP_VECTOR_DB_PATH)
 
 
 @VectorDBFactory.register('memory')
 def create_in_memory_vector() -> IVector:
-    return InMemoryVectorDB()
+    return InMemoryChromaDB()
 
 
 vector_db = VectorDBFactory.create(settings.APP_VECTOR_DB)

@@ -6,7 +6,7 @@ from fai_backend.vector.interface import IVector, OneOrMany, Embedding
 from fai_backend.vector.types import Document, Where
 
 
-class BaseVectorDB(IVector):
+class BaseChromaDB(IVector):
     def __init__(self, client: ClientAPI):
         self.client = client
 

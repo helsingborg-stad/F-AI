@@ -3,13 +3,13 @@ from random import random
 import pytest
 import pytest_asyncio
 
-from fai_backend.vector.memory import InMemoryVectorDB
+from fai_backend.vector.memory import InMemoryChromaDB
 from fai_backend.vector.service import VectorService
 
 
 @pytest_asyncio.fixture
 async def memory_vector_db():
-    db_instance = InMemoryVectorDB()
+    db_instance = InMemoryChromaDB()
     yield db_instance
     await db_instance.reset()
 

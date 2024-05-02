@@ -3,7 +3,7 @@ import pytest
 import pytest_asyncio
 
 from fai_backend.files.file_parser import ParserFactory
-from fai_backend.vector.memory import InMemoryVectorDB
+from fai_backend.vector.memory import InMemoryChromaDB
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_PDF_PATH = os.path.join(CURRENT_DIR, 'test_data/Bevprogram_Raa_1991_sbf.pdf')
@@ -17,7 +17,7 @@ def document_elements():
 
 @pytest_asyncio.fixture
 async def vector_db():
-    db = InMemoryVectorDB()
+    db = InMemoryChromaDB()
     yield db
     await db.reset()
 
