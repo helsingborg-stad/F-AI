@@ -11,13 +11,10 @@ class IVector(Protocol[T]):
     def heartbeat(self) -> int:
         raise NotImplementedError('heartbeat not implemented')
 
-    def reset(self) -> bool:
+    async def reset(self) -> bool:
         raise NotImplementedError('reset not implemented')
 
-    def delete(self, collection_name: str) -> None:
-        raise NotImplementedError('delete not implemented')
-
-    def add(
+    async def add(
         self,
         collection_name: str,
         ids: OneOrMany[str],
@@ -28,7 +25,7 @@ class IVector(Protocol[T]):
     ) -> None:
         raise NotImplementedError('add not implemented')
 
-    def query(
+    async def query(
             self,
             collection_name: str,
             query_embeddings: Optional[
@@ -43,11 +40,17 @@ class IVector(Protocol[T]):
     ) -> T:
         raise NotImplementedError('query not implemented')
 
-    def list_collections(self) -> T:
+    async def list_collections(self) -> T:
         raise NotImplementedError('list_collections not implemented')
 
-    def get_or_create_collection(self, collection_name: str) -> T:
+    async def get_collection(self, name: str) -> T:
+        raise NotImplementedError('get_collection not implemented')
+
+    async def get_or_create_collection(self, collection_name: str) -> T:
         raise NotImplementedError('get_or_create_collection not implemented')
 
-    def create_collection(self, collection_name: str) -> T:
+    async def create_collection(self, name: str) -> T:
         raise NotImplementedError('create_collection not implemented')
+
+    async def delete_collection(self, name: str) -> T:
+        raise NotImplementedError('delete_collection not implemented')
