@@ -1,9 +1,9 @@
 import chromadb
 
-from fai_backend.vector.base_chromadb import BaseVectorDB
+from fai_backend.vector.base_chromadb import BaseChromaDB
 
 
-class InMemoryVectorDB(BaseVectorDB):
+class InMemoryChromaDB(BaseChromaDB):
     def __init__(self):
         super().__init__(chromadb.EphemeralClient(
             settings=chromadb.Settings(

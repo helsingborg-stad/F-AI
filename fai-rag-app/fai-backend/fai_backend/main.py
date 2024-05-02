@@ -7,6 +7,7 @@ from fai_backend.auth.router import router as auth_router
 from fai_backend.config import settings
 from fai_backend.dependencies import get_project_user
 from fai_backend.documents.routes import router as documents_router
+from fai_backend.vector.routes import router as vector_router
 from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
@@ -32,6 +33,7 @@ app.include_router(auth_router)
 app.include_router(projects_router)
 app.include_router(qaf_router)
 app.include_router(documents_router)
+app.include_router(vector_router)
 
 app.middleware('http')(remove_trailing_slash)
 
