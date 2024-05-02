@@ -22,7 +22,7 @@ from fai_backend.setup import setup_db, setup_project
 async def lifespan(_app: FastAPI):
     console.log('Try setup db')
     await setup_db()
-    console.log('Try setup initial project ')
+    console.log('Try setup initial project')
     await setup_project()
     yield
     console.log('😴 Unmounting app ...')
