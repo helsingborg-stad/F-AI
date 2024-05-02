@@ -25,7 +25,7 @@ from fai_backend.qaf.dependencies import (
     submitted_question_details_request,
     submitted_questions_request,
 )
-from fai_backend.qaf.schema import QuestionDetails
+from fai_backend.qaf.schema import QuestionDetails, QuestionEntry
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
 
@@ -85,7 +85,7 @@ def submit_question_view(
         return [
             c.Text(
                 text=_('no_projects', 'You are not a member of any proj.. wait a mintue, how did you login? 😱'),
-                class_name='bg-error text-center font-black text-3xl text-warning h-screen flex  items-center justify-center leading-relaxed',
+                class_name='bg-error text-center font-black text-3xl text-warning h-screen flex items-center justify-center leading-relaxed',
                 element='h1'
             ),
         ]
@@ -151,7 +151,7 @@ def create_question_handler(
 @router.get('/questions', response_model=list, response_model_exclude_none=True)
 def questions_index_view(
         authenticated_user: User | None = Depends(try_get_authenticated_user),
-        questions: list[Conversation] = Depends(list_my_questions_request),
+        questions: list[QuestionEntry] = Depends(list_my_questions_request),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     if not authenticated_user:
@@ -161,20 +161,16 @@ def questions_index_view(
         [c.Div(components=[
             c.Div(components=[
                 c.Table(
-                    data=[
-                        {
-                            'subject': question.metadata['subject'],
-                            'status': question.status,
-                            'link': f'/questions/{question.id}',
-                        }
-                        for question in questions
-                    ],
+                    data=[{'subject': question.subject,
+                           'status': question.status,
+                           'errand_id': question.errand_id,
+                           'link': f'/questions/{question.id}'} for question in questions],
                     columns=[
                         {'key': 'subject', 'label': 'Subject'},
                         {'key': 'status', 'label': 'Status'},
+                        {'key': 'errand_id', 'label': 'Errand ID'},
                         {'key': 'link', 'label': '', 'link_text': 'View'},
                     ],
-
                     class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
                 ),
             ], class_name='overflow-x-auto space-y-4'),
