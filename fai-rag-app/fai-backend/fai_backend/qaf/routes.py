@@ -85,7 +85,7 @@ def submit_question_view(
         return [
             c.Text(
                 text=_('no_projects', 'You are not a member of any proj.. wait a mintue, how did you login? 😱'),
-                class_name='bg-error text-center font-black text-3xl text-warning h-screen flex  items-center justify-center leading-relaxed',
+                class_name='bg-error text-center font-black text-3xl text-warning h-screen flex items-center justify-center leading-relaxed',
                 element='h1'
             ),
         ]
