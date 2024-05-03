@@ -20,15 +20,12 @@ class FrontendEnvironment(ABC):
 
 class DevelopmentEnvironment(FrontendEnvironment):
     async def serve(self, request: Request) -> Response:
-        async with httpx.AsyncClient() as client:
-            try:
-                async with httpx.AsyncClient() as client:
-                    resp = await client.get(f'http://localhost:3000{request.url.path}')
-                    return Response(
-                        content=resp.content, media_type=resp.headers['Content-Type']
-                    )
-            except httpx.RequestError:
-                raise HTTPException(status_code=404, detail='Item not found')
+        try:
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(f'http://localhost:3000{request.url.path}')
+                return Response(content=resp.content, media_type=resp.headers['Content-Type'])
+        except httpx.RequestError:
+            raise HTTPException(status_code=404, detail='Item not found')
 
     def configure(self, app: FastAPI):
         pass
