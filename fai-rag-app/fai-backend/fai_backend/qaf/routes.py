@@ -3,7 +3,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from fai_backend.conversations.models import Conversation, Message
+from fai_backend.conversations.models import Message
 from fai_backend.dependencies import (
     get_authenticated_user,
     get_page_template_for_logged_in_users,
