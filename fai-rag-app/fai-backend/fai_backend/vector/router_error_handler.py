@@ -15,7 +15,7 @@ def handle_errors(f):
         except KeyError as ke:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Resource not found."
+                detail="Resource not found: " + str(ke)
             )
         except Exception as e:
             # Log exception details here if logging is set up
