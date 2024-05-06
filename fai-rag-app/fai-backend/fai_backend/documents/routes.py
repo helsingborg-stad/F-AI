@@ -8,6 +8,9 @@ from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
 from fai_backend.schema import ProjectUser
+from fai_backend.vector.dependencies import get_vector_service
+from fai_backend.vector import routes as vector_routes
+from fai_backend.vector.service import VectorService
 
 router = APIRouter(
     prefix='/api',
@@ -80,13 +83,20 @@ def upload_view(
 
 
 @router.post('/documents/upload', response_model=list, response_model_exclude_none=True)
-def upload_handler(
+async def upload_handler(
         files: list[UploadFile],
         project_user: ProjectUser = Depends(get_project_user),
         file_service: FileUploadService = Depends(get_file_upload_service),
+        vector_service: VectorService = Depends(get_vector_service),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
-    file_service.save_files(project_user.project_id, files)
+    upload_path = file_service.save_files(project_user.project_id, files)
+
+    await vector_routes.vectorize_files(
+        upload_path=upload_path,
+        file_service=file_service,
+        vector_service=vector_service,
+    )
 
     return view(
         c.FireEvent(event=e.GoToEvent(url='/documents')),
