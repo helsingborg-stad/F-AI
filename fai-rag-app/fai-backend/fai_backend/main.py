@@ -48,11 +48,8 @@ async def health_check():
 
 @app.get('/greet')
 async def greet(language: str = Header(default='en')):
-    # Set the language based on the 'language' header
-    _.set_language(language)
-
-    # Return the translated greeting
-    return {'message': _('greeting')}
+    print(f'{language=}')
+    return {'message': _('greeting', '')}
 
 
 @app.get('/api', include_in_schema=True)

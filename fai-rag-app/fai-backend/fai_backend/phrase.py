@@ -1,37 +1,30 @@
+import gettext
+import os
+from typing import Any
+
 from fai_backend.config import settings
 
 
 class Phrase:
-    def __init__(self, mapping_by_language: dict[str, dict[str, str]], default_language: str):
-        self.translations: dict[str, dict[str, str]] = mapping_by_language
-        self.default_language: str = default_language
-        self.current_language: str = default_language
+    _instance = None
 
-    def set_language(self, language: str) -> None:
-        self.current_language = language
+    def __new__(cls, selected_language: str = 'sv', **kwargs):
+        if not cls._instance:
+            cls._instance = super(Phrase, cls).__new__(cls)
+            cls._instance._initialize(selected_language)
+        return cls._instance
 
-    def __call__(self, key: str, default: str | None = None) -> str:
-        if not isinstance(key, str):
-            raise TypeError('Key must be a string')
-        if default is not None and not isinstance(default, str):
-            raise TypeError('Default value must be a string')
+    def _initialize(self, selected_language: str) -> None:
+        locale_path = os.path.join(os.path.dirname(__file__), 'locale')
+        self.translation = gettext.translation('messages', locale_path, languages=[selected_language])
+        self.translation.install()
 
-        lang: str = self.current_language if self.current_language in self.translations else self.default_language
-        return self.translations.get(lang, {}).get(key, default if default is not None else key)
+    def translate(self, key: str) -> str:
+        return self.translation.gettext(key)
 
 
-language_mappings = {
-    'sv': {
-        'greeting': 'Hej',
-        'logout_button_text': 'Logga ut',
-        'my_questions': 'Mina frågor',
-        'submit_a_question': 'Ställ en fråga',
-        'submit_question': 'Ställ en fråga',
-        'questions': 'Frågor',
-        'input_pin_placeholder': 'Ange engångskod',
-        'input_email_placeholder': 'Ange E-postadress',
-        'request_pin_submit_button': 'Skicka engångskod'
-    }
-}
+def translate_phrase(key: str, default: Any) -> str:
+    return Phrase(settings.DEFAULT_LANGUAGE).translate(key)
 
-phrase = Phrase(language_mappings, settings.DEFAULT_LANGUAGE)
+
+phrase = translate_phrase
