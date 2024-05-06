@@ -109,8 +109,10 @@ async def vectorize_files(
         vector_service: VectorService = Depends(get_vector_service),
 ):
     upload_directory_name = upload_path.split('/')[-1]
+
+    # Upload directory name will be used as the collection which is limited to 62 characters
     if len(upload_directory_name) > 62:
-        raise ValueError("Generated path exceeds the 62 character limit")
+        raise ValueError("Directory name exceeds the 62 character limit, cannot create collection with same name")
     if len(upload_directory_name) == 0:
         raise ValueError("Generated path is empty")
 
