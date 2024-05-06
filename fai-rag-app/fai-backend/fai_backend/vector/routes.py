@@ -1,5 +1,7 @@
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import Depends, APIRouter
 
+from fai_backend.files.dependecies import get_file_upload_service
+from fai_backend.files.service import FileUploadService
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.vector.dependencies import get_vector_service
 from fai_backend.vector.service import VectorService
@@ -97,3 +99,32 @@ async def list_collections(
         "message": "Successfully listed collections",
         "collections": list(collections),
     }
+
+
+@router.post('/vector/vectorize_files', response_model=dict)
+@handle_errors
+async def vectorize_files(
+        upload_path: str,
+        file_service: FileUploadService = Depends(get_file_upload_service),
+        vector_service: VectorService = Depends(get_vector_service),
+):
+    upload_directory_name = upload_path.split('/')[-1]
+    if len(upload_directory_name) > 62:
+        raise ValueError("Generated path exceeds the 62 character limit")
+    if len(upload_directory_name) == 0:
+        raise ValueError("Generated path is empty")
+
+    parsed_files = file_service.parse_files(upload_path)
+
+    # Create JSON object with an array `artifact` containing the parsed files strings
+    stringify_parsed_files = [str(elem) for elem in parsed_files]
+    json_object = {"artifacts": stringify_parsed_files}
+
+    await create_collection(collection_name=upload_directory_name, vector_service=vector_service)
+
+    vector_data = VectorData(**json_object)
+    await add_to_collection(
+        collection_name=upload_directory_name,
+        json=vector_data,
+        vector_service=vector_service,
+    )
