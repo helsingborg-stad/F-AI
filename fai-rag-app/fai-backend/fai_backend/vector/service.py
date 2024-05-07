@@ -28,6 +28,18 @@ class VectorService:
             documents=documents,
         )
 
+    async def add_artifacts_to_collection(
+            self,
+            collection_name: str,
+            artifacts: list[str]
+    ) -> None:
+        ids = [str(i) for i in range(len(artifacts))]
+        await self.add_to_collection(
+            collection_name=collection_name,
+            ids=ids,
+            documents=artifacts,
+        )
+
     async def query_from_collection(
             self,
             collection_name: str,
