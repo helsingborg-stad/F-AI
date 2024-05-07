@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-06 21:05+0200\n"
-"PO-Revision-Date: 2024-05-06 19:06+0200\n"
+"POT-Creation-Date: 2024-05-07 20:19+0200\n"
+"PO-Revision-Date: 2024-05-07 20:20+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sv\n"
 "Language-Team: sv <LL@li.org>\n"
@@ -18,29 +18,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.15.0\n"
 
-#: main.py:46
-msgid "healthy"
-msgstr "Allt frid o fröjd!"
-
-#: main.py:52
-msgid "greeting"
-msgstr "Hejsan!!!"
-
-#: main.py:62
-msgid "not_found"
-msgstr "Hepp"
+#: main.py:51
+msgid "some_complex_id"
+msgstr "Hej, ditt förnamn är {first_name} och ditt efternamn är {last_name}"
 
 #: views.py:34
 msgid "questions"
-msgstr "Frågor"
+msgstr ""
 
 #: views.py:39
 msgid "submit_question"
-msgstr "Ställ en fråga"
+msgstr ""
 
 #: qaf/routes.py:178 views.py:43
 msgid "my_questions"
-msgstr "Mina frågor"
+msgstr ""
 
 #: documents/menu.py:14 views.py:49
 msgid "show_all"
@@ -68,7 +60,7 @@ msgstr ""
 
 #: views.py:128
 msgid "logout_button_text"
-msgstr "Logga ut"
+msgstr ""
 
 #: auth/router.py:43
 msgid "input_email_label"
@@ -76,11 +68,11 @@ msgstr ""
 
 #: auth/router.py:44
 msgid "input_email_placeholder"
-msgstr "Ange E-postadress"
+msgstr ""
 
 #: auth/router.py:50
 msgid "request_pin_submit_button"
-msgstr "Skicka engångskod"
+msgstr ""
 
 #: auth/router.py:64
 msgid "input_pin_label"
@@ -88,7 +80,7 @@ msgstr ""
 
 #: auth/router.py:65
 msgid "input_pin_placeholder"
-msgstr "Ange engångskod"
+msgstr ""
 
 #: auth/router.py:81
 msgid "verify_pin_submit_button"
@@ -137,7 +129,7 @@ msgstr ""
 #: documents/routes.py:93 qaf/routes.py:136 qaf/routes.py:147 qaf/routes.py:349
 #: qaf/routes.py:361
 msgid "submit_a_question"
-msgstr "Ställ en fråga"
+msgstr ""
 
 #: projects/router.py:71
 msgid "email"

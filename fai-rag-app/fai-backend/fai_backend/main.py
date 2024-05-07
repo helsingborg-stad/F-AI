@@ -48,8 +48,8 @@ async def health_check():
 
 @app.get('/greet')
 async def greet(language: str = Header(default='en')):
-    print(f'{language=}')
-    return {'message': _('greeting', '')}
+    return {'message': _(key='some_complex_id', default='Hello {first_name}, your last name is {last_name}',
+                         first_name='Tim', last_name='Kook')}
 
 
 @app.get('/api', include_in_schema=True)
