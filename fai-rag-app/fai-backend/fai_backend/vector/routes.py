@@ -1,3 +1,5 @@
+from pathlib import Path, PurePosixPath
+
 from fastapi import Depends, APIRouter
 
 from fai_backend.files.dependecies import get_file_upload_service
@@ -50,14 +52,10 @@ async def add_to_collection(
         json: VectorData,
         vector_service: VectorService = Depends(get_vector_service)
 ):
-    artifacts = json.artifacts
-    ids = [str(i) for i in range(len(artifacts))]
-    documents = [str(elem) for elem in artifacts]
-
-    await vector_service.add_to_collection(
+    artifacts = [str(elem) for elem in json.artifacts]
+    await vector_service.add_artifacts_to_collection(
         collection_name=collection_name,
-        ids=ids,
-        documents=documents,
+        artifacts=artifacts,
     )
 
     return {
@@ -105,28 +103,14 @@ async def list_collections(
 @handle_errors
 async def vectorize_files(
         upload_path: str,
-        file_service: FileUploadService = Depends(get_file_upload_service),
         vector_service: VectorService = Depends(get_vector_service),
+        file_service: FileUploadService = Depends(get_file_upload_service),
 ):
     upload_directory_name = upload_path.split('/')[-1]
-
-    # Upload directory name will be used as the collection which is limited to 62 characters
-    if len(upload_directory_name) > 62:
-        raise ValueError("Directory name exceeds the 62 character limit, cannot create collection with same name")
-    if len(upload_directory_name) == 0:
-        raise ValueError("Generated path is empty")
+    await vector_service.create_collection(collection_name=upload_directory_name)
 
     parsed_files = file_service.parse_files(upload_path)
-
-    # Create JSON object with an array `artifact` containing the parsed files strings
-    stringify_parsed_files = [str(elem) for elem in parsed_files]
-    json_object = {"artifacts": stringify_parsed_files}
-
-    await create_collection(collection_name=upload_directory_name, vector_service=vector_service)
-
-    vector_data = VectorData(**json_object)
-    await add_to_collection(
+    await vector_service.add_artifacts_to_collection(
         collection_name=upload_directory_name,
-        json=vector_data,
-        vector_service=vector_service,
+        artifacts=parsed_files,
     )

@@ -62,7 +62,7 @@ def upload_view(
     return view(
         c.Form(
             submit_as='form',
-            submit_url='/api/documents/upload',
+            submit_url='/api/documents/upload_and_vectorize',
             components=[
                 c.FileInput(
                     name='files',
@@ -82,8 +82,8 @@ def upload_view(
     )
 
 
-@router.post('/documents/upload', response_model=list, response_model_exclude_none=True)
-async def upload_handler(
+@router.post('/documents/upload_and_vectorize', response_model=list, response_model_exclude_none=True)
+async def upload_and_vectorize_handler(
         files: list[UploadFile],
         project_user: ProjectUser = Depends(get_project_user),
         file_service: FileUploadService = Depends(get_file_upload_service),
@@ -92,15 +92,19 @@ async def upload_handler(
 ) -> list:
     upload_path = file_service.save_files(project_user.project_id, files)
 
-    await vector_routes.vectorize_files(
-        upload_path=upload_path,
-        file_service=file_service,
-        vector_service=vector_service,
+    upload_directory_name = upload_path.split('/')[-1]
+    await vector_service.create_collection(collection_name=upload_directory_name)
+
+    parsed_files = file_service.parse_files(upload_path)
+    artifacts = [str(elem) for elem in parsed_files]
+    await vector_service.add_artifacts_to_collection(
+        collection_name=upload_directory_name,
+        artifacts=artifacts,
     )
 
     return view(
         c.FireEvent(event=e.GoToEvent(url='/documents')),
-        _('submit_a_question', 'Create Question'''),
+        _('submit_a_question', 'Create Question'),
     )
 
 
