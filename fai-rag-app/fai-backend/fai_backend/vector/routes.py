@@ -102,15 +102,15 @@ async def list_collections(
 @router.post('/vector/vectorize_files', response_model=dict)
 @handle_errors
 async def vectorize_files(
-        upload_path: str,
+        directory_path: str,
         vector_service: VectorService = Depends(get_vector_service),
         file_service: FileUploadService = Depends(get_file_upload_service),
 ):
-    upload_directory_name = upload_path.split('/')[-1]
-    await vector_service.create_collection(collection_name=upload_directory_name)
+    directory_name = directory_path.split('/')[-1]
+    await vector_service.create_collection(collection_name=directory_name)
 
-    parsed_files = file_service.parse_files(upload_path)
+    parsed_files = file_service.parse_files(directory_path)
     await vector_service.add_artifacts_to_collection(
-        collection_name=upload_directory_name,
+        collection_name=directory_name,
         artifacts=parsed_files,
     )
