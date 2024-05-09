@@ -14,6 +14,11 @@ async def memory_vector_db():
     await db_instance.reset()
 
 
+@pytest_asyncio.fixture
+async def vector_service(memory_vector_db):
+    return VectorService(memory_vector_db)
+
+
 @pytest.mark.asyncio
 async def test_add(memory_vector_db):
     collection_name = "test_collection"
@@ -135,3 +140,20 @@ async def test_update_id_document_and_expect_update(memory_vector_db):
     )
 
     assert query_non_updated_document["ids"] == [['id2']]
+
+
+@pytest.mark.asyncio
+async def test_add_artifacts_to_collection_then_query_correct_result(vector_service):
+    collection_name = "animal_collection"
+    artifacts = ["Cat", "Dog"]
+
+    await vector_service.create_collection(collection_name)
+    await vector_service.add_artifacts_to_collection(collection_name, artifacts)
+
+    results = await vector_service.query_from_collection(
+        collection_name=collection_name,
+        query_texts=["Cat"],
+        n_results=1
+    )
+
+    assert results["ids"] == [['0']]
