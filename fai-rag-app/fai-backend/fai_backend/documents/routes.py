@@ -96,10 +96,9 @@ async def upload_and_vectorize_handler(
     await vector_service.create_collection(collection_name=upload_directory_name)
 
     parsed_files = file_service.parse_files(upload_path)
-    artifacts = [str(elem) for elem in parsed_files]
     await vector_service.add_artifacts_to_collection(
         collection_name=upload_directory_name,
-        artifacts=artifacts,
+        artifacts=parsed_files,
     )
 
     return view(

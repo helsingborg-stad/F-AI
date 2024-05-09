@@ -75,7 +75,7 @@ class FileUploadService:
             0]
         return os.path.join(self.upload_dir, latest_directory)
 
-    def parse_files(self, src_directory_path: str):
+    def parse_files(self, src_directory_path: str) -> list[str]:
         parsed_files = []
 
         upload_date = datetime.fromtimestamp(os.path.getctime(src_directory_path))
@@ -84,7 +84,7 @@ class FileUploadService:
         for file in files:
             parser = ParserFactory.get_parser(file.path)
             parsed_file = parser.parse(file.path)
-            parsed_files.extend(parsed_file)
+            parsed_files.extend([str(elem) for elem in parsed_file])
 
         return parsed_files
 
