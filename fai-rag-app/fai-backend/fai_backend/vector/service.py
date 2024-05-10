@@ -33,6 +33,11 @@ class VectorService:
             collection_name: str,
             documents: list[str]
     ) -> None:
+        """
+        Add documents to a collection without specifying ID's
+
+        The collection should be empty before calling this method to avoid ID conflicts.
+        """
         ids = [str(i) for i in range(len(documents))]
         await self.add_to_collection(
             collection_name=collection_name,
