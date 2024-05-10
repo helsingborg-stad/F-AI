@@ -143,12 +143,12 @@ async def test_update_id_document_and_expect_update(memory_vector_db):
 
 
 @pytest.mark.asyncio
-async def test_add_artifacts_to_collection_then_query_correct_result(vector_service):
+async def test_add_documents_without_id_to_collection_then_query_correct_result(vector_service):
     collection_name = "animal_collection"
-    artifacts = ["Cat", "Dog"]
+    documents = ["Cat", "Dog"]
 
     await vector_service.create_collection(collection_name)
-    await vector_service.add_artifacts_to_collection(collection_name, artifacts)
+    await vector_service.add_documents_without_id_to_empty_collection(collection_name, documents)
 
     results = await vector_service.query_from_collection(
         collection_name=collection_name,

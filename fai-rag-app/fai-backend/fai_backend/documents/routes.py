@@ -96,9 +96,9 @@ async def upload_and_vectorize_handler(
     await vector_service.create_collection(collection_name=upload_directory_name)
 
     parsed_files = file_service.parse_files(upload_path)
-    await vector_service.add_artifacts_to_collection(
+    await vector_service.add_documents_without_id_to_empty_collection(
         collection_name=upload_directory_name,
-        artifacts=parsed_files,
+        documents=parsed_files,
     )
 
     return view(

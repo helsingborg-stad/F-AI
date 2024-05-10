@@ -1,5 +1,3 @@
-from pathlib import Path, PurePosixPath
-
 from fastapi import Depends, APIRouter
 
 from fai_backend.files.dependecies import get_file_upload_service
@@ -52,16 +50,16 @@ async def add_to_collection(
         json: VectorData,
         vector_service: VectorService = Depends(get_vector_service)
 ):
-    artifacts = [str(elem) for elem in json.artifacts]
-    await vector_service.add_artifacts_to_collection(
+    documents = [str(elem) for elem in json.documents]
+    await vector_service.add_documents_without_id_to_empty_collection(
         collection_name=collection_name,
-        artifacts=artifacts,
+        documents=documents,
     )
 
     return {
         "message": "Successfully added to collection",
         "collection_name": collection_name,
-        "added_count": len(artifacts),
+        "added_count": len(documents),
     }
 
 
@@ -110,7 +108,7 @@ async def vectorize_files(
     await vector_service.create_collection(collection_name=directory_name)
 
     parsed_files = file_service.parse_files(directory_path)
-    await vector_service.add_artifacts_to_collection(
+    await vector_service.add_documents_without_id_to_empty_collection(
         collection_name=directory_name,
-        artifacts=parsed_files,
+        documents=parsed_files,
     )

@@ -21,23 +21,23 @@ class VectorService:
             collection_name: str,
             ids: OneOrMany[str],
             documents: Optional[OneOrMany[str]],
-    ):
+    ) -> None:
         await self.vector_db.add(
             collection_name=collection_name,
             ids=ids,
             documents=documents,
         )
 
-    async def add_artifacts_to_collection(
+    async def add_documents_without_id_to_empty_collection(
             self,
             collection_name: str,
-            artifacts: list[str]
+            documents: list[str]
     ) -> None:
-        ids = [str(i) for i in range(len(artifacts))]
+        ids = [str(i) for i in range(len(documents))]
         await self.add_to_collection(
             collection_name=collection_name,
             ids=ids,
-            documents=artifacts,
+            documents=documents,
         )
 
     async def query_from_collection(
