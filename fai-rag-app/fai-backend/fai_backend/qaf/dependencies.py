@@ -1,6 +1,8 @@
 from fastapi import Depends
 
 from fai_backend.dependencies import get_project_user
+from fai_backend.files.dependecies import get_file_upload_service
+from fai_backend.files.service import FileUploadService
 from fai_backend.llm.service import ask_llm_raq_question
 from fai_backend.logger.console import console
 from fai_backend.qaf.schema import (
@@ -32,9 +34,16 @@ async def submit_question_request(
 async def submit_question_and_generate_answer_request(
         question: QuestionDetails = Depends(submit_question_request),
         service: QAFService = Depends(QAFService.factory),
+        file_service: FileUploadService = Depends(get_file_upload_service),
         user: ProjectUser = Depends(get_project_user),
 ) -> QuestionDetails:
-    response = await ask_llm_raq_question(question.question.content)
+    latest_upload_path = file_service.get_latest_upload_path(user.project_id)
+    if not latest_upload_path:
+        raise Exception('No upload path found')
+
+    directory_name = latest_upload_path.split('/')[-1]
+
+    response = await ask_llm_raq_question(question=question.question.content, collection_name=directory_name)
     await service.add_message(
         user,
         GenerateAnswerPayload(question_id=question.id, answer=response)
