@@ -46,9 +46,12 @@ async def llm_question_endpoint(question: str):
 
 
 @router.get('/llm-raq-question', response_model=Any)
-async def llm_raq_question_endpoint(question: str):
+async def llm_raq_question_endpoint(
+        question: str,
+        vector_collection_name: str,
+):
     try:
-        response = await ask_llm_raq_question(question)
+        response = await ask_llm_raq_question(question=question, collection_name=vector_collection_name)
         return {'response': response}
     except Exception as exception:
         raise HTTPException(status_code=500, detail=str(exception))
