@@ -87,13 +87,14 @@ async def ask_llm_raq_question(question: str, collection_name: str):
                 .and_then(lambda scored: sorted(list(scored)[0], key=lambda x: x[1], reverse=True)[:6])
                 .and_then(lambda results: {"query": query, "results": results[0]})
                 .and_then(chat_stream)
+                .map(lambda delta: delta.content)
             )(query)
         except Exception as e:
             print(f"Error processing query: {e}", {str(e)})
             raise e
 
     try:
-        return await collect_final_output(stream(question))
+        return await join_final_output(stream(question))
     except Exception as e:
         print(f"Error joining final output '{question}': {str(e)}")
         raise e
