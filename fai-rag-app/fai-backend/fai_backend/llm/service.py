@@ -59,12 +59,12 @@ async def ask_llm_raq_question(question: str, collection_name: str):
         lambda: [*documents]
     ))([])
 
-    chat_stream, chat_prompt = create_chat_stream_from_prompt(CHAT_PROMPT_TEMPLATE_ARGS)
-    scoring_stream, scoring_prompt = create_chat_stream_from_prompt(SCORING_PROMPT_TEMPLATE_ARGS)
+    chat_stream, _ = create_chat_stream_from_prompt(CHAT_PROMPT_TEMPLATE_ARGS)
+    scoring_stream, _ = create_chat_stream_from_prompt(SCORING_PROMPT_TEMPLATE_ARGS)
     vector_service = VectorService(vector_db=vector_db)
 
     scoring_stream = scoring_stream.map(
-        lambda delta: (lambda num: num)(json.loads(delta.content)['score'])
+        lambda delta: json.loads(delta.content)['score']
         if delta.role == "function" and delta.name == "score_document"
         else 0
     )
