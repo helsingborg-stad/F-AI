@@ -36,3 +36,7 @@ def test_non_string_default():
 def test_configurable_default_language():
     set_language('xyz')  # Invalid language to trigger default
     assert phrase('greeting', 'Default Greeting') == 'Hej', 'Should use Swedish as the default language'
+
+
+def test_placeholders_happy():
+    assert phrase('hello_key', 'Hello {name}', name='Rambo') == 'Hello Rambo'
