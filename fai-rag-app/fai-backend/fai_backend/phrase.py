@@ -5,33 +5,51 @@ from fai_backend.config import settings
 
 
 class Phrase:
-    _instance = None
+    def __init__(self) -> None:
+        self.locale_path = os.path.join(os.path.dirname(__file__), 'locale')
+        self.current_language = 'sv'
+        self.translation = None
+        self.set_language(self.current_language)
 
-    def __new__(cls, selected_language: str = 'en', **kwargs):
-        if not cls._instance:
-            cls._instance = super(Phrase, cls).__new__(cls)
-            cls._instance._initialize(selected_language)
-        return cls._instance
-
-    def _initialize(self, selected_language: str) -> None:
+    def set_language(self, selected_language='sv') -> None:
         try:
-            locale_path = os.path.join(os.path.dirname(__file__), 'locale')
-            self.translation = gettext.translation(domain='messages', localedir=locale_path,
-                                                   languages=[selected_language])
+            new_translation = gettext.translation(domain='messages', localedir=self.locale_path,
+                                                  languages=[selected_language])
+            new_translation.install()
+            self.current_language = selected_language
+            self.translation = new_translation
         except FileNotFoundError:
-            self.translation = gettext.NullTranslations()
-        self.translation.install()
+            if self.current_language != 'sv':
+                self.set_language('sv')
 
     def translate(self, key: str) -> str:
+        if not self.translation:
+            raise ValueError('Language not set. Call set_language() before calling translate()')
+
         return self.translation.gettext(key)
 
 
-def translate_phrase(key: str, default: str = None, **kwargs) -> str:
-    translated = Phrase(settings.DEFAULT_LANGUAGE).translate(key)
+phrase_instance = Phrase()
+
+
+def phrase(key: str, default: str | None = None, **kwargs) -> str:
+    if not isinstance(key, str):
+        raise TypeError('Key must be a string')
+    if default is not None and not isinstance(default, str):
+        raise TypeError('Default value must be a string')
+
+    translated = phrase_instance.translate(key)
     if translated == key and default:
         translated = default
 
     return translated.format(**kwargs)
 
 
-phrase = translate_phrase
+def set_language(language: str) -> None:
+    try:
+        phrase_instance.set_language(language)
+    except ValueError as _:
+        phrase_instance.set_language('sv')
+
+
+set_language(settings.DEFAULT_LANGUAGE)
