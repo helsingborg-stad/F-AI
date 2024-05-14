@@ -12,7 +12,9 @@ from fai_backend.dependencies import get_project_user
 from fai_backend.documents.routes import router as documents_router
 from fai_backend.vector.routes import router as vector_router
 from fai_backend.framework.frontend import get_frontend_environment
-from fai_backend.llm.protocol import ParrotLLM, SSESerializer, LLMMessage
+from fai_backend.llm.impl.parrot import ParrotLLM
+from fai_backend.llm.models import LLMMessage
+from fai_backend.llm.serializer.impl.sse import SSESerializer
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
 from fai_backend.phrase import phrase as _, set_language
