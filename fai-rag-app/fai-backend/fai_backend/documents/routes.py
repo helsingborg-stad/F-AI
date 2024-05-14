@@ -8,6 +8,9 @@ from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
 from fai_backend.schema import ProjectUser
+from fai_backend.vector.dependencies import get_vector_service
+from fai_backend.vector import routes as vector_routes
+from fai_backend.vector.service import VectorService
 
 router = APIRouter(
     prefix='/api',
@@ -59,7 +62,7 @@ def upload_view(
     return view(
         c.Form(
             submit_as='form',
-            submit_url='/api/documents/upload',
+            submit_url='/api/documents/upload_and_vectorize',
             components=[
                 c.FileInput(
                     name='files',
@@ -79,18 +82,28 @@ def upload_view(
     )
 
 
-@router.post('/documents/upload', response_model=list, response_model_exclude_none=True)
-def upload_handler(
+@router.post('/documents/upload_and_vectorize', response_model=list, response_model_exclude_none=True)
+async def upload_and_vectorize_handler(
         files: list[UploadFile],
         project_user: ProjectUser = Depends(get_project_user),
         file_service: FileUploadService = Depends(get_file_upload_service),
+        vector_service: VectorService = Depends(get_vector_service),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
-    file_service.save_files(project_user.project_id, files)
+    upload_path = file_service.save_files(project_user.project_id, files)
+
+    upload_directory_name = upload_path.split('/')[-1]
+    await vector_service.create_collection(collection_name=upload_directory_name)
+
+    parsed_files = file_service.parse_files(upload_path)
+    await vector_service.add_documents_without_id_to_empty_collection(
+        collection_name=upload_directory_name,
+        documents=parsed_files,
+    )
 
     return view(
         c.FireEvent(event=e.GoToEvent(url='/documents')),
-        _('submit_a_question', 'Create Question'''),
+        _('submit_a_question', 'Create Question'),
     )
 
 

@@ -10,6 +10,8 @@ from pydantic import ByteSize
 from fai_backend.files.file_parser import ParserFactory
 from fai_backend.files.models import FileInfo
 
+PROJECT_PATH_PREFIX = 'proj'
+
 
 class FileUploadService:
     def __init__(self, upload_dir: str):
@@ -18,8 +20,8 @@ class FileUploadService:
 
     def _generate_upload_path(self, project_id: str) -> str:
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        upload_session_uuid = str(uuid.uuid4())
-        path = f'project_{project_id}_{timestamp}_{upload_session_uuid}'
+        upload_session_uuid = str(uuid.uuid4())[:8]
+        path = f'{PROJECT_PATH_PREFIX}_{project_id}_{timestamp}_{upload_session_uuid}'
         full_path = os.path.join(self.upload_dir, path)
         os.makedirs(full_path, exist_ok=True)
         return full_path
@@ -53,7 +55,7 @@ class FileUploadService:
         return file_infos
 
     def list_files(self, project_id: str) -> list[FileInfo]:
-        project_directories = [d for d in os.listdir(self.upload_dir) if d.startswith(f'project_{project_id}_')]
+        project_directories = [d for d in os.listdir(self.upload_dir) if d.startswith(f'{PROJECT_PATH_PREFIX}_{project_id}_')]
         if not project_directories:
             return []
 
@@ -65,7 +67,7 @@ class FileUploadService:
         return self.get_file_infos(latest_directory_path, upload_date)
 
     def get_latest_upload_path(self, project_id: str) -> str | None:
-        project_directories = [d for d in os.listdir(self.upload_dir) if d.startswith(f'project_{project_id}_')]
+        project_directories = [d for d in os.listdir(self.upload_dir) if d.startswith(f'{PROJECT_PATH_PREFIX}_{project_id}_')]
         if not project_directories:
             return None
 
@@ -73,7 +75,7 @@ class FileUploadService:
             0]
         return os.path.join(self.upload_dir, latest_directory)
 
-    def parse_files(self, src_directory_path: str):
+    def parse_files(self, src_directory_path: str) -> list[str]:
         parsed_files = []
 
         upload_date = datetime.fromtimestamp(os.path.getctime(src_directory_path))
@@ -82,7 +84,7 @@ class FileUploadService:
         for file in files:
             parser = ParserFactory.get_parser(file.path)
             parsed_file = parser.parse(file.path)
-            parsed_files.extend(parsed_file)
+            parsed_files.extend([str(elem) for elem in parsed_file])
 
         return parsed_files
 

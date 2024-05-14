@@ -1,5 +1,7 @@
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import Depends, APIRouter
 
+from fai_backend.files.dependecies import get_file_upload_service
+from fai_backend.files.service import FileUploadService
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.vector.dependencies import get_vector_service
 from fai_backend.vector.service import VectorService
@@ -48,20 +50,16 @@ async def add_to_collection(
         json: VectorData,
         vector_service: VectorService = Depends(get_vector_service)
 ):
-    artifacts = json.artifacts
-    ids = [str(i) for i in range(len(artifacts))]
-    documents = [str(elem) for elem in artifacts]
-
-    await vector_service.add_to_collection(
+    documents = [str(elem) for elem in json.documents]
+    await vector_service.add_documents_without_id_to_empty_collection(
         collection_name=collection_name,
-        ids=ids,
         documents=documents,
     )
 
     return {
         "message": "Successfully added to collection",
         "collection_name": collection_name,
-        "added_count": len(artifacts),
+        "added_count": len(documents),
     }
 
 
@@ -97,3 +95,20 @@ async def list_collections(
         "message": "Successfully listed collections",
         "collections": list(collections),
     }
+
+
+@router.post('/vector/vectorize_files', response_model=dict)
+@handle_errors
+async def vectorize_files(
+        directory_path: str,
+        vector_service: VectorService = Depends(get_vector_service),
+        file_service: FileUploadService = Depends(get_file_upload_service),
+):
+    directory_name = directory_path.split('/')[-1]
+    await vector_service.create_collection(collection_name=directory_name)
+
+    parsed_files = file_service.parse_files(directory_path)
+    await vector_service.add_documents_without_id_to_empty_collection(
+        collection_name=directory_name,
+        documents=parsed_files,
+    )

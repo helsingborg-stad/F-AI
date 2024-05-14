@@ -28,7 +28,7 @@ class ParserFactory:
 
         if mime_type == 'application/pdf':
             return PDFParser()
-        if mime_type == 'text/markdown':
+        if mime_type == 'text/plain':
             return MarkdownParser()
 
         raise ValueError(f'Unsupported file type: {mime_type}')
