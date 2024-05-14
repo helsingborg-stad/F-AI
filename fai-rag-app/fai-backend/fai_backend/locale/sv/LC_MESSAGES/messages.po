@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-07 20:19+0200\n"
+"POT-Creation-Date: 2024-05-14 11:22+0200\n"
 "PO-Revision-Date: 2024-05-07 20:20+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sv\n"
@@ -18,9 +18,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.15.0\n"
 
-#: main.py:51
-msgid "some_complex_id"
-msgstr "Hej, ditt förnamn är {first_name} och ditt efternamn är {last_name}"
+#: main.py:52
+msgid "greeting"
+msgstr "Hej"
 
 #: views.py:34
 msgid "questions"
