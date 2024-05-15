@@ -67,7 +67,6 @@ def reviewer_menu() -> list:
                 c.Link(
                     text=_('inbox', 'Inbox'),
                     url='/reviews',
-                    badge='3',
                     badge_state='accent',
                 )
             ]
