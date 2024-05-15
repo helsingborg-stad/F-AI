@@ -61,28 +61,39 @@ async def ask_llm_raq_question(question: str, collection_name: str):
     scoring_stream, _ = create_chat_stream_from_prompt(SCORING_PROMPT_TEMPLATE_ARGS)
     vector_service = VectorService(vector_db=vector_db)
 
+    def append_score_to_documents(scores):
+        return zip(list_documents(), [s[0] for s in scores])
+
+    def sort_and_slice_documents(scored_documents, slice_size: int):
+        first_element = list(scored_documents)[0]
+        sorted_scores = sorted(first_element, key=lambda x: x[1], reverse=True)
+        return sorted_scores[:slice_size]
+
+    def create_query_document_pair(query, document):
+        return {"query": query, "document": document}
+
+    vector_db_query_result = await query_vector(
+        vector_service=vector_service,
+        collection_name=collection_name,
+        query=question,
+    )
+
     scoring_stream = scoring_stream.map(
         lambda delta: json.loads(delta.content)['score']
         if delta.role == "function" and delta.name == "score_document"
         else 0
     )
 
-    stream_retrieve_documents = await query_vector(
-        vector_service=vector_service,
-        collection_name=collection_name,
-        query=question,
-    )
-
     def stream(query):
         try:
             return (
-                stream_retrieve_documents
+                vector_db_query_result
                 .map(add_document)
-                .map(lambda document: {"query": query, "document": document})
+                .map(lambda document: create_query_document_pair(query, document))
                 .map(scoring_stream)
                 .gather()
-                .and_then(lambda scores: zip(list_documents(), [s[0] for s in scores]))
-                .and_then(lambda scored: sorted(list(scored)[0], key=lambda x: x[1], reverse=True)[:6])
+                .and_then(append_score_to_documents)
+                .and_then(lambda scored_documents: sort_and_slice_documents(scored_documents, 6))
                 .and_then(lambda results: {"query": query, "results": results[0]})
                 .and_then(chat_stream)
                 .map(lambda delta: delta.content)
