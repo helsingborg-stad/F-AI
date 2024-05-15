@@ -5,6 +5,10 @@ from langstream.contrib import OpenAIChatStream, OpenAIChatMessage, OpenAIChatDe
 
 from fai_backend.chat.stream import create_chat_stream_from_prompt
 from fai_backend.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
+from fai_backend.config import settings
+from fai_backend.llm.impl.openai import OpenAILLM
+from fai_backend.llm.impl.parrot import ParrotLLM
+from fai_backend.llm.protocol import ILLMProtocol
 from fai_backend.vector.service import VectorService
 from fai_backend.vector.factory import vector_db
 
@@ -14,6 +18,15 @@ SYSTEM_TEMPLATE = "You are a helpful AI assistant that helps people with answeri
 "question is not related to the context, politely respond that you are tuned to only "
 "answer questions that are related to the context.<br> The questions are going to be "
 "asked in Swedish. Your response must always be in Swedish."
+
+
+class LLMFactory:
+    @staticmethod
+    def get(backend: str = settings.LLM_BACKEND) -> ILLMProtocol:
+        return {
+            "parrot": lambda: ParrotLLM(),
+            "openai": lambda: OpenAILLM(template=SYSTEM_TEMPLATE),
+        }[backend]()
 
 
 async def query_vector(vector_service, collection_name, query, n_results=10):

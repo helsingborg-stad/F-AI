@@ -10,6 +10,7 @@ from fai_backend.auth.router import router as auth_router
 from fai_backend.config import settings
 from fai_backend.dependencies import get_project_user
 from fai_backend.documents.routes import router as documents_router
+from fai_backend.llm.service import LLMFactory
 from fai_backend.vector.routes import router as vector_router
 from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.llm.impl.parrot import ParrotLLM
@@ -58,14 +59,10 @@ frontend.configure(app)
 
 @app.get('/chat-stream')
 async def chat_stream(question: str):
-    console.log(f"{question=}")
-
-    llm = ParrotLLM()
-
-    # uncomment to use OpenAI llm instead
-    # llm = OpenAILLM(template=SYSTEM_TEMPLATE)
-
+    llm = LLMFactory.get()
     serializer = SSESerializer()
+
+    print(f"{llm=}")
 
     async def generator():
         async for output in llm.run(question):
