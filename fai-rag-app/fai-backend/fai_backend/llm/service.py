@@ -1,8 +1,6 @@
-import asyncio
 import json
-from typing import AsyncGenerator, Iterable, List, Tuple
 
-from langstream import Stream, join_final_output, as_async_generator, collect_final_output
+from langstream import Stream, join_final_output, as_async_generator
 from langstream.contrib import OpenAIChatStream, OpenAIChatMessage, OpenAIChatDelta
 
 from fai_backend.chat.stream import create_chat_stream_from_prompt
@@ -35,7 +33,7 @@ async def query_vector(vector_service, collection_name, query, n_results=10):
 
 async def ask_llm_question(question: str):
     llm_stream: Stream[str, str] = OpenAIChatStream[str, OpenAIChatDelta](
-        "RecipeStream",
+        "AskLLMStream",
         lambda user_question: [
             OpenAIChatMessage(
                 role="system",
