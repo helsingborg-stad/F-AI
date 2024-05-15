@@ -58,8 +58,10 @@ async def valid_user_email(
         body: RequestPin,
         auth_service: AuthService = Depends(get_auth_service),
 ) -> EmailStr:
-    if await auth_service.email_exists(body.email):
-        return body.email
+    email_as_lowercase = body.email.lower()
+
+    if await auth_service.email_exists(email_as_lowercase):
+        return email_as_lowercase
     else:
         raise HTTPException(status_code=404, detail=[
             {
