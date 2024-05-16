@@ -4,23 +4,27 @@ import os
 from fai_backend.config import settings
 
 
-class Phrase:
-    def __init__(self) -> None:
-        self.locale_path = os.path.join(os.path.dirname(__file__), 'locale')
-        self.current_language = 'sv'
-        self.translation = None
-        self.set_language(self.current_language)
+class UnsupportedLanguageError(Exception):
+    pass
 
-    def set_language(self, selected_language='sv') -> None:
+
+class Phrase:
+    def __init__(self, default_language: str = settings.DEFAULT_LANGUAGE) -> None:
+        self.locale_path = os.path.join(os.path.dirname(__file__), 'locale')
+        self.translation = None
+        self.set_language(default_language)
+
+    def set_language(self, selected_language: str) -> None:
         try:
             new_translation = gettext.translation(domain='messages', localedir=self.locale_path,
                                                   languages=[selected_language])
             new_translation.install()
-            self.current_language = selected_language
             self.translation = new_translation
         except FileNotFoundError:
-            if self.current_language != 'sv':
-                self.set_language('sv')
+            if selected_language != settings.DEFAULT_LANGUAGE:
+                self.set_language(settings.DEFAULT_LANGUAGE)
+            else:
+                raise UnsupportedLanguageError(f'Could not find locale for {selected_language}')
 
     def translate(self, key: str) -> str:
         if not self.translation:
@@ -46,10 +50,4 @@ def phrase(key: str, default: str | None = None, **kwargs) -> str:
 
 
 def set_language(language: str) -> None:
-    try:
-        phrase_instance.set_language(language)
-    except ValueError as _:
-        phrase_instance.set_language('sv')
-
-
-set_language(settings.DEFAULT_LANGUAGE)
+    phrase_instance.set_language(language)
