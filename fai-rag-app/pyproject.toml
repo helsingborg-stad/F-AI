@@ -29,6 +29,7 @@ omit = []
 python = "^3.11"
 fai-backend = { path = "./fai-backend" }
 ruff = "^0.1.11"
+Babel = "2.15.0"
 
 [build-system]
 requires = ["poetry-core"]
