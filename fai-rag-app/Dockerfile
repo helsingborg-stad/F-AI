@@ -35,6 +35,7 @@ WORKDIR /app/fai-backend
 # Install poetry and backend dependencies
 RUN pip install poetry && \
     poetry config virtualenvs.create false && \
+    poetry lock && \
     poetry install
 
 # Set environment variables for FastAPI
