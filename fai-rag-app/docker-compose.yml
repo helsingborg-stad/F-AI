@@ -1,8 +1,8 @@
-version: '3.8'
-
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.base
     ports:
       - "8888:80"
     environment:
@@ -18,9 +18,12 @@ services:
       BREVO_API_URL: "your_brevo_api_url"
       BREVO_API_KEY: "your_brevo_api_key"
       LOG_LEVEL: "debug"
-      ENV_MODE: "production"
+      ENV_MODE: "development"
+      FILE_UPLOAD_PATH: "/fai-backend/uploads"
     depends_on:
       - mongo
+    volumes:
+      - uploads-data:/fai-backend/uploads
 
   mongo:
     image: mongo
@@ -31,3 +34,4 @@ services:
 
 volumes:
   mongo-data:
+  uploads-data:
