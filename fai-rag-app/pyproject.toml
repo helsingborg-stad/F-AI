@@ -24,13 +24,13 @@ testpaths = [
 source = ["fai-backend"]
 omit = []
 
-
 [tool.poetry.dependencies]
-python = ">=3.11,<3.12"
 fai-backend = { path = "./fai-backend" }
+
+[tool.poetry.dev-dependencies]
 ruff = "^0.1.11"
 Babel = "2.15.0"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
