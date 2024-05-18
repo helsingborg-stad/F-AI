@@ -36,5 +36,5 @@ jobs:
           build-args: GITHUB_ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       - name: Clean up Docker images and volumes
-          run: |
-            docker system prune --all --force --volumes
+        run: |
+          docker system prune --all --force --volumes
