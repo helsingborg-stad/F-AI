@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM python:3.11.9-slim-bookworm
 
 ENV POETRY_VERSION=1.8.2 \
@@ -19,18 +20,14 @@ RUN apt-get update && apt-get install -y \
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
-WORKDIR /app
+WORKDIR /fai-backend
 
-COPY ./fai-backend/poetry.lock ./fai-backend/pyproject.toml fai-backend/
-
-WORKDIR /app/fai-backend
+COPY ./fai-backend/poetry.lock ./fai-backend/pyproject.toml ./
 
 RUN poetry lock --no-update
-RUN poetry install --only main --no-root
+RUN poetry install --only main --no-root --no-directory
 
-COPY ./fai-backend/fai_backend .
-
-RUN poetry install --only main
+COPY ./fai-backend/fai_backend ./fai_backend
 
 ENV HOST=0.0.0.0
 ENV PORT=80
