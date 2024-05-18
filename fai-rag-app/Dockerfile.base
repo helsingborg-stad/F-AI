@@ -26,12 +26,9 @@ COPY ./fai-backend/poetry.lock ./fai-backend/pyproject.toml fai-backend/
 WORKDIR /app/fai-backend
 
 RUN poetry lock --no-update
-RUN poetry install --only main --no-root --no-directory
+RUN poetry install --only main --no-root
 
 COPY ./fai-backend/fai_backend fai_backend/
-
-RUN poetry lock --no-update
-RUN poetry install --only main
 
 ENV HOST=0.0.0.0
 ENV PORT=80
