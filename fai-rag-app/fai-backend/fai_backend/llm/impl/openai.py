@@ -1,18 +1,17 @@
-from typing import AsyncGenerator
-
-from langstream import StreamOutput, Stream
+from langstream import Stream
 from langstream.contrib import OpenAIChatStream, OpenAIChatDelta, OpenAIChatMessage
 
-from fai_backend.llm.protocol import ILLMProtocol
+from fai_backend.llm.protocol import ILLMStreamProtocol
+from fai_backend.llm.models import LLMDataPacket
 
 
-class OpenAILLM(ILLMProtocol):
+class OpenAILLM(ILLMStreamProtocol):
 
     def __init__(self, template: str):
         self.template = template
 
-    def run(self, input_message: str) -> AsyncGenerator[StreamOutput[str], str]:
-        llm_stream: Stream[str, str] = OpenAIChatStream[str, OpenAIChatDelta](
+    async def create(self) -> Stream[str, LLMDataPacket]:
+        return OpenAIChatStream[str, OpenAIChatDelta](
             "RecipeStream",
             lambda user_question: [
                 OpenAIChatMessage(
@@ -26,6 +25,4 @@ class OpenAILLM(ILLMProtocol):
             ],
             model="gpt-4",
             temperature=0,
-        ).map(lambda delta: delta.content)
-
-        return llm_stream(input_message)
+        ).map(lambda delta: LLMDataPacket(content=delta.content, user_friendly=True))

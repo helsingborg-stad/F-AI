@@ -1,18 +1,14 @@
-from typing import Protocol, AsyncGenerator
+from typing import Protocol
 
-from langstream import Stream, StreamOutput
+from langstream import Stream
+
+from fai_backend.llm.models import LLMDataPacket
 
 
-class ILLMProtocol(Protocol):
-    def run(self, input_message: str) -> AsyncGenerator[StreamOutput[str], str]:
+class ILLMStreamProtocol(Protocol):
+    async def create(self) -> Stream[str, LLMDataPacket]:
         """
-        Takes an input message and returns an async stream resolving to the response from the LLM.
-
-        :param input_message: The input message, as a string.
-        :type input_message: str
-
-        :return: The resulting `Stream[str, str]` object.
-        :rtype: Stream[str, str]
-
+        Create a Stream that takes a str (generally a question) and returns
+        a stream of tokens (strings) of the response given by the LLM.
         """
         ...

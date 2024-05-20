@@ -133,18 +133,15 @@
         isSelf={message.isSelf}
       />
     {:else}
-      <p class="py-20">Inga meddelanden kompis. Fråga mig nåt!</p>
+      <p class="py-20">Här kan du ställa direkta frågor angående dokument du har laddat upp!</p>
     {/each}
   </Div>
-  <Div class="flex gap-2 w-full">
+  <Div class="flex gap-2 w-full items-end">
     <span class="loading loading-spinner" class:opacity-0={!eventSource} />
-    <input
-      class="input input-bordered grow"
-      bind:value={currentMessageInput}
-      type="text"
+    <textarea
       name="message"
-      placeholder="Meddelande"
-      data-1p-ignore
+      bind:value={currentMessageInput}
+      class="textarea textarea-bordered grow"
     />
     <Button
       onClick={()=>createSSE(currentMessageInput)}

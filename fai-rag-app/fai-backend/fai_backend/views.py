@@ -51,6 +51,10 @@ def questions_menu() -> list:
                         ),
                     ],
                 ),
+                c.Link(
+                    text=_('chat', "Chat"),
+                    url='/chat'
+                )
             ],
         ),
     ]

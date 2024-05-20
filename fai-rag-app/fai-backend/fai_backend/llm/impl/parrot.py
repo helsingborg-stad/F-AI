@@ -1,13 +1,13 @@
 import asyncio
 from random import uniform
-from typing import AsyncGenerator
 
-from langstream import StreamOutput, Stream
+from langstream import Stream
 
-from fai_backend.llm.protocol import ILLMProtocol
+from fai_backend.llm.protocol import ILLMStreamProtocol
+from fai_backend.llm.models import LLMDataPacket
 
 
-class ParrotLLM(ILLMProtocol):
+class ParrotLLM(ILLMStreamProtocol):
     """
     Parrot (mock) LLM protocol reference implementation.
 
@@ -25,9 +25,8 @@ class ParrotLLM(ILLMProtocol):
             yield part
             await asyncio.sleep(uniform(self.min_delay, self.max_delay))
 
-    def run(self, input_message: str) -> AsyncGenerator[StreamOutput[str], str]:
-        stream = Stream[str, str](
+    async def create(self) -> Stream[str, LLMDataPacket]:
+        return Stream[str, str](
             "ParrotStream",
             self.to_generator
-        )
-        return stream(input_message)
+        ).map(lambda delta: LLMDataPacket(content=delta, user_friendly=True))
