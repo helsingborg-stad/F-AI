@@ -18,7 +18,15 @@
     isSelf: boolean;
   }
 
+  interface Document {
+    id: string;
+    name: string;
+  }
+
   export let endpoint: string;
+  export let documents: Document[];
+
+  let selectedDocument: string;
   let messages: ChatMessage[] = [];
   let currentMessageInput: string = "";
   let eventSource: EventSource | null = null;
@@ -107,7 +115,7 @@
       eventSource?.close();
       eventSource = null;
 
-      eventSource = new EventSource(`${endpoint}?question=${question}`);
+      eventSource = new EventSource(`${endpoint}?question=${question}&document=${selectedDocument}`);
       eventSource.onmessage = (e) => processRawSSEEvent(e.data);
       eventSource.onerror = (e) => {
         addErrorMessage(`unknown error / ${e}`);
@@ -123,30 +131,65 @@
   }
 </script>
 
-<Div class="flex flex-col items-center justify-center">
-  <Div class="w-full flex flex-col items-center justify-center my-5">
-    {#each messages as message (message.id)}
-      <ChatBubble
-        user={message.user}
-        content={message.content}
-        time={message.time}
-        isSelf={message.isSelf}
-      />
-    {:else}
-      <p class="py-20">Här kan du ställa direkta frågor angående dokument du har laddat upp!</p>
+<Div class="flex gap-5 p-5 flex-col items-center justify-center h-full overflow-hidden grow">
+
+  <!-- Document picker -->
+  <select
+    class="select select-bordered w-full max-w-xs"
+    bind:value={selectedDocument}>
+    <option disabled selected value="">Välj dokument</option>
+    {#each documents as document (document.id)}
+      <option value={document.id}>{document.name}</option>
     {/each}
+  </select>
+
+  <!-- Content -->
+  <Div class="w-full grow flex flex-col gap-2 items-center justify-center overflow-hidden">
+
+    <!-- Chat bubbles -->
+    <div class="grow w-full max-w-prose">
+      {#each messages as message (message.id)}
+        <ChatBubble
+          user={message.user}
+          content={message.content}
+          time={message.time}
+          isSelf={message.isSelf}
+        />
+      {:else}
+        <div class="flex flex-col items-center justify-center">
+          <p>Här kan du ställa direkta frågor angående dokument du har laddat upp.</p>
+          <p>Välj ett dokument för att börja.</p>
+        </div>
+      {/each}
+
+      <span class="loading loading-spinner" class:opacity-0={!eventSource} />
+    </div>
+
+    <!-- Clear button -->
+    {#if messages.length > 0}
+      <Button
+        onClick={() => messages = []}
+        label="Rensa chat"
+        state="secondary"
+        disabled={!!eventSource} />
+    {/if}
   </Div>
-  <Div class="flex gap-2 w-full items-end">
-    <span class="loading loading-spinner" class:opacity-0={!eventSource} />
-    <textarea
-      name="message"
-      bind:value={currentMessageInput}
-      class="textarea textarea-bordered grow"
-    />
-    <Button
-      onClick={()=>createSSE(currentMessageInput)}
-      label=""
-      iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlbmQiPjxwYXRoIGQ9Im0yMiAyLTcgMjAtNC05LTktNFoiLz48cGF0aCBkPSJNMjIgMiAxMSAxMyIvPjwvc3ZnPg=="
-    />
-  </Div>
+
+  <!-- Form controls -->
+  <form class="w-full" on:submit|preventDefault={() => alert("bruh")}>
+    <fieldset disabled={!selectedDocument}>
+      <Div class="flex gap-2 w-full items-end">
+        <textarea
+          name="message"
+          bind:value={currentMessageInput}
+          class="textarea textarea-bordered grow"
+        />
+        <Button
+          onClick={()=>createSSE(currentMessageInput)}
+          label=""
+          iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlbmQiPjxwYXRoIGQ9Im0yMiAyLTcgMjAtNC05LTktNFoiLz48cGF0aCBkPSJNMjIgMiAxMSAxMyIvPjwvc3ZnPg=="
+        />
+      </Div>
+    </fieldset>
+  </form>
 </Div>

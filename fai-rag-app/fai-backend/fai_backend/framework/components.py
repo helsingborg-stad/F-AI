@@ -258,8 +258,14 @@ class ChatBubble(UIComponent):
     footer: 'list[AnyUI] | None' = Field(None, serialization_alias='slot.footer')
 
 
+class SSEDocument(BaseModel):
+    id: str
+    name: str
+
+
 class SSEChat(UIComponent):
     type: Literal['SSEChat'] = 'SSEChat'
+    documents: list[SSEDocument]
     endpoint: str
 
 

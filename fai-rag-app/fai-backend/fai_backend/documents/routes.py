@@ -34,6 +34,7 @@ def list_view(
                         {
                             'file_name': document.file_name,
                             'file_size': document.file_size.human_readable(),
+                            'collection': document.collection,
                             'mime_type': document.mime_type,
                             'upload_date': document.upload_date.date(),
                         }
@@ -41,6 +42,7 @@ def list_view(
                     ],
                     columns=[
                         {'key': 'file_name', 'label': _('file_name', 'File name')},
+                        {'key': 'collection', 'label': _('collection', 'Collection')},
                         {'key': 'file_size', 'label': _('file_size', 'File size')},
                         {'key': 'mime_type', 'label': _('mime_type', 'Mime type')},
                         {'key': 'upload_date', 'label': _('upload_date', 'Upload date')},
