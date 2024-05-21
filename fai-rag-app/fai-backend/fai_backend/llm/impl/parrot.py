@@ -1,5 +1,6 @@
 import asyncio
 from random import uniform
+from typing import Any
 
 from langstream import Stream
 
@@ -18,7 +19,14 @@ class ParrotLLM(ILLMStreamProtocol):
         self.min_delay = min_delay
         self.max_delay = max_delay
 
-    async def to_generator(self, input_message: str):
+    async def to_generator(self, input_message: str | Any):
+        if not isinstance(input_message, str):
+            if isinstance(input_message, list) and "query" in input_message[0]:
+                input_message = input_message[0]["query"]
+            else:
+                yield "squawk?"
+                return
+
         import re
         parts = re.findall(r'\S+\s*', input_message)
         for part in parts:
