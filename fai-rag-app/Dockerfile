@@ -1,5 +1,5 @@
 # Stage 1: Build the frontend
-FROM node:16-bullseye as frontend-builder
+FROM node:16 as frontend-builder
 
 WORKDIR /app/fai-frontend
 
@@ -22,35 +22,37 @@ RUN npm run build
 RUN rm -rf ./src/fai_backend
 
 # Stage 2: Set up the backend
-FROM python:3.11-bullseye
+FROM python:3.11-slim
 
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 libmagic1
+
+# Install poetry for dependency management
+RUN pip install poetry
+
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+
+# Set the working directory
 WORKDIR /app
 
-# Copy the backend code and the built frontend from the first stage
-COPY --from=frontend-builder /app/fai-frontend/dist ./fai-frontend/dist
-COPY fai-backend/ ./fai-backend/
+# Copy the backend dependencies files
+COPY fai-backend/pyproject.toml fai-backend/poetry.lock ./
 
-WORKDIR /app/fai-backend
+# Install backend dependencies
+RUN poetry install
+RUN rm -rf $POETRY_CACHE_DIR
 
-# Install poetry and backend dependencies
-RUN pip install poetry && \
-    poetry config virtualenvs.create false && \
-    poetry lock && \
-    poetry install
+# Copy the backend source code
+COPY fai-backend/fai_backend ./fai_backend
+
+# Copy the frontend build from the frontend-builder stage
+COPY --from=frontend-builder /app/fai-frontend/dist ./fai_backend/static
+RUN rm -rf /app/fai-frontend
 
 # Set environment variables for FastAPI
 ENV HOST=0.0.0.0
 ENV PORT=80
-
-WORKDIR /app
-
-# Copy frontend build to static directory
-RUN cp -r ./fai-frontend/dist ./fai-backend/fai_backend/static
-
-# Clean up frontend files
-RUN rm -rf ./fai-frontend
-
-WORKDIR /app/fai-backend
 
 # Command to run the FastAPI application
 CMD uvicorn fai_backend.main:app --host $HOST --port $PORT
