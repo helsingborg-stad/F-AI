@@ -41,7 +41,6 @@
     }];
   }
 
-
   function toChatMessage(sse: SSEMessage): ChatMessage {
     return {
       id: sse.date,
@@ -52,46 +51,10 @@
     };
   }
 
-
-  function processRawSSEEvent(rawData: string) {
-    try {
-      const rEvent = /event: (.*)\n/;
-      const rData = /data: (.*)\n\n/;
-
-      const eventMatch = rEvent.exec(rawData);
-      if (!eventMatch) {
-        return;
-      }
-
-      const event = eventMatch[1];
-
-      if (event == "message_end") {
-        console.log("got end of message");
-        eventSource?.close();
-        eventSource = null;
-        return;
-      }
-
-      if (event == "message") {
-        const dataMatch = rData.exec(rawData);
-        const b64string = dataMatch![1];
-        const bytes = Uint8Array.from(atob(b64string), (m) => m.codePointAt(0)!);
-        const jsonString = new TextDecoder().decode(bytes);
-        const messagePayload = JSON.parse(jsonString) as SSEMessage;
-        const chatMessage = toChatMessage(messagePayload);
-
-        messages = [...messages.slice(0, -1), {
-          ...messages.at(-1),
-          ...chatMessage,
-          content: messages.at(-1)!.content + chatMessage.content
-        }];
-      }
-    } catch (e) {
-      console.error("Failed to parse raw message", e);
-      eventSource?.close();
-    }
+  function closeSSE() {
+    eventSource?.close();
+    eventSource = null;
   }
-
 
   function createSSE(question: string) {
     try {
@@ -112,20 +75,40 @@
         time: ""
       }];
 
-      eventSource?.close();
-      eventSource = null;
+      closeSSE();
 
       eventSource = new EventSource(`${endpoint}?question=${question}&document=${selectedDocument}`);
-      eventSource.onmessage = (e) => processRawSSEEvent(e.data);
+
       eventSource.onerror = (e) => {
         addErrorMessage(`unknown error / ${e}`);
-        eventSource?.close();
-        eventSource = null;
+        closeSSE();
       };
-      console.log("sse up");
+
+      eventSource.addEventListener("message_end", () => {
+        closeSSE();
+        return;
+      });
+
+      eventSource.addEventListener("message", (e) => {
+        try {
+          const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!);
+          const jsonString = new TextDecoder().decode(bytes);
+          const messagePayload = JSON.parse(jsonString) as SSEMessage;
+          const chatMessage = toChatMessage(messagePayload);
+
+          messages = [...messages.slice(0, -1), {
+            ...messages.at(-1),
+            ...chatMessage,
+            content: messages.at(-1)!.content + chatMessage.content
+          }];
+        } catch (ex) {
+          console.error("Failed to parse raw message", ex, e);
+          closeSSE();
+        }
+      });
     } catch (e) {
-      eventSource?.close();
-      eventSource = null;
+      closeSSE();
+      console.error("createSSE error", e);
       addErrorMessage(e?.toString() ?? "unknown");
     }
   }
@@ -143,7 +126,7 @@
     {/each}
   </select>
 
-  <!-- Content -->
+  <!-- Chat content -->
   <Div class="w-full grow flex flex-col gap-2 items-center justify-center overflow-hidden">
 
     <!-- Chat bubbles -->

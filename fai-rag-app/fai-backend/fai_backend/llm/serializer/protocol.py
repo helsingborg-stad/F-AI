@@ -1,10 +1,10 @@
 from typing import Protocol
 
-from fai_backend.llm.models import LLMMessage
+from pydantic import BaseModel
 
 
 class ISerializer(Protocol):
-    def serialize(self, input_data: LLMMessage) -> str:
+    def serialize(self, input_data: BaseModel) -> str:
         """
 
         """

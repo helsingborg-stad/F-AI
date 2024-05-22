@@ -3,7 +3,7 @@ from datetime import datetime
 
 from fastapi import Depends, FastAPI, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
-from sse_starlette import EventSourceResponse
+from sse_starlette import EventSourceResponse, ServerSentEvent
 from starlette.responses import HTMLResponse, RedirectResponse
 
 from fai_backend.auth.router import router as auth_router
@@ -14,7 +14,7 @@ from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.llm.impl.rag_wrapper import RAGWrapper
 from fai_backend.llm.models import LLMMessage, LLMDataPacket
 from fai_backend.llm.protocol import ILLMStreamProtocol
-from fai_backend.llm.serializer.impl.sse import SSESerializer
+from fai_backend.llm.serializer.impl.base64 import Base64Serializer
 from fai_backend.llm.service import LLMFactory
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
@@ -59,7 +59,7 @@ frontend.configure(app)
 
 
 async def event_source_llm_generator(question: str, llm: ILLMStreamProtocol):
-    serializer = SSESerializer()
+    serializer = Base64Serializer()
     stream = await llm.create()
 
     print(f"{llm=}")
@@ -67,16 +67,20 @@ async def event_source_llm_generator(question: str, llm: ILLMStreamProtocol):
     async def generator():
         async for output in stream(question):
             if isinstance(output.data, LLMDataPacket) and output.data.user_friendly:
-                yield serializer.serialize(LLMMessage(
-                    type="message",
-                    date=datetime.now(),
-                    source="Chat AI",
-                    content=output.data.content
-                ))
-        yield serializer.serialize(LLMMessage(
-            type="message_end",
-            date=datetime.now()
-        ))
+                yield ServerSentEvent(
+                    event="message",
+                    data=serializer.serialize(LLMMessage(
+                        date=datetime.now(),
+                        source="Chat AI",
+                        content=output.data.content
+                    )),
+                )
+        yield ServerSentEvent(
+            event="message_end",
+            data=serializer.serialize(LLMMessage(
+                date=datetime.now(),
+            ))
+        )
 
     return EventSourceResponse(generator())
 
