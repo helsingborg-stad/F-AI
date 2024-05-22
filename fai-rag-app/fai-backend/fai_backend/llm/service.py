@@ -4,7 +4,7 @@ from langstream import Stream, join_final_output, as_async_generator
 from langstream.contrib import OpenAIChatStream, OpenAIChatMessage, OpenAIChatDelta
 
 from fai_backend.chat.stream import create_chat_stream_from_prompt
-from fai_backend.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
+from fai_backend.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS, chatPromptTemplate
 from fai_backend.config import settings
 from fai_backend.llm.impl.openai import OpenAILLM
 from fai_backend.llm.impl.parrot import ParrotLLM
@@ -25,7 +25,7 @@ class LLMFactory:
     def get(backend: str = settings.LLM_BACKEND) -> ILLMStreamProtocol:
         return {
             "parrot": lambda: ParrotLLM(),
-            "openai": lambda: OpenAILLM(template=SYSTEM_TEMPLATE),
+            "openai": lambda: OpenAILLM(template=chatPromptTemplate),
         }[backend]()
 
 
