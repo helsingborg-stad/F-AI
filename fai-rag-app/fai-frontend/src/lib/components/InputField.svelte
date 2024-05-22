@@ -24,8 +24,7 @@
 <div
         class:form-control={html_type !== 'hidden'}
         class:hidden={html_type === 'hidden'}
-        class:mt-0={html_type === 'hidden'}
-        class="grow">
+        class:mt-0={html_type === 'hidden'}>
     <input
             bind:this={ref}
             class:input={html_type !== 'hidden'}

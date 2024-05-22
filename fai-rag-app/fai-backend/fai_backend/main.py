@@ -45,7 +45,6 @@ app.include_router(vector_router)
 
 app.middleware('http')(remove_trailing_slash)
 
-# Add Cross Origin Resource Sharing middleware to the app
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
