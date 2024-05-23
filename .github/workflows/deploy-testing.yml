@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
 
     steps:
       - name: Checkout code
@@ -15,12 +15,14 @@ jobs:
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v1
+        with:
+          driver: "docker"
 
-      - name: Login to Docker Hub
+      - name: Login GitHub Container Registry
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v3
@@ -29,8 +31,8 @@ jobs:
           platforms: linux/amd64
           file: ./fai-rag-app/Dockerfile.base
           push: ${{ github.event_name != 'pull_request' }}
-          tags: helsingborg-stad/f-ai:deploy-testing
-          # build-args: GITHUB_ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          tags: helsingborg-stad/fai-rag-app:base
+          build-args: GITHUB_ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       - name: Clean up Docker images and volumes
         run: |

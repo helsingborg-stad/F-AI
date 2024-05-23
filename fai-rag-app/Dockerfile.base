@@ -20,16 +20,11 @@ RUN apt-get update && apt-get install -y \
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
-WORKDIR /fai-backend
+WORKDIR /package
 
-COPY ./fai-backend/poetry.lock ./fai-backend/pyproject.toml ./
+COPY ./fai-backend/poetry.lock ./fai-backend/pyproject.toml /package/
 
 RUN poetry lock --no-update
-RUN poetry install --only main --no-root --no-directory
+RUN poetry install --only main --no-root
 
-COPY ./fai-backend/fai_backend ./fai_backend
-
-ENV HOST=0.0.0.0
-ENV PORT=80
-
-CMD uvicorn fai_backend.main:app --host $HOST --port $PORT
+VOLUME /packages
