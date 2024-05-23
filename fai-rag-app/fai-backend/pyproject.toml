@@ -2,7 +2,7 @@
 name = "fai-backend"
 version = "0.1.0"
 description = ""
-authors = ["Nikolas Ramstedt <nikolas.ramstedt@helsingborg.se>", "Ehsan Zilaei <ehsan.zilaei@helsingborg.se>"]
+authors = ["Helsingborg Stad <webbutveckling@helsingborg.se>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

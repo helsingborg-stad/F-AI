@@ -11,7 +11,7 @@ from fai_backend.vector.routes import router as vector_router
 from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
-from fai_backend.phrase import phrase as _
+from fai_backend.phrase import phrase as _, set_language
 from fai_backend.projects.router import router as projects_router
 from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.schema import ProjectUser
@@ -48,11 +48,8 @@ async def health_check():
 
 @app.get('/greet')
 async def greet(language: str = Header(default='en')):
-    # Set the language based on the 'language' header
-    _.set_language(language)
-
-    # Return the translated greeting
-    return {'message': _('greeting')}
+    set_language(language)
+    return {'message': _('greeting', '')}
 
 
 @app.get('/api', include_in_schema=True)

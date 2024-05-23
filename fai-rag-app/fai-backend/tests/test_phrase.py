@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from fai_backend.main import app
-from fai_backend.phrase import Phrase, language_mappings, phrase
+from fai_backend.phrase import phrase, set_language
 
 client = TestClient(app)
 
@@ -13,7 +13,7 @@ def test_greeting_swedish():
 
 
 def test_greeting_nonexistent_key():
-    phrase.set_language('en')
+    set_language('en')
     assert phrase('nonexistent') == 'nonexistent'
 
 
@@ -34,7 +34,9 @@ def test_non_string_default():
 
 
 def test_configurable_default_language():
-    test_default_lang = 'sv'  # Swedish for testing
-    test_phrase = Phrase(language_mappings, test_default_lang)
-    test_phrase.set_language('xyz')  # Invalid language to trigger default
-    assert test_phrase('greeting', 'Default Greeting') == 'Hej', 'Should use Swedish as the default language'
+    set_language('xyz')  # Invalid language to trigger default
+    assert phrase('greeting', 'Default Greeting') == 'Hej', 'Should use Swedish as the default language'
+
+
+def test_placeholders_happy():
+    assert phrase('hello_key', 'Hello {name}', name='Rambo') == 'Hello Rambo'

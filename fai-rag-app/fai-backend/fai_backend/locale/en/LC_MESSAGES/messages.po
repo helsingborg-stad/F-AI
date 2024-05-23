@@ -1,0 +1,209 @@
+# English translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-05-14 11:17+0200\n"
+"PO-Revision-Date: 2024-05-14 11:22+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.15.0\n"
+
+#: main.py:52
+msgid "greeting"
+msgstr ""
+
+#: views.py:34
+msgid "questions"
+msgstr ""
+
+#: views.py:39
+msgid "submit_question"
+msgstr ""
+
+#: qaf/routes.py:178 views.py:43
+msgid "my_questions"
+msgstr ""
+
+#: documents/menu.py:14 views.py:49
+msgid "show_all"
+msgstr ""
+
+#: views.py:63
+msgid "reviews"
+msgstr ""
+
+#: views.py:68
+msgid "inbox"
+msgstr ""
+
+#: views.py:88
+msgid "assistant"
+msgstr ""
+
+#: views.py:94
+msgid "metrics"
+msgstr ""
+
+#: projects/router.py:79 projects/router.py:110 views.py:99
+msgid "users"
+msgstr ""
+
+#: views.py:128
+msgid "logout_button_text"
+msgstr ""
+
+#: auth/router.py:43
+msgid "input_email_label"
+msgstr ""
+
+#: auth/router.py:44
+msgid "input_email_placeholder"
+msgstr ""
+
+#: auth/router.py:50
+msgid "request_pin_submit_button"
+msgstr ""
+
+#: auth/router.py:64
+msgid "input_pin_label"
+msgstr ""
+
+#: auth/router.py:65
+msgid "input_pin_placeholder"
+msgstr ""
+
+#: auth/router.py:81
+msgid "verify_pin_submit_button"
+msgstr ""
+
+#: auth/router.py:100
+msgid "test"
+msgstr ""
+
+#: documents/menu.py:8 documents/routes.py:50
+msgid "documents"
+msgstr ""
+
+#: documents/menu.py:18
+msgid "upload_new"
+msgstr ""
+
+#: documents/routes.py:40
+msgid "file_name"
+msgstr ""
+
+#: documents/routes.py:41
+msgid "file_size"
+msgstr ""
+
+#: documents/routes.py:42
+msgid "mime_type"
+msgstr ""
+
+#: documents/routes.py:43
+msgid "upload_date"
+msgstr ""
+
+#: documents/routes.py:66
+msgid "file"
+msgstr ""
+
+#: documents/routes.py:72
+msgid "upload"
+msgstr ""
+
+#: documents/routes.py:78
+msgid "upload_documents"
+msgstr ""
+
+#: documents/routes.py:93 qaf/routes.py:136 qaf/routes.py:147 qaf/routes.py:349
+#: qaf/routes.py:361
+msgid "submit_a_question"
+msgstr ""
+
+#: projects/router.py:71
+msgid "email"
+msgstr ""
+
+#: projects/router.py:72
+msgid "role"
+msgstr ""
+
+#: qaf/routes.py:87
+msgid "no_projects"
+msgstr ""
+
+#: qaf/routes.py:99 qaf/routes.py:287 qaf/routes.py:312
+msgid "create_question_submit_button"
+msgstr ""
+
+#: qaf/routes.py:103
+msgid "input_subject_label"
+msgstr ""
+
+#: qaf/routes.py:104
+msgid "input_subject_placeholder"
+msgstr ""
+
+#: qaf/routes.py:110 qaf/routes.py:111
+msgid "input_label_errand_id"
+msgstr ""
+
+#: qaf/routes.py:116
+msgid "input_label_question"
+msgstr ""
+
+#: qaf/routes.py:117
+msgid "input_question_placeholder"
+msgstr ""
+
+#: qaf/routes.py:122
+msgid "input_quality_tag"
+msgstr ""
+
+#: qaf/routes.py:127
+msgid "question_quality_good"
+msgstr ""
+
+#: qaf/routes.py:128
+msgid "question_quality_ok"
+msgstr ""
+
+#: qaf/routes.py:129
+msgid "question_quality_bad"
+msgstr ""
+
+#: qaf/routes.py:251
+msgid "Inbox"
+msgstr ""
+
+#: qaf/routes.py:289
+msgid "review_answer"
+msgstr ""
+
+#: qaf/routes.py:293
+msgid "rating"
+msgstr ""
+
+#: qaf/routes.py:301
+msgid "comment"
+msgstr ""
+
+#: qaf/routes.py:302 qaf/routes.py:319
+msgid "input_comment_placeholder"
+msgstr ""
+
+#: qaf/routes.py:314 qaf/routes.py:318
+msgid "answer"
+msgstr ""
+

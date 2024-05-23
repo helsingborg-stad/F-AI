@@ -1,0 +1,185 @@
+#: main.py:52
+msgid "greeting"
+msgstr ""
+
+#: views.py:34
+msgid "questions"
+msgstr ""
+
+#: views.py:39
+msgid "submit_question"
+msgstr ""
+
+#: qaf/routes.py:181 views.py:43
+msgid "my_questions"
+msgstr ""
+
+#: documents/menu.py:14 views.py:49
+msgid "show_all"
+msgstr ""
+
+#: views.py:63
+msgid "reviews"
+msgstr ""
+
+#: views.py:68
+msgid "inbox"
+msgstr ""
+
+#: views.py:87
+msgid "assistant"
+msgstr ""
+
+#: projects/router.py:79 projects/router.py:110 views.py:93
+msgid "users"
+msgstr ""
+
+#: views.py:122
+msgid "logout_button_text"
+msgstr ""
+
+#: auth/router.py:43
+msgid "input_email_label"
+msgstr ""
+
+#: auth/router.py:44
+msgid "input_email_placeholder"
+msgstr ""
+
+#: auth/router.py:50
+msgid "request_pin_submit_button"
+msgstr ""
+
+#: auth/router.py:64
+msgid "input_pin_label"
+msgstr ""
+
+#: auth/router.py:65
+msgid "input_pin_placeholder"
+msgstr ""
+
+#: auth/router.py:81
+msgid "verify_pin_submit_button"
+msgstr ""
+
+#: auth/router.py:100
+msgid "test"
+msgstr ""
+
+#: documents/menu.py:8 documents/routes.py:53
+msgid "documents"
+msgstr ""
+
+#: documents/menu.py:18
+msgid "upload_new"
+msgstr ""
+
+#: documents/routes.py:43
+msgid "file_name"
+msgstr ""
+
+#: documents/routes.py:44
+msgid "file_size"
+msgstr ""
+
+#: documents/routes.py:45
+msgid "mime_type"
+msgstr ""
+
+#: documents/routes.py:46
+msgid "upload_date"
+msgstr ""
+
+#: documents/routes.py:69
+msgid "file"
+msgstr ""
+
+#: documents/routes.py:75
+msgid "upload"
+msgstr ""
+
+#: documents/routes.py:81
+msgid "upload_documents"
+msgstr ""
+
+#: documents/routes.py:106 qaf/routes.py:139 qaf/routes.py:150
+#: qaf/routes.py:352 qaf/routes.py:364
+msgid "submit_a_question"
+msgstr ""
+
+#: projects/router.py:71
+msgid "email"
+msgstr ""
+
+#: projects/router.py:72
+msgid "role"
+msgstr ""
+
+#: qaf/routes.py:90
+msgid "no_projects"
+msgstr ""
+
+#: qaf/routes.py:102 qaf/routes.py:290 qaf/routes.py:315
+msgid "create_question_submit_button"
+msgstr ""
+
+#: qaf/routes.py:106
+msgid "input_subject_label"
+msgstr ""
+
+#: qaf/routes.py:107
+msgid "input_subject_placeholder"
+msgstr ""
+
+#: qaf/routes.py:113 qaf/routes.py:114
+msgid "input_label_errand_id"
+msgstr ""
+
+#: qaf/routes.py:119
+msgid "input_label_question"
+msgstr ""
+
+#: qaf/routes.py:120
+msgid "input_question_placeholder"
+msgstr ""
+
+#: qaf/routes.py:125
+msgid "input_quality_tag"
+msgstr ""
+
+#: qaf/routes.py:130
+msgid "question_quality_good"
+msgstr ""
+
+#: qaf/routes.py:131
+msgid "question_quality_ok"
+msgstr ""
+
+#: qaf/routes.py:132
+msgid "question_quality_bad"
+msgstr ""
+
+#: qaf/routes.py:254
+msgid "Inbox"
+msgstr ""
+
+#: qaf/routes.py:292
+msgid "review_answer"
+msgstr ""
+
+#: qaf/routes.py:296
+msgid "rating"
+msgstr ""
+
+#: qaf/routes.py:304
+msgid "comment"
+msgstr ""
+
+#: qaf/routes.py:305 qaf/routes.py:322
+msgid "input_comment_placeholder"
+msgstr ""
+
+#: qaf/routes.py:317 qaf/routes.py:321
+msgid "answer"
+msgstr ""
+

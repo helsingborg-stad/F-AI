@@ -2,7 +2,7 @@
 name = "fai-rag-app"
 version = "0.1.0"
 description = ""
-authors = ["Nikolas Ramstedt <nikolas.ramstedt@helsingborg.se>", "Ehsan Zilaei <ehsan.zilaei@helsingborg.se>"]
+authors = ["Helsingborg Stad <webbutveckling@helsingborg.se>"]
 readme = "README.md"
 
 [tool.ruff]
@@ -26,9 +26,10 @@ omit = []
 
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.12"
 fai-backend = { path = "./fai-backend" }
 ruff = "^0.1.11"
+Babel = "2.15.0"
 
 [build-system]
 requires = ["poetry-core"]

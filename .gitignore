@@ -58,8 +58,8 @@ coverage.xml
 .ruff_cache
 
 # Translations
-*.mo
-*.pot
+#*.mo
+#*.pot
 
 # Django stuff:
 *.log
