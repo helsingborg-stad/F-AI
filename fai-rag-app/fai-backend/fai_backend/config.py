@@ -30,6 +30,7 @@ class Settings(BaseSettings, extra=Extra.ignore):
     LOG_LEVEL: str = 'INFO'
     DEFAULT_LANGUAGE: str = 'en'
     FILE_UPLOAD_PATH: str = 'uploads'
+    LLM_BACKEND: Literal['parrot', 'openai'] = 'parrot'
 
     class Config:
         env_file = '.env'

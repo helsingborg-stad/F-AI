@@ -46,6 +46,7 @@ class FileUploadService:
                     file_name=file_name,
                     file_size=ByteSize(stat.st_size),
                     path=file_path,
+                    collection=file_path.split('/')[-2],  # TODO: niceify
                     mime_type=mime_type or 'application/octet-stream',
                     last_modified=datetime.fromtimestamp(stat.st_mtime),
                     upload_date=upload_date,
@@ -55,19 +56,21 @@ class FileUploadService:
         return file_infos
 
     def list_files(self, project_id: str) -> list[FileInfo]:
-        project_directories = [d for d in os.listdir(self.upload_dir) if d.startswith(f'{PROJECT_PATH_PREFIX}_{project_id}_')]
+        project_directories = [d for d in os.listdir(self.upload_dir) if
+                               d.startswith(f'{PROJECT_PATH_PREFIX}_{project_id}_')]
         if not project_directories:
             return []
 
-        latest_directory = sorted(project_directories, key=lambda x: (x.split('_')[2], x.split('_')[3]), reverse=True)[
-            0]
-        latest_directory_path = os.path.join(self.upload_dir, latest_directory)
-        upload_date = datetime.fromtimestamp(os.path.getctime(latest_directory_path))
+        full_paths = [os.path.join(self.upload_dir, path) for path in project_directories]
 
-        return self.get_file_infos(latest_directory_path, upload_date)
+        all_files = [file for path in full_paths for file in
+                     self.get_file_infos(path, datetime.fromtimestamp(os.path.getctime(path)))]
+
+        return all_files
 
     def get_latest_upload_path(self, project_id: str) -> str | None:
-        project_directories = [d for d in os.listdir(self.upload_dir) if d.startswith(f'{PROJECT_PATH_PREFIX}_{project_id}_')]
+        project_directories = [d for d in os.listdir(self.upload_dir) if
+                               d.startswith(f'{PROJECT_PATH_PREFIX}_{project_id}_')]
         if not project_directories:
             return None
 

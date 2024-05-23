@@ -10,6 +10,8 @@ from fai_backend.dependencies import (
     get_project_user,
     try_get_authenticated_user,
 )
+from fai_backend.files.dependecies import get_file_upload_service
+from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.framework.components import AnyUI
@@ -179,6 +181,27 @@ def questions_index_view(
             ], class_name='overflow-x-auto space-y-4'),
         ], class_name='card bg-base-100 w-full max-w-6xl')],
         _('my_questions', 'My Questions'),
+    )
+
+
+@router.get('/chat', response_model=list, response_model_exclude_none=True)
+def chat_index_view(
+        file_service: FileUploadService = Depends(get_file_upload_service),
+        authenticated_user: User | None = Depends(get_project_user),
+        view=Depends(get_page_template_for_logged_in_users),
+) -> list:
+    if not authenticated_user:
+        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
+
+    documents = [{"id": doc.collection, "name": doc.file_name} for doc in
+                 file_service.list_files(authenticated_user.project_id)]
+
+    return view(
+        [c.SSEChat(
+            documents=documents,
+            endpoint='http://localhost:8000/chat-stream'
+        )],
+        _('chat', 'Chat'),
     )
 
 

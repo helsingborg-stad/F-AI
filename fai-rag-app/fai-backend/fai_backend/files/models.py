@@ -7,6 +7,7 @@ class FileInfo(BaseModel):
     file_name: str
     file_size: ByteSize
     path: str
+    collection: str
     mime_type: str
     last_modified: datetime
     upload_date: datetime
