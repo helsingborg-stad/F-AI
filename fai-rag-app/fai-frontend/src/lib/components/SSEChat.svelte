@@ -119,6 +119,11 @@
       createSSE(currentMessageInput);
     }
   }
+
+  function formatMessageForMarkdown(content: string): string {
+    return content
+      .replace(/\n/g, `\n\n  `);
+  }
 </script>
 
 <Div class="flex gap-5 p-5 flex-col items-center justify-center h-full overflow-hidden grow">
@@ -141,7 +146,7 @@
       {#each messages as message (message.id)}
         <ChatBubble
           user={message.user}
-          content={message.content}
+          content={formatMessageForMarkdown(message.content)}
           time={message.time}
           isSelf={message.isSelf}
         />
