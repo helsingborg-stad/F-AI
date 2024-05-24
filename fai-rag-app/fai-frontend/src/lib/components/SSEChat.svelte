@@ -112,6 +112,13 @@
       addErrorMessage(e?.toString() ?? "unknown");
     }
   }
+
+  function handleTextareaKeypress(event: KeyboardEvent) {
+    if (event.key == "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      createSSE(currentMessageInput);
+    }
+  }
 </script>
 
 <Div class="flex gap-5 p-5 flex-col items-center justify-center h-full overflow-hidden grow">
@@ -159,12 +166,13 @@
   </Div>
 
   <!-- Form controls -->
-  <form class="w-full" on:submit|preventDefault={() => alert("bruh")}>
+  <form class="w-full">
     <fieldset disabled={!selectedDocument}>
       <Div class="flex gap-2 w-full items-end">
         <textarea
           name="message"
           bind:value={currentMessageInput}
+          on:keydown={handleTextareaKeypress}
           class="textarea textarea-bordered grow"
         />
         <Button
