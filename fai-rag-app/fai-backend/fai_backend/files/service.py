@@ -66,7 +66,7 @@ class FileUploadService:
         all_files = [file for path in full_paths for file in
                      self.get_file_infos(path, datetime.fromtimestamp(os.path.getctime(path)))]
 
-        return all_files
+        return sorted(all_files, key=lambda x: x.upload_date, reverse=True)
 
     def get_latest_upload_path(self, project_id: str) -> str | None:
         project_directories = [d for d in os.listdir(self.upload_dir) if
