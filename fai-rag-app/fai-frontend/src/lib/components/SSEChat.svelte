@@ -31,6 +31,8 @@
     let currentMessageInput: string = "";
     let eventSource: EventSource | null = null;
 
+    $: selectedDocument = documents[0]?.id ?? ""
+
     function addErrorMessage(message: string) {
         messages = [...messages, {
             id: `error${messages.length}`,
@@ -128,21 +130,29 @@
 
 <Div class="flex gap-5 p-5 flex-col items-center justify-center h-full overflow-hidden grow">
 
-    <!-- Document picker -->
+    <!-- Document picker
     <select
             class="select select-bordered w-full max-w-xs"
             bind:value={selectedDocument}>
         <option disabled selected value="">Välj dokument</option>
-        {#each documents as document (document.id)}
+
+        {#each documents as document}
+            {console.log(document)}
             <option value={document.id}>{document.name}</option>
         {/each}
     </select>
+    -->
 
     <!-- Chat content -->
     <Div class="w-full grow flex flex-col gap-2 items-center justify-center overflow-hidden">
 
         <!-- Chat bubbles -->
-        <div class="grow w-full max-w-prose">
+        <div
+                class="grow w-full max-w-prose"
+                class:flex={!messages.length}
+                class:flex-col={!messages.length}
+                class:items-center={!messages.length}
+                class:justify-center={!messages.length}>
             {#each messages as message (message.id)}
                 <ChatBubble
                         user={message.user}
@@ -151,9 +161,18 @@
                         isSelf={message.isSelf}
                 />
             {:else}
-                <div class="flex flex-col items-center justify-center">
-                    <p>Här kan du ställa direkta frågor angående dokument du har laddat upp.</p>
-                    <p>Välj ett dokument för att börja.</p>
+                <div class="prose text-center">
+                    <h3>Ställ en fråga för att börja</h3>
+                    {#if documents.length > 0}
+                        <h5>Här kan du ställa direkta frågor angående de dokument
+                            {#each documents.filter((d) => d.id === selectedDocument) as document}
+                                <code>{document.name}</code>
+                            {/each} du har laddat upp.
+
+                        </h5>
+                    {:else}
+                        <h5>Inga dokument tillgängliga</h5>
+                    {/if}
                 </div>
             {/each}
 
@@ -172,7 +191,7 @@
 
     <!-- Form controls -->
     <form class="w-full">
-        <fieldset disabled={!selectedDocument}>
+        <fieldset disabled={false}>
             <Div class="flex gap-2 w-full items-end">
         <textarea
                 name="message"
