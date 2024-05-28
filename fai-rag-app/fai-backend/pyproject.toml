@@ -30,8 +30,8 @@ rq = "^1.16.0"
 fakeredis = "^2.21.1"
 langstream = "^0.3.1"
 openai = "^1.13.3"
-unstructured = { version = "^0.13.2", extras = ["pdf", "md"]}
 python-dotenv = "^1.0.1"
+unstructured = { extras = ["md", "pdf"], version = "0.10.16" }
 sse-starlette = "^2.1.0"
 
 [build-system]
