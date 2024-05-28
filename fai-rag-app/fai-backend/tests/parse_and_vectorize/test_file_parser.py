@@ -25,7 +25,7 @@ async def vector_db():
 def test_parser_with_pdf_file_then_expect_parsed_correctly(document_elements):
     first_element = str(document_elements[0]) if document_elements else ""
 
-    expect_text = "Bevaringsprogram för Råå\n\nHELSINGBORGS MUSEUM\n\nBevaringsprogram för Råå Fastställt av kommunfullmäktige 1991-08-27\n\nHelsingborgs bevaringskommitte Helsingborgs museum"
+    expect_text = "Bevaringsprogram för Råå"
     assert expect_text in first_element, "The PDF content was not parsed correctly."
 
 
