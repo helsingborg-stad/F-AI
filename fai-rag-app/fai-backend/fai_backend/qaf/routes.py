@@ -199,7 +199,7 @@ def chat_index_view(
     return view(
         [c.SSEChat(
             documents=documents,
-            endpoint='http://localhost:8000/chat-stream'
+            endpoint='/api/chat-stream'
         )],
         _('chat', 'Chat'),
     )

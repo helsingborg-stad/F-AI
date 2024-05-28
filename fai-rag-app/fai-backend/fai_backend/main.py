@@ -84,7 +84,7 @@ async def event_source_llm_generator(question: str, llm: ILLMStreamProtocol):
     return EventSourceResponse(generator())
 
 
-@app.get('/chat-stream')
+@app.get('/api/chat-stream')
 async def chat_stream(question: str, document: str | None = None):
     print(f"/chat-stream {document=} {question=}")
     llm = LLMFactory.get()
