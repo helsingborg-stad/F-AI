@@ -24,6 +24,7 @@ from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.schema import ProjectUser
 from fai_backend.setup import setup_db, setup_project
 from fai_backend.vector.routes import router as vector_router
+from fai_backend.assistant.routes import router as templates_router
 
 
 @asynccontextmanager
@@ -42,6 +43,7 @@ app.include_router(projects_router)
 app.include_router(qaf_router)
 app.include_router(documents_router)
 app.include_router(vector_router)
+app.include_router(templates_router)
 
 app.middleware('http')(remove_trailing_slash)
 
@@ -91,6 +93,11 @@ async def chat_stream(question: str, document: str | None = None):
     if document:
         llm = RAGWrapper(question, llm, document)
     return await event_source_llm_generator(question, llm)
+
+@app.get('/assistant-stream')
+async def assistant_stream(question: str, assistant: str):
+    print(f"/assistant-stream {assistant=} {question=}")
+
 
 
 @app.get('/health', include_in_schema=False)
