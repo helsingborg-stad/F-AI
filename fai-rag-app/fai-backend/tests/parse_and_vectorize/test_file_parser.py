@@ -1,12 +1,12 @@
-import os
 import pytest
 import pytest_asyncio
+from pathlib import Path
 
 from fai_backend.files.file_parser import ParserFactory
 from fai_backend.vector.memory import InMemoryChromaDB
 
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-TEST_PDF_PATH = os.path.join(CURRENT_DIR, 'test_data/Bevprogram_Raa_1991_sbf.pdf')
+CURRENT_DIR = Path(__file__).parent
+TEST_PDF_PATH = CURRENT_DIR / 'test_data/Bevprogram_Raa_1991_sbf.pdf'
 
 
 @pytest.fixture(scope='session')
