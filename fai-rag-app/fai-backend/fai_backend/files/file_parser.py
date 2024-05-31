@@ -1,4 +1,4 @@
-from pathlib import Path
+from pathlib import PurePath
 from typing import Any, Protocol
 
 import magic
@@ -10,10 +10,12 @@ from unstructured.partition.pdf import partition_pdf
 
 from fai_backend.config import settings
 
+PathLike = str | PurePath
+
 
 class IDocumentParser(Protocol):
     @staticmethod
-    def parse(file_path: Path) -> Any:
+    def parse(file_path: PathLike) -> Any:
         ...
 
 
@@ -24,7 +26,7 @@ class DocxParser:
 
 class PDFParserDefault:
     @staticmethod
-    def parse(file_path: Path) -> list[str]:
+    def parse(file_path: PathLike) -> list[str]:
         reader = PdfReader(file_path)
         return [page.extract_text() for page in reader.pages]
 
@@ -53,7 +55,7 @@ class ParserFactory:
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document': DocxParser}}
 
     @staticmethod
-    def get_parser(file_path: Path) -> IDocumentParser:
+    def get_parser(file_path: PathLike) -> IDocumentParser:
         env = settings.FILE_PARSER
         parser = ParserFactory.parsers.get(env, 'default')
         file_mime_type = magic.from_file(file_path, mime=True)
