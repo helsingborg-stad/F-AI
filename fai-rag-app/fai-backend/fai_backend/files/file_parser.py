@@ -2,13 +2,13 @@ from pathlib import PurePath
 from typing import Any, Protocol
 
 import magic
-from pypdf import PdfReader
 from unstructured.documents.elements import Element
 from unstructured.partition.docx import partition_docx
 from unstructured.partition.md import partition_md
 from unstructured.partition.pdf import partition_pdf
 
 from fai_backend.config import settings
+from fai_backend.files.document_loaders.pdf import PyPDFLoader
 
 PathLike = str | PurePath
 
@@ -27,8 +27,9 @@ class DocxParser:
 class PDFParserDefault:
     @staticmethod
     def parse(file_path: PathLike) -> list[str]:
-        reader = PdfReader(file_path)
-        return [page.extract_text() for page in reader.pages]
+        loader = PyPDFLoader(file_path)
+        docs = [d for d in loader.lazy_load()]
+        return [docs[0].page_content]
 
 
 class PDFParserUnstructured:
