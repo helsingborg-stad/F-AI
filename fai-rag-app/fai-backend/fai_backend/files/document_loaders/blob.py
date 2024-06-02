@@ -3,8 +3,8 @@ import mimetypes
 import contextlib
 from io import BufferedReader, BytesIO
 from pathlib import PurePath
-from pydantic import BaseModel, Field, root_validator
-from typing import Any, Dict, Generator, Mapping, cast
+from pydantic import BaseModel, Field
+from typing import Any, Dict, Generator
 
 
 class Blob(BaseModel):
@@ -14,22 +14,6 @@ class Blob(BaseModel):
 
     path: str | PurePath | None = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
-
-    class Config:
-        arbitrary_types_allowed = True
-        frozen = True
-
-    @property
-    def source(self) -> str | None:
-        if self.metadata and 'source' in self.metadata:
-            return cast(str | None, self.metadata['source'])
-        return str(self.path) if self.path else None
-
-    @root_validator(pre=True)
-    def check_blob_is_valid(cls, values: Mapping[str, Any]) -> Mapping[str, Any]:
-        if 'data' not in values and 'path' not in values:
-            raise ValueError('Either data or path must be provided')
-        return values
 
     @contextlib.contextmanager
     def as_bytes_io(self) -> Generator[BytesIO | BufferedReader, None, None]:
@@ -59,9 +43,3 @@ class Blob(BaseModel):
                    encoding=encoding,
                    path=path,
                    metadata=metadata if metadata is not None else {})
-
-    def __repr__(self) -> str:
-        str_repr = f'Blob {id(self)}'
-        if self.source:
-            str_repr += f' {self.source}'
-        return str_repr

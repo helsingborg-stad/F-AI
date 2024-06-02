@@ -23,9 +23,6 @@ class IBaseLoader(Protocol):
     def load(self) -> list[Document]:
         return list(self.lazy_load())
 
-    async def aload(self) -> list[Document]:
-        return [doc async for doc in self.alazy_load()]
-
     def lazy_load(self) -> Iterator[Document]:
         if type(self).load != IBaseLoader.load:
             return iter(self.load())
