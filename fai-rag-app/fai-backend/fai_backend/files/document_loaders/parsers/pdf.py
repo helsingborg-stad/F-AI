@@ -24,6 +24,18 @@ class PyPDFParser(BaseBlobParser):
         with blob.as_bytes_io() as pdf_file_obj:
             pdf_reader = pypdf.PdfReader(pdf_file_obj)
             yield from [
-                Document(page_content=page.extract_text(),
-                         metadata={'source': blob.source, 'page': page_number})
+                Document(page_content=page.extract_text(), metadata={'page': page_number})
                 for page_number, page in enumerate(pdf_reader.pages)]
+
+
+class PdfMinerParser(BaseBlobParser):
+    def __init__(self, extract_images: bool = False) -> None:
+        self.extract_images = extract_images
+
+    def lazy_parse(self, blob: Blob) -> Iterator[Document]:
+        from pdfminer.high_level import extract_text
+
+        with blob.as_bytes_io() as pdf_file_obj:
+            yield from [
+                Document(page_content=page, metadata={'page': page_number})
+                for page_number, page in enumerate(extract_text(pdf_file_obj))]

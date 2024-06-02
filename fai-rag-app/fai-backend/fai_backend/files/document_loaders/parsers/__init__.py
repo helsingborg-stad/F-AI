@@ -2,10 +2,11 @@ import importlib
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from fai_backend.files.document_loaders.parsers.pdf import PyPDFParser
+    from fai_backend.files.document_loaders.parsers.pdf import PyPDFParser, PdfMinerParser
 
 _module_lookup = {
-    'PyPDFParser': 'fai_backend.files.document_loaders.parsers.pdf'}
+    'PyPDFParser': 'fai_backend.files.document_loaders.parsers.pdf',
+    'PdfMinerParser': 'fai_backend.files.document_loaders.parsers.pdf'}
 
 
 def __getattr__(name: str) -> Any:
@@ -15,4 +16,4 @@ def __getattr__(name: str) -> Any:
     raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
-__all__ = ['PyPDFParser']
+__all__ = ['PyPDFParser', 'PdfMinerParser']

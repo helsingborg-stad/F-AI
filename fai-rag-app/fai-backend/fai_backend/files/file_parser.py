@@ -8,7 +8,7 @@ from unstructured.partition.md import partition_md
 from unstructured.partition.pdf import partition_pdf
 
 from fai_backend.config import settings
-from fai_backend.files.document_loaders.pdf import PyPDFLoader
+from fai_backend.files.document_loaders.pdf import PdfMinerLoader
 
 PathLike = str | PurePath
 
@@ -27,8 +27,9 @@ class DocxParser:
 class PDFParserDefault:
     @staticmethod
     def parse(file_path: PathLike) -> list[str]:
-        loader = PyPDFLoader(file_path)
+        loader = PdfMinerLoader(file_path)
         docs = [d for d in loader.lazy_load()]
+        print(docs)
         return [docs[0].page_content]
 
 

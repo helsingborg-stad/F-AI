@@ -5,7 +5,7 @@ from typing import Iterator
 
 from fai_backend.files.document_loaders import IBaseLoader
 from fai_backend.files.documents import Document
-from fai_backend.files.document_loaders.parsers import PyPDFParser
+from fai_backend.files.document_loaders.parsers import PyPDFParser, PdfMinerParser
 from fai_backend.files.document_loaders.blob import Blob
 
 
@@ -18,10 +18,6 @@ class IBasePDFLoader(IBaseLoader):
         if not os.path.isfile(self.file_path):
             raise ValueError("File path %s is not a valid file" % self.file_path)
 
-    @property
-    def source(self) -> str:
-        return self.file_path
-
 
 class PyPDFLoader(IBasePDFLoader):
     def __init__(self, file_path: str, extract_images: bool = False) -> None:
@@ -31,6 +27,20 @@ class PyPDFLoader(IBasePDFLoader):
             raise ImportError('pypdf package not found, please install it with `pip install pypdf`')
         super().__init__(file_path)
         self.parser = PyPDFParser(extract_images=extract_images)
+
+    def lazy_load(self) -> Iterator[Document]:
+        blob = Blob.from_path(self.file_path)
+        yield from self.parser.parse(blob)
+
+
+class PdfMinerLoader(IBasePDFLoader):
+    def __init__(self, file_path: str, extract_images: bool = False) -> None:
+        try:
+            from pdfminer.high_level import extract_text
+        except ImportError:
+            raise ImportError('pdfminer package not found, please install it with `pip install pdfminer`')
+        super().__init__(file_path)
+        self.parser = PdfMinerParser(extract_images=extract_images)
 
     def lazy_load(self) -> Iterator[Document]:
         blob = Blob.from_path(self.file_path)
