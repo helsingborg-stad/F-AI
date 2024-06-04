@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: codebuild-f-ai-builder-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: codebuild-f-ai-builder-${{ github.run_id }}-${{ github.run_attempt }}-ubuntu-7.0-medium
 
     steps:
       - name: Checkout code
