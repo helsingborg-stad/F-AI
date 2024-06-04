@@ -26,8 +26,8 @@ async def mongo_repo():
 
 @pytest.mark.asyncio
 async def test_list(mongo_repo):
-    await SampleDocument(name='Alice', age=30).insert()
-    await SampleDocument(name='Bob', age=25).insert()
+    await mongo_repo.create(SampleDocument(name='Alice', age=30))
+    await mongo_repo.create(SampleDocument(name='Bob', age=25))
 
     documents = await mongo_repo.list()
 
@@ -38,9 +38,7 @@ async def test_list(mongo_repo):
 
 @pytest.mark.asyncio
 async def test_create(mongo_repo):
-    new_document = SampleDocument(name='Charlie', age=40)
-
-    created_document = await mongo_repo.create(new_document)
+    created_document = await mongo_repo.create(SampleDocument(name='Charlie', age=40))
 
     assert created_document.name == 'Charlie'
     assert created_document.age == 40
@@ -49,7 +47,7 @@ async def test_create(mongo_repo):
 
 @pytest.mark.asyncio
 async def test_get_existing_document(mongo_repo):
-    sample_document = await SampleDocument(name='Dave', age=35).insert()
+    sample_document = await mongo_repo.create(SampleDocument(name='Dave', age=35))
 
     retrieved_document = await mongo_repo.get(str(sample_document.id))
 
@@ -91,7 +89,7 @@ async def test_update_non_existing_document(mongo_repo):
 
 @pytest.mark.asyncio
 async def test_delete_existing_document(mongo_repo):
-    sample_document = await SampleDocument(name='Frank', age=55).insert()
+    sample_document = await mongo_repo.create(SampleDocument(name='Frank', age=55))
     deleted_document = await mongo_repo.delete(str(sample_document.id))
 
     assert deleted_document is not None
