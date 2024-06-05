@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Security
 from langstream import join_final_output
 
 from fai_backend.assistant.service import AssistantFactory
+from fai_backend.dependencies import get_authenticated_user
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.projects.dependencies import list_projects_request
 from fai_backend.projects.schema import ProjectResponse
@@ -16,7 +17,7 @@ router = APIRouter(
 
 @router.get(
     '/assistant/{project_id}/{assistant_id}',
-    # dependencies=[Security(get_authenticated_user)]
+    dependencies=[Security(get_authenticated_user)]
 )
 async def ask_assistant(
         project_id: str,

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Dict, List, Any, Literal, Union
 
 from pydantic import BaseModel
@@ -26,3 +27,9 @@ class AssistantTemplate(BaseModel):
     name: str
     files_collection_id: Optional[str] = None
     streams: List[LLMStreamDef]
+
+
+class LLMClientChatMessage(BaseModel):
+    date: datetime
+    source: str | None = None
+    content: str | None = None
