@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from fai_backend.config import settings
 from fai_backend.projects.schema import ProjectMember, ProjectRole
 from fai_backend.repositories import ConversationDocument, PinCodeModel, ProjectModel, projects_repo
-from fai_backend.assistant.models import AssistantTemplate, LLMStreamSettings, LLMStream, LLMStreamMessage
+from fai_backend.assistant.models import AssistantTemplate, LLMStreamSettings, LLMStreamDef, LLMStreamMessage
 
 
 def use_route_names_as_operation_ids(app: FastAPI) -> None:
@@ -49,8 +49,9 @@ async def setup_project():
                 creator=settings.APP_ADMIN_EMAIL,
                 assistants=[
                     AssistantTemplate(
-                        name='Basic Assistant',
-                        streams=[LLMStream(
+                        id='example',
+                        name='Example Assistant',
+                        streams=[LLMStreamDef(
                             name='ChatStream',
                             settings=LLMStreamSettings(model='gpt-4o'),
                             messages=[LLMStreamMessage(
@@ -62,34 +63,64 @@ async def setup_project():
                         )],
                     ),
                     AssistantTemplate(
-                        name='Planning Assistant',
-                        files_collection_id='please upload files in the Assistant UI',
+                        id='multi_example',
+                        name='Multi-stream Example',
                         streams=[
-                            LLMStream(
-                                name='ScoringStream',
-                                settings=LLMStreamSettings(
-                                    model='gpt-3.5-turbo',
-                                    functions=[{
-                                        "name": "score_document",
-                                        "description": "Scores the previous document according to the user query\n\n  "
-                                                       "  Parameters\n    ----------\n    score\n        A number "
-                                                       "from 0-100 scoring how well does the document matches the "
-                                                       "query. The higher the score, the better match for the query\n "
-                                                       "   ",
-                                        "parameters": {
-                                            "type": "object",
-                                            "properties": {
-                                                "score": {
-                                                    "type": "number",
-                                                }
-                                            },
-                                            "required": ["score"],
-                                        }
-                                    }],
-                                    function_call={"name": "score_document"}
-                                )
+                            LLMStreamDef(
+                                name='First Stream',
+                                settings=LLMStreamSettings(model='gpt-4o'),
+                                messages=[
+                                    LLMStreamMessage(
+                                        role='system',
+                                        content="Make this text sound more fancy and verbose."
+                                    ),
+                                    LLMStreamMessage(
+                                        role='user',
+                                        content="{query}"
+                                    )
+                                ]
                             ),
-                            LLMStream(
+                            LLMStreamDef(
+                                name='Second Stream',
+                                settings=LLMStreamSettings(model='gpt-4o'),
+                                messages=[
+                                    LLMStreamMessage(
+                                        role='system',
+                                        content="Repeat back any text verbatim and count the number of words"
+                                    ),
+                                    LLMStreamMessage(
+                                        role='user',
+                                        content="{last_input}"
+                                    )
+                                ]
+                            )
+                        ]
+                    ),
+                    AssistantTemplate(
+                        id='rag_example',
+                        name='RAG (document) Example',
+                        files_collection_id='Upload files in the Assistant Creation UI',
+                        streams=[LLMStreamDef(
+                            name='RagStream',
+                            settings=LLMStreamSettings(model='gpt-4o'),
+                            messages=[
+                                LLMStreamMessage(
+                                    role='system',
+                                    content="Explain what this is and repeat back an excerpt of it."
+                                ),
+                                LLMStreamMessage(
+                                    role='user',
+                                    content="{rag_results}"
+                                )
+                            ]
+                        )]
+                    ),
+                    AssistantTemplate(
+                        id='planning',
+                        name='Planning Assistant',
+                        files_collection_id='Upload files in the Assistant Creation UI',
+                        streams=[
+                            LLMStreamDef(
                                 name='ChatStream',
                                 settings=LLMStreamSettings(
                                     model='gpt-4o'
@@ -112,7 +143,7 @@ async def setup_project():
                                     ),
                                     LLMStreamMessage(
                                         role='user',
-                                        content='Here are the results of the search:\n\n {results}'
+                                        content='Here are the results of the search:\n\n {rag_results}'
                                     )
                                 ]
                             )

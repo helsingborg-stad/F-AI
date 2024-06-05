@@ -94,11 +94,6 @@ async def chat_stream(question: str, document: str | None = None):
         llm = RAGWrapper(question, llm, document)
     return await event_source_llm_generator(question, llm)
 
-@app.get('/assistant-stream')
-async def assistant_stream(question: str, assistant: str):
-    print(f"/assistant-stream {assistant=} {question=}")
-
-
 
 @app.get('/health', include_in_schema=False)
 async def health_check():
