@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette import EventSourceResponse, ServerSentEvent
 from starlette.responses import HTMLResponse, RedirectResponse
 
+from fai_backend.assistant.service import AssistantFactory
 from fai_backend.auth.router import router as auth_router
 from fai_backend.config import settings
 from fai_backend.dependencies import get_project_user
@@ -19,7 +20,9 @@ from fai_backend.llm.service import LLMFactory
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
 from fai_backend.phrase import phrase as _, set_language
+from fai_backend.projects.dependencies import list_projects_request
 from fai_backend.projects.router import router as projects_router
+from fai_backend.projects.schema import ProjectResponse
 from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.schema import ProjectUser
 from fai_backend.setup import setup_db, setup_project
@@ -67,13 +70,13 @@ async def event_source_llm_generator(question: str, llm: ILLMStreamProtocol):
 
     async def generator():
         async for output in stream(question):
-            if isinstance(output.data, LLMDataPacket) and output.data.user_friendly:
+            if output.final:
                 yield ServerSentEvent(
                     event="message",
                     data=serializer.serialize(LLMMessage(
                         date=datetime.now(),
                         source="Chat AI",
-                        content=output.data.content
+                        content=output.data
                     )),
                 )
         yield ServerSentEvent(
@@ -93,6 +96,20 @@ async def chat_stream(question: str, document: str | None = None):
     if document:
         llm = RAGWrapper(question, llm, document)
     return await event_source_llm_generator(question, llm)
+
+
+@app.get('/api/assistant-stream/{project}/{assistant}')
+async def assistant_stream(
+        project: str,
+        assistant: str,
+        question: str,
+        projects: list[ProjectResponse] = Depends(list_projects_request)
+):
+    print(f"/assistant-stream {project=} {assistant=} {question=}")
+
+    factory = AssistantFactory([a for p in projects for a in p.assistants if p.id == project])
+    assistant_instance = factory.create_assistant_stream(assistant)
+    return await event_source_llm_generator(question, assistant_instance)
 
 
 @app.get('/health', include_in_schema=False)

@@ -54,12 +54,19 @@ async def setup_project():
                         streams=[LLMStreamDef(
                             name='ChatStream',
                             settings=LLMStreamSettings(model='gpt-4o'),
-                            messages=[LLMStreamMessage(
-                                role='system',
-                                content="You are a helpful AI assistant that helps people with answering questions "
-                                        "related to municipality and Helsingborg City. The questions are going to be "
-                                        "asked in Swedish. Your response must always be in Swedish."
-                            )]
+                            messages=[
+                                LLMStreamMessage(
+                                    role='system',
+                                    content="You are a helpful AI assistant that helps people with answering "
+                                            "questions related to municipality and Helsingborg City. The "
+                                            "questions are going to be asked in Swedish. Your response must "
+                                            "always be in Swedish."
+                                ),
+                                LLMStreamMessage(
+                                    role='user',
+                                    content="{query}"
+                                )
+                            ]
                         )],
                     ),
                     AssistantTemplate(
