@@ -8,6 +8,7 @@ from fai_backend.repository.interface import IAsyncRepo
 from fai_backend.repository.query.component import (
     QueryComponent,
 )
+from fai_backend.repository.query.mongo import adapt_query_component
 
 T = TypeVar('T', bound=BaseModel)
 T_DB = TypeVar('T_DB', bound=Document)
