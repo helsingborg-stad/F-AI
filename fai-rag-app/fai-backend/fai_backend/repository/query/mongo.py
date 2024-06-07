@@ -1,6 +1,11 @@
 from dataclasses import dataclass
 
-from fai_backend.repository.query import AttributeAssignment, AttributeComparison, LogicalExpression, QueryComponent
+from fai_backend.repository.query.component import (
+    AttributeAssignment,
+    AttributeComparison,
+    LogicalExpression,
+    QueryComponent,
+)
 
 
 class QueryAdapter:
