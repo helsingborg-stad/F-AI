@@ -64,5 +64,5 @@ jobs:
 
       - name: Deploy container to Jelastic
         run: |
-          curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID }}&envName=${{ secrets.JELASTIC_ENV_NAME }}&tag=latest'
+          curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID }}&envName=${{ secrets.JELASTIC_ENV_NAME }}&tag=latest&useExistingVolumes=true'
         shell: bash
