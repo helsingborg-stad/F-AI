@@ -22,7 +22,11 @@ def try_get_first_match(objects: list[T], condition: Callable[[T], bool]) -> T |
     return None
 
 
-def format_datetime_human_readable(specified_datetime, threshold_days):
+def format_datetime_human_readable(
+        specified_datetime: datetime,
+        threshold_days: int = 3,
+        format: str = '%B %d, %Y'
+):
     """
     Converts a datetime to a human-readable format based on the specified criteria.
 
@@ -40,13 +44,13 @@ def format_datetime_human_readable(specified_datetime, threshold_days):
     minutes, _ = divmod(remainder, 60)
 
     if days > threshold_days:
-        return specified_datetime.strftime('%B %d, %Y')
+        return specified_datetime.strftime(format)
     elif days == 1 or (
             days < 1 and hours > 23):  # Adjusting for edge case where difference is just under 24 hours but on 'yesterday'
         return 'Yesterday'
     elif days > 1:
         return f'{days} days ago'
     elif hours >= 1:
-        return f'{hours} hours, {minutes} minutes ago'
+        return f'{hours} hours ago'
     else:
         return f'{minutes} minutes ago'
