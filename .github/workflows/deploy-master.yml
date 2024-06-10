@@ -5,7 +5,7 @@ on:
     types:
       - released
     branches:
-      - cicd/deploy-testing
+      - master
 
 jobs:
   build:
