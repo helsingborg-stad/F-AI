@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from fai_backend.conversations.models import Message
 from fai_backend.dependencies import (
@@ -20,14 +20,15 @@ from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
 from fai_backend.qaf.dependencies import (
     list_my_questions_request,
+    list_questions_filter_params,
+    list_submitted_questions_request,
     my_question_details_request,
     submit_answer_request,
     submit_feedback_request,
     submit_question_and_generate_answer_request,
     submitted_question_details_request,
-    submitted_questions_request,
 )
-from fai_backend.qaf.schema import QuestionDetails, QuestionEntry
+from fai_backend.qaf.schema import QuestionDetails, QuestionEntry, QuestionFilterParams
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
 
@@ -193,7 +194,7 @@ def chat_index_view(
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
-    documents = [{"id": doc.collection, "name": doc.file_name} for doc in
+    documents = [{'id': doc.collection, 'name': doc.file_name} for doc in
                  file_service.list_files(authenticated_user.project_id)]
 
     return view(
@@ -248,11 +249,41 @@ async def question_details_view(
 @router.get('/reviews', response_model=list, response_model_exclude_none=True)
 def reviews_index_view(
         authenticated_user: User | None = Depends(try_get_authenticated_user),
-        questions: list[QuestionDetails] = Depends(submitted_questions_request),
+        questions: list[QuestionDetails] = Depends(list_submitted_questions_request),
         view=Depends(get_page_template_for_logged_in_users),
+        query_params: QuestionFilterParams = Depends(list_questions_filter_params),
+        request: Request = None,
 ) -> list:
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
+
+    def map_sort_query_onto_columns(columns: list[dict], filter_params: QuestionFilterParams | None,
+                                    sortable_keys: list[str] | None,
+                                    default_sort_key: str | None, default_order: str | None) -> list[dict]:
+        current_key = filter_params.sort \
+            if filter_params and filter_params.sort in sortable_keys \
+            else default_sort_key
+
+        current_order = filter_params.sort_order \
+            if (filter_params
+                and filter_params.sort_order
+                and filter_params.sort_order in ['asc', 'desc']) \
+            else default_order
+
+        reverse_order = 'asc' if current_order == 'desc' else 'desc'
+
+        if not current_key:
+            return columns
+
+        return list(map(
+            lambda col: {
+                **col,
+                'sortable': col['key'] in [*(sortable_keys or []), *(default_sort_key or [])],
+                'sort_order': current_order if col['key'] == current_key else None,
+                'sort_url': f'?sort={col["key"]}&sort_order={reverse_order if col["key"] == current_key else "desc"}',
+            },
+            columns
+        ))
 
     return view(
         [c.Div(components=[
@@ -261,14 +292,31 @@ def reviews_index_view(
                     data=[
                         {
                             'subject': question.subject,
+                            'errand_id': question.errand_id,
+                            'timestamp.created': question.timestamp.created.date(),
+                            'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
+                            'tags': question.tags,
+                            'status': question.status,
+                            'review_status': question.review_status,
                             'link': f'/reviews/{question.id}',
                         }
                         for question in questions
                     ],
-                    columns=[
-                        {'key': 'subject', 'label': 'Subject'},
-                        {'key': 'link', 'label': '', 'link_text': 'View'},
-                    ],
+                    columns=map_sort_query_onto_columns(
+                        [
+                            {'key': 'subject', 'label': 'Subject'},
+                            {'key': 'errand_id', 'label': 'Errand ID'},
+                            {'key': 'status', 'label': 'Status'},
+                            {'key': 'timestamp.modified', 'label': 'Modified'},
+                            {'key': 'timestamp.created', 'label': 'Created'},
+                            {'key': 'review_status', 'label': 'Review Status'},
+                            {'key': 'link', 'label': '', 'link_text': 'View'},
+                        ],
+                        query_params,
+                        ['timestamp.modified', 'timestamp.created'],
+                        'timestamp.modified',
+                        'desc'
+                    ),
 
                     class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
                 ),

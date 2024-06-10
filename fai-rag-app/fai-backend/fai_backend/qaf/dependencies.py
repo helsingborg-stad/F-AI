@@ -77,7 +77,7 @@ async def list_my_questions_request(
         user: ProjectUser = Depends(get_project_user),
 ) -> list[QuestionEntry]:
     try:
-        return await service.my_questions(user)
+        return await service.list_my_questions(user)
     except Exception as e:
         console.log(e)
     return []
@@ -91,11 +91,12 @@ async def my_question_details_request(
     return await service.my_question_details(user, conversation_id)
 
 
-async def submitted_questions_request(
+async def list_submitted_questions_request(
         service: QAFService = Depends(QAFService.factory),
         user: ProjectUser = Depends(get_project_user),
+        query_params: QuestionFilterParams = Depends(list_questions_filter_params),
 ) -> list[QuestionEntry]:
-    return await service.submitted_questions(user)
+    return await service.list_submitted_questions(user, query_params)
 
 
 async def submitted_question_details_request(
