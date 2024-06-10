@@ -25,7 +25,8 @@ async def submit_question_request(
     question = await service.submit_question(
         user,
         body.question,
-        body.model_dump(exclude={'question'}),
+        body.model_dump(exclude={'question', 'tags'}),
+        body.tags,
     )
 
     return question

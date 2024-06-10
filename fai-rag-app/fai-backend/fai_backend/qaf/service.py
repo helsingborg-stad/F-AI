@@ -29,6 +29,7 @@ class QAFService:
             project_user: ProjectUser,
             question: str,
             meta: dict,
+            tags: list[str] | None = None,
     ) -> QuestionDetails:
         conversation = await self.conversations.create(
             Conversation(
@@ -44,7 +45,8 @@ class QAFService:
                         type='question'
                     )
                 ],
-                metadata=meta
+                metadata=meta,
+                tags=tags
             )
         )
 
