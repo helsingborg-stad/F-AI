@@ -10,6 +10,7 @@ from fai_backend.qaf.schema import (
     GenerateAnswerPayload,
     QuestionDetails,
     QuestionEntry,
+    QuestionFilterParams,
     SubmitAnswerPayload,
     SubmitQuestionPayload,
 )
@@ -51,6 +52,24 @@ async def submit_question_and_generate_answer_request(
     )
 
     return question
+
+
+async def list_questions_filter_params(
+        q: str = None,
+        tags: list[str] = None,
+        status: str = None,
+        review_status: str = None,
+        sort: str = None,
+        sort_order: str = None,
+) -> QuestionFilterParams:
+    return QuestionFilterParams(
+        q=q,
+        tags=tags,
+        status=status,
+        review_status=review_status,
+        sort=sort or 'timestamp.modified',
+        sort_order=sort_order or 'desc',
+    )
 
 
 async def list_my_questions_request(

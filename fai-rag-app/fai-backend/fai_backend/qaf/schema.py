@@ -99,3 +99,12 @@ class RejectAnswerPayload(BaseModel):
 
 
 FeedbackPayload = ApproveAnswerPayload | RejectAnswerPayload
+
+
+class QuestionFilterParams(BaseModel):
+    q: str | None = None
+    tags: list[str] | None = None
+    status: str | None = None
+    review_status: str | None = None
+    sort: str | None = None
+    sort_order: str | None = None
