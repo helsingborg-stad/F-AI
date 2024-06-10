@@ -44,7 +44,9 @@ jobs:
           key: venv-${{ hashFiles('fai-rag-app/fai-backend/poetry.lock') }}
 
       - name: install dependencies
-        run: poetry install
+        run: |
+          poetry lock --no-update
+          poetry install
 
       - name: Run tests
         run: poetry run pytest -s -vv
