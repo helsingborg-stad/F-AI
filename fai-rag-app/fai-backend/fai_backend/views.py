@@ -12,12 +12,18 @@ T = TypeVar('T', bound=Callable[..., list[Any]])
 def permission_required(required_permissions: list[str]) -> Callable[[T], T]:
     def decorator(func: T) -> T:
         @wraps(func)
-        def wrapper(*args, user_permissions: list[str] | None = None, **kwargs) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
+            user_permissions = kwargs.get('user_permissions', [])
+
             if not user_permissions:
                 user_permissions = []
 
+            if user_permissions:
+                kwargs.pop('user_permissions')
+
             if not required_permissions or all(
-                    (permission in user_permissions) for permission in required_permissions):
+                    (permission in user_permissions) for permission in required_permissions
+            ):
                 return func(*args, **kwargs)
             else:
                 return []
