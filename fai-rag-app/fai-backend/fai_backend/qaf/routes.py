@@ -3,7 +3,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from fai_backend.conversations.models import Message
+from fai_backend.conversations.schema import ResponseMessage
 from fai_backend.dependencies import (
     get_authenticated_user,
     get_page_template_for_logged_in_users,
@@ -217,7 +217,7 @@ async def question_details_view(
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
-    def message_factory(message: Message) -> AnyUI:
+    def message_factory(message: ResponseMessage) -> AnyUI:
         return c.Div(components=[
             {
                 'user': lambda: c.ChatBubble(content=message.content,

@@ -2,25 +2,25 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from fai_backend.conversations.models import Message
+from fai_backend.conversations.schema import ResponseMessage
 from fai_backend.schema import Timestamp
 
 
 class QuestionEntry(BaseModel):
     id: str
-    messages: list[Message] = Field(default_factory=list, repr=False)
+    messages: list[ResponseMessage] = Field(default_factory=list, repr=False)
     metadata: dict = Field(default_factory=dict, repr=False)
     tags: list[str] = Field(default_factory=list)
     subject: str
     errand_id: str
     status: Literal['open', 'pending', 'answered', 'resolved', 'closed'] | None
     review_status: Literal['approved', 'rejected', 'in-progress', 'closed', 'blocked', 'open'] | None
-    answer: Message | None
+    answer: ResponseMessage | None
     timestamp: Timestamp
 
 
 class QuestionDetails(QuestionEntry):
-    question: Message
+    question: ResponseMessage
 
 
 class SubmitQuestionPayload(BaseModel):

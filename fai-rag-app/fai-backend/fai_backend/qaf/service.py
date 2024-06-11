@@ -3,6 +3,7 @@ from typing import Literal
 from pydantic import BaseModel, computed_field
 
 from fai_backend.conversations.models import Conversation, Feedback, Message
+from fai_backend.conversations.schema import ResponseMessage
 from fai_backend.logger.console import console
 from fai_backend.qaf.schema import (
     ApproveAnswerPayload,
@@ -122,7 +123,7 @@ class QAFService:
             }['assistant' if isinstance(payload, GenerateAnswerPayload) else 'user']()
 
             result = await self.conversations.update(str(conversation.id), {'messages': conversation.messages})
-            return self._to_question(**result.model_dump())
+            return self._to_question(result)
         except Exception:
             console.print_exception(show_locals=False)
 
@@ -148,7 +149,7 @@ class QAFService:
             )
 
             result = await self.conversations.update(str(conversation.id), {'messages': conversation.messages})
-            return self._to_question(**result.model_dump())
+            return self._to_question(result)
         except Exception:
             console.print_exception(show_locals=False)
             raise
@@ -219,7 +220,7 @@ class QAFService:
             return None
 
         @computed_field
-        def answer(self) -> Message | None:
+        def answer(self) -> ResponseMessage | None:
             answer = try_get_first_match(
                 self.conversation.messages,
                 lambda message: message.type == 'answer' or
@@ -227,8 +228,8 @@ class QAFService:
                                 and len(message.feedback) > 0
                                 and message.feedback[0].rating == 'approved'
             )
-            return answer if answer is not None else None
+            return ResponseMessage.model_validate(answer.model_dump()) if answer is not None else None
 
         @computed_field
-        def question(self) -> Message:
-            return self.conversation.messages[0]
+        def question(self) -> ResponseMessage:
+            return ResponseMessage.model_validate(self.conversation.messages[0].model_dump())
