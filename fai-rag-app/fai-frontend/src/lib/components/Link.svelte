@@ -1,12 +1,14 @@
 <script lang="ts">
     import InlineSvgIcon from "./SVG.svelte"
     import Badge from "./Badge.svelte"
+    import {path, searchParams} from 'elegua';
+    import {matchCurrentPath} from "../../util/match-path";
 
     let className = ''
     export {className as class}
     export let text: string | null = null
     export let href: string = ''
-    export let active: boolean = false
+    export let active: boolean | string = false
     export let disabled: boolean = false
 
     export let underline: 'always' | 'never' | 'on-hover' | boolean = false
@@ -28,7 +30,8 @@
 <a {href}
    class:link={['always', true, 'on-hover'].includes(underline)}
    class:link-hover={underline === 'on-hover'}
-   class:link-active={active}
+   class:link-active={active === true || typeof active === 'string' && matchCurrentPath(active, $path, $searchParams) }
+   class:active={active === true || typeof active === 'string' && matchCurrentPath(active, $path, $searchParams) }
    class:link-disabled={disabled}
    class:link-primary={state === 'primary'}
    class:link-secondary={state === 'secondary'}
