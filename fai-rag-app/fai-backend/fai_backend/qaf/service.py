@@ -213,8 +213,8 @@ class QAFService:
 
             if generated_answer.feedback[0].rating == 'rejected':
                 if self.answer is None:
-                    return 'rejected'
-                return 'in-progress'
+                    return 'in-progress'
+                return 'rejected'
 
             return None
 
