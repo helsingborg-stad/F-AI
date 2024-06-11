@@ -29,6 +29,7 @@ from fai_backend.qaf.dependencies import (
     submitted_question_details_request,
 )
 from fai_backend.qaf.schema import QuestionDetails, QuestionEntry, QuestionFilterParams
+from fai_backend.qaf.views import message_factory, question_form, table_index, two_column_layout
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
 
@@ -60,28 +61,6 @@ async def llm_raq_question_endpoint(
         raise HTTPException(status_code=500, detail=str(exception))
 
 
-def two_column_layout(left: list[AnyUI], right: list[AnyUI]) -> list[AnyUI]:
-    return [
-        c.Div(
-            components=[
-                c.Div(
-                    components=left,
-                    class_name='flex-1 overflow-y-scroll'
-                ),
-                c.Div(components=[
-                    c.Div(components=[
-                        c.Div(
-                            components=right,
-                            class_name='card-body'
-                        )
-                    ], class_name='card sticky top-0')
-                ], class_name='flex-1 max-w-md border-l'),
-            ],
-            class_name='grow flex max-h-[calc(100vh-65px)]'
-        )
-    ]
-
-
 @router.get('/questions/create', response_model=list, response_model_exclude_none=True)
 def submit_question_view(
         view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
@@ -96,51 +75,7 @@ def submit_question_view(
             ),
         ]
 
-    return view(
-        [c.Div(components=[
-            c.Div(components=[
-                c.Form(
-                    submit_url='/api/questions/create',
-                    method='POST',
-                    submit_text=_('create_question_submit_button', 'Submit'),
-                    components=[
-                        c.InputField(
-                            name='subject',
-                            title=_('input_subject_label', 'Subject'),
-                            placeholder=_('input_subject_placeholder', 'Subject'),
-                            required=True,
-                            html_type='text',
-                        ),
-                        c.InputField(
-                            name='errand_id',
-                            title=_('input_label_errand_id', 'Errand ID'),
-                            placeholder=_('input_label_errand_id', 'Errand ID'),
-                            html_type='text',
-                        ),
-                        c.Textarea(
-                            name='question',
-                            title=_('input_label_question', 'Question'),
-                            placeholder=_('input_question_placeholder', 'Enter your question here'),
-                            required=True,
-                        ),
-                        c.Radio(
-                            name='tags[0]',
-                            title=_('input_quality_tag',
-                                    'How is the AI expected to be able to respond to this question?'),
-                            required=True,
-                            options=[
-                                ('quality.good',
-                                 _('question_quality_good', '✅ AI is expected to answer the question correctly')),
-                                ('quality.ok', _('question_quality_ok', '🟡 AI might not be able to answer')),
-                                ('quality.bad', _('question_quality_bad', '❌ AI is not expected to provide an answer')),
-                            ],
-                        )
-                    ],
-                )
-            ], class_name='card-body'),
-        ], class_name='card')],
-        _('submit_a_question', 'Create Question'),
-    )
+    return question_form(view, '/api/questions/create')
 
 
 @router.post('/questions/create', response_model=list, response_model_exclude_none=True)
@@ -248,113 +183,46 @@ async def question_details_view(
 
 @router.get('/reviews', response_model=list, response_model_exclude_none=True)
 def reviews_index_view(
-        authenticated_user: User | None = Depends(try_get_authenticated_user),
         questions: list[QuestionDetails] = Depends(list_submitted_questions_request),
         view=Depends(get_page_template_for_logged_in_users),
         query_params: QuestionFilterParams = Depends(list_questions_filter_params),
         request: Request = None,
 ) -> list:
-    if not authenticated_user:
-        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
-
-    def map_sort_query_onto_columns(columns: list[dict], filter_params: QuestionFilterParams | None,
-                                    sortable_keys: list[str] | None,
-                                    default_sort_key: str | None, default_order: str | None) -> list[dict]:
-        current_key = filter_params.sort \
-            if filter_params and filter_params.sort in sortable_keys \
-            else default_sort_key
-
-        current_order = filter_params.sort_order \
-            if (filter_params
-                and filter_params.sort_order
-                and filter_params.sort_order in ['asc', 'desc']) \
-            else default_order
-
-        reverse_order = 'asc' if current_order == 'desc' else 'desc'
-
-        if not current_key:
-            return columns
-
-        return list(map(
-            lambda col: {
-                **col,
-                'sortable': col['key'] in [*(sortable_keys or []), *(default_sort_key or [])],
-                'sort_order': current_order if col['key'] == current_key else None,
-                'sort_url': f'?sort={col["key"]}&sort_order={reverse_order if col["key"] == current_key else "desc"}',
-            },
-            columns
-        ))
-
-    return view(
-        [c.Div(components=[
-            c.Div(components=[
-                c.Table(
-                    data=[
-                        {
-                            'subject': question.subject,
-                            'errand_id': question.errand_id,
-                            'timestamp.created': question.timestamp.created.date(),
-                            'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
-                            'tags': question.tags,
-                            'status': question.status,
-                            'review_status': question.review_status,
-                            'link': f'/reviews/{question.id}',
-                        }
-                        for question in questions
-                    ],
-                    columns=map_sort_query_onto_columns(
-                        [
-                            {'key': 'subject', 'label': 'Subject'},
-                            {'key': 'errand_id', 'label': 'Errand ID'},
-                            {'key': 'status', 'label': 'Status'},
-                            {'key': 'timestamp.modified', 'label': 'Modified'},
-                            {'key': 'timestamp.created', 'label': 'Created'},
-                            {'key': 'review_status', 'label': 'Review Status'},
-                            {'key': 'link', 'label': '', 'link_text': 'View'},
-                        ],
-                        query_params,
-                        ['timestamp.modified', 'timestamp.created'],
-                        'timestamp.modified',
-                        'desc'
-                    ),
-
-                    class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
-                ),
-            ], class_name='overflow-x-auto space-y-4'),
-        ], class_name='card bg-base-100 w-full max-w-6xl')],
-        _('Inbox', 'Inbox'),
+    return table_index(
+        data=[
+            {
+                'subject': question.subject,
+                'errand_id': question.errand_id,
+                'timestamp.created': question.timestamp.created.date(),
+                'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
+                'tags': question.tags,
+                'status': question.status,
+                'review_status': question.review_status,
+                'link': f'/reviews/{question.id}',
+            }
+            for question in questions
+        ],
+        columns=[
+            {'key': 'subject', 'label': 'Subject'},
+            {'key': 'errand_id', 'label': 'Errand ID'},
+            {'key': 'status', 'label': 'Status'},
+            {'key': 'timestamp.modified', 'label': 'Modified'},
+            {'key': 'timestamp.created', 'label': 'Created'},
+            {'key': 'review_status', 'label': 'Review Status'},
+            {'key': 'link', 'label': '', 'link_text': 'View'},
+        ],
+        query_params=query_params.model_dump(exclude_none=True),
+        view=view,
     )
 
 
-@router.get('/reviews/{conversation_id}', response_model=list, response_model_exclude_none=True)
-async def review_details_view(
-        authenticated_user: ProjectUser | None = Depends(get_project_user),
-        question: QuestionDetails = Depends(submitted_question_details_request),
-        view=Depends(get_page_template_for_logged_in_users),
-) -> list:
-    if not question:
-        return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
-
-    def message_factory(message: Message) -> AnyUI:
-        return {
-            'user': lambda: c.ChatBubble(content=message.content,
-                                         is_self=message.created_by == authenticated_user.email,
-                                         user=message.user.capitalize(),
-                                         image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
-                                         time=format_datetime_human_readable(message.timestamp.created, 3)),
-            'assistant': lambda: c.ChatBubble(content=message.content,
-                                              is_self=message.created_by == authenticated_user.email,
-                                              user=message.user.capitalize(),
-                                              image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
-                                              time=format_datetime_human_readable(message.timestamp.created, 3)),
-        }[message.user if message.user == 'assistant' else 'user']()
-
+def review_details(user: ProjectUser, question: QuestionDetails, view):
     components = [
-        *[message_factory(message) for message in question.messages],
+        *[message_factory(user, message) for message in question.messages],
     ]
 
     render_form = ({
-        'feedback_form': lambda: [
+        'open': lambda: [
             c.Form(
                 submit_url=f'/api/reviews/{question.id}/feedback',
                 method='POST',
@@ -379,7 +247,7 @@ async def review_details_view(
                 ],
             ),
         ],
-        'answer_form': lambda: [
+        'in-progress': lambda: [
             c.Form(
                 submit_url=f'/api/reviews/{question.id}/answer',
                 method='POST',
@@ -396,12 +264,10 @@ async def review_details_view(
                 ],
             )
         ],
+        'approved': lambda: [],
+        'rejected': lambda: [],
         'null': lambda: [],
-    }[
-        'feedback_form' if question.review_status is None
-        else 'answer_form' if question.review_status == 'rejected' and question.answer is None
-        else 'null'
-    ])
+    }[question.review_status])
 
     return view(
         two_column_layout(
@@ -410,6 +276,18 @@ async def review_details_view(
         ),
         'Review: ' + str(question.subject)
     )
+
+
+@router.get('/reviews/{conversation_id}', response_model=list, response_model_exclude_none=True)
+async def review_details_view(
+        authenticated_user: ProjectUser | None = Depends(get_project_user),
+        question: QuestionDetails = Depends(submitted_question_details_request),
+        view=Depends(get_page_template_for_logged_in_users),
+) -> list:
+    if not question:
+        return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
+
+    return review_details(authenticated_user, question, view)
 
 
 @router.post('/reviews/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)

@@ -66,33 +66,13 @@ def questions_menu() -> list:
     ]
 
 
-@permission_required(['can_review_answers'])
-def reviewer_menu() -> list:
-    return [
-        c.Menu(
-            title=_('reviews', 'Reviews'),
-            id='reviewer-menu',
-            variant='vertical',
-            components=[
-                c.Link(
-                    text=_('inbox', 'Inbox'),
-                    url='/reviews',
-                    badge_state='accent',
-                )
-            ]
-        ),
-    ]
-
-
 @permission_required(['can_edit_questions_and_answers'])
 def mock_menu() -> list:
     return [
         c.Menu(
             id='mock-menu',
             variant='vertical',
-
             components=[
-
                 c.Link(
                     text=_('assistant', 'Assistant'),
                     url='/',
@@ -104,7 +84,6 @@ def mock_menu() -> list:
                     url='/users',
                     icon_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXJzLXJvdW5kIj48cGF0aCBkPSJNMTggMjFhOCA4IDAgMCAwLTE2IDAiLz48Y2lyY2xlIGN4PSIxMCIgY3k9IjgiIHI9IjUiLz48cGF0aCBkPSJNMjIgMjBjMC0zLjM3LTItNi41LTQtOGE1IDUgMCAwIDAtLjQ1LTguMyIvPjwvc3ZnPg=='
                 )
-
             ]
         ),
     ]
@@ -114,11 +93,7 @@ def app_drawer(menus: list | None = None) -> list:
     return [
         c.AppDrawer(
             title='Folkets AI',
-            components=[
-                *questions_menu(),
-                *reviewer_menu(),
-                *mock_menu(),
-            ] if not menus else menus
+            components=[] if not menus else menus
         )
     ]
 
