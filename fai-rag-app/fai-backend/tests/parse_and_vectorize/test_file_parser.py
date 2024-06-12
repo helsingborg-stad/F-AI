@@ -4,6 +4,8 @@ import pytest_asyncio
 
 from fai_backend.files.file_parser import ParserFactory
 from fai_backend.vector.memory import InMemoryChromaDB
+from fai_backend.files.service import FileUploadService
+from fai_backend.vector.service import VectorService
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_PDF_PATH = os.path.join(CURRENT_DIR, 'test_data/Bevprogram_Raa_1991_sbf.pdf')
@@ -15,11 +17,23 @@ def document_elements():
     return pdf_parser.parse(TEST_PDF_PATH)
 
 
+@pytest.fixture(scope='session')
+def document_elements_from_multiple_files() -> list[str]:
+    test_data_path = (CURRENT_DIR / 'test_data' / 'multiples').as_posix()
+    file_service = FileUploadService("")
+    return file_service.parse_files(test_data_path)
+
+
 @pytest_asyncio.fixture
 async def vector_db():
     db = InMemoryChromaDB()
     yield db
     await db.reset()
+
+
+@pytest_asyncio.fixture
+async def vector_service(vector_db):
+    return VectorService(vector_db)
 
 
 def test_parser_with_pdf_file_then_expect_parsed_correctly(document_elements):
@@ -76,3 +90,21 @@ async def test_without_metadatas(document_elements, vector_db):
 
     assert results["ids"] == [
         [expected_doc_id]], f"The query did not return the expected document id {expected_doc_id}."
+
+
+@pytest.mark.asyncio
+async def test_vectorize_multiple_files_then_query_correct_result(document_elements_from_multiple_files,
+                                                                  vector_service):
+    documents = document_elements_from_multiple_files
+    collection_name = "test_collection_multiple_files"
+    expected_doc = ["Hur anmäler jag?", "Behöver jag bygglov?"]
+
+    await vector_service.create_collection(collection_name)
+    await vector_service.add_documents_without_id_to_empty_collection(collection_name, documents)
+
+    query_text = "Vad är ett komplementbostadshus?"
+    results = await vector_service.query_from_collection(
+        collection_name=collection_name,
+        query_texts=[query_text])
+
+    assert results["documents"] == [expected_doc], f"The query did not return the expected document {expected_doc}."
