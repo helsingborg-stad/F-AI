@@ -109,7 +109,7 @@ async def upload_and_vectorize_handler(
     )
 
 
-@router.post('documents/parse_and_save', response_model=list, response_model_exclude_none=True)
+@router.post('/documents/parse_and_save', response_model=list, response_model_exclude_none=True)
 def parse_documents(
         src_directory_path: str,
         dest_directory_path: str,
