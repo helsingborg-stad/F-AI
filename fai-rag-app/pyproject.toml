@@ -25,6 +25,7 @@ source = ["fai-backend"]
 omit = []
 
 [tool.poetry.dependencies]
+python = "~3.11.9"
 fai-backend = { path = "./fai-backend" }
 
 [tool.poetry.dev-dependencies]
