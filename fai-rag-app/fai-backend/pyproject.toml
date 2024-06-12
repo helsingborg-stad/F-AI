@@ -6,6 +6,7 @@ authors = ["Helsingborg Stad <webbutveckling@helsingborg.se>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
+python = "~3.11.9"
 fastapi = { extras = ["all"], version = "^0.108.0" }
 pydantic = { extras = ["email"], version = "^2.5.3" }
 uvicorn = { extras = ["standard"], version = "^0.25.0" }
