@@ -3,7 +3,7 @@ name: PRE RELEASE - Build and push docker image to github registry. Deploy to Je
 on:
   release:
     types:
-      - prereleased
+      - prerelease
     branches:
       - master
 
