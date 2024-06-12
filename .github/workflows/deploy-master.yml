@@ -39,7 +39,7 @@ jobs:
           images: ghcr.io/${{ steps.string.outputs.lowercase }}
           tags: |
             # set latest tag for default branch
-            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'cicd/deploy-testing') }}
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
             type=schedule
             type=ref,event=branch
             type=ref,event=tag
