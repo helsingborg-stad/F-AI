@@ -1,9 +1,9 @@
-name: PRE RELEASE - Build and push docker image to github registry. Deploy to Jelastic.
+name: PRE RELEASE
 
 on:
   release:
     types:
-      - prerelease
+      - prereleased
     branches:
       - master
 
