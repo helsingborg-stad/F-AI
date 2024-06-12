@@ -36,7 +36,7 @@ jobs:
           images: ghcr.io/${{ steps.string.outputs.lowercase }}
           tags: |
             # set latest tag for default branch
-            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
+            type=raw,value=${{github.event.release.tag_name}}
             type=schedule
             type=ref,event=branch
             type=ref,event=tag
@@ -61,5 +61,5 @@ jobs:
 
       - name: Deploy container to Jelastic
         run: |
-          curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=latest&useExistingVolumes=true'
+          curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
         shell: bash
