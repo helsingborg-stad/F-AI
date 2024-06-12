@@ -1,11 +1,8 @@
-name: PRE RELEASE
+name: PRE RELEASED
 
 on:
   release:
-    types:
-      - prereleased
-    branches:
-      - master
+    types: [prereleased]
 
 jobs:
   build:
