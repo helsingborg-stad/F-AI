@@ -24,10 +24,9 @@ from fai_backend.qaf.dependencies import (
     submitted_question_details_request,
 )
 from fai_backend.qaf.schema import QuestionDetails, QuestionFilterParams
-from fai_backend.qaf.views import question_form, table_index
+from fai_backend.qaf.views import question_form, review_details, table_index
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
-from qaf.views import review_details
 
 router = APIRouter(
     prefix='/api',

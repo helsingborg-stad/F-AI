@@ -12,13 +12,14 @@ from fai_backend.dependencies import get_project_user
 from fai_backend.documents.routes import router as documents_router
 from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.llm.impl.rag_wrapper import RAGWrapper
-from fai_backend.llm.models import LLMMessage, LLMDataPacket
+from fai_backend.llm.models import LLMDataPacket, LLMMessage
 from fai_backend.llm.protocol import ILLMStreamProtocol
 from fai_backend.llm.serializer.impl.base64 import Base64Serializer
 from fai_backend.llm.service import LLMFactory
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
-from fai_backend.phrase import phrase as _, set_language
+from fai_backend.phrase import phrase as _
+from fai_backend.phrase import set_language
 from fai_backend.projects.router import router as projects_router
 from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.schema import ProjectUser
@@ -47,10 +48,10 @@ app.middleware('http')(remove_trailing_slash)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=['*'],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 frontend = get_frontend_environment(settings.ENV_MODE)
@@ -61,21 +62,21 @@ async def event_source_llm_generator(question: str, llm: ILLMStreamProtocol):
     serializer = Base64Serializer()
     stream = await llm.create()
 
-    print(f"{llm=}")
+    print(f'{llm=}')
 
     async def generator():
         async for output in stream(question):
             if isinstance(output.data, LLMDataPacket) and output.data.user_friendly:
                 yield ServerSentEvent(
-                    event="message",
+                    event='message',
                     data=serializer.serialize(LLMMessage(
                         date=datetime.now(),
-                        source="Chat AI",
+                        source='Chat AI',
                         content=output.data.content
                     )),
                 )
         yield ServerSentEvent(
-            event="message_end",
+            event='message_end',
             data=serializer.serialize(LLMMessage(
                 date=datetime.now(),
             ))
@@ -86,7 +87,7 @@ async def event_source_llm_generator(question: str, llm: ILLMStreamProtocol):
 
 @app.get('/api/chat-stream')
 async def chat_stream(question: str, document: str | None = None):
-    print(f"/chat-stream {document=} {question=}")
+    print(f'/chat-stream {document=} {question=}')
     llm = LLMFactory.get()
     if document:
         llm = RAGWrapper(question, llm, document)
