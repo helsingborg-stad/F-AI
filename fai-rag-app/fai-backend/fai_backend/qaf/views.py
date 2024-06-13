@@ -4,9 +4,9 @@ from fai_backend.conversations.schema import ResponseMessage
 from fai_backend.framework import components as c
 from fai_backend.framework.components import AnyUI
 from fai_backend.phrase import phrase as _
+from fai_backend.qaf.schema import QuestionDetails
+from fai_backend.schema import ProjectUser
 from fai_backend.utils import format_datetime_human_readable
-from qaf.schema import QuestionDetails
-from schema import ProjectUser
 
 
 def two_column_layout(left: list[AnyUI], right: list[AnyUI]) -> list[AnyUI]:
