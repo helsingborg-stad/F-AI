@@ -20,8 +20,8 @@ chatPromptTemplate = PromptTemplate(
     name="ChatStream",
     messages=[
         SystemChatPrompt(
-            "You are a helpful AI assistant that helps people with answering questions about planning "
-            "permission.<br> If you can't find the answer in the search result below, just say (in Swedish) "
+            "You are a helpful AI assistant that helps people with answering questions."
+            "<br> If you can't find the answer in the search result below, just say (in Swedish) "
             "\"Tyvärr kan jag inte svara på det.\" Don't try to make up an answer.<br> If the "
             "question is not related to the context, politely respond that you are tuned to only "
             "answer questions that are related to the context.<br> The questions are going to be "
