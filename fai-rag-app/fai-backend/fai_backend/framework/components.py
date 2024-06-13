@@ -181,6 +181,7 @@ class Link(Text):
     state: Literal['primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success'] | None = None
     underline: Literal['on-hover', 'always', 'never'] | bool | None = None
     active: bool | str = False
+    disabled: bool | None = None
 
 
 class AppContent(UIComponent):
