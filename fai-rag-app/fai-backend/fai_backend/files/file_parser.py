@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 
 import magic
+from unstructured.partition.docx import partition_docx
 from unstructured.partition.md import partition_md
 from unstructured.partition.pdf import partition_pdf
 
@@ -9,6 +10,11 @@ class AbstractDocumentParser(ABC):
     @abstractmethod
     def parse(self, filename: str):
         pass
+
+
+class DocxParser(AbstractDocumentParser):
+    def parse(self, filename: str):
+        return partition_docx(filename, chunking_strategy="basic")
 
 
 class PDFParser(AbstractDocumentParser):
@@ -30,5 +36,7 @@ class ParserFactory:
             return PDFParser()
         if mime_type == 'text/plain':
             return MarkdownParser()
+        if mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+            return DocxParser()
 
         raise ValueError(f'Unsupported file type: {mime_type}')
