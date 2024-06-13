@@ -9,10 +9,11 @@ from fai_backend.auth.dependencies import (
 )
 from fai_backend.auth.schema import TokenPayload
 from fai_backend.auth.service import AuthService
+from fai_backend.documents.menu import menu_items as document_menu_items
 from fai_backend.qaf.menu import build_qa_menu_items, qa_menu
 from fai_backend.qaf.service import QAFService
 from fai_backend.schema import ProjectUser, User
-from fai_backend.views import mock_menu, page_template, questions_menu
+from fai_backend.views import chat_menu, mock_menu, page_template
 
 
 async def try_get_authenticated_user(
@@ -73,8 +74,9 @@ async def get_page_template_for_logged_in_users(
         *components if isinstance(components, list) else [components],
         page_title=page_title,
         menus=[
-            *questions_menu(user_permissions=permissions),
+            *chat_menu(user_permissions=permissions),
             *(qa_menu(user_permissions=permissions, **menu_args['qa_menu'])),
+            *document_menu_items(),
             *mock_menu(user_permissions=permissions),
         ]
     ))

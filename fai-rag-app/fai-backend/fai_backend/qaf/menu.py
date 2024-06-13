@@ -23,7 +23,7 @@ async def build_qa_menu_items(
         *[
             (
                 f'{status.capitalize()}',
-                f'/reviews?review_status={status}',
+                f'/questions?review_status={status}',
                 await get_count_by_review_status(status) or '0',
 
             )
@@ -38,40 +38,34 @@ def qa_menu(
 ) -> list:
     return [
         c.Menu(
-            title=_('QA'),
-            id='qa-menu',
+            title=_('questions', 'Questions'),
+            id='questions-menu',
             variant='vertical',
+            sub_menu=True,
+            icon_src=icons['messages_square'],
             components=[
-                c.Menu(
-                    title=_('questions', 'Questions'),
-                    id='questions-menu',
-                    variant='vertical',
-                    sub_menu=True,
-                    components=[
-                        c.Link(
-                            text=_('show_all', 'Visa alla'),
-                            url='/reviews',
-                            active='/reviews*'
-                        ),
-                        c.Menu(
-                            title=_('status', 'Status'),
-                            components=[
-                                *[c.Link(
-                                    text=text,
-                                    url=url,
-                                    active=url,
-                                    badge=badge,
-                                ) for text, url, badge in (items or [])]
-                            ]
-                        ),
-                        c.Link(
-                            text=_('Add new question'),
-                            url='/questions/create',
-                            active='/questions/create',
-                            icon_src=icons['square_pen'],
-                        ),
-                    ],
+                c.Link(
+                    text=_('show_all', 'Visa alla'),
+                    url='/questions',
+                    active='/questions*'
                 ),
-            ]
+                c.Menu(
+                    title=_('status', 'Status'),
+                    components=[
+                        *[c.Link(
+                            text=text,
+                            url=url,
+                            active=url,
+                            badge=badge,
+                        ) for text, url, badge in (items or [])]
+                    ]
+                ),
+                c.Link(
+                    text=_('Add new question'),
+                    url='/questions/create',
+                    active='/questions/create',
+                    icon_src=icons['square_pen'],
+                ),
+            ],
         ),
     ]

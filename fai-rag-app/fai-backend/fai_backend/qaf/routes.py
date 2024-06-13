@@ -3,35 +3,31 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from fai_backend.conversations.schema import ResponseMessage
 from fai_backend.dependencies import (
     get_authenticated_user,
     get_page_template_for_logged_in_users,
     get_project_user,
-    try_get_authenticated_user,
 )
 from fai_backend.files.dependecies import get_file_upload_service
 from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
-from fai_backend.framework.components import AnyUI
 from fai_backend.llm.service import ask_llm_question, ask_llm_raq_question
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
 from fai_backend.qaf.dependencies import (
-    list_my_questions_request,
     list_questions_filter_params,
     list_submitted_questions_request,
-    my_question_details_request,
     submit_answer_request,
     submit_feedback_request,
     submit_question_and_generate_answer_request,
     submitted_question_details_request,
 )
-from fai_backend.qaf.schema import QuestionDetails, QuestionEntry, QuestionFilterParams
-from fai_backend.qaf.views import message_factory, question_form, table_index, two_column_layout
+from fai_backend.qaf.schema import QuestionDetails, QuestionFilterParams
+from fai_backend.qaf.views import question_form, table_index
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
+from qaf.views import review_details
 
 router = APIRouter(
     prefix='/api',
@@ -61,8 +57,64 @@ async def llm_raq_question_endpoint(
         raise HTTPException(status_code=500, detail=str(exception))
 
 
+@router.get('/chat', response_model=list, response_model_exclude_none=True)
+def chat_index_view(
+        file_service: FileUploadService = Depends(get_file_upload_service),
+        authenticated_user: User | None = Depends(get_project_user),
+        view=Depends(get_page_template_for_logged_in_users),
+) -> list:
+    if not authenticated_user:
+        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
+
+    documents = [{'id': doc.collection, 'name': doc.file_name} for doc in
+                 file_service.list_files(authenticated_user.project_id)]
+
+    return view(
+        [c.SSEChat(
+            documents=documents,
+            endpoint='/api/chat-stream'
+        )],
+        _('chat', 'Chat'),
+    )
+
+
+@router.get('/questions', response_model=list, response_model_exclude_none=True)
+def reviews_index_view(
+        questions: list[QuestionDetails] = Depends(list_submitted_questions_request),
+        view=Depends(get_page_template_for_logged_in_users),
+        query_params: QuestionFilterParams = Depends(list_questions_filter_params),
+        request: Request = None,
+) -> list:
+    return table_index(
+        data=[
+            {
+                'subject': question.subject,
+                'errand_id': question.errand_id,
+                'timestamp.created': question.timestamp.created.date(),
+                'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
+                'tags': question.tags,
+                'status': question.status,
+                'review_status': question.review_status,
+                'link': f'/questions/{question.id}',
+            }
+            for question in questions
+        ],
+        columns=[
+            {'key': 'subject', 'label': 'Subject'},
+            {'key': 'errand_id', 'label': 'Errand ID'},
+            {'key': 'status', 'label': 'Status'},
+            {'key': 'timestamp.modified', 'label': 'Modified'},
+            {'key': 'timestamp.created', 'label': 'Created'},
+            {'key': 'review_status', 'label': 'Review Status'},
+            {'key': 'link', 'label': '', 'link_text': 'View'},
+        ],
+        query_params=query_params.model_dump(exclude_none=True),
+        view=view,
+    )
+
+
 @router.get('/questions/create', response_model=list, response_model_exclude_none=True)
-def submit_question_view(
+def create_question_view(
         view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
         authenticated_user: User = Depends(get_authenticated_user)
 ) -> list:
@@ -89,197 +141,8 @@ def create_question_handler(
     )
 
 
-@router.get('/questions', response_model=list, response_model_exclude_none=True)
-def questions_index_view(
-        authenticated_user: User | None = Depends(try_get_authenticated_user),
-        questions: list[QuestionEntry] = Depends(list_my_questions_request),
-        view=Depends(get_page_template_for_logged_in_users),
-) -> list:
-    if not authenticated_user:
-        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
-
-    return view(
-        [c.Div(components=[
-            c.Div(components=[
-                c.Table(
-                    data=[{'subject': question.subject,
-                           'status': question.status,
-                           'errand_id': question.errand_id,
-                           'link': f'/questions/{question.id}'} for question in questions],
-                    columns=[
-                        {'key': 'subject', 'label': 'Subject'},
-                        {'key': 'status', 'label': 'Status'},
-                        {'key': 'errand_id', 'label': 'Errand ID'},
-                        {'key': 'link', 'label': '', 'link_text': 'View'},
-                    ],
-                    class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
-                ),
-            ], class_name='overflow-x-auto space-y-4'),
-        ], class_name='card bg-base-100 w-full max-w-6xl')],
-        _('my_questions', 'My Questions'),
-    )
-
-
-@router.get('/chat', response_model=list, response_model_exclude_none=True)
-def chat_index_view(
-        file_service: FileUploadService = Depends(get_file_upload_service),
-        authenticated_user: User | None = Depends(get_project_user),
-        view=Depends(get_page_template_for_logged_in_users),
-) -> list:
-    if not authenticated_user:
-        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
-
-    documents = [{'id': doc.collection, 'name': doc.file_name} for doc in
-                 file_service.list_files(authenticated_user.project_id)]
-
-    return view(
-        [c.SSEChat(
-            documents=documents,
-            endpoint='/api/chat-stream'
-        )],
-        _('chat', 'Chat'),
-    )
-
-
 @router.get('/questions/{conversation_id}', response_model=list, response_model_exclude_none=True)
 async def question_details_view(
-        authenticated_user: ProjectUser | None = Depends(get_project_user),
-        question: QuestionDetails = Depends(my_question_details_request),
-        view=Depends(get_page_template_for_logged_in_users),
-) -> list:
-    if not question:
-        return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
-    if not authenticated_user:
-        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
-
-    def message_factory(message: ResponseMessage) -> AnyUI:
-        return c.Div(components=[
-            {
-                'user': lambda: c.ChatBubble(content=message.content,
-                                             is_self=message.created_by == authenticated_user.email,
-                                             user=message.user.capitalize(),
-                                             image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
-                                             time=format_datetime_human_readable(message.timestamp.created, 3)),
-                'assistant': lambda: c.ChatBubble(content=message.content,
-                                                  is_self=False,
-                                                  user=message.user.capitalize(),
-                                                  image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWJvdCI+PHBhdGggZD0iTTEyIDhWNEg4Ii8+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiB4PSI0IiB5PSI4IiByeD0iMiIvPjxwYXRoIGQ9Ik0yIDE0aDIiLz48cGF0aCBkPSJNMjAgMTRoMiIvPjxwYXRoIGQ9Ik0xNSAxM3YyIi8+PHBhdGggZD0iTTkgMTN2MiIvPjwvc3ZnPg==',
-                                                  time=format_datetime_human_readable(
-                                                      message.timestamp.created, 3)
-
-                                                  ),
-            }[message.user if message.user == 'assistant' else 'user']()
-        ])
-
-    return view(
-        two_column_layout(
-            left=[message_factory(question.question),
-                  *([message_factory(question.answer)] if question.answer else []), ],
-            right=[],
-        ),
-        'Conversation: ' + str(question.subject)
-    )
-
-
-@router.get('/reviews', response_model=list, response_model_exclude_none=True)
-def reviews_index_view(
-        questions: list[QuestionDetails] = Depends(list_submitted_questions_request),
-        view=Depends(get_page_template_for_logged_in_users),
-        query_params: QuestionFilterParams = Depends(list_questions_filter_params),
-        request: Request = None,
-) -> list:
-    return table_index(
-        data=[
-            {
-                'subject': question.subject,
-                'errand_id': question.errand_id,
-                'timestamp.created': question.timestamp.created.date(),
-                'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
-                'tags': question.tags,
-                'status': question.status,
-                'review_status': question.review_status,
-                'link': f'/reviews/{question.id}',
-            }
-            for question in questions
-        ],
-        columns=[
-            {'key': 'subject', 'label': 'Subject'},
-            {'key': 'errand_id', 'label': 'Errand ID'},
-            {'key': 'status', 'label': 'Status'},
-            {'key': 'timestamp.modified', 'label': 'Modified'},
-            {'key': 'timestamp.created', 'label': 'Created'},
-            {'key': 'review_status', 'label': 'Review Status'},
-            {'key': 'link', 'label': '', 'link_text': 'View'},
-        ],
-        query_params=query_params.model_dump(exclude_none=True),
-        view=view,
-    )
-
-
-def review_details(user: ProjectUser, question: QuestionDetails, view):
-    components = [
-        *[message_factory(user, message) for message in question.messages],
-    ]
-
-    render_form = ({
-        'open': lambda: [
-            c.Form(
-                submit_url=f'/api/reviews/{question.id}/feedback',
-                method='POST',
-                submit_text=_('create_question_submit_button', 'Submit'),
-                components=[
-                    c.Text(text=_('review_answer', 'Review answer'), element='h2', class_name='text-lg'),
-                    c.InputField(html_type='hidden', name='question_id', value=question.id, hidden=True),
-                    c.Select(
-                        name='rating',
-                        title=_('rating', 'Rating'),
-                        options=[
-                            ('approved', 'Approved'),
-                            ('rejected', 'Rejected'),
-                        ],
-                    ),
-                    c.Textarea(
-                        name='comment',
-                        title=_('comment', 'Comment'),
-                        placeholder=_('input_comment_placeholder', 'Enter a comment here'),
-                        required=True,
-                    ),
-                ],
-            ),
-        ],
-        'in-progress': lambda: [
-            c.Form(
-                submit_url=f'/api/reviews/{question.id}/answer',
-                method='POST',
-                submit_text=_('create_question_submit_button', 'Submit'),
-                components=[
-                    c.Text(text=_('answer', 'Answer')),
-                    c.InputField(html_type='hidden', name='question_id', value=question.id, hidden=True),
-                    c.Textarea(
-                        name='answer',
-                        title=_('answer', 'Answer'),
-                        placeholder=_('input_comment_placeholder', 'Enter correct answer'),
-                        required=True,
-                    ),
-                ],
-            )
-        ],
-        'approved': lambda: [],
-        'rejected': lambda: [],
-        'null': lambda: [],
-    }[question.review_status])
-
-    return view(
-        two_column_layout(
-            left=components,
-            right=[*render_form()],
-        ),
-        'Review: ' + str(question.subject)
-    )
-
-
-@router.get('/reviews/{conversation_id}', response_model=list, response_model_exclude_none=True)
-async def review_details_view(
         authenticated_user: ProjectUser | None = Depends(get_project_user),
         question: QuestionDetails = Depends(submitted_question_details_request),
         view=Depends(get_page_template_for_logged_in_users),
@@ -290,25 +153,24 @@ async def review_details_view(
     return review_details(authenticated_user, question, view)
 
 
-@router.post('/reviews/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)
+@router.post('/questions/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)
 def submit_feedback_handler(
         conversation_id: str,
         review: QuestionDetails = Depends(submit_feedback_request),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     return view(
-        [c.FireEvent(event=e.GoToEvent(url=f'/reviews/{review.id}'))],
+        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{review.id}'))],
         page_title=_('submit_a_question', 'Create Question'''),
     )
 
 
-@router.post('/reviews/{conversation_id}/answer', response_model=list, response_model_exclude_none=True)
+@router.post('/questions/{conversation_id}/answer', response_model=list, response_model_exclude_none=True)
 def submit_answer_handler(
-        conversation_id: str,
-        review: QuestionDetails = Depends(submit_answer_request),
+        question: QuestionDetails = Depends(submit_answer_request),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     return view(
-        [c.FireEvent(event=e.GoToEvent(url=f'/reviews/{review.id}'))],
+        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{question.id}'))],
         _('submit_a_question', 'Create Question'''),
     )
