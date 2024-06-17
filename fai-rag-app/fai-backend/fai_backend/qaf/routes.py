@@ -90,7 +90,6 @@ def questions(
                 'timestamp.created': question.timestamp.created.date(),
                 'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
                 'tags': question.tags,
-                'status': question.status,
                 'review_status': question.review_status,
                 'link': f'/questions/{question.id}',
             }
@@ -99,7 +98,6 @@ def questions(
         columns=[
             {'key': 'subject', 'label': 'Subject'},
             {'key': 'errand_id', 'label': 'Errand ID'},
-            {'key': 'status', 'label': 'Status'},
             {'key': 'timestamp.modified', 'label': 'Modified'},
             {'key': 'timestamp.created', 'label': 'Created'},
             {'key': 'review_status', 'label': 'Review Status'},
