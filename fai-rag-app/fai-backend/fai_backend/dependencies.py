@@ -10,7 +10,7 @@ from fai_backend.auth.dependencies import (
 from fai_backend.auth.schema import TokenPayload
 from fai_backend.auth.service import AuthService
 from fai_backend.documents.menu import menu_items as document_menu_items
-from fai_backend.qaf.menu import build_qa_menu_items, qa_menu
+from fai_backend.qaf.menu import qa_menu, qa_menu_loader
 from fai_backend.qaf.service import QAFService
 from fai_backend.schema import ProjectUser, User
 from fai_backend.views import chat_menu, mock_menu, page_template
@@ -67,7 +67,7 @@ async def get_page_template_for_logged_in_users(
 ) -> Callable[[list[Any] | Any, str | None], list[Any]]:
     menu_args = {
         'qa_menu': {
-            'items': await build_qa_menu_items(project_user, qaf_service),
+            'items': await qa_menu_loader(project_user, qaf_service),
         }
     }
     return (lambda components, page_title: page_template(

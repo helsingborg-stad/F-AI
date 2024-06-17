@@ -154,10 +154,6 @@ class QAFService:
             console.print_exception(show_locals=False)
             raise
 
-    @staticmethod
-    def factory() -> 'QAFService':
-        return QAFService(conversations=conversation_repo)
-
     def _to_question(self, conversation: Conversation) -> QuestionDetails:
         return QuestionDetails.model_validate({
             **conversation.model_dump(),
@@ -233,3 +229,7 @@ class QAFService:
         @computed_field
         def question(self) -> ResponseMessage:
             return ResponseMessage.model_validate(self.conversation.messages[0].model_dump())
+
+    @staticmethod
+    def factory() -> 'QAFService':
+        return QAFService(conversations=conversation_repo)

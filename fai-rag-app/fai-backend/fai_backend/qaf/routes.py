@@ -1,10 +1,9 @@
 from collections.abc import Callable
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 
 from fai_backend.dependencies import (
-    get_authenticated_user,
     get_page_template_for_logged_in_users,
     get_project_user,
 )
@@ -16,15 +15,15 @@ from fai_backend.llm.service import ask_llm_question, ask_llm_raq_question
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
 from fai_backend.qaf.dependencies import (
-    list_questions_filter_params,
-    list_submitted_questions_request,
-    submit_answer_request,
-    submit_feedback_request,
-    submit_question_and_generate_answer_request,
-    submitted_question_details_request,
+    add_answer_action,
+    add_feedback_action,
+    question_details_loader,
+    questions_filter_params,
+    questions_loader,
+    run_llm_on_question_create_action,
 )
 from fai_backend.qaf.schema import QuestionDetails, QuestionFilterParams
-from fai_backend.qaf.views import question_form, review_details, table_index
+from fai_backend.qaf.views import QuestionForm, QuestionsDataTable, ReviewDetails
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
 
@@ -78,13 +77,12 @@ def chat_index_view(
 
 
 @router.get('/questions', response_model=list, response_model_exclude_none=True)
-def reviews_index_view(
-        questions: list[QuestionDetails] = Depends(list_submitted_questions_request),
-        view=Depends(get_page_template_for_logged_in_users),
-        query_params: QuestionFilterParams = Depends(list_questions_filter_params),
-        request: Request = None,
+def questions(
+        data: list[QuestionDetails] = Depends(questions_loader),
+        query_params: QuestionFilterParams = Depends(questions_filter_params),
+        view=Depends(get_page_template_for_logged_in_users)
 ) -> list:
-    return table_index(
+    return QuestionsDataTable(
         data=[
             {
                 'subject': question.subject,
@@ -96,7 +94,7 @@ def reviews_index_view(
                 'review_status': question.review_status,
                 'link': f'/questions/{question.id}',
             }
-            for question in questions
+            for question in data
         ],
         columns=[
             {'key': 'subject', 'label': 'Subject'},
@@ -113,60 +111,49 @@ def reviews_index_view(
 
 
 @router.get('/questions/create', response_model=list, response_model_exclude_none=True)
-def create_question_view(
+def create_question(
         view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
-        authenticated_user: User = Depends(get_authenticated_user)
 ) -> list:
-    if len(authenticated_user.projects) == 0:
-        return [
-            c.Text(
-                text=_('no_projects', 'You are not a member of any proj.. wait a mintue, how did you login? 😱'),
-                class_name='bg-error text-center font-black text-3xl text-warning h-screen flex items-center justify-center leading-relaxed',
-                element='h1'
-            ),
-        ]
-
-    return question_form(view, '/api/questions/create')
+    return QuestionForm(view, '/api/questions/create')
 
 
 @router.post('/questions/create', response_model=list, response_model_exclude_none=True)
-def create_question_handler(
-        question: QuestionDetails = Depends(submit_question_and_generate_answer_request),
+def on_create_question(
+        data: QuestionDetails = Depends(run_llm_on_question_create_action),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     return view(
-        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{question.id}'))],
+        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{data.id}'))],
         _('submit_a_question', 'Create Question'''),
     )
 
 
 @router.get('/questions/{conversation_id}', response_model=list, response_model_exclude_none=True)
-async def question_details_view(
-        authenticated_user: ProjectUser | None = Depends(get_project_user),
-        question: QuestionDetails = Depends(submitted_question_details_request),
+async def question_details(
+        data: QuestionDetails = Depends(question_details_loader),
         view=Depends(get_page_template_for_logged_in_users),
+        authenticated_user: ProjectUser | None = Depends(get_project_user),
 ) -> list:
-    if not question:
+    if not data:
         return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
 
-    return review_details(authenticated_user, question, view)
+    return ReviewDetails(authenticated_user, data, view)
 
 
 @router.post('/questions/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)
-def submit_feedback_handler(
-        conversation_id: str,
-        review: QuestionDetails = Depends(submit_feedback_request),
+def on_submit_feedback(
+        data: QuestionDetails = Depends(add_feedback_action),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     return view(
-        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{review.id}'))],
+        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{data.id}'))],
         page_title=_('submit_a_question', 'Create Question'''),
     )
 
 
 @router.post('/questions/{conversation_id}/answer', response_model=list, response_model_exclude_none=True)
-def submit_answer_handler(
-        question: QuestionDetails = Depends(submit_answer_request),
+def on_submit_answer(
+        question: QuestionDetails = Depends(add_answer_action),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     return view(

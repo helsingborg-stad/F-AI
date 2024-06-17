@@ -69,6 +69,7 @@ def app_drawer(menus: list | None = None) -> list:
             title='Folkets AI',
             components=[
                 c.Menu(
+                    title=_('main_menu', 'Main menu'),
                     components=[] if not menus else menus
                 ),
             ]

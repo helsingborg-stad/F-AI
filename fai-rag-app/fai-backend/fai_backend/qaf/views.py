@@ -9,6 +9,21 @@ from fai_backend.schema import ProjectUser
 from fai_backend.utils import format_datetime_human_readable
 
 
+def message_factory(authenticated_user, message: ResponseMessage) -> AnyUI:
+    return {
+        'user': lambda: c.ChatBubble(content=message.content,
+                                     is_self=message.created_by == authenticated_user.email,
+                                     user=message.user.capitalize(),
+                                     image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
+                                     time=format_datetime_human_readable(message.timestamp.created, 3)),
+        'assistant': lambda: c.ChatBubble(content=message.content,
+                                          is_self=message.created_by == authenticated_user.email,
+                                          user=message.user.capitalize(),
+                                          image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
+                                          time=format_datetime_human_readable(message.timestamp.created, 3)),
+    }[message.user if message.user == 'assistant' else 'user']()
+
+
 def two_column_layout(left: list[AnyUI], right: list[AnyUI]) -> list[AnyUI]:
     return [
         c.Div(
@@ -31,7 +46,7 @@ def two_column_layout(left: list[AnyUI], right: list[AnyUI]) -> list[AnyUI]:
     ]
 
 
-def table_index(
+def QuestionsDataTable(
         data: list,
         columns: list[dict],
         query_params: dict,
@@ -91,7 +106,7 @@ def table_index(
     )
 
 
-def question_form(view, submit_url: str):
+def QuestionForm(view, submit_url: str):
     return view(
         [c.Div(components=[
             c.Div(components=[
@@ -139,27 +154,8 @@ def question_form(view, submit_url: str):
     )
 
 
-def message_factory(authenticated_user, message: ResponseMessage) -> AnyUI:
-    return {
-        'user': lambda: c.ChatBubble(content=message.content,
-                                     is_self=message.created_by == authenticated_user.email,
-                                     user=message.user.capitalize(),
-                                     image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
-                                     time=format_datetime_human_readable(message.timestamp.created, 3)),
-        'assistant': lambda: c.ChatBubble(content=message.content,
-                                          is_self=message.created_by == authenticated_user.email,
-                                          user=message.user.capitalize(),
-                                          image_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxLjI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNSIvPjxwYXRoIGQ9Ik0yMCAyMWE4IDggMCAwIDAtMTYgMCIvPjwvc3ZnPg==',
-                                          time=format_datetime_human_readable(message.timestamp.created, 3)),
-    }[message.user if message.user == 'assistant' else 'user']()
-
-
-def review_details(user: ProjectUser, question: QuestionDetails, view):
-    components = [
-        *[message_factory(user, message) for message in question.messages],
-    ]
-
-    render_form = ({
+def ReviewDetails(user: ProjectUser, question: QuestionDetails, view):
+    review_state = {
         'open': lambda: [
             c.Form(
                 submit_url=f'/api/questions/{question.id}/feedback',
@@ -204,13 +200,14 @@ def review_details(user: ProjectUser, question: QuestionDetails, view):
         ],
         'approved': lambda: [],
         'rejected': lambda: [],
+        'blocked': lambda: [],
         'null': lambda: [],
-    }[question.review_status])
+    }
 
     return view(
         two_column_layout(
-            left=components,
-            right=[*render_form()],
+            left=[message_factory(user, message) for message in question.messages],
+            right=review_state[question.review_status]()
         ),
         'Review: ' + str(question.subject)
     )

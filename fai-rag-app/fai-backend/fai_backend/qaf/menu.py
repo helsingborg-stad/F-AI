@@ -7,9 +7,9 @@ from fai_backend.schema import ProjectUser
 from fai_backend.views import permission_required
 
 
-async def build_qa_menu_items(
+async def qa_menu_loader(
         project_user: ProjectUser,
-        qaf_service: QAFService
+        qaf_service: QAFService,
 ) -> list[tuple[str, str, str]]:
     status_tabs = ['open', 'in-progress', 'rejected', 'approved']
 
@@ -43,6 +43,7 @@ def qa_menu(
             variant='vertical',
             sub_menu=True,
             icon_src=icons['messages_square'],
+            class_name='qa-menu',
             components=[
                 c.Link(
                     text=_('show_all', 'Visa alla'),
@@ -64,7 +65,7 @@ def qa_menu(
                     text=_('Add new question'),
                     url='/questions/create',
                     active='/questions/create',
-                    icon_src=icons['square_pen'],
+                    icon_src=icons['plus'],
                 ),
             ],
         ),
