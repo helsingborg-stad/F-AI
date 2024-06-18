@@ -20,7 +20,7 @@ FROM python:3.11.9-slim-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
-  libmagic-dev \
+  libmagic1 \
   libgl1 \
   libgl1-mesa-glx \
   libglib2.0-0
