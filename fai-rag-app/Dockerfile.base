@@ -19,7 +19,6 @@ RUN rm -rf ./src/fai_backend
 FROM python:3.11.9-slim-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  curl \
   build-essential \
   libmagic-dev \
   libgl1 \
