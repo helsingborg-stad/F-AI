@@ -24,10 +24,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libmagic-dev \
   libgl1 \
   libgl1-mesa-glx \
-  libglib2.0-0 \
+  libglib2.0-0
+
+# Needed for images and PDFs.
+RUN apt-get install -y --no-install-recommends \
   poppler-utils \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+  tesseract-ocr
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ENV POETRY_HOME="/opt/poetry" \
   POETRY_CACHE_DIR="/tmp/poetry_cache" \
