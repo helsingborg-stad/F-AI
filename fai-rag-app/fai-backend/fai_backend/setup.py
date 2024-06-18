@@ -1,3 +1,6 @@
+import json
+import os
+
 from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
@@ -43,120 +46,20 @@ async def setup_project():
                 )
             }
 
+        assistant_templates_dir = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                                '../../../data/assistant-templates'))
+        initial_assistants = \
+            [
+                AssistantTemplate(**json.loads(open(os.path.join(assistant_templates_dir, f)).read()))
+                for f in os.listdir(assistant_templates_dir)
+                if f.endswith('.json')
+            ] if os.path.exists(assistant_templates_dir) else []
+
         initial_project = await projects_repo.create(
             ProjectModel(
                 name='Project',
                 creator=settings.APP_ADMIN_EMAIL,
-                assistants=[
-                    AssistantTemplate(
-                        id='example',
-                        name='Example Assistant',
-                        streams=[LLMStreamDef(
-                            name='ChatStream',
-                            settings=LLMStreamSettings(model='gpt-4o'),
-                            messages=[
-                                LLMStreamMessage(
-                                    role='system',
-                                    content="You are a helpful AI assistant that helps people with answering "
-                                            "questions related to municipality and Helsingborg City. The "
-                                            "questions are going to be asked in Swedish. Your response must "
-                                            "always be in Swedish."
-                                ),
-                                LLMStreamMessage(
-                                    role='user',
-                                    content="{query}"
-                                )
-                            ]
-                        )],
-                    ),
-                    AssistantTemplate(
-                        id='multi_example',
-                        name='Multi-stream Example',
-                        streams=[
-                            LLMStreamDef(
-                                name='First Stream',
-                                settings=LLMStreamSettings(model='gpt-4o'),
-                                messages=[
-                                    LLMStreamMessage(
-                                        role='system',
-                                        content="Make this text sound more fancy and verbose."
-                                    ),
-                                    LLMStreamMessage(
-                                        role='user',
-                                        content="{query}"
-                                    )
-                                ]
-                            ),
-                            LLMStreamDef(
-                                name='Second Stream',
-                                settings=LLMStreamSettings(model='gpt-4o'),
-                                messages=[
-                                    LLMStreamMessage(
-                                        role='system',
-                                        content="Repeat back any text verbatim and count the number of words"
-                                    ),
-                                    LLMStreamMessage(
-                                        role='user',
-                                        content="{last_input}"
-                                    )
-                                ]
-                            )
-                        ]
-                    ),
-                    AssistantTemplate(
-                        id='rag_example',
-                        name='RAG (document) Example',
-                        files_collection_id='Upload files in the Assistant Creation UI',
-                        streams=[LLMStreamDef(
-                            name='RagStream',
-                            settings=LLMStreamSettings(model='gpt-4o'),
-                            messages=[
-                                LLMStreamMessage(
-                                    role='system',
-                                    content="Explain what this is and repeat back an excerpt of it."
-                                ),
-                                LLMStreamMessage(
-                                    role='user',
-                                    content="{rag_results}"
-                                )
-                            ]
-                        )]
-                    ),
-                    AssistantTemplate(
-                        id='planning',
-                        name='Planning Assistant',
-                        files_collection_id='Upload files in the Assistant Creation UI',
-                        streams=[
-                            LLMStreamDef(
-                                name='ChatStream',
-                                settings=LLMStreamSettings(
-                                    model='gpt-4o'
-                                ),
-                                messages=[
-                                    LLMStreamMessage(
-                                        role='system',
-                                        content="You are a helpful AI assistant that helps people with answering "
-                                                "questions about planning permission.<br> If you can't find the "
-                                                "answer in the search result below, just say (in Swedish) \"Tyvärr "
-                                                "kan jag inte svara på det.\" Don't try to make up an answer.<br> If "
-                                                "the question is not related to the context, politely respond that "
-                                                "you are tuned to only answer questions that are related to the "
-                                                "context.<br> The questions are going to be asked in Swedish. Your "
-                                                "response must always be in Swedish."
-                                    ),
-                                    LLMStreamMessage(
-                                        role='user',
-                                        content='{query}'
-                                    ),
-                                    LLMStreamMessage(
-                                        role='user',
-                                        content='Here are the results of the search:\n\n {rag_results}'
-                                    )
-                                ]
-                            )
-                        ]
-                    )
-                ],
+                assistants=initial_assistants,
                 members=[
                     ProjectMember(
                         email=settings.APP_ADMIN_EMAIL,

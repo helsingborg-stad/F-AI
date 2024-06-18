@@ -26,6 +26,8 @@ class AssistantTemplate(BaseModel):
     id: str
     name: str
     files_collection_id: Optional[str] = None
+    description: Optional[str] = None
+    sample_questions: list[str] = []
     streams: List[LLMStreamDef]
 
 

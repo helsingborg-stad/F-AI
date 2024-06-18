@@ -149,6 +149,6 @@ Pipfile.lock
 pyrightconfig.json
 
 # Project specific ignores (add your own here)
-data/
+src/planning_permission/data/
 output/
 *.xlsx
