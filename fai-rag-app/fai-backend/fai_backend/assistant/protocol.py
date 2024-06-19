@@ -16,6 +16,4 @@ class ILLMProtocol(Protocol):
 
 class IAssistantStreamProtocol(Protocol):
     async def create_stream(self, stream_def: LLMStreamDef, get_vars: Callable[[], dict]) -> Stream[str, str]:
-        """
-
-        """
+        ...
