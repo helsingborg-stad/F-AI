@@ -32,6 +32,24 @@
   let currentMessageInput: string = "";
   let eventSource: EventSource | null = null;
 
+  let contentScrollDiv: Element;
+  let isContentAtBottom: Boolean = true;
+
+  $: isContentAtBottom = messages.length == 0 || isContentAtBottom;
+
+  function handleContentScroll() {
+    const scrollPadding = 10;
+
+    const isScrollable = contentScrollDiv.scrollHeight > contentScrollDiv.clientHeight || contentScrollDiv.scrollWidth > contentScrollDiv.clientWidth;
+
+    isContentAtBottom = !isScrollable || (contentScrollDiv.scrollHeight - contentScrollDiv.scrollTop < contentScrollDiv.clientHeight + scrollPadding);
+    console.log(`contentAtBottom ${isContentAtBottom} scrollHeight ${contentScrollDiv.scrollHeight} scrollTop: ${contentScrollDiv.scrollTop} clientHeight: ${contentScrollDiv.clientHeight}`);
+  }
+
+  function scrollContentToBottom() {
+    contentScrollDiv.scrollTop = contentScrollDiv.scrollHeight;
+  }
+
   function addErrorMessage(message: string) {
     messages = [...messages, {
       id: `error${messages.length}`,
@@ -127,23 +145,29 @@
   }
 </script>
 
-<Div class="flex gap-5 p-5 flex-col items-center justify-center h-full overflow-hidden grow">
+<Div class="h-full relative">
 
   <!-- Document picker -->
-  <select
-    class="select select-bordered w-full max-w-xs"
-    bind:value={selectedAssistant}>
-    <option disabled selected value="">Choose assistant</option>
-    {#each assistants as assistant (`${assistant.project}/${assistant.id}`)}
-      <option value={`${assistant.project}/${assistant.id}`}>{assistant.name}</option>
-    {/each}
-  </select>
+  <Div class="h-20 p-4 absolute inset-x-0 top-0 flex justify-center">
+    <select
+      class="select select-bordered w-full max-w-xs"
+      bind:value={selectedAssistant}>
+      <option disabled selected value="">Choose assistant</option>
+      {#each assistants as assistant (`${assistant.project}/${assistant.id}`)}
+        <option value={`${assistant.project}/${assistant.id}`}>{assistant.name}</option>
+      {/each}
+    </select>
+  </Div>
 
   <!-- Chat content -->
-  <Div class="w-full grow flex flex-col gap-2 items-center justify-center overflow-hidden">
+  <Div class="w-full grow flex flex-col gap-2 items-center justify-center absolute top-20 bottom-24">
 
     <!-- Chat bubbles -->
-    <div class="grow w-full max-w-prose">
+    <div
+      class="grow w-full relative max-w-prose overflow-scroll"
+      bind:this={contentScrollDiv}
+      on:scroll={handleContentScroll}
+    >
       {#each messages as message (message.id)}
         <ChatBubble
           user={message.user}
@@ -161,6 +185,17 @@
       <span class="loading loading-spinner" class:opacity-0={!eventSource} />
     </div>
 
+
+    <div class="flex justify-center absolute inset-x-0 bottom-20"
+         class:hidden={isContentAtBottom}
+    >
+      <Button
+        onClick={scrollContentToBottom}
+        label=""
+        iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg=="
+      />
+    </div>
+
     <!-- Clear button -->
     {#if messages.length > 0}
       <Button
@@ -172,21 +207,23 @@
   </Div>
 
   <!-- Form controls -->
-  <form class="w-full">
-    <fieldset disabled={!selectedAssistant}>
-      <Div class="flex gap-2 w-full items-end">
+  <Div class="h-24 p-3 absolute inset-x-0 bottom-0">
+    <form class="w-full">
+      <fieldset disabled={!selectedAssistant}>
+        <Div class="flex gap-2 w-full items-end">
         <textarea
           name="message"
           bind:value={currentMessageInput}
           on:keydown={handleTextareaKeypress}
           class="textarea textarea-bordered grow"
         />
-        <Button
-          onClick={()=>createSSE(currentMessageInput)}
-          label=""
-          iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlbmQiPjxwYXRoIGQ9Im0yMiAyLTcgMjAtNC05LTktNFoiLz48cGF0aCBkPSJNMjIgMiAxMSAxMyIvPjwvc3ZnPg=="
-        />
-      </Div>
-    </fieldset>
-  </form>
+          <Button
+            onClick={()=>createSSE(currentMessageInput)}
+            label=""
+            iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlbmQiPjxwYXRoIGQ9Im0yMiAyLTcgMjAtNC05LTktNFoiLz48cGF0aCBkPSJNMjIgMiAxMSAxMyIvPjwvc3ZnPg=="
+          />
+        </Div>
+      </fieldset>
+    </form>
+  </Div>
 </Div>
