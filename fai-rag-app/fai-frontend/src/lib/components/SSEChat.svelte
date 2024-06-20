@@ -2,6 +2,7 @@
   import Div from "./Div.svelte";
   import Button from "./Button.svelte";
   import ChatBubble from "./ChatBubble.svelte";
+  import SvelteMarkdown from "svelte-markdown";
 
   interface SSEMessage {
     type: string;
@@ -22,12 +23,13 @@
     id: string;
     name: string;
     project: string;
+    description: string;
   }
 
   export let endpoint: string;
   export let assistants: Assistant[];
 
-  let selectedAssistant: string;
+  let selectedAssistantId: string;
   let messages: ChatMessage[] = [];
   let currentMessageInput: string = "";
   let eventSource: EventSource | null = null;
@@ -43,7 +45,6 @@
     const isScrollable = contentScrollDiv.scrollHeight > contentScrollDiv.clientHeight || contentScrollDiv.scrollWidth > contentScrollDiv.clientWidth;
 
     isContentAtBottom = !isScrollable || (contentScrollDiv.scrollHeight - contentScrollDiv.scrollTop < contentScrollDiv.clientHeight + scrollPadding);
-    console.log(`contentAtBottom ${isContentAtBottom} scrollHeight ${contentScrollDiv.scrollHeight} scrollTop: ${contentScrollDiv.scrollTop} clientHeight: ${contentScrollDiv.clientHeight}`);
   }
 
   function scrollContentToBottom() {
@@ -96,7 +97,9 @@
 
       closeSSE();
 
-      eventSource = new EventSource(`${endpoint}/${selectedAssistant}?question=${question}`);
+      const selectedAssistant = assistants.find(a => a.id === selectedAssistantId)!;
+
+      eventSource = new EventSource(`${endpoint}/${selectedAssistant.project}/${selectedAssistant.id}?question=${question}`);
 
       eventSource.onerror = (e) => {
         addErrorMessage(`unknown error / ${e}`);
@@ -151,10 +154,10 @@
   <Div class="h-20 p-4 absolute inset-x-0 top-0 flex justify-center">
     <select
       class="select select-bordered w-full max-w-xs"
-      bind:value={selectedAssistant}>
+      bind:value={selectedAssistantId}>
       <option disabled selected value="">Choose assistant</option>
       {#each assistants as assistant (`${assistant.project}/${assistant.id}`)}
-        <option value={`${assistant.project}/${assistant.id}`}>{assistant.name}</option>
+        <option value={assistant.id}>{assistant.name}</option>
       {/each}
     </select>
   </Div>
@@ -177,8 +180,12 @@
         />
       {:else}
         <div class="prose text-center">
-          <p>Here you can chat with any specialized assistant that has been created for you.</p>
-          <p>Choose an assistant from the dropdown to begin.</p>
+          {#if selectedAssistantId}
+            <SvelteMarkdown source={assistants.find(a => a.id === selectedAssistantId)?.description} />
+          {:else}
+            <p>Here you can chat with any specialized assistant that has been created for you.</p>
+            <p>Choose an assistant from the dropdown to begin.</p>
+          {/if}
         </div>
       {/each}
 
@@ -209,7 +216,7 @@
   <!-- Form controls -->
   <Div class="h-24 p-3 absolute inset-x-0 bottom-0">
     <form class="w-full">
-      <fieldset disabled={!selectedAssistant}>
+      <fieldset disabled={!selectedAssistantId}>
         <Div class="flex gap-2 w-full items-end">
         <textarea
           name="message"

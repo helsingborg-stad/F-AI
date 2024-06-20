@@ -267,6 +267,7 @@ class Assistant(BaseModel):
     id: str
     name: str
     project: str
+    description: str
 
 
 class SSEChat(UIComponent):
