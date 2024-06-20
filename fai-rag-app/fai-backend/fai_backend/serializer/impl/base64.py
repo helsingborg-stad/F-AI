@@ -2,7 +2,7 @@ import base64
 
 from pydantic import BaseModel
 
-from fai_backend.llm.serializer.protocol import ISerializer
+from fai_backend.serializer.protocol import ISerializer
 
 
 class Base64Serializer(ISerializer):

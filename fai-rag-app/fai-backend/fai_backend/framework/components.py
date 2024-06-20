@@ -263,9 +263,15 @@ class SSEDocument(BaseModel):
     name: str
 
 
+class Assistant(BaseModel):
+    id: str
+    name: str
+    project: str
+
+
 class SSEChat(UIComponent):
     type: Literal['SSEChat'] = 'SSEChat'
-    documents: list[SSEDocument]
+    assistants: list[Assistant]
     endpoint: str
 
 
