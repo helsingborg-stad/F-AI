@@ -25,7 +25,7 @@ RUN pip install poetry && pip install poetry-plugin-export
 
 COPY ./fai-backend/pyproject.toml ./fai-backend/poetry.lock* ./
 
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
+RUN poetry export -f requirements.txt -o requirements.txt --without-hashes --with unstructured
 
 
 # Stage: Build the final image with the backend and the frontend
