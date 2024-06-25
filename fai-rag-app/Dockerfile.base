@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
-# Stage 1: Build the frontend
-FROM node:lts-bookworm-slim as frontend-builder
+# Stage: Build the frontend and copy the static files to the backend
+FROM node:lts-bookworm-slim AS frontend-builder
 
 WORKDIR /app/fai-frontend
 
@@ -54,7 +54,4 @@ COPY ./fai-backend/fai_backend ./fai_backend
 COPY --from=frontend-builder /app/fai-frontend/dist ./fai_backend/static
 RUN rm -rf /app/fai-frontend
 
-ENV HOST=0.0.0.0
-ENV PORT=80
-
-CMD uvicorn fai_backend.main:app --host $HOST --port $PORT
+CMD ["uvicorn", "fai_backend.main:app", "--host", "0.0.0.0",  "--port", "80"]
