@@ -15,7 +15,20 @@ COPY fai-backend/fai_backend ./src/fai_backend
 RUN npm run build
 RUN rm -rf ./src/fai_backend
 
-# Stage 2: Set up the backend
+
+# Stage: Build requirements for the backend
+FROM python:3.11.9-slim-bookworm AS requirements-stage
+
+WORKDIR /tmp
+
+RUN pip install poetry && pip install poetry-plugin-export
+
+COPY ./fai-backend/pyproject.toml ./fai-backend/poetry.lock* ./
+
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+
+# Stage: Buiqld the final image with the backend and the frontend
 FROM python:3.11.9-slim-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -32,22 +45,11 @@ RUN apt-get install -y --no-install-recommends \
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV POETRY_HOME="/opt/poetry" \
-  POETRY_CACHE_DIR="/tmp/poetry_cache" \
-  POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_NO_INTERACTION=1 \
-  PATH="$POETRY_HOME/bin:$PATH"
-
-# RUN curl -sSL https://install.python-poetry.org | python3 -
-RUN pip install poetry
-
 WORKDIR /app
 
-COPY ./fai-backend/poetry.lock ./fai-backend/pyproject.toml ./
+COPY --from=requirements-stage /tmp/requirements.txt .
 
-RUN poetry lock --no-update
-RUN poetry install --only main --no-root
-RUN rm -rf $POETRY_CACHE_DIR
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 COPY ./fai-backend/fai_backend ./fai_backend
 
