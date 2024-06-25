@@ -7,13 +7,13 @@ from fai_backend.dependencies import (
     get_page_template_for_logged_in_users,
     get_project_user,
 )
-from fai_backend.files.dependecies import get_file_upload_service
-from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.llm.service import ask_llm_question, ask_llm_raq_question
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
+from fai_backend.projects.dependencies import list_projects_request
+from fai_backend.projects.schema import ProjectResponse
 from fai_backend.qaf.dependencies import (
     add_answer_action,
     add_feedback_action,
@@ -57,20 +57,24 @@ async def llm_raq_question_endpoint(
 
 @router.get('/chat', response_model=list, response_model_exclude_none=True)
 def chat_index_view(
-        file_service: FileUploadService = Depends(get_file_upload_service),
         authenticated_user: User | None = Depends(get_project_user),
         view=Depends(get_page_template_for_logged_in_users),
+        projects: list[ProjectResponse] = Depends(list_projects_request),
 ) -> list:
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
-    documents = [{'id': doc.collection, 'name': doc.file_name} for doc in
-                 file_service.list_files(authenticated_user.project_id)]
+    assistants = [c.Assistant(
+        id=a.id,
+        name=a.name,
+        project=p.id,
+        description=a.description,
+    ) for p in projects for a in p.assistants]
 
     return view(
         [c.SSEChat(
-            documents=documents,
-            endpoint='/api/chat-stream'
+            assistants=assistants,
+            endpoint='/api/assistant-stream'
         )],
         _('chat', 'Chat'),
     )

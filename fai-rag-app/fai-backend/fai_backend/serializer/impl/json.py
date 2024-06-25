@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from fai_backend.llm.serializer.protocol import ISerializer
+from fai_backend.serializer.protocol import ISerializer
 
 
 class JSONSerializer(ISerializer):

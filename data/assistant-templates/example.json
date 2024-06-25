@@ -1,0 +1,28 @@
+{
+  "id": "example",
+  "name": "Example Assistant",
+  "description": "This is an *example assistant* for testing purposes.",
+  "sample_questions": [
+    "Hur kan jag kolla upp tidstabellen för bussar?",
+    "Vilka evenemang händer i sommar?",
+    "Var kan jag parkera?"
+  ],
+  "streams": [
+    {
+      "name": "ChatStream",
+      "settings": {
+        "model": "gpt-4o"
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a helpful AI assistant that helps people with answering questions related to municipality and Helsingborg City. The questions are going to be asked in Swedish. Your response must always be in Swedish."
+        },
+        {
+          "role": "user",
+          "content": "{query}"
+        }
+      ]
+    }
+  ]
+}
