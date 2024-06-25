@@ -12,6 +12,6 @@
     $: Tag = `h${Math.min(6, Math.max(1, level))}` as keyof HTMLElementTagNameMap
 </script>
 
-<Text element={Tag} {...$$props}>
+<Text element={Tag} {...$$props} {...$$restProps}>
     <slot>{text}</slot>
 </Text>

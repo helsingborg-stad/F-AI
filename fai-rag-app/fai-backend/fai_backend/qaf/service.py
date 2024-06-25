@@ -1,15 +1,22 @@
+from typing import Literal
+
+from pydantic import BaseModel, computed_field
+
 from fai_backend.conversations.models import Conversation, Feedback, Message
+from fai_backend.conversations.schema import ResponseMessage
 from fai_backend.logger.console import console
 from fai_backend.qaf.schema import (
     ApproveAnswerPayload,
     GenerateAnswerPayload,
     QuestionDetails,
     QuestionEntry,
+    QuestionFilterParams,
     RejectAnswerPayload,
     SubmitAnswerPayload,
 )
 from fai_backend.repositories import ConversationRepository, conversation_repo
-from fai_backend.schema import ProjectUser
+from fai_backend.repository.query.component import AttributeAssignment, LogicalExpression
+from fai_backend.schema import ProjectUser, Timestamp
 from fai_backend.utils import try_get_first_match
 
 
@@ -29,6 +36,7 @@ class QAFService:
             project_user: ProjectUser,
             question: str,
             meta: dict,
+            tags: list[str] | None = None,
     ) -> QuestionDetails:
         conversation = await self.conversations.create(
             Conversation(
@@ -44,32 +52,51 @@ class QAFService:
                         type='question'
                     )
                 ],
-                metadata=meta
+                metadata=meta,
+                tags=tags
             )
         )
 
-        return QuestionDetails(**conversation.model_dump()) if conversation else None
+        return self._to_question(conversation) if conversation else None
 
-    async def my_questions(self, project_user: ProjectUser) -> list[QuestionEntry]:
-        return [QuestionEntry(**conversation.model_dump()) for conversation in await self.conversations.list() if
-                conversation.type == 'question' and project_user.email in conversation.created_by]
+    async def list_my_questions(self, project_user: ProjectUser) -> list[QuestionEntry]:
+
+        return [self._to_question(conversation) for conversation in
+                await self.conversations.list(query=LogicalExpression('AND', [
+                    AttributeAssignment('type', 'question'),
+                    AttributeAssignment('created_by', project_user.email)
+                ]))]
 
     async def my_question_details(self, project_user: ProjectUser, question_id: str) -> QuestionDetails | None:
         conversation = await self.conversations.get(question_id)
         if conversation and conversation.created_by != project_user.email:
             raise PermissionError('User does not have permission to view this question')
-        return QuestionDetails(**conversation.model_dump()) if conversation else None
+        return self._to_question(conversation) if conversation else None
 
-    async def submitted_questions(self, project_user: ProjectUser) -> list[QuestionEntry]:
-        return [QuestionEntry(**conversation.model_dump()) for conversation in await self.conversations.list() if
-                conversation.type == 'question' and project_user.email in conversation.created_by]
+    async def list_submitted_questions(self, project_user: ProjectUser, query_params: QuestionFilterParams) -> list[
+        QuestionEntry]:
 
-    async def submitted_question_details(self, project_user: ProjectUser,
-                                         question_id: str) -> QuestionDetails | None:
+        db_query = LogicalExpression('AND', [
+            AttributeAssignment('type', 'question'),
+            AttributeAssignment('created_by', project_user.email)
+        ])
+
+        questions = [self._to_question(conversation) for conversation in await self.conversations.list(
+            query=db_query,
+            sort_by=query_params.sort,
+            sort_order=query_params.sort_order
+        )]
+
+        return list(filter(lambda question: (
+                (not query_params.status or question.status == query_params.status)
+                and (not query_params.review_status or question.review_status == query_params.review_status)
+        ), questions))
+
+    async def submitted_question_details(self, project_user: ProjectUser, question_id: str) -> QuestionDetails | None:
         conversation = await self.conversations.get(question_id)
         if conversation.created_by != project_user.email:
             raise PermissionError('User does not have permission to view this question')
-        return QuestionDetails(**conversation.model_dump()) if conversation else None
+        return self._to_question(conversation) if conversation else None
 
     async def add_message(self, project_user: ProjectUser,
                           payload: SubmitAnswerPayload | GenerateAnswerPayload) -> QuestionDetails | None:
@@ -96,7 +123,7 @@ class QAFService:
             }['assistant' if isinstance(payload, GenerateAnswerPayload) else 'user']()
 
             result = await self.conversations.update(str(conversation.id), {'messages': conversation.messages})
-            return QuestionDetails(**result.model_dump())
+            return self._to_question(result)
         except Exception:
             console.print_exception(show_locals=False)
 
@@ -122,10 +149,86 @@ class QAFService:
             )
 
             result = await self.conversations.update(str(conversation.id), {'messages': conversation.messages})
-            return QuestionDetails(**result.model_dump())
+            return self._to_question(result)
         except Exception:
             console.print_exception(show_locals=False)
             raise
+
+    def _to_question(self, conversation: Conversation) -> QuestionDetails:
+        return QuestionDetails.model_validate({
+            **conversation.model_dump(),
+            **self._QuestionState(conversation=conversation).model_dump()
+        })
+
+    class _QuestionState(BaseModel):
+        conversation: Conversation
+
+        @computed_field
+        def timestamp(self) -> Timestamp:
+            return Timestamp(
+                created=self.conversation.messages[0].timestamp.created,
+                modified=self.conversation.messages[-1].timestamp.modified
+            )
+
+        @computed_field
+        def subject(self) -> str:
+            return self.conversation.metadata['subject']
+
+        @computed_field
+        def errand_id(self) -> str:
+            return self.conversation.metadata['errand_id']
+
+        @computed_field
+        def status(self) -> Literal['open', 'pending', 'answered', 'resolved', 'closed']:
+            if try_get_first_match(
+                    self.conversation.messages,
+                    lambda message: message.type == 'event' and message.content == 'user_closed_question'
+            ):
+                return 'closed'
+            elif len(self.conversation.messages) == 1:
+                return 'open'
+            elif self.review_status == 'approved':
+                return 'resolved'
+            elif len(self.conversation.messages) > 1 and self.answer is None:
+                return 'pending'
+
+        @computed_field
+        def review_status(self) -> Literal['approved', 'rejected', 'in-progress', 'closed', 'blocked', 'open'] | None:
+            generated_answer = try_get_first_match(
+                self.conversation.messages,
+                lambda message: message.type == 'generated_answer'
+            )
+
+            if not generated_answer:
+                return 'blocked'
+
+            if generated_answer and len(generated_answer.feedback) == 0:
+                return 'open'
+
+            if generated_answer.feedback[0].rating == 'approved':
+                return 'approved'
+
+            if generated_answer.feedback[0].rating == 'rejected':
+                if self.answer is None:
+                    return 'in-progress'
+                return 'rejected'
+
+            return None
+
+        @computed_field
+        def answer(self) -> ResponseMessage | None:
+            answer = try_get_first_match(
+                self.conversation.messages,
+                lambda message: message.type == 'answer' or
+                                message.type == 'generated_answer'
+                                and len(message.feedback) > 0
+                                and message.feedback[0].rating == 'approved'
+            )
+            return ResponseMessage.model_validate(answer.model_dump()) if answer is not None else None
+
+        @computed_field
+        def question(self) -> ResponseMessage:
+            return ResponseMessage.model_validate(self.conversation.messages[0].model_dump())
 
     @staticmethod
     def factory() -> 'QAFService':

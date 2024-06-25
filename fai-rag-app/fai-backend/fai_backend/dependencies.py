@@ -9,8 +9,11 @@ from fai_backend.auth.dependencies import (
 )
 from fai_backend.auth.schema import TokenPayload
 from fai_backend.auth.service import AuthService
+from fai_backend.documents.menu import menu_items as document_menu_items
+from fai_backend.qaf.menu import qa_menu, qa_menu_loader
+from fai_backend.qaf.service import QAFService
 from fai_backend.schema import ProjectUser, User
-from fai_backend.views import mock_menu, page_template, questions_menu, reviewer_menu
+from fai_backend.views import chat_menu, mock_menu, page_template
 
 
 async def try_get_authenticated_user(
@@ -51,16 +54,29 @@ async def get_project_user(
     return user
 
 
-async def get_page_template_for_logged_in_users(project_user: ProjectUser = Depends(get_project_user)) \
-        -> Callable[[list[Any] | Any, str | None], list[Any]]:
-    permissions = list(map(lambda x: x[0], filter(lambda x: x[1], project_user.permissions.items())))
+def get_project_user_permissions(
+        project_user: ProjectUser = Depends(get_project_user),
+) -> list[str]:
+    return list(map(lambda x: x[0], filter(lambda x: x[1], project_user.permissions.items())))
 
+
+async def get_page_template_for_logged_in_users(
+        permissions: list[str] = Depends(get_project_user_permissions),
+        project_user: ProjectUser = Depends(get_project_user),
+        qaf_service: QAFService = Depends(QAFService.factory),
+) -> Callable[[list[Any] | Any, str | None], list[Any]]:
+    menu_args = {
+        'qa_menu': {
+            'items': await qa_menu_loader(project_user, qaf_service),
+        }
+    }
     return (lambda components, page_title: page_template(
         *components if isinstance(components, list) else [components],
         page_title=page_title,
         menus=[
-            *questions_menu(user_permissions=permissions),
-            *reviewer_menu(user_permissions=permissions),
+            *chat_menu(user_permissions=permissions),
+            *(qa_menu(user_permissions=permissions, **menu_args['qa_menu'])),
+            *document_menu_items(),
             *mock_menu(user_permissions=permissions),
         ]
     ))

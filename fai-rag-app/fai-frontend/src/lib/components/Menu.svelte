@@ -2,7 +2,7 @@
     import MenuSlot from "./MenuSlot.svelte"
     import type {IRenderableComponent} from "../types"
     import AsComponent, {type component} from "./common/AsComponent.svelte"
-    import InlineSvgIcon from "./SVG.svelte";
+    import SVG from "./SVG.svelte";
 
     export let title: string | null = null
     export let subMenu: boolean | null = null
@@ -36,10 +36,10 @@
 </AsComponent>
 
 {#if subMenu}
-    <details class:group={subMenu} {open}>
+    <details {open}>
         <summary>
             {#if iconSrc}
-                <InlineSvgIcon
+                <SVG
                         state={iconState}
                         src={iconSrc}/>
             {/if}
@@ -57,7 +57,7 @@
         class:menu-sm={size === 'sm'}
         class:menu-md={size === 'md'}
         class:menu-lg={size === 'lg'}
-        {...$$props}>
+        {...$$restProps}>
         {#if title && !subMenu}
             <li class:menu-title={true}
                 class:text-xs={true}>

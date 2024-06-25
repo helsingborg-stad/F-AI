@@ -50,10 +50,10 @@ app.middleware('http')(remove_trailing_slash)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=['*'],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 frontend = get_frontend_environment(settings.ENV_MODE)
@@ -64,7 +64,7 @@ async def event_source_llm_generator(question: str, llm: ILLMProtocol):
     serializer = Base64Serializer()
     stream = await llm.create()
 
-    print(f"{llm=}")
+    print(f'{llm=}')
 
     async def generator():
         async for output in stream(question):
@@ -85,6 +85,8 @@ async def event_source_llm_generator(question: str, llm: ILLMProtocol):
         )
 
     return EventSourceResponse(generator())
+
+
 
 
 @app.get('/api/assistant-stream/{project}/{assistant}')

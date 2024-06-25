@@ -180,7 +180,8 @@ class Link(Text):
     element: None = Field(None, exclude=True)
     state: Literal['primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success'] | None = None
     underline: Literal['on-hover', 'always', 'never'] | bool | None = None
-    active: bool = False
+    active: bool | str = False
+    disabled: bool | None = None
 
 
 class AppContent(UIComponent):

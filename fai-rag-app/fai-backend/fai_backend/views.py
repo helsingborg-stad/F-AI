@@ -2,8 +2,8 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any, TypeVar, cast
 
-from fai_backend.documents.menu import menu_items as document_menu_items
 from fai_backend.framework import components as c
+from fai_backend.icons import icons
 from fai_backend.phrase import phrase as _
 
 T = TypeVar('T', bound=Callable[..., list[Any]])
@@ -12,12 +12,18 @@ T = TypeVar('T', bound=Callable[..., list[Any]])
 def permission_required(required_permissions: list[str]) -> Callable[[T], T]:
     def decorator(func: T) -> T:
         @wraps(func)
-        def wrapper(*args, user_permissions: list[str] | None = None, **kwargs) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
+            user_permissions = kwargs.get('user_permissions', [])
+
             if not user_permissions:
                 user_permissions = []
 
+            if user_permissions:
+                kwargs.pop('user_permissions')
+
             if not required_permissions or all(
-                    (permission in user_permissions) for permission in required_permissions):
+                    (permission in user_permissions) for permission in required_permissions
+            ):
                 return func(*args, **kwargs)
             else:
                 return []
@@ -28,79 +34,32 @@ def permission_required(required_permissions: list[str]) -> Callable[[T], T]:
 
 
 @permission_required(['can_ask_questions'])
-def questions_menu() -> list:
+def chat_menu() -> list:
     return [
-        c.Menu(
-            title=_('questions', 'Questions'),
-            id='questions-menu',
-            variant='vertical',
-            components=[
-                c.Link(
-                    text=_('submit_question', 'Submit a question'),
-                    url='/questions/create',
-                ),
-                c.Menu(
-                    title=_('my_questions', 'My Questions'),
-                    id='questions-menu',
-                    variant='vertical',
-                    sub_menu=True,
-                    components=[
-                        c.Link(
-                            text=_('show_all', 'Visa alla'),
-                            url='/questions'
-                        ),
-                    ],
-                ),
-                c.Link(
-                    text=_('chat', "Chat"),
-                    url='/chat'
-                )
-            ],
-        ),
-    ]
-
-
-@permission_required(['can_review_answers'])
-def reviewer_menu() -> list:
-    return [
-        c.Menu(
-            title=_('reviews', 'Reviews'),
-            id='reviewer-menu',
-            variant='vertical',
-            components=[
-                c.Link(
-                    text=_('inbox', 'Inbox'),
-                    url='/reviews',
-                    badge_state='accent',
-                )
-            ]
-        ),
+        c.Link(
+            text=_('chat', 'Chat'),
+            url='/chat',
+            icon_src=icons['message_square_more'],
+            active='/chat*'
+        )
     ]
 
 
 @permission_required(['can_edit_questions_and_answers'])
 def mock_menu() -> list:
     return [
-        c.Menu(
-            id='mock-menu',
-            variant='vertical',
-
-            components=[
-
-                c.Link(
-                    text=_('assistant', 'Assistant'),
-                    url='/',
-                    icon_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWJyYWluLWNpcmN1aXQiPjxwYXRoIGQ9Ik0xMiA0LjVhMi41IDIuNSAwIDAgMC00Ljk2LS40NiAyLjUgMi41IDAgMCAwLTEuOTggMyAyLjUgMi41IDAgMCAwLTEuMzIgNC4yNCAzIDMgMCAwIDAgLjM0IDUuNTggMi41IDIuNSAwIDAgMCAyLjk2IDMuMDggMi41IDIuNSAwIDAgMCA0LjkxLjA1TDEyIDIwVjQuNVoiLz48cGF0aCBkPSJNMTYgOFY1YzAtMS4xLjktMiAyLTIiLz48cGF0aCBkPSJNMTIgMTNoNCIvPjxwYXRoIGQ9Ik0xMiAxOGg2YTIgMiAwIDAgMSAyIDJ2MSIvPjxwYXRoIGQ9Ik0xMiA4aDgiLz48cGF0aCBkPSJNMjAuNSA4YS41LjUgMCAxIDEtMSAwIC41LjUgMCAwIDEgMSAwWiIvPjxwYXRoIGQ9Ik0xNi41IDEzYS41LjUgMCAxIDEtMSAwIC41LjUgMCAwIDEgMSAwWiIvPjxwYXRoIGQ9Ik0yMC41IDIxYS41LjUgMCAxIDEtMSAwIC41LjUgMCAwIDEgMSAwWiIvPjxwYXRoIGQ9Ik0xOC41IDNhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDAgMSAxIDBaIi8+PC9zdmc+'
-                ),
-                *document_menu_items(),
-                c.Link(
-                    text=_('users', 'Users'),
-                    url='/users',
-                    icon_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXJzLXJvdW5kIj48cGF0aCBkPSJNMTggMjFhOCA4IDAgMCAwLTE2IDAiLz48Y2lyY2xlIGN4PSIxMCIgY3k9IjgiIHI9IjUiLz48cGF0aCBkPSJNMjIgMjBjMC0zLjM3LTItNi41LTQtOGE1IDUgMCAwIDAtLjQ1LTguMyIvPjwvc3ZnPg=='
-                )
-
-            ]
+        c.Link(
+            text=_('assistant', 'Assistant'),
+            url='#',
+            disabled=True,
+            icon_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWJyYWluLWNpcmN1aXQiPjxwYXRoIGQ9Ik0xMiA0LjVhMi41IDIuNSAwIDAgMC00Ljk2LS40NiAyLjUgMi41IDAgMCAwLTEuOTggMyAyLjUgMi41IDAgMCAwLTEuMzIgNC4yNCAzIDMgMCAwIDAgLjM0IDUuNTggMi41IDIuNSAwIDAgMCAyLjk2IDMuMDggMi41IDIuNSAwIDAgMCA0LjkxLjA1TDEyIDIwVjQuNVoiLz48cGF0aCBkPSJNMTYgOFY1YzAtMS4xLjktMiAyLTIiLz48cGF0aCBkPSJNMTIgMTNoNCIvPjxwYXRoIGQ9Ik0xMiAxOGg2YTIgMiAwIDAgMSAyIDJ2MSIvPjxwYXRoIGQ9Ik0xMiA4aDgiLz48cGF0aCBkPSJNMjAuNSA4YS41LjUgMCAxIDEtMSAwIC41LjUgMCAwIDEgMSAwWiIvPjxwYXRoIGQ9Ik0xNi41IDEzYS41LjUgMCAxIDEtMSAwIC41LjUgMCAwIDEgMSAwWiIvPjxwYXRoIGQ9Ik0yMC41IDIxYS41LjUgMCAxIDEtMSAwIC41LjUgMCAwIDEgMSAwWiIvPjxwYXRoIGQ9Ik0xOC41IDNhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDAgMSAxIDBaIi8+PC9zdmc+'
         ),
+        c.Link(
+            text=_('users', 'Users'),
+            url='/users',
+            active='/users*',
+            icon_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXJzLXJvdW5kIj48cGF0aCBkPSJNMTggMjFhOCA4IDAgMCAwLTE2IDAiLz48Y2lyY2xlIGN4PSIxMCIgY3k9IjgiIHI9IjUiLz48cGF0aCBkPSJNMjIgMjBjMC0zLjM3LTItNi41LTQtOGE1IDUgMCAwIDAtLjQ1LTguMyIvPjwvc3ZnPg=='
+        )
     ]
 
 
@@ -109,10 +68,11 @@ def app_drawer(menus: list | None = None) -> list:
         c.AppDrawer(
             title='Folkets AI',
             components=[
-                *questions_menu(),
-                *reviewer_menu(),
-                *mock_menu(),
-            ] if not menus else menus
+                c.Menu(
+                    title=_('main_menu', 'Main menu'),
+                    components=[] if not menus else menus
+                ),
+            ]
         )
     ]
 
