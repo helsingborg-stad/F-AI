@@ -28,7 +28,7 @@ COPY ./fai-backend/pyproject.toml ./fai-backend/poetry.lock* ./
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 
-# Stage: Buiqld the final image with the backend and the frontend
+# Stage: Build the final image with the backend and the frontend
 FROM python:3.11.9-slim-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
