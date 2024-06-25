@@ -13,7 +13,6 @@ bcrypt = "~4.0.1"
 passlib = { extras = ["bcrypt"], version = "~1.7.4" }
 python-jose = { extras = ["cryptography"], version = "~3.3.0" }
 beanie = "~1.26.0"
-watchfiles = "~0.21.0"
 fastapi-jwt = "~0.2.0"
 rich = "~13.7.1"
 requests = "~2.32.3"
@@ -28,13 +27,29 @@ python-dotenv = "~1.0.1"
 unstructured = { extras = ["md", "pdf", "docx"], version = "0.13.7" }
 sse-starlette = "~2.1.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.test.dependencies]
 pytest = "~7.4.4"
 pytest-asyncio = "~0.23.7"
 pytest-cov = "~4.1.0"
 mongomock = "~4.1.2"
 mongomock-motor = "~0.0.26"
 fakeredis = "~2.23.2"
+
+[tool.poetry.group.dev.dependencies]
+watchfiles = "~0.21.0"
+ruff = "^0.1.11"
+Babel = "~2.9.1"
+
+[tool.ruff]
+line-length = 120
+extend-select = ["Q", "RUF100", "UP", "I"]
+flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
+format.quote-style = "single"
+target-version = "py311"
+
+[tool.coverage.run]
+source = ["fai-backend"]
+omit = []
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
