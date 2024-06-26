@@ -1,1 +1,39 @@
-SECRET_KEY="Lol"
+# General
+
+ENV_MODE='development'
+LOG_LEVEL="debug"
+DEFAULT_LANGUAGE="sv"
+FILE_PARSER="unstructured"
+LLM_BACKEND="openai"
+APP_DB="mongodb"
+APP_VECTOR_DB="chromadb"
+
+# Mongo DB
+
+MONGO_DB_NAME="some db name"
+MONGO_DB_URI="mongodb://admin:1234@localhost:27017"
+
+# AUTH / JWT
+
+SECRET_KEY="lol"
+
+# AUTH / Pin
+
+FIXED_PIN="1234"
+
+# MAIL
+
+MAIL_SENDER_NAME="some name"
+MAIL_SENDER_EMAIL="some email"
+MAIL_CLIENT="console"
+
+# MAIL / Brevo
+
+BREVO_API_URL="some brevo url"
+BREVO_API_KEY="some brevo api key"
+
+# Project Init
+
+APP_PROJECT_NAME="some name"
+APP_ADMIN_EMAIL="some email"
+OPENAI_API_KEY="some openai api key"
