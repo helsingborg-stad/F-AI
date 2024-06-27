@@ -25,7 +25,7 @@ cd F-AI/fai-rag-app/fai-backend
 ```
 
 ```bash
-poetry shell && poetry install --with unstructured
+poetry shell && poetry install --with dev,test,unstructured
 ```
 
 Setup mongodb as needed.
