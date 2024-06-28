@@ -31,7 +31,7 @@ poetry shell && poetry install --with dev,test,unstructured
 Setup mongodb as needed.
 
 ```bash
-cp .example-env .env
+cp .env.example .env
 ```
 
 Edit .env to fit your needs
