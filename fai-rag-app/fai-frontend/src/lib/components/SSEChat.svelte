@@ -151,7 +151,7 @@
 <Div class="h-full relative">
 
   <!-- Document picker -->
-  <Div class="h-20 p-4 absolute inset-x-0 top-0 flex justify-center">
+  <Div class="h-24 p-4 absolute inset-x-0 top-0 flex flex-col justify-center items-center">
     <select
       class="select select-bordered w-full max-w-xs"
       bind:value={selectedAssistantId}>
@@ -163,11 +163,11 @@
   </Div>
 
   <!-- Chat content -->
-  <Div class="w-full grow flex flex-col gap-2 items-center justify-center absolute top-20 bottom-24">
+  <Div class="w-full grow flex flex-col gap-2 items-center justify-center absolute top-24 bottom-28">
 
     <!-- Chat bubbles -->
     <div
-      class="grow w-full relative max-w-prose overflow-scroll"
+      class="grow w-full relative max-w-prose overflow-y-auto"
       bind:this={contentScrollDiv}
       on:scroll={handleContentScroll}
     >
@@ -214,15 +214,18 @@
   </Div>
 
   <!-- Form controls -->
-  <Div class="h-24 p-3 absolute inset-x-0 bottom-0">
-    <form class="w-full">
-      <fieldset disabled={!selectedAssistantId}>
-        <Div class="flex gap-2 w-full items-end">
+  <Div class="h-28 p-3 absolute inset-x-0 bottom-0">
+    <form class="w-full h-full">
+      <fieldset
+        disabled={!selectedAssistantId}
+        class="h-full"
+      >
+        <Div class="flex gap-2 w-full h-full items-end">
         <textarea
           name="message"
           bind:value={currentMessageInput}
           on:keydown={handleTextareaKeypress}
-          class="textarea textarea-bordered grow"
+          class="textarea textarea-bordered grow h-full"
         />
           <Button
             onClick={()=>createSSE(currentMessageInput)}
