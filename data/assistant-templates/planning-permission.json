@@ -1,18 +1,25 @@
 {
   "id": "planning",
-  "name": "Planning Assistant",
-  "files_collection_id": "Upload files in the Assistant Creation UI",
-  "description": "Den här assistenten är expert på att svara på frågor angående bygglov i Helsingborg Stad.",
+  "meta": {
+    "name": "Planning Assistant",
+    "description": "Den här assistenten är expert på att svara på frågor angående bygglov i Helsingborg Stad.",
+    "sample_questions": []
+  },
+  "files_collection_id": "<set by uploading files in editor ui>",
   "streams": [
     {
-      "name": "ChatStream",
+      "pipeline": "rag_scoring"
+    },
+    {
+      "provider": "openai",
       "settings": {
-        "model": "gpt-4o"
+        "model": "gpt-4o",
+        "temperature": 0
       },
       "messages": [
         {
           "role": "system",
-          "content": "You are a helpful AI assistant that helps people with answering questions about planning permission.<br> If you can't find the answer in the search result below, just say (in Swedish) \"Tyvärr kan jag inte svara på det.\" Don't try to make up an answer.<br> If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.<br> The questions are going to be asked in Swedish. Your response must always be in Swedish."
+          "content": "You are a helpful AI assistant that helps people with answering questions about planning permission.<br> If you can't find the answer in the search result below, just say (in Swedish) \\\"Tyvärr kan jag inte svara på det.\\\" Don't try to make up an answer.<br> If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.<br> The questions are going to be asked in Swedish. Your response must always be in Swedish."
         },
         {
           "role": "user",
@@ -20,7 +27,7 @@
         },
         {
           "role": "user",
-          "content": "Here are the results of the search:\n\n {rag_results}"
+          "content": "Here are the results of the search:\\n\\n {rag_output}"
         }
       ]
     }

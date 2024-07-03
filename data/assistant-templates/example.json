@@ -1,17 +1,20 @@
 {
   "id": "example",
-  "name": "Example Assistant",
-  "description": "This is an *example assistant* for testing purposes.",
-  "sample_questions": [
-    "Hur kan jag kolla upp tidstabellen för bussar?",
-    "Vilka evenemang händer i sommar?",
-    "Var kan jag parkera?"
-  ],
+  "meta": {
+    "name": "Example Assistant",
+    "description": "This is an *example assistant* for testing purposes.",
+    "sample_questions": [
+      "Hur kan jag kolla upp tidstabellen för bussar?",
+      "Vilka evenemang händer i sommar?",
+      "Var kan jag parkera?"
+    ]
+  },
   "streams": [
     {
-      "name": "ChatStream",
+      "provider": "openai",
       "settings": {
-        "model": "gpt-4o"
+        "model": "gpt-4o",
+        "temperature": 0
       },
       "messages": [
         {

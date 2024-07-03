@@ -1,53 +1,61 @@
-from typing import Any
+from typing import Any, Callable
 
 from langstream import Stream
 
-from fai_backend.assistant.models import AssistantTemplate
-from fai_backend.assistant.protocol import ILLMProtocol, IAssistantStreamProtocol
-from fai_backend.llm.service import create_rag_stream
+from fai_backend.assistant.config import provider_map, pipeline_map
+from fai_backend.assistant.models import AssistantTemplate, AssistantStreamPipelineDef, \
+    AssistantStreamConfig
+from fai_backend.assistant.protocol import IAssistantContextStore
 
 
-class AssistantLLM(ILLMProtocol):
-    def __init__(self, template: AssistantTemplate, base_stream: IAssistantStreamProtocol):
+class Assistant:
+    def __init__(
+            self,
+            template: AssistantTemplate,
+            get_context_store: Callable[[], IAssistantContextStore]
+    ):
         self.template = template
-        self.base_stream = base_stream
-        self.vars = {}
+        self.get_context_store = get_context_store
 
-    async def create(self) -> Stream[str, Any]:
-        all_stream_producers = [self.base_stream.create_stream(stream_def, lambda: self.vars) for
-                                stream_def in self.template.streams]
+    async def create_stream(self) -> Stream[str, str]:
+        context_store = self.get_context_store()
 
-        chained_stream: Stream[str, Any] | None = None
+        def preprocess(user_query: str):
+            context = context_store.get_mutable()
+            context.query = user_query
+            context.files_collection_id = self.template.files_collection_id
+            context.history = []  # TODO
+            return user_query
 
-        if self.template.files_collection_id:
-            chained_stream = await self._create_rag_stream()
+        def update_previous_stream_output(previous_stream_raw_output: Any):
+            def parse_in_data(data: Any):
+                if isinstance(data, list):
+                    return "".join([parse_in_data(c) for c in data])
+                return str(data)
 
-        for stream_producer in all_stream_producers:
-            chained_stream = chained_stream.and_then(await stream_producer) \
-                if chained_stream is not None \
-                else await stream_producer
+            output_as_str = parse_in_data(previous_stream_raw_output)
+            context = context_store.get_mutable()
+            context.previous_stream_output = output_as_str
+            return previous_stream_raw_output
 
-        def preprocess(initial_query: str):
-            self.vars.update({"query": initial_query})
-            return initial_query
+        stream = Stream('preprocess', preprocess)
 
-        return (
-            Stream[str, str]('preprocess', preprocess)
-            .and_then(chained_stream)
-        )
+        for stream_def in self.template.streams:
+            new_stream = await self._create_stream_from_config(stream_def, context_store)
+            stream = (stream
+                      .and_then(update_previous_stream_output)
+                      .and_then(new_stream))
 
-    async def _create_rag_stream(self) -> Stream[str, str]:
-        async def run_rag_stream(initial_query: list[str]):
-            stream = await create_rag_stream(initial_query[0], self.template.files_collection_id)
-            async for r in stream(initial_query[0]):
-                yield r
+        return stream
 
-        def rag_postprocess(in_data: Any):
-            results = in_data[0]['results']
-            self.vars.update({'rag_results': results})
-            return self.vars['query']
+    @staticmethod
+    async def _create_stream_from_config(
+            config: AssistantStreamConfig | AssistantStreamPipelineDef,
+            context_store: IAssistantContextStore
+    ) -> Stream[str, str]:
+        if isinstance(config, AssistantStreamConfig):
+            llm = provider_map[config.provider](config.settings)
+            return await llm.create_llm_stream(config.messages, context_store)
 
-        return (
-            Stream('RAGStream', run_rag_stream)
-            .and_then(rag_postprocess)
-        )
+        pipeline = pipeline_map[config.pipeline]()
+        return await pipeline.create_pipeline(context_store)

@@ -1,37 +1,46 @@
 from datetime import datetime
-from typing import Optional, Dict, List, Any, Literal, Union
+from typing import Optional, Any, Literal
 
 from pydantic import BaseModel
-
-
-class LLMStreamMessage(BaseModel):
-    role: Literal["system", "user", "assistant", "function"]
-    content: str
-
-
-class LLMStreamSettings(BaseModel):
-    model: str
-    temperature: Optional[float] = 0
-    functions: Optional[List[Dict[str, Any]]] = None
-    function_call: Optional[Union[Literal["none", "auto"], Dict[str, Any]]] = None
-
-
-class LLMStreamDef(BaseModel):
-    name: str
-    settings: LLMStreamSettings
-    messages: Optional[List[LLMStreamMessage]] = None
-
-
-class AssistantTemplate(BaseModel):
-    id: str
-    name: str
-    files_collection_id: Optional[str] = None
-    description: Optional[str] = None
-    sample_questions: list[str] = []
-    streams: List[LLMStreamDef]
 
 
 class LLMClientChatMessage(BaseModel):
     date: datetime
     source: str | None = None
     content: str | None = None
+
+
+class AssistantStreamMessage(BaseModel):
+    role: Literal["system", "user", "assistant", "function"]
+    content: str
+
+
+class AssistantContext(BaseModel):
+    query: str = ""
+    files_collection_id: Optional[str] = None
+    previous_stream_output: Optional[str] = None
+    history: list[AssistantStreamMessage] = []
+    rag_output: Optional[str] = None
+
+
+class AssistantTemplateMeta(BaseModel):
+    name: str = ""
+    description: str = ""
+    sample_questions: list[str] = []
+
+
+class AssistantStreamConfig(BaseModel):
+    provider: str
+    settings: dict[str, Any]
+    messages: list[AssistantStreamMessage]
+
+
+class AssistantStreamPipelineDef(BaseModel):
+    pipeline: str
+
+
+class AssistantTemplate(BaseModel):
+    id: str
+    meta: AssistantTemplateMeta
+    files_collection_id: Optional[str] = None
+    streams: list[AssistantStreamConfig | AssistantStreamPipelineDef]

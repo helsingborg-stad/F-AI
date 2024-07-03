@@ -1,12 +1,15 @@
 {
   "id": "multi_example",
-  "name": "Multi-stream Example",
-  "description": "This is an example assistant that showcases how an assistant can run through multiple different internal prompts before answering the user.",
+  "meta": {
+    "name": "Multi-stream Example",
+    "description": "This is an example assistant that showcases how an assistant can run through multiple different internal prompts before answering the user."
+  },
   "streams": [
     {
-      "name": "First Stream",
+      "provider": "openai",
       "settings": {
-        "model": "gpt-4o"
+        "model": "gpt-4o",
+        "temperature": 0
       },
       "messages": [
         {
@@ -20,18 +23,19 @@
       ]
     },
     {
-      "name": "Second Stream",
+      "provider": "openai",
       "settings": {
-        "model": "gpt-4o"
+        "model": "gpt-4o",
+        "temperature": 0
       },
       "messages": [
         {
           "role": "system",
-          "content": "Repeat back any text verbatim and count the number of words"
+          "content": "Repeat back any text verbatim and count the number of words."
         },
         {
           "role": "user",
-          "content": "{last_input}"
+          "content": "{previous_stream_output}"
         }
       ]
     }

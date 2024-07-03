@@ -9,7 +9,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from fai_backend.config import settings
 from fai_backend.projects.schema import ProjectMember, ProjectRole
 from fai_backend.repositories import ConversationDocument, PinCodeModel, ProjectModel, projects_repo
-from fai_backend.assistant.models import AssistantTemplate, LLMStreamSettings, LLMStreamDef, LLMStreamMessage
+from fai_backend.assistant.models import AssistantTemplate
 
 
 def use_route_names_as_operation_ids(app: FastAPI) -> None:
