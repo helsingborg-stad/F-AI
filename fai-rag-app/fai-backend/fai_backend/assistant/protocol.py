@@ -1,8 +1,8 @@
-from typing import Protocol
+from typing import Protocol, Callable
 
 from langstream import Stream
 
-from fai_backend.assistant.models import AssistantContext, AssistantStreamMessage
+from fai_backend.assistant.models import AssistantContext, AssistantStreamMessage, AssistantStreamInsert
 
 
 class IAssistantContextStore(Protocol):
@@ -10,11 +10,17 @@ class IAssistantContextStore(Protocol):
         ...
 
 
+class IAssistantMessageInsert(Protocol):
+    def get_messages(self, context_store: IAssistantContextStore) -> list[AssistantStreamMessage]:
+        pass
+
+
 class IAssistantLLMProvider(Protocol):
     async def create_llm_stream(
             self,
-            messages: list[AssistantStreamMessage],
-            context_store: IAssistantContextStore
+            messages: list[AssistantStreamMessage | AssistantStreamInsert],
+            context_store: IAssistantContextStore,
+            get_insert: Callable[[str], IAssistantMessageInsert],
     ) -> Stream[str, str]:
         ...
 

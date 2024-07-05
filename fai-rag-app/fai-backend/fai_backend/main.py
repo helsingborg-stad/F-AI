@@ -8,7 +8,7 @@ from sse_starlette import EventSourceResponse, ServerSentEvent
 from starlette.responses import HTMLResponse, RedirectResponse
 
 from fai_backend.assistant.assistant import Assistant
-from fai_backend.assistant.models import LLMClientChatMessage
+from fai_backend.assistant.models import LLMClientChatMessage, AssistantStreamMessage, AssistantChatHistoryModel
 from fai_backend.assistant.routes import router as templates_router
 from fai_backend.assistant.service import AssistantFactory
 from fai_backend.auth.router import router as auth_router
@@ -23,6 +23,7 @@ from fai_backend.projects.dependencies import list_projects_request
 from fai_backend.projects.router import router as projects_router
 from fai_backend.projects.schema import ProjectResponse
 from fai_backend.qaf.routes import router as qaf_router
+from fai_backend.repositories import chat_history_repo
 from fai_backend.schema import ProjectUser
 from fai_backend.serializer.impl.base64 import Base64Serializer
 from fai_backend.setup import setup_db, setup_project
@@ -64,9 +65,13 @@ frontend.configure(app)
 async def event_source_llm_generator(question: str, assistant: Assistant, conversation_id: str | None):
     serializer = Base64Serializer()
 
-    used_conversation_id = conversation_id or uuid.uuid4().hex
+    used_conversation_id = conversation_id
 
-    stream = await assistant.create_stream()
+    if not used_conversation_id:
+        new_item = await chat_history_repo.create(AssistantChatHistoryModel())
+        used_conversation_id = str(new_item.id)
+
+    stream = await assistant.create_stream(used_conversation_id)
 
     async def generator(conversation_id_to_send):
         yield ServerSentEvent(
@@ -74,8 +79,20 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
             data=conversation_id_to_send,
         )
 
+        history = await chat_history_repo.get(conversation_id_to_send)
+        history.history.append(
+            AssistantStreamMessage(
+                role='user',
+                content=question
+            )
+        )
+        await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
+
+        final_output = ""
+
         async for output in stream(question):
             if output.final:
+                final_output += output.data
                 yield ServerSentEvent(
                     event="message",
                     data=serializer.serialize(LLMClientChatMessage(
@@ -84,6 +101,14 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
                         content=output.data
                     )),
                 )
+
+        history.history.append(
+            AssistantStreamMessage(
+                role='system',
+                content=final_output
+            )
+        )
+        await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
 
         yield ServerSentEvent(
             event="message_end",

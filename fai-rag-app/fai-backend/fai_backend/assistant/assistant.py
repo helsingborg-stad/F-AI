@@ -1,30 +1,28 @@
-from typing import Any, Callable
+from typing import Any
 
 from langstream import Stream
 
-from fai_backend.assistant.config import provider_map, pipeline_map
+from fai_backend.assistant.config import provider_map, pipeline_map, insert_map
 from fai_backend.assistant.models import AssistantTemplate, AssistantStreamPipelineDef, \
     AssistantStreamConfig
-from fai_backend.assistant.protocol import IAssistantContextStore
+from fai_backend.assistant.protocol import IAssistantContextStore, IAssistantMessageInsert
+from fai_backend.repositories import chat_history_repo
 
 
 class Assistant:
     def __init__(
             self,
             template: AssistantTemplate,
-            get_context_store: Callable[[], IAssistantContextStore]
+            context_store: IAssistantContextStore
     ):
         self.template = template
-        self.get_context_store = get_context_store
+        self.context_store = context_store
 
-    async def create_stream(self) -> Stream[str, str]:
-        context_store = self.get_context_store()
+    async def create_stream(self, conversation_id: str) -> Stream[str, str]:
 
-        def preprocess(user_query: str):
-            context = context_store.get_mutable()
-            context.query = user_query
-            context.files_collection_id = self.template.files_collection_id
-            context.history = []  # TODO
+        def set_query(user_query: str):
+            current_context = self.context_store.get_mutable()
+            current_context.query = user_query
             return user_query
 
         def update_previous_stream_output(previous_stream_raw_output: Any):
@@ -34,28 +32,37 @@ class Assistant:
                 return str(data)
 
             output_as_str = parse_in_data(previous_stream_raw_output)
-            context = context_store.get_mutable()
-            context.previous_stream_output = output_as_str
+            current_context = self.context_store.get_mutable()
+            current_context.previous_stream_output = output_as_str
             return previous_stream_raw_output
 
-        stream = Stream('preprocess', preprocess)
+        context = self.context_store.get_mutable()
+        context.files_collection_id = self.template.files_collection_id
+        history_model = await chat_history_repo.get(conversation_id)
+        context.history = history_model.history if history_model else []
+
+        stream = Stream('start', set_query)
 
         for stream_def in self.template.streams:
-            new_stream = await self._create_stream_from_config(stream_def, context_store)
+            new_stream = await self._create_stream_from_config(stream_def, self.context_store)
             stream = (stream
                       .and_then(update_previous_stream_output)
                       .and_then(new_stream))
 
         return stream
 
-    @staticmethod
     async def _create_stream_from_config(
+            self,
             config: AssistantStreamConfig | AssistantStreamPipelineDef,
             context_store: IAssistantContextStore
     ) -> Stream[str, str]:
         if isinstance(config, AssistantStreamConfig):
             llm = provider_map[config.provider](config.settings)
-            return await llm.create_llm_stream(config.messages, context_store)
+            return await llm.create_llm_stream(config.messages, context_store, self.get_insert)
 
         pipeline = pipeline_map[config.pipeline]()
         return await pipeline.create_pipeline(context_store)
+
+    @staticmethod
+    def get_insert(name: str) -> IAssistantMessageInsert:
+        return insert_map[name]()
