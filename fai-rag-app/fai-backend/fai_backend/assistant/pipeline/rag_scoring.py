@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any
 
 from langstream import Stream
@@ -10,11 +11,11 @@ class RagScoringPipeline(IAssistantPipelineStrategy):
     async def create_pipeline(
             self,
             context_store: IAssistantContextStore
-    ) -> Stream[str, str]:
-        async def run_rag_stream(initial_query: list[list[str]]):
+    ) -> Stream[list[str], str]:
+        async def run_rag_stream(query: list[str]):
             collection_id = context_store.get_mutable().files_collection_id
-            stream = await create_rag_stream(initial_query[0][0], collection_id)
-            async for r in stream(initial_query[0][0]):
+            stream = await create_rag_stream(query[0], collection_id)
+            async for r in stream(query[0]):
                 yield r
 
         def rag_postprocess(in_data: Any):

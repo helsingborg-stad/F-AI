@@ -160,7 +160,7 @@
 <Div class="h-full relative">
 
   <!-- Document picker -->
-  <Div class="h-24 p-4 absolute inset-x-0 top-0 flex flex-col justify-center items-center">
+  <Div class="h-24 p-4 absolute inset-x-0 top-0 flex flex-col gap-1 justify-center items-center">
     <select
       class="select select-bordered w-full max-w-xs"
       bind:value={selectedAssistantId}
@@ -171,7 +171,7 @@
         <option value={assistant.id}>{assistant.name}</option>
       {/each}
     </select>
-    <p>conversation id: {activeConversationId}</p>
+    <p class="text-sm" class:invisible={!activeConversationId}>conversation id: {activeConversationId}</p>
   </Div>
 
   <!-- Chat content -->

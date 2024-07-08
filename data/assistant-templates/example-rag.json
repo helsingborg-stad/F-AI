@@ -2,7 +2,7 @@
   "id": "rag_example",
   "meta": {
     "name": "RAG (document) Example",
-    "description": "This is an example assistant that showcases how to setup an assistant for answering questions about uploaded documents.  \\n\\nMake sure to upload documents first.",
+    "description": "This is an example assistant that showcases how to setup an assistant for answering questions about uploaded documents.  \n\nMake sure to upload documents first.",
     "sample_questions": []
   },
   "files_collection_id": "<set by uploading files in editor ui>",

@@ -25,16 +25,11 @@ class Assistant:
             current_context.query = user_query
             return user_query
 
-        def update_previous_stream_output(previous_stream_raw_output: Any):
-            def parse_in_data(data: Any):
-                if isinstance(data, list):
-                    return "".join([parse_in_data(c) for c in data])
-                return str(data)
-
-            output_as_str = parse_in_data(previous_stream_raw_output)
+        def postprocess_stream(collected_previous_stream_output: list[str]):
+            output_as_str = "".join([s for s in collected_previous_stream_output])
             current_context = self.context_store.get_mutable()
             current_context.previous_stream_output = output_as_str
-            return previous_stream_raw_output
+            return output_as_str
 
         context = self.context_store.get_mutable()
         context.files_collection_id = self.template.files_collection_id
@@ -46,7 +41,7 @@ class Assistant:
         for stream_def in self.template.streams:
             new_stream = await self._create_stream_from_config(stream_def, self.context_store)
             stream = (stream
-                      .and_then(update_previous_stream_output)
+                      .and_then(postprocess_stream)
                       .and_then(new_stream))
 
         return stream
@@ -55,7 +50,7 @@ class Assistant:
             self,
             config: AssistantStreamConfig | AssistantStreamPipelineDef,
             context_store: IAssistantContextStore
-    ) -> Stream[str, str]:
+    ) -> Stream[list[str], str]:
         if isinstance(config, AssistantStreamConfig):
             llm = provider_map[config.provider](config.settings)
             return await llm.create_llm_stream(config.messages, context_store, self.get_insert)

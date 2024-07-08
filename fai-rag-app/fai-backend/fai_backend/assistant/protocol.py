@@ -21,7 +21,7 @@ class IAssistantLLMProvider(Protocol):
             messages: list[AssistantStreamMessage | AssistantStreamInsert],
             context_store: IAssistantContextStore,
             get_insert: Callable[[str], IAssistantMessageInsert],
-    ) -> Stream[str, str]:
+    ) -> Stream[list[str], str]:
         ...
 
 
@@ -29,5 +29,5 @@ class IAssistantPipelineStrategy(Protocol):
     async def create_pipeline(
             self,
             context_store: IAssistantContextStore
-    ) -> Stream[str, str]:
+    ) -> Stream[list[str], str]:
         ...
