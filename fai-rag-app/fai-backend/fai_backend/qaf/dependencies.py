@@ -39,6 +39,13 @@ async def questions_filter_params(
 async def questions_loader(
         service: QAFService = Depends(QAFService.factory),
         user: ProjectUser = Depends(get_project_user),
+) -> list[QuestionEntry]:
+    return await service.list_submitted_questions(user)
+
+
+async def filterable_questions_loader(
+        service: QAFService = Depends(QAFService.factory),
+        user: ProjectUser = Depends(get_project_user),
         query_params: QuestionFilterParams = Depends(questions_filter_params),
 ) -> list[QuestionEntry]:
     return await service.list_submitted_questions(user, query_params)
