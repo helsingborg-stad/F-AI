@@ -30,6 +30,7 @@
   export let assistants: Assistant[];
 
   let selectedAssistantId: string;
+  let activeConversationId: string | null = null;
   let messages: ChatMessage[] = [];
   let currentMessageInput: string = "";
   let eventSource: EventSource | null = null;
@@ -41,9 +42,7 @@
 
   function handleContentScroll() {
     const scrollPadding = 10;
-
     const isScrollable = contentScrollDiv.scrollHeight > contentScrollDiv.clientHeight || contentScrollDiv.scrollWidth > contentScrollDiv.clientWidth;
-
     isContentAtBottom = !isScrollable || (contentScrollDiv.scrollHeight - contentScrollDiv.scrollTop < contentScrollDiv.clientHeight + scrollPadding);
   }
 
@@ -69,6 +68,11 @@
       time: sse.date,
       isSelf: false
     };
+  }
+
+  function clearChat() {
+    messages = [];
+    activeConversationId = null;
   }
 
   function closeSSE() {
@@ -99,7 +103,7 @@
 
       const selectedAssistant = assistants.find(a => a.id === selectedAssistantId)!;
 
-      eventSource = new EventSource(`${endpoint}/${selectedAssistant.project}/${selectedAssistant.id}?question=${question}`);
+      eventSource = new EventSource(`${endpoint}/${selectedAssistant.project}/${selectedAssistant.id}?question=${question}&conversation_id=${activeConversationId ?? ""}`);
 
       eventSource.onerror = (e) => {
         addErrorMessage(`unknown error / ${e}`);
@@ -109,6 +113,11 @@
       eventSource.addEventListener("message_end", () => {
         closeSSE();
         return;
+      });
+
+      eventSource.addEventListener("conversation_id", (e) => {
+        activeConversationId = e.data;
+        console.log(`got conversation id ${e.data}`);
       });
 
       eventSource.addEventListener("message", (e) => {
@@ -151,15 +160,18 @@
 <Div class="h-full relative">
 
   <!-- Document picker -->
-  <Div class="h-24 p-4 absolute inset-x-0 top-0 flex flex-col justify-center items-center">
+  <Div class="h-24 p-4 absolute inset-x-0 top-0 flex flex-col gap-1 justify-center items-center">
     <select
       class="select select-bordered w-full max-w-xs"
-      bind:value={selectedAssistantId}>
+      bind:value={selectedAssistantId}
+      on:change={clearChat}
+    >
       <option disabled selected value="">Choose assistant</option>
       {#each assistants as assistant (`${assistant.project}/${assistant.id}`)}
         <option value={assistant.id}>{assistant.name}</option>
       {/each}
     </select>
+    <p class="text-sm" class:invisible={!activeConversationId}>conversation id: {activeConversationId}</p>
   </Div>
 
   <!-- Chat content -->
@@ -206,7 +218,7 @@
     <!-- Clear button -->
     {#if messages.length > 0}
       <Button
-        onClick={() => messages = []}
+        onClick={clearChat}
         label="Rensa chat"
         state="secondary"
         disabled={!!eventSource} />

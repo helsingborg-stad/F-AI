@@ -66,9 +66,9 @@ def chat_index_view(
 
     assistants = [c.Assistant(
         id=a.id,
-        name=a.name,
+        name=a.meta.name,
         project=p.id,
-        description=a.description,
+        description=a.meta.description,
     ) for p in projects for a in p.assistants]
 
     return view(

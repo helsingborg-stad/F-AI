@@ -2,52 +2,62 @@ from typing import Any
 
 from langstream import Stream
 
-from fai_backend.assistant.models import AssistantTemplate
-from fai_backend.assistant.protocol import ILLMProtocol, IAssistantStreamProtocol
-from fai_backend.llm.service import create_rag_stream
+from fai_backend.assistant.config import provider_map, pipeline_map, insert_map
+from fai_backend.assistant.models import AssistantTemplate, AssistantStreamPipelineDef, \
+    AssistantStreamConfig
+from fai_backend.assistant.protocol import IAssistantContextStore, IAssistantMessageInsert
+from fai_backend.repositories import chat_history_repo
 
 
-class AssistantLLM(ILLMProtocol):
-    def __init__(self, template: AssistantTemplate, base_stream: IAssistantStreamProtocol):
+class Assistant:
+    def __init__(
+            self,
+            template: AssistantTemplate,
+            context_store: IAssistantContextStore
+    ):
         self.template = template
-        self.base_stream = base_stream
-        self.vars = {}
+        self.context_store = context_store
 
-    async def create(self) -> Stream[str, Any]:
-        all_stream_producers = [self.base_stream.create_stream(stream_def, lambda: self.vars) for
-                                stream_def in self.template.streams]
+    async def create_stream(self, conversation_id: str) -> Stream[str, str]:
 
-        chained_stream: Stream[str, Any] | None = None
+        def set_query(user_query: str):
+            current_context = self.context_store.get_mutable()
+            current_context.query = user_query
+            return user_query
 
-        if self.template.files_collection_id:
-            chained_stream = await self._create_rag_stream()
+        def postprocess_stream(collected_previous_stream_output: list[str]):
+            output_as_str = "".join([s for s in collected_previous_stream_output])
+            current_context = self.context_store.get_mutable()
+            current_context.previous_stream_output = output_as_str
+            return output_as_str
 
-        for stream_producer in all_stream_producers:
-            chained_stream = chained_stream.and_then(await stream_producer) \
-                if chained_stream is not None \
-                else await stream_producer
+        context = self.context_store.get_mutable()
+        context.files_collection_id = self.template.files_collection_id
+        history_model = await chat_history_repo.get(conversation_id)
+        context.history = history_model.history if history_model else []
 
-        def preprocess(initial_query: str):
-            self.vars.update({"query": initial_query})
-            return initial_query
+        stream = Stream('start', set_query)
 
-        return (
-            Stream[str, str]('preprocess', preprocess)
-            .and_then(chained_stream)
-        )
+        for stream_def in self.template.streams:
+            new_stream = await self._create_stream_from_config(stream_def, self.context_store)
+            stream = (stream
+                      .and_then(postprocess_stream)
+                      .and_then(new_stream))
 
-    async def _create_rag_stream(self) -> Stream[str, str]:
-        async def run_rag_stream(initial_query: list[str]):
-            stream = await create_rag_stream(initial_query[0], self.template.files_collection_id)
-            async for r in stream(initial_query[0]):
-                yield r
+        return stream
 
-        def rag_postprocess(in_data: Any):
-            results = in_data[0]['results']
-            self.vars.update({'rag_results': results})
-            return self.vars['query']
+    async def _create_stream_from_config(
+            self,
+            config: AssistantStreamConfig | AssistantStreamPipelineDef,
+            context_store: IAssistantContextStore
+    ) -> Stream[list[str], str]:
+        if isinstance(config, AssistantStreamConfig):
+            llm = provider_map[config.provider](config.settings)
+            return await llm.create_llm_stream(config.messages, context_store, self.get_insert)
 
-        return (
-            Stream('RAGStream', run_rag_stream)
-            .and_then(rag_postprocess)
-        )
+        pipeline = pipeline_map[config.pipeline]()
+        return await pipeline.create_pipeline(context_store)
+
+    @staticmethod
+    def get_insert(name: str) -> IAssistantMessageInsert:
+        return insert_map[name]()

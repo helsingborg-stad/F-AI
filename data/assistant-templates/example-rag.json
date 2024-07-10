@@ -1,13 +1,20 @@
 {
   "id": "rag_example",
-  "name": "RAG (document) Example",
-  "files_collection_id": "Upload files in the Assistant Creation UI",
-  "description": "This is an example assistant that showcases how to setup an assistant for answering questions about uploaded documents.  \n\nMake sure to upload documents first.",
+  "meta": {
+    "name": "RAG (document) Example",
+    "description": "This is an example assistant that showcases how to setup an assistant for answering questions about uploaded documents.  \n\nMake sure to upload documents first.",
+    "sample_questions": []
+  },
+  "files_collection_id": "<set by uploading files in editor ui>",
   "streams": [
     {
-      "name": "RagStream",
+      "pipeline": "rag_scoring"
+    },
+    {
+      "provider": "openai",
       "settings": {
-        "model": "gpt-4o"
+        "model": "gpt-4o",
+        "temperature": 0
       },
       "messages": [
         {
@@ -16,7 +23,7 @@
         },
         {
           "role": "user",
-          "content": "{rag_results}"
+          "content": "{rag_output}"
         }
       ]
     }
