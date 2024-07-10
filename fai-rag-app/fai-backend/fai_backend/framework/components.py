@@ -26,6 +26,7 @@ __all__ = (
     'ChatBubble',
     'FileInput',
     'SSEChat',
+    'DataTable',
     # then `AnyComponent` itself
     'AnyUI',
 )
@@ -284,6 +285,6 @@ AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
      PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | Radio |
-     ChatBubble | FileInput | SSEChat),
+     ChatBubble | FileInput | SSEChat | DataTable),
     Field(discriminator='type')
 ]
