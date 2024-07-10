@@ -19,6 +19,10 @@
     let ref: HTMLInputElement;
 
     onMount(() => autoFocus && (ref?.focus() !== undefined))
+
+
+    $: inputValue = ((v: string | null = null) => v)(value)
+
 </script>
 
 <div
@@ -39,8 +43,10 @@
             {title}
             {placeholder}
             {required}
-            {value}
+            value={inputValue}
             {autocomplete}
+            on:input
+            on:change
 
     />
     {#if error}
