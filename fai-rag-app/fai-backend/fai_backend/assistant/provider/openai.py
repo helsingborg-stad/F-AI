@@ -22,9 +22,9 @@ class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
             context_store: IAssistantContextStore,
             get_insert: Callable[[str], IAssistantMessageInsert],
     ) -> Stream[list[str], str]:
-        return OpenAIChatStream[str, OpenAIChatDelta](
+        return OpenAIChatStream[list[str], OpenAIChatDelta](
             "openai",
-            lambda in_data: self._parse_messages(messages, context_store, get_insert),
+            lambda _: self._parse_messages(messages, context_store, get_insert),
             **self.settings.dict(),
         ).map(lambda delta: delta.content)
 
