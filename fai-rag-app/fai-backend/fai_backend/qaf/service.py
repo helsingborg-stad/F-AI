@@ -73,7 +73,15 @@ class QAFService:
             raise PermissionError('User does not have permission to view this question')
         return self._to_question(conversation) if conversation else None
 
-    async def list_submitted_questions(self, project_user: ProjectUser, query_params: QuestionFilterParams) -> list[
+    async def list_submitted_questions(self, project_user: ProjectUser,
+                                       query_params: QuestionFilterParams = QuestionFilterParams(
+                                           q=None,
+                                           tags=None,
+                                           status=None,
+                                           review_status=None,
+                                           sort='timestamp.modified',
+                                           sort_order='desc',
+                                       )) -> list[
         QuestionEntry]:
 
         db_query = LogicalExpression('AND', [
