@@ -69,6 +69,7 @@ def chat_index_view(
         name=a.meta.name,
         project=p.id,
         description=a.meta.description,
+        sampleQuestions=a.meta.sample_questions
     ) for p in projects for a in p.assistants]
 
     return view(

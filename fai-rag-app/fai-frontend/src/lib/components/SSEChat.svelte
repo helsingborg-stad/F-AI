@@ -24,12 +24,14 @@
     name: string;
     project: string;
     description: string;
+    sampleQuestions: string[];
   }
 
   export let endpoint: string;
   export let assistants: Assistant[];
 
   let selectedAssistantId: string;
+  let selectedAssistant: Assistant | null = null;
   let activeConversationId: string | null = null;
   let messages: ChatMessage[] = [];
   let currentMessageInput: string = "";
@@ -39,6 +41,7 @@
   let isContentAtBottom: Boolean = true;
 
   $: isContentAtBottom = messages.length == 0 || isContentAtBottom;
+  $: selectedAssistant = assistants.find(a => a.id === selectedAssistantId) || null;
 
   function handleContentScroll() {
     const scrollPadding = 10;
@@ -101,9 +104,7 @@
 
       closeSSE();
 
-      const selectedAssistant = assistants.find(a => a.id === selectedAssistantId)!;
-
-      eventSource = new EventSource(`${endpoint}/${selectedAssistant.project}/${selectedAssistant.id}?question=${question}&conversation_id=${activeConversationId ?? ""}`);
+      eventSource = new EventSource(`${endpoint}/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}&conversation_id=${activeConversationId ?? ""}`);
 
       eventSource.onerror = (e) => {
         addErrorMessage(`unknown error / ${e}`);
@@ -155,6 +156,10 @@
     return content
       .replace(/\n/g, `\n\n  `);
   }
+
+  function askSampleQuestion(question: string) {
+    createSSE(question);
+  }
 </script>
 
 <Div class="h-full relative">
@@ -192,8 +197,17 @@
         />
       {:else}
         <div class="prose text-center">
-          {#if selectedAssistantId}
-            <SvelteMarkdown source={assistants.find(a => a.id === selectedAssistantId)?.description} />
+          {#if selectedAssistant}
+            <SvelteMarkdown source={selectedAssistant.description} />
+
+            <div class="flex gap-2 max-w-full flex-wrap justify-center">
+              {#each selectedAssistant.sampleQuestions as question}
+                <button
+                  class="btn btn-outline"
+                  on:click={() => askSampleQuestion(question)}
+                >{question}</button>
+              {/each}
+            </div>
           {:else}
             <p>Here you can chat with any specialized assistant that has been created for you.</p>
             <p>Choose an assistant from the dropdown to begin.</p>
