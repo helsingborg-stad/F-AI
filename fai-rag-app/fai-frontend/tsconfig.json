@@ -13,7 +13,13 @@
      */
     "allowJs": true,
     "checkJs": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "exactOptionalPropertyTypes": false,
+    "paths": {
+      "$lib/*": [
+        "./src/lib/*"
+      ]
+    }
   },
   "include": [
     "src/**/*"
