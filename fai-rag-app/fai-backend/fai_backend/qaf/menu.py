@@ -50,7 +50,7 @@ def qa_menu(
                     url='/questions',
                     active='/questions*'
                 ),
-                c.Menu(
+                *([c.Menu(
                     title=_('status', 'Status'),
                     components=[
                         *[c.Link(
@@ -60,7 +60,7 @@ def qa_menu(
                             badge=badge,
                         ) for text, url, badge in (items or [])]
                     ]
-                ),
+                )] if items else []),
                 c.Link(
                     text=_('Add new question'),
                     url='/questions/create',
