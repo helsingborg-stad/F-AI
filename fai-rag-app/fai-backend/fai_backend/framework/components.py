@@ -87,6 +87,7 @@ class Button(UIComponent):
     badge_state: Literal[
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = Field(
         None, serialization_alias='badgeState')
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
 
 
 class Form(UIComponent):
