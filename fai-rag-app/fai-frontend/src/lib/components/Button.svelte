@@ -1,12 +1,9 @@
 <script lang="ts">
     import InlineSvgIcon from "./SVG.svelte"
     import Badge from "./Badge.svelte"
-    import {createEventDispatcher} from 'svelte';
+    import type {Action} from "svelte/action";
 
-    const dispatch = createEventDispatcher();
-    export let onClick = () => {
-        dispatch('click')
-    }
+
     export let className: string | null
     export {className as class}
     export let disabled: boolean = false
@@ -25,10 +22,41 @@
     export let badgeState: 'primary' | 'secondary' | 'accent' | 'success' | 'info' | 'warning' | 'error' | null = null
     export let iconSrc: string | null = null
     export let iconState: 'primary' | 'secondary' | 'accent' | 'success' | 'info' | 'warning' | 'error' | null = null
+
+
+    const attrs: Action<HTMLElement, Record<string, any>> = (node, attrs) => {
+        const attrKeys = Object.keys(attrs)
+
+        const addEvt = (e, f) => node.addEventListener(e, f)
+        const remEvt = (e, f) => node.removeEventListener(e, f)
+
+        const onEvents = attr => attr.startsWith('on:')
+        const others = attr => !attr.startsWith('on:')
+
+        const setup = attr => addEvt(attr.substr(3), attrs[attr])
+        const teardown = attr => remEvt(attr.substr(3), attrs[attr])
+
+        const apply = (attrName: string) => node[attrName] = attrs[attrName]
+
+        attrKeys.filter(onEvents).map(setup)
+        attrKeys.filter(others).map(apply)
+
+        return {
+            update(attrs) {
+                const attrKeys = Object.keys(attrs)
+                attrKeys.filter(onEvents).map(teardown)
+                attrKeys.filter(onEvents).map(setup)
+                attrKeys.filter(others).map(apply)
+            },
+            destroy() {
+                attrKeys.filter(onEvents).map(teardown)
+            }
+        }
+    }
 </script>
 
 <button
-        class="btn {className}"
+        class="{className ?? null}"
         class:btn={true}
         class:btn-block={block}
         class:btn-wide={wide}
@@ -55,7 +83,8 @@
         class:btn-disabled={disabled}
         disabled={disabled}
         type={html_type}
-        on:click={onClick}
+        on:click
+        use:attrs={{...$$props}}
 >
     {#if html_type === 'submit'}
         <span class="loading loading-spinner hidden group-[.is-submitting]:block"></span>
