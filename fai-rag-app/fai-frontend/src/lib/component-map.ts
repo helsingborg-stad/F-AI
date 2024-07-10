@@ -1,4 +1,4 @@
-import type { SvelteComponent } from "svelte";
+import type {SvelteComponent} from "svelte";
 import Heading from "./components/Heading.svelte";
 import Div from "./components/Div.svelte";
 import Form from "./components/Form.svelte";
@@ -17,6 +17,7 @@ import Button from "./components/Button.svelte";
 import Textarea from "./components/Textarea.svelte";
 import Text from "./components/Text.svelte";
 import Table from "./components/Table.svelte";
+import {DataTable} from "$lib/components/table";
 import Pagination from "./components/Pagination.svelte";
 import ChatBubble from "./components/ChatBubble.svelte";
 import Select from "./components/Select.svelte";
@@ -25,30 +26,31 @@ import FileInput from "./components/FileInput.svelte";
 import SSEChat from "./components/SSEChat.svelte";
 
 export const componentMap: Record<string, typeof SvelteComponent> = {
-  Heading,
-  Div,
-  Form,
-  InputField,
-  FireEvent,
-  AppShell,
-  AppDrawer,
-  AppContent,
-  AppFooter,
-  PageHeader,
-  PageContent,
-  Dropdown,
-  Link,
-  Menu,
-  Button,
-  Textarea,
-  Text,
-  Table,
-  Pagination,
-  ChatBubble,
-  Select,
-  Radio,
-  SSEChat,
-  FileInput,
+    Heading,
+    Div,
+    Form,
+    InputField,
+    FireEvent,
+    AppShell,
+    AppDrawer,
+    AppContent,
+    AppFooter,
+    PageHeader,
+    PageContent,
+    Dropdown,
+    Link,
+    Menu,
+    Button,
+    Textarea,
+    Text,
+    Table,
+    DataTable,
+    Pagination,
+    ChatBubble,
+    Select,
+    Radio,
+    SSEChat,
+    FileInput,
 };
 
 export default componentMap;
