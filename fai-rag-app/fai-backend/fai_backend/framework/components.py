@@ -31,6 +31,7 @@ __all__ = (
 )
 
 from fai_backend.framework import events as e
+from fai_backend.framework.table import DataTable
 
 
 class UIComponent(BaseModel, extra='forbid'):
