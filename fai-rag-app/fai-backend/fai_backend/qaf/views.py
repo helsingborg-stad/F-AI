@@ -24,7 +24,7 @@ def message_factory(authenticated_user, message: ResponseMessage) -> AnyUI:
     }[message.user if message.user == 'assistant' else 'user']()
 
 
-def two_column_layout(left: list[AnyUI], right: list[AnyUI]) -> list[AnyUI]:
+def two_column_layout(left: list[any], right: list[any]) -> list[any]:
     return [
         c.Div(
             components=[
@@ -85,24 +85,53 @@ def QuestionsDataTable(
             column_data
         ))
 
+    table = c.Table(
+        data=data,
+        columns=map_sort_query_onto_columns(
+            columns,
+            query_params,
+            ['timestamp.modified', 'timestamp.created'],
+            'timestamp.modified',
+            'desc'
+        ),
+
+        class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
+    )
+
     return view(
         [c.Div(components=[
             c.Div(components=[
-                c.Table(
-                    data=data,
-                    columns=map_sort_query_onto_columns(
-                        columns,
-                        query_params,
-                        ['timestamp.modified', 'timestamp.created'],
-                        'timestamp.modified',
-                        'desc'
-                    ),
-
-                    class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
-                ),
+                # c.CustomComponent(component='async'),
+                table
             ], class_name='overflow-x-auto space-y-4'),
         ], class_name='card bg-base-100 w-full max-w-6xl')],
         _('Inbox', 'Inbox'),
+    )
+
+
+def QuestionsMeta(
+        data: dict,
+        fields: list[dict],
+):
+    return c.Table(
+        data=[
+            {
+                'label': field['label'] if 'label' in field else field['key'],
+                'value': data[field['key']] if field['key'] in data else 'None'
+            }
+            for field in fields
+        ],
+        columns=[
+            {
+                'key': 'label',
+                'label': 'Field',
+            },
+            {
+                'key': 'value',
+                'label': 'Value',
+            },
+        ],
+        class_name='text-base-content join-item md:table-xs lg:table-sm table-auto',
     )
 
 
@@ -154,7 +183,28 @@ def QuestionForm(view, submit_url: str):
     )
 
 
-def ReviewDetails(user: ProjectUser, question: QuestionDetails, view):
+def ReviewDetailsMeta(question: QuestionDetails):
+    return []
+
+
+def ReviewDetailsHeader(question: QuestionDetails):
+    fields = {
+        'type': _('Question'),
+        'title': question.question.content
+    }
+
+    return [
+        c.Div(
+            components=[
+                c.Text(text=fields['type'], class_name='text-xs'),
+                c.Heading(text=fields['title'], level=2, class_name='text-xl')
+            ]
+        ),
+    ]
+
+
+def ReviewDetails(user: ProjectUser, question: QuestionDetails, view, meta_data: dict = None,
+                  meta_fields: list[dict] = None):
     review_state = {
         'open': lambda: [
             c.Form(
@@ -207,7 +257,14 @@ def ReviewDetails(user: ProjectUser, question: QuestionDetails, view):
     return view(
         two_column_layout(
             left=[message_factory(user, message) for message in question.messages],
-            right=review_state[question.review_status]()
+            right=[
+                *ReviewDetailsHeader(question),
+                *review_state[question.review_status](),
+                *[QuestionsMeta(
+                    data=meta_data,
+                    fields=meta_fields
+                )],
+            ]
         ),
         'Review: ' + str(question.subject)
     )

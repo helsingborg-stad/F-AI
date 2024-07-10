@@ -82,6 +82,30 @@ def chat_index_view(
     )
 
 
+def to_table_data(question: QuestionDetails) -> dict[str, Any]:
+    return {
+        'subject': question.subject,
+        'errand_id': question.errand_id,
+        'timestamp.created': question.timestamp.created.date(),
+        'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
+        'tags': question.tags,
+        'review_status': question.review_status,
+        'link': f'/questions/{question.id}',
+    }
+
+
+def question_fields() -> list[dict]:
+    return [
+        {'key': 'subject', 'label': 'Subject'},
+        {'key': 'errand_id', 'label': 'Errand ID'},
+        {'key': 'tags', 'label': 'Tags'},
+        {'key': 'review_status', 'label': 'Review Status'},
+        {'key': 'timestamp.modified', 'label': 'Modified'},
+        {'key': 'timestamp.created', 'label': 'Created'},
+        {'key': 'link', 'label': '', 'link_text': 'View'},
+    ]
+
+
 @router.get('/questions', response_model=list, response_model_exclude_none=True)
 def questions(data: list[QuestionDetails] = Depends(questions_loader),
               view=Depends(get_page_template_for_logged_in_users)):
@@ -151,6 +175,7 @@ def questions(data: list[QuestionDetails] = Depends(questions_loader),
         _('questions', 'Questions'),
     )
 
+
 @router.get('/questions/create', response_model=list, response_model_exclude_none=True)
 def create_question(
         view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
@@ -178,7 +203,7 @@ async def question_details(
     if not data:
         return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
 
-    return ReviewDetails(authenticated_user, data, view)
+    return ReviewDetails(authenticated_user, data, view, meta_data=to_table_data(data), meta_fields=question_fields())
 
 
 @router.post('/questions/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)
