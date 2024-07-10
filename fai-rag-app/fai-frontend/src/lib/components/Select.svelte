@@ -15,11 +15,13 @@
     export let variant: 'ghost' | 'bordered' = 'bordered'
     export let autoFocus: boolean | null = null;
 
-    export let options: [string, string][] | [string][] = []
+    export let options: [string, string, boolean | null][] | [string, string][] | [string][] = []
 
     let ref: HTMLInputElement;
 
     onMount(() => autoFocus && (ref?.focus() !== undefined))
+
+    $: inputValue = ((v: string | null = null) => v)(value)
 </script>
 
 
@@ -28,16 +30,19 @@
         class:select-ghost={variant === 'ghost'}
         class:select-bordered={variant === 'bordered'}
         class:w-full={block}
+        on:input
         class={className}
         id={id}
         name={name}
         required={required}
+        bind:value={inputValue}
+
 
 >
-    <option disabled selected>{placeholder}</option>
+    <option disabled selected value="">{placeholder}</option>
 
-    {#each options as [value, label]}
-        <option value={value}>{label}</option>
+    {#each options as [v, label, disabled = null]}
+        <option value={v} {disabled}>{label}</option>
     {/each}
 </select>
 
