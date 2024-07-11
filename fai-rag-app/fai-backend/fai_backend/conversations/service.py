@@ -28,7 +28,7 @@ class ConversationService:
         conversation.created_by = user_email
         conversation.participants.append(user_email)
         return Conversation.model_validate((await self.conversations_repo.create(
-            Conversation.model_validate(conversation.model_dump(exclude={'id'}))
+            Conversation.model_validate(conversation.model_dump())
         )).model_dump())
 
     async def add_feedback(self, message, email, body) -> FeedbackResponse | None:
