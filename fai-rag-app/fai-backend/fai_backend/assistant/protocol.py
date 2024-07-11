@@ -1,4 +1,4 @@
-from typing import Protocol, Callable
+from typing import Protocol, Callable, Any
 
 from langstream import Stream
 
@@ -11,7 +11,7 @@ class IAssistantContextStore(Protocol):
 
 
 class IAssistantMessageInsert(Protocol):
-    def get_messages(self, context_store: IAssistantContextStore) -> list[AssistantStreamMessage]:
+    async def get_messages(self, context_store: IAssistantContextStore) -> list[AssistantStreamMessage]:
         pass
 
 
@@ -21,7 +21,7 @@ class IAssistantLLMProvider(Protocol):
             messages: list[AssistantStreamMessage | AssistantStreamInsert],
             context_store: IAssistantContextStore,
             get_insert: Callable[[str], IAssistantMessageInsert],
-    ) -> Stream[list[str], str]:
+    ) -> Stream[Any, Any]:
         ...
 
 

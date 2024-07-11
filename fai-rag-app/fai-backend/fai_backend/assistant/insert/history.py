@@ -3,6 +3,6 @@ from fai_backend.assistant.protocol import IAssistantMessageInsert, IAssistantCo
 
 
 class AssistantHistoryInsert(IAssistantMessageInsert):
-    def get_messages(self, context_store: IAssistantContextStore) -> list[AssistantStreamMessage]:
+    async def get_messages(self, context_store: IAssistantContextStore) -> list[AssistantStreamMessage]:
         context = context_store.get_mutable()
         return context.history
