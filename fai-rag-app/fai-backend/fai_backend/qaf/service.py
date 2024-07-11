@@ -3,7 +3,8 @@ from typing import Literal
 from pydantic import BaseModel, computed_field
 
 from fai_backend.conversations.models import Conversation, Feedback, Message
-from fai_backend.conversations.schema import ResponseMessage
+from fai_backend.conversations.schema import ResponseMessage, CreateConversationRequest, CreateMessageRequest
+from fai_backend.conversations.service import ConversationService
 from fai_backend.logger.console import console
 from fai_backend.qaf.schema import (
     ApproveAnswerPayload,
@@ -31,21 +32,20 @@ class QAFService:
     def __init__(self, conversations: ConversationRepository):
         self.conversations = conversations
 
-    async def submit_question(
+    async def submit_new_question(
             self,
+            conversation_service: ConversationService,
             project_user: ProjectUser,
             question: str,
             meta: dict,
             tags: list[str] | None = None,
     ) -> QuestionDetails:
-        conversation = await self.conversations.create(
-            Conversation(
-                id='temp_id',
-                created_by=project_user.email,
-                participants=[project_user.email],
-                type='question',
+        conversation = await conversation_service.create_conversation(
+            project_user.email,
+            CreateConversationRequest(
+                project_id=project_user.project_id,
                 messages=[
-                    Message(
+                    CreateMessageRequest(
                         user='user',
                         created_by=project_user.email,
                         content=question,

@@ -1,5 +1,7 @@
 from fastapi import Depends
 
+from fai_backend.conversations.dependencies import get_conversation_service
+from fai_backend.conversations.service import ConversationService
 from fai_backend.dependencies import get_project_user
 from fai_backend.files.dependecies import get_file_upload_service
 from fai_backend.files.service import FileUploadService
@@ -54,10 +56,12 @@ async def question_details_loader(
 
 async def question_create_action(
         body: SubmitQuestionPayload,
-        service: QAFService = Depends(QAFService.factory),
+        qaf_service: QAFService = Depends(QAFService.factory),
+        conversation_service: ConversationService = Depends(get_conversation_service),
         user: ProjectUser = Depends(get_project_user),
 ) -> QuestionDetails:
-    question = await service.submit_question(
+    question = await qaf_service.submit_new_question(
+        conversation_service,
         user,
         body.question,
         body.model_dump(exclude={'question', 'tags'}),
