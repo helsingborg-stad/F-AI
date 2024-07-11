@@ -28,7 +28,18 @@ class CreateMessageRequest(BaseModel):
     metadata: dict = Field(default_factory=dict)
 
 
+class CreateThreadRequest(BaseModel):
+    thread_name: str
+    copy_of_thread_with_id: str = None
+    active_flag: bool
+    messages: list[CreateMessageRequest]
+    feedback: CreateFeedbackRequest = None
+    metadata: dict | None = Field(default_factory=dict)
+
+
 class CreateConversationRequest(BaseModel):
     project_id: str
+    threads: list[CreateThreadRequest] | None = Field(default_factory=list)
     messages: list[CreateMessageRequest]
     metadata: dict = Field(default_factory=dict)
+    tags: list[str] | None = Field(default_factory=list)

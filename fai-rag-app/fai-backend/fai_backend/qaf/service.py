@@ -3,7 +3,8 @@ from typing import Literal
 from pydantic import BaseModel, computed_field
 
 from fai_backend.conversations.models import Conversation, Feedback, Message
-from fai_backend.conversations.schema import ResponseMessage, CreateConversationRequest, CreateMessageRequest
+from fai_backend.conversations.schema import ResponseMessage, CreateConversationRequest, CreateMessageRequest, \
+    CreateThreadRequest
 from fai_backend.conversations.service import ConversationService
 from fai_backend.logger.console import console
 from fai_backend.qaf.schema import (
@@ -44,6 +45,20 @@ class QAFService:
             project_user.email,
             CreateConversationRequest(
                 project_id=project_user.project_id,
+                threads=[
+                    CreateThreadRequest(
+                        thread_name='initial thread',
+                        active_flag=True,
+                        messages=[
+                            CreateMessageRequest(
+                                user='user',
+                                created_by=project_user.email,
+                                content=question,
+                                type='question'
+                            )
+                        ]
+                    )
+                ],
                 messages=[
                     CreateMessageRequest(
                         user='user',
