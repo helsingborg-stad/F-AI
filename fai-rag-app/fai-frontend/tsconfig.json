@@ -26,17 +26,10 @@
   "include": [
     "src/**/*.d.ts",
     "src/**/*.ts",
-    "src/**/*.js",
     "src/**/*.svelte"
   ],
   "exclude": [
     "node_modules"
-  ],
-  "exclude": [
-    "node_modules",
-    "public",
-    "dist",
-    "cypress"
   ],
   "references": [
     {
