@@ -6,7 +6,7 @@ import {
   DataColumn,
   Table,
 } from 'svelte-headless-table'
-import { get, readable, type Writable } from 'svelte/store'
+import { get, type Writable } from 'svelte/store'
 import {
   type ColumnFilterMap,
   DisplayAs,
@@ -19,9 +19,6 @@ import {
   addHiddenColumns,
   addSortBy,
   addTableFilter,
-  type TablePlugin,
-  type TablePluginInit,
-  type TablePluginInstance,
 } from 'svelte-headless-table/plugins'
 import { initialSortKeys } from '$lib/components/table/sort'
 import { accessProperty } from '$lib/components/table/object'
@@ -36,7 +33,6 @@ import {
 import MultiSelectFilter from '$lib/components/table/filter-controls/MultiSelectFilter.svelte'
 import { normalizeToArray } from '$lib/components/table/array'
 import SVG from '$lib/components/SVG.svelte'
-import svelteHTML from '../../../additional-svelte-typings'
 
 export const columnCellFactory: {
   [key in DisplayAs]: (value: any, column: DisplayColumnDef) => ComponentRenderConfig
