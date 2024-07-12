@@ -1,7 +1,7 @@
-import type {SvelteComponent} from "svelte";
+import type { SvelteComponent } from 'svelte'
 
 type addPrefixToObject<T, P extends string> = {
-    [K in keyof T as K extends string ? `${P}${K}` : never]: T[K]
+  [K in keyof T as K extends string ? `${P}${K}` : never]: T[K]
 }
 
 /**
@@ -11,11 +11,14 @@ type addPrefixToObject<T, P extends string> = {
  * @property {IComponentDef[]} [components] - The optional array of child component definitions.
  */
 export interface IComponentDef {
-    type: string;
-    components?: IComponentDef[];
-    slot?: IComponentDef[] | IComponentDef;
+  type: string
+  components?: IComponentDef[]
+  slot?: IComponentDef[] | IComponentDef
 
-    [key: string]: any | addPrefixToObject<IComponentDef[] | IComponentDef, 'slot.'> | addPrefixToObject<IComponentDef[] | IComponentDef, 'on:'>;
+  [key: string]:
+    | any
+    | addPrefixToObject<IComponentDef[] | IComponentDef, 'slot.'>
+    | addPrefixToObject<IComponentDef[] | IComponentDef, 'on:'>
 }
 
 /**
@@ -25,24 +28,21 @@ export interface IComponentDef {
  * @property {any} props - The properties of the component.
  */
 export interface IRenderableComponent {
-    component: typeof SvelteComponent;
-    type: typeof SvelteComponent;
-    props: any;
-    components?: IRenderableComponent[];
+  component: typeof SvelteComponent
+  type: typeof SvelteComponent
+  props: any
+  components?: IRenderableComponent[]
 
-    slots?: Record<string, IRenderableComponent[]>;
-    events?: Record<string, (e: Event) => void>;
+  slots?: Record<string, IRenderableComponent[]>
+  events?: Record<string, (e: Event) => void>
 }
 
 export interface IEventDef {
-    type: string;
+  type: string
 }
 
 export interface GoToEvent extends IComponentDef {
-    type: 'GoToEvent';
-    url: string;
-    query: Record<string, any> | null;
+  type: 'GoToEvent'
+  url: string
+  query: Record<string, any> | null
 }
-
-
-
