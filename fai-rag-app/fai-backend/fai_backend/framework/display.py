@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 class DisplayAs(str, enum.Enum):
     auto = 'auto'
+    link = 'link'
     date = 'date'
 
 
