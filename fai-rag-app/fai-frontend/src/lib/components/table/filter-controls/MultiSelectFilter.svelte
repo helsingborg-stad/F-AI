@@ -14,12 +14,10 @@
 
   type T = $$Generic
 
-  export let id: string | null
-  export let filterValue: Writable<any>
-  export let values: Readable<any[]>
+  export let id: string | null = null
+  export let filterValue: Writable<any[]>
   export let preFilteredValues: Readable<any[]>
-  export let preFilteredRows: Readable<BodyRow<T>[]>
-  export let initialFilterValue: any
+  export let initialFilterValue: any[] | null = null
   export let column: DisplayColumnDef
 
   export const resetHandler = () => {

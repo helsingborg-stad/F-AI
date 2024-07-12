@@ -1,5 +1,4 @@
-import { type ComponentProps, type ComponentType, SvelteComponent } from 'svelte'
-import { DataBodyCell, type TableState } from 'svelte-headless-table'
+import type { ColumnFiltersColumnOptions } from 'svelte-headless-table/plugins'
 
 export enum DisplayAs {
   auto = 'auto',
@@ -18,7 +17,6 @@ export interface DisplayField {
 }
 
 export enum FilterWith {
-  select = 'select',
   multi_select = 'multi-select',
   search = 'search',
 }
@@ -34,13 +32,11 @@ export interface DisplayColumnDef extends DisplayField {
   hidden?: boolean
   hideFromSearch?: boolean
 }
-
-export interface DisplayColumnRender<T extends SvelteComponent, Item = any> {
-  component: ComponentType<T>
-  props: (
-    value: any,
-    cell: DataBodyCell<Item>,
-    state: TableState<Item>,
-    displayColumnDef: DisplayColumnDef,
-  ) => ComponentProps<T>
+export type ColumnFilterMap = {
+  [FilterWith.multi_select]: <Item>(
+    column: DisplayColumnDef,
+  ) => ColumnFiltersColumnOptions<Item, any[]>
+  [FilterWith.search]: <Item>(
+    column: DisplayColumnDef,
+  ) => ColumnFiltersColumnOptions<Item>
 }
