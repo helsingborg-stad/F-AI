@@ -10,7 +10,7 @@ from fai_backend.dependencies import (
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.framework.display import DisplayAs
-from fai_backend.framework.table import ColumnFilterControl, DataColumn
+from fai_backend.framework.table import ColumnFilter, DataColumn
 from fai_backend.llm.service import ask_llm_question, ask_llm_raq_question
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
@@ -123,30 +123,39 @@ def questions(data: list[QuestionDetails] = Depends(questions_loader),
                     key='question.content',
                     id='question',
                     label=_('question', 'Question'),
+                    display=DisplayAs.link,
+                    on_click=e.GoToEvent(url='/questions/{id}'),
+                    sortable=True,
+                    # filter=ColumnFilter.search,
                 ),
                 DataColumn(
                     key='answer.content',
                     id='answer',
                     label=_('answer', 'Answer'),
+                    sortable=True,
+                    # filter=ColumnFilter.search,
                 ),
                 DataColumn(
                     key='subject',
                     label=_('subject', 'Subject'),
+                    filter=ColumnFilter.search,
+                    sortable=True
                 ),
                 DataColumn(
                     key='errand_id',
                     label=_('errand_id', 'Errand ID'),
-                    filter=ColumnFilterControl.search
+                    filter=ColumnFilter.search,
+                    sortable=True
                 ),
                 DataColumn(
                     key='tags',
                     label=_('tags', 'Tags'),
-                    filter=ColumnFilterControl.multi_select
+                    filter=ColumnFilter.multi_select,
                 ),
                 DataColumn(
                     key='review_status',
                     label=_('review_status', 'Review Status'),
-                    filter=ColumnFilterControl.multi_select,
+                    filter=ColumnFilter.multi_select,
                     filter_options=[
                         ('approved', 'Approved'),
                         ('rejected', 'Rejected'),
@@ -154,7 +163,9 @@ def questions(data: list[QuestionDetails] = Depends(questions_loader),
                         ('closed', 'Closed'),
                         ('blocked', 'Blocked'),
                         ('open', 'Open'),
-                    ]
+                    ],
+                    sortable=True
+
                 ),
                 DataColumn(
                     key='timestamp.modified',
