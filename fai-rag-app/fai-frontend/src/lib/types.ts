@@ -34,15 +34,28 @@ export interface IRenderableComponent {
   components?: IRenderableComponent[]
 
   slots?: Record<string, IRenderableComponent[]>
-  events?: Record<string, (e: Event) => void>
+  events?: Record<string, (e: AnyEvent) => void>
+}
+
+export enum EventType {
+  GoTo = 'GoToEvent',
 }
 
 export interface IEventDef {
-  type: string
+  type: EventType
 }
 
-export interface GoToEvent extends IComponentDef {
-  type: 'GoToEvent'
+export interface GoToEventProps {
   url: string
   query: Record<string, any> | null
 }
+
+export interface GoToEvent extends IEventDef, GoToEventProps {
+  type: EventType.GoTo
+}
+
+export interface EventToHandlerMap {
+  [EventType.GoTo]: ({ url, query }: GoToEventProps) => void
+}
+
+export type AnyEvent = GoToEvent
