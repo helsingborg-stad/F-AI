@@ -44,10 +44,6 @@
     | 'warning'
     | 'error'
     | null = null
-
-  $: stateClass = state ? `link-${state}` : null
-
-  const {} = $$props
 </script>
 
 <a
@@ -67,6 +63,7 @@
   class:link-warning={state === 'warning'}
   class:link-error={state === 'error'}
   class={className ?? null}
+  on:click
 >
   {#if iconSrc}
     <InlineSvgIcon state={iconState} src={iconSrc} />

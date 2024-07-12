@@ -1,6 +1,6 @@
-import { type DisplayColumnDef } from '$lib/components/table/types'
+import { type DataColumnSchema } from '$lib/components/table/types'
 
-export function initialSortKeys(columns: DisplayColumnDef[]) {
+export function initialSortKeys(columns: DataColumnSchema[]) {
   return [
     ...columns
       .filter(({ sortable }) => sortable)

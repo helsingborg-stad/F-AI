@@ -3,7 +3,7 @@
   import { writable } from 'svelte/store'
   import SVG from '$lib/components/SVG.svelte'
   import Button from '$lib/components/Button.svelte'
-  import type { DisplayColumnDef } from '$lib/components/table/types'
+  import type { DataColumnSchema } from '$lib/components/table/types'
   import { useDataTable } from '$lib/components/table/data-table'
   import { SORT_ICONS } from '$lib/components/table/sort'
   import ToolBar from '$lib/components/table/toolbar/ToolBar.svelte'
@@ -14,7 +14,7 @@
 
   export let data: T[] = []
 
-  export let columns: DisplayColumnDef[] = []
+  export let columns: DataColumnSchema[] = []
 
   $: dataStore = writable<T[]>(data)
   $: $dataStore = data
@@ -27,7 +27,6 @@
     tableBodyAttrs,
     visibleColumns,
     pluginStates,
-
     ...rest
   } = useDataTable<T>(dataStore, columns))
 
@@ -57,7 +56,6 @@
 
   let canResetFilterValues: boolean = false
   $: canResetFilterValues = filterIsActive($filterValues, $filterValue, $sortKeys)
-
   let showFilterPanel: boolean = false
 </script>
 
@@ -69,7 +67,8 @@
         filterValue={$filterValue}
         resetHandler={() => ($filterValue = '')}
         on:input={(e) => {
-          $filterValue = e?.target?.value?.trim() ?? $filterValue
+          const { currentTarget } = e
+          $filterValue = currentTarget?.value?.trim() ?? $filterValue
         }}
       />
       {#key canResetFilterValues}

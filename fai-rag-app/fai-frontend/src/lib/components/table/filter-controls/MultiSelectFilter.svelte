@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Readable, Writable } from 'svelte/store'
-  import type { DisplayColumnDef } from '$lib/components/table/types'
+  import type { DataColumnSchema } from '$lib/components/table/types'
   import {
     getDistinct,
     normalizeFlatten,
@@ -18,7 +18,7 @@
   export let filterValue: Writable<any[]>
   export let preFilteredValues: Readable<any[]>
   export let initialFilterValue: any[] | null = null
-  export let column: DisplayColumnDef
+  export let column: DataColumnSchema
 
   export const resetHandler = () => {
     $filterValue = []
@@ -38,8 +38,6 @@
   )
   $: value = normalizeToArray((initialFilterValue || $filterValue) ?? [])
   $: showReset = value.length > 0
-
-  $: console.log(id)
 </script>
 
 <div class:badge-outline={showReset} class="border px-4 pb-4">

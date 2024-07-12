@@ -1,16 +1,16 @@
 import {
   Column,
-  ComponentRenderConfig,
   createRender,
   createTable,
   DataColumn,
   Table,
 } from 'svelte-headless-table'
-import { get, type Writable } from 'svelte/store'
+import { derived, get, type Writable } from 'svelte/store'
 import {
   type ColumnFilterMap,
+  type ColumnRenderCellMap,
+  type DataColumnSchema,
   DisplayAs,
-  type DisplayColumnDef,
   FilterWith,
 } from '$lib/components/table/types'
 import {
@@ -33,10 +33,9 @@ import {
 import MultiSelectFilter from '$lib/components/table/filter-controls/MultiSelectFilter.svelte'
 import { normalizeToArray } from '$lib/components/table/array'
 import SVG from '$lib/components/SVG.svelte'
+import { normalizeEventsToHandler } from '$lib/components/table/handlers'
 
-export const columnCellFactory: {
-  [key in DisplayAs]: (value: any, column: DisplayColumnDef) => ComponentRenderConfig
-} = {
+export const columnCellFactory: ColumnRenderCellMap = {
   [DisplayAs.auto]: (value, _) =>
     createRender(Text, {
       text: value,
@@ -46,34 +45,36 @@ export const columnCellFactory: {
       text: new Date(value).toLocaleDateString(),
       class: 'text-xs',
     }),
-  [DisplayAs.link]: (value, _) =>
-    createRender(Link, {
+  [DisplayAs.link]: (value, { onClick }, row) => {
+    const handleOnClick = onClick ? normalizeEventsToHandler(onClick) : () => {}
+    const link = createRender(Link, {
       text: value,
       underline: true,
-    }),
+    })
+    return link.on('click', () => handleOnClick(get(row)))
+  },
 }
 
 export const columnFilterFactory: ColumnFilterMap = {
   [FilterWith.multi_select]: (column) => ({
+    initialFilterValue: normalizeToArray(column?.filterInitialValue ?? []),
     fn: ({ value, filterValue }) =>
       !filterValue?.length ||
       filterValue.length === 0 ||
       matchAnyFilter(value, filterValue),
-    render: ({ filterValue, preFilteredValues }) => {
-      return createRender(MultiSelectFilter, {
+    render: ({ filterValue, preFilteredValues }) =>
+      createRender(MultiSelectFilter, {
         filterValue,
         preFilteredValues,
         column,
-      })
-    },
-    initialFilterValue: normalizeToArray(column?.filterInitialValue ?? []),
+      }),
   }),
   [FilterWith.search]: ({ label, filterInitialValue }) => ({
+    initialFilterValue: filterInitialValue ?? '',
     fn: ({ value, filterValue }) =>
       !filterValue?.length ||
       filterValue.length === 0 ||
       textPrefixFilter(value, filterValue),
-    initialFilterValue: filterInitialValue ?? '',
     render: ({ filterValue }) =>
       createRender(TextInput, {
         name: 'table-search',
@@ -90,19 +91,19 @@ export const columnFilterFactory: ColumnFilterMap = {
   }),
 }
 
-const addColumnOptionsForColumnFilter = (column: DisplayColumnDef) =>
+const addColumnOptionsForColumnFilter = (column: DataColumnSchema) =>
   column?.filter && Object.keys(columnFilterFactory).includes(column.filter)
     ? { filter: columnFilterFactory[column.filter as FilterWith](column) }
     : {}
 
-const addColumnOptionsForSortBy = ({ sortable }: DisplayColumnDef) => ({
+const addColumnOptionsForSortBy = ({ sortable }: DataColumnSchema) => ({
   sort: {
     disable: !sortable,
   },
 })
 
 const createColumn =
-  <T>(table: Table<T>): ((columnDef: DisplayColumnDef) => DataColumn<T>) =>
+  <T>(table: Table<T>): ((columnSchema: DataColumnSchema) => DataColumn<T>) =>
   ({ key, label, id, sortable, display = DisplayAs.auto, ...rest }) =>
     table.column({
       accessor: (i) => accessProperty(i, key),
@@ -116,13 +117,19 @@ const createColumn =
           text: label,
         }),
       cell: (cell, state) =>
-        columnCellFactory[display](cell.value, {
-          key,
-          label,
-          sortable,
-          display,
-          ...rest,
-        }),
+        columnCellFactory[display](
+          cell.value,
+          {
+            key,
+            label,
+            sortable,
+            display,
+            ...rest,
+          },
+          derived(state.originalRows, (rows) =>
+            cell.row.isData() ? cell.row.original : null,
+          ),
+        ),
       footer: () =>
         createRender(Text, {
           text: label,
@@ -141,7 +148,8 @@ export const withIndexColumnLeft = <T>(table: Table<T>, columns: Column<T>[]) =>
 export const withActionColumnRight = <T>(
   table: Table<T>,
   columns: Column<T>[],
-  path: string = '/',
+  path: string = '/questions/',
+  key: string = '',
 ) => [
   ...columns,
   table.display({
@@ -168,7 +176,7 @@ export const withActionColumnRight = <T>(
 
 export const useDataTable = <T>(
   dataStore: Writable<T[]>,
-  columns: DisplayColumnDef[],
+  columns: DataColumnSchema[],
 ) => {
   const plugins = {
     sort: addSortBy<T>({

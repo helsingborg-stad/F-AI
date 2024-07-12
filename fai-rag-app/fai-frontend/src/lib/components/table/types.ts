@@ -1,5 +1,7 @@
 import type { ColumnFiltersColumnOptions } from 'svelte-headless-table/plugins'
-
+import type { GoToEvent } from '$lib/types'
+import type { ComponentRenderConfig } from 'svelte-headless-table'
+import type { Readable } from 'svelte/store'
 export enum DisplayAs {
   auto = 'auto',
   link = 'link',
@@ -21,7 +23,7 @@ export enum FilterWith {
   search = 'search',
 }
 
-export interface DisplayColumnDef extends DisplayField {
+export interface DataColumnSchema extends DisplayField {
   width?: string
   align?: 'left' | 'center' | 'right'
   sortable?: boolean
@@ -31,12 +33,32 @@ export interface DisplayColumnDef extends DisplayField {
   filterInitialValue?: string | string[] | null
   hidden?: boolean
   hideFromSearch?: boolean
+  onClick?: (row: any) => void | GoToEvent
 }
+
 export type ColumnFilterMap = {
   [FilterWith.multi_select]: <Item>(
-    column: DisplayColumnDef,
+    column: DataColumnSchema,
   ) => ColumnFiltersColumnOptions<Item, any[]>
   [FilterWith.search]: <Item>(
-    column: DisplayColumnDef,
+    column: DataColumnSchema,
   ) => ColumnFiltersColumnOptions<Item>
+}
+
+export type ColumnRenderCellMap = {
+  [DisplayAs.auto]: (
+    value: any,
+    column: DataColumnSchema,
+    rowData: Readable<any>,
+  ) => ComponentRenderConfig
+  [DisplayAs.date]: (
+    value: any,
+    column: DataColumnSchema,
+    rowData: Readable<any>,
+  ) => ComponentRenderConfig
+  [DisplayAs.link]: (
+    value: any,
+    column: DataColumnSchema,
+    rowData: Readable<any>,
+  ) => ComponentRenderConfig
 }
