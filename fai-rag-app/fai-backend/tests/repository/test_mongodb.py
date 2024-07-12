@@ -3,17 +3,21 @@ import pytest_asyncio
 from beanie import Document, init_beanie
 from bson import ObjectId
 from mongomock_motor import AsyncMongoMockClient
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from fai_backend.repository.mongodb import MongoDBRepo
 from fai_backend.repository.query.component import AttributeAssignment, AttributeComparison, LogicalExpression
 
 
 class Employee(BaseModel):
-    id: str = None
+    id: ObjectId = Field(alias='_id', default_factory=ObjectId)
     name: str
     age: int
     perks: list[str] = []
+
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
 
 
 class EmployeeDocument(Document, Employee):
@@ -72,7 +76,7 @@ async def test_update_existing_document(mongo_repo):
     document = await mongo_repo.get(created.id)
     saved_id = document.id
     updated_document = await mongo_repo.update(
-        document.id, {'name': 'Eve Updated', 'age': 50}
+        document.copy(update={'name': 'Eve Updated', 'age': 50})
     )
 
     assert updated_document is not None
@@ -83,11 +87,12 @@ async def test_update_existing_document(mongo_repo):
 
 @pytest.mark.asyncio
 async def test_update_non_existing_document(mongo_repo):
-    updated_document = await mongo_repo.update(
-        str(ObjectId()), {'name': 'Non Existing', 'age': 99}
-    )
+    with pytest.raises(AttributeError) as exception_info:
+        await mongo_repo.update(
+            Employee(name='Non Existing', age=99)
+        )
 
-    assert updated_document is None
+    assert "'Employee' object has no attribute 'save_changes'" in str(exception_info.value)
 
 
 @pytest.mark.asyncio

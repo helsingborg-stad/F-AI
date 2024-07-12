@@ -31,7 +31,7 @@ class CompositeRepo(Generic[T], IAsyncRepo[T]):
                 continue
         return None
 
-    async def update(self, item_id: str, item: dict) -> T | None:
+    async def update_id(self, item_id: str, item: dict) -> T | None:
         for repo in self._repos:
             try:
                 updated_item = await repo.update(item_id, item)

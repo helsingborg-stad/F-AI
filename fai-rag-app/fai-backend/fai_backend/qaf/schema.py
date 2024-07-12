@@ -8,6 +8,7 @@ from fai_backend.schema import Timestamp
 
 class QuestionEntry(BaseModel):
     id: str
+    type: str
     messages: list[ResponseMessage] = Field(default_factory=list, repr=False)
     metadata: dict = Field(default_factory=dict, repr=False)
     tags: list[str] = Field(default_factory=list)

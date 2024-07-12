@@ -24,7 +24,7 @@ class ProjectService:
 
     async def update_project(self, project_id: str, project: ProjectUpdateRequest):
         ignore_keys = ['id', 'timestamp']
-        return await self.repo.update(
+        return await self.repo.update_id(
             project_id,
             {
                 key: project.model_dump()[key]

@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar
 
 from beanie import Document, PydanticObjectId, SortDirection
+from bson import ObjectId
 from bson.errors import InvalidId
 from pydantic import BaseModel
 
@@ -39,21 +40,27 @@ class MongoDBRepo(Generic[T, T_DB], IAsyncRepo[T]):
         return [self.model.model_validate(doc) for doc in await db_query.to_list()]
 
     async def create(self, item: T) -> T:
-        item = item.model_dump()
-        item['id'] = PydanticObjectId()
-        item_in_db = await self.odm_model.model_validate(item).create()
+        item_dict = item.dict(by_alias=True)
+        item_in_db = await self.odm_model(**item_dict).create()
+        if not isinstance(item_in_db, dict):
+            item_in_db = item_in_db.dict(by_alias=True)
+
+        if '_id' in item_in_db and isinstance(item_in_db['_id'], str):
+            item_in_db['_id'] = ObjectId(item_in_db['_id'])
+
         return self.model.model_validate(item_in_db)
 
-    async def get(self, item_id: str) -> T | None:
-        try:
-            item = await self.odm_model.find_one(self.odm_model.id == self._str_to_object_id(item_id))
-            return self.model.model_validate(
-                item
-            ) if item else None
-        except InvalidId:
-            return None
+    async def update(self, item: T) -> T:
+        item_in_db = await item.save_changes()
+        if not isinstance(item_in_db, dict):
+            item_in_db = item_in_db.dict(by_alias=True)
 
-    async def update(self, item_id: str, item_data: dict) -> T | None:
+        if '_id' in item_in_db and isinstance(item_in_db['_id'], str):
+            item_in_db['_id'] = ObjectId(item_in_db['_id'])
+
+        return self.model.model_validate(item_in_db)
+
+    async def update_id(self, item_id: str, item_data: dict) -> T | None:
         object_id = self._str_to_object_id(item_id)
         item = await self.odm_model.find_one(self.odm_model.id == object_id)
         if item:
@@ -63,6 +70,15 @@ class MongoDBRepo(Generic[T, T_DB], IAsyncRepo[T]):
             await item.save_changes()
             return self.model.model_validate(item)
         return None
+
+    async def get(self, item_id: str | ObjectId) -> T | None:
+        try:
+            item = await self.odm_model.find_one(self.odm_model.id == self._str_to_object_id(item_id))
+            return self.model.model_validate(
+                item
+            ) if item else None
+        except InvalidId:
+            return None
 
     async def delete(self, item_id: str) -> T | None:
         object_id = self._str_to_object_id(item_id)

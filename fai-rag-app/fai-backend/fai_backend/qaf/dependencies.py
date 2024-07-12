@@ -50,8 +50,9 @@ async def question_details_loader(
         conversation_id: str,
         service: QAFService = Depends(QAFService.factory),
         user: ProjectUser = Depends(get_project_user),
+        conversation_service: ConversationService = Depends(get_conversation_service),
 ) -> QuestionEntry | None:
-    return await service.submitted_question_details(user, conversation_id)
+    return await service.submitted_question_details(user, conversation_id, conversation_service)
 
 
 async def question_create_action(
@@ -76,23 +77,27 @@ async def add_feedback_action(
         body: FeedbackPayload,
         service: QAFService = Depends(QAFService.factory),
         user: ProjectUser = Depends(get_project_user),
+        conversation_service: ConversationService = Depends(get_conversation_service),
 ) -> QuestionDetails | None:
     return await service.add_feedback(
         user,
         body,
+        conversation_id,
+        conversation_service
     )
 
 
 async def add_answer_action(
-        conversation_id: str,
         body: SubmitAnswerPayload,
         service: QAFService = Depends(QAFService.factory),
         user: ProjectUser = Depends(get_project_user),
+        conversation_service: ConversationService = Depends(get_conversation_service),
 ) -> QuestionDetails | None:
     try:
         review = await service.add_message(
             user,
             body,
+            conversation_service
         )
         return review
     except Exception as e:
@@ -105,6 +110,7 @@ async def run_llm_on_question_create_action(
         service: QAFService = Depends(QAFService.factory),
         file_service: FileUploadService = Depends(get_file_upload_service),
         user: ProjectUser = Depends(get_project_user),
+        conversation_service: ConversationService = Depends(get_conversation_service),
 ) -> QuestionDetails:
     latest_upload_path = file_service.get_latest_upload_path(user.project_id)
     if not latest_upload_path:
@@ -115,7 +121,8 @@ async def run_llm_on_question_create_action(
     response = await ask_llm_raq_question(question=question.question.content, collection_name=directory_name)
     await service.add_message(
         user,
-        GenerateAnswerPayload(question_id=question.id, answer=response)
+        GenerateAnswerPayload(question_id=question.id, answer=response),
+        conversation_service
     )
 
     return question

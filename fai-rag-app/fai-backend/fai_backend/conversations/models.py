@@ -1,6 +1,10 @@
-from uuid import uuid4
+import uuid
+from typing import Optional, Annotated, List
+from uuid import uuid4, UUID
 
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel, Field, UUID4, BeforeValidator, ConfigDict
+from bson import ObjectId as BsonObjectId, ObjectId
+from pydantic.v1 import validator, root_validator
 
 from fai_backend.schema import Timestamp
 
@@ -14,6 +18,7 @@ class Feedback(BaseModel):
 
 
 class Message(BaseModel):
+    id: UUID4 = Field(default_factory=uuid4)
     user: str
     content: str
     created_by: str
@@ -23,24 +28,27 @@ class Message(BaseModel):
     metadata: dict | None = Field(default_factory=dict)
 
 
-class Thread(BaseModel):
-    id: UUID4 = Field(default_factory=uuid4)
-    thread_name: str
-    copy_of_thread_with_id: str | None = None
-    active_flag: bool
-    timestamp: Timestamp = Timestamp()
-    messages: list[Message]
-    feedback: Feedback | None = None
-    metadata: dict | None = Field(default_factory=dict)
-
-
 class Conversation(BaseModel):
-    id: str
+    id: ObjectId = Field(alias='_id')
     type: str = 'conversation'
     created_by: str
-    participants: list[str]
-    threads: list[Thread]
-    messages: list[Message]
+    participants: List[str]
+    messages: List[Message] = Field(default_factory=list)
+    conversation_id: UUID4 = Field(default_factory=uuid4)
+    conversation_root_id: UUID4 | None = None
+    conversation_active_id: UUID4
     timestamp: Timestamp = Timestamp()
     metadata: dict = Field(default_factory=dict)
-    tags: list[str] | None = Field(default_factory=list)
+    tags: List[str] | None = Field(default_factory=list)
+
+    class Config:
+        populate_by_name = True             # Populate model fields by name instead of alias if present
+        arbitrary_types_allowed = True      # Allow arbitrary types (e.g. ObjectId)
+        json_encoders = {ObjectId: str}     # `ObjectId` not serializable by default
+        orm_mode = True
+
+    @validator('id', pre=True, always=True)
+    def ensure_object_id(cls, v):
+        if isinstance(v, str):
+            return ObjectId(v)
+        return v
