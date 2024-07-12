@@ -1,8 +1,16 @@
 /// <reference types="svelte" />
 /// <reference types="vite/client" />
-declare namespace svelteHTML {
+
+declare global {
+  declare namespace svelteHTML {
     interface HTMLAttributes<T> {
-        'on:felteerror'?: (event: any) => any;
-        'on:feltesuccess'?: (event: any) => any;
+      'on:felteerror'?: (event: any) => any
+      'on:feltesuccess'?: (event: any) => any
     }
+  }
+
+  type EventElements = Event & {
+    currentTarget: EventTarget & HTMLInputElement
+  }
 }
+export {}
