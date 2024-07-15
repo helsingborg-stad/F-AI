@@ -2,7 +2,7 @@
   "id": "example",
   "meta": {
     "name": "Example Assistant",
-    "description": "This is an *example assistant* for testing purposes.",
+    "description": "This is an *example assistant* for testing purposes. It has been instructed to answer Swedish questions about Helsingborg.",
     "sample_questions": [
       "Hur kan jag kolla upp tidstabellen för bussar?",
       "Vilka evenemang händer i sommar?",
