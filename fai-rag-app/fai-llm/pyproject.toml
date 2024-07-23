@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "fai-llm"
+version = "0.1.0"
+description = "Process that handles LLM jobs with API for remote communication."
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "~3.11.9"
+fastapi = {version = "~0.108.0", extras = ["all"]}
+pydantic = {version = "~2.7.4", extras = ["email"]}
+python-dotenv = "~1.0.1"
+pydantic-settings = "^2.3.4"
+langstream = "~0.3.1"
+openai = "~1.33.0"
+websockets = "^12.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "~7.4.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
