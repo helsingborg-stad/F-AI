@@ -15,13 +15,7 @@ async def llm_enqueue(
         history: list[AssistantStreamMessage],
         query: str
 ):
-    service = global_locator.services.worker_service
-    job_id = service.enqueue(
-        assistant=assistant,
-        history=history,
-        query=query
-    )
-    return {'job_id': job_id}
+    return {'job_id': 'todo'}
 
 
 @router.post('/cancel', summary='Cancel a pending LLM job that has not yet been started.')

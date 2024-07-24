@@ -1,4 +1,3 @@
-import logging
 from dataclasses import dataclass
 
 from fai_llm.app_life.service import AppLifeService

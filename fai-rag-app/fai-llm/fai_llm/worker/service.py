@@ -4,14 +4,15 @@ import threading
 import uuid
 from multiprocessing import Process, Pipe
 from multiprocessing.connection import Connection
+from typing import Callable, Awaitable
 
 from fai_llm.assistant.models import AssistantTemplate, AssistantStreamMessage, AssistantTemplateMeta, \
     AssistantStreamConfig
 from fai_llm.assistant.service import AssistantFactory
 from fai_llm.log.service import MPLogging
 from fai_llm.service_locator.service import global_locator
-from fai_llm.worker.model import WorkerMessages, OpaqueID, WorkStatus
-from fai_llm.worker.protocol import IWorkerService
+from fai_llm.worker.model import WorkerMessages, WorkStatus
+from fai_llm.worker.protocol import IWorkerService, WorkCallback
 
 
 class AssistantWorkerProcess(Process):
@@ -75,8 +76,10 @@ class MPWorkerService(IWorkerService):
     _log: logging.Logger
     _worker_process: AssistantWorkerProcess
     _polling_thread: threading.Thread
-    _history: dict[OpaqueID, WorkStatus] = {}
+    # _history: dict[str, WorkStatus] = {}
     _should_poll: bool = True
+    _callbacks: dict[str, WorkCallback] = {}
+    _pending_job_ids = []
 
     def __init__(self):
         self._log = global_locator.services.main_logger.scope('MPWorkerService')
@@ -107,24 +110,38 @@ class MPWorkerService(IWorkerService):
             self._log.info(f'stopped worker process')
         self._worker_process.close()
 
-        print(f'mp worker service shutdown')
+        self._log.info('shutdown complete')
 
-    def enqueue(self, assistant: AssistantTemplate, history: list[AssistantStreamMessage], query: str) -> OpaqueID:
-        new_job_id = OpaqueID(uuid.uuid4())
-        self._history[new_job_id] = WorkStatus(status='pending', message='')
+    def enqueue(
+            self,
+            job_id: str,
+            assistant: AssistantTemplate,
+            history: list[AssistantStreamMessage],
+            query: str
+    ) -> str:
+        # self._history[job_id] = WorkStatus(status='pending', message='')
+        self._pending_job_ids.append(job_id)
         self._conn.send(WorkerMessages.RunRequest(
-            job_id=new_job_id,
+            job_id=job_id,
             assistant=assistant,
             history=history,
             query=query,
         ))
-        return new_job_id
+        return job_id
 
-    def cancel(self, job_id: OpaqueID):
+    def cancel(self, job_id: str):
         raise NotImplementedError('cancel not implemented yet')
 
-    def status(self, job_id: OpaqueID) -> WorkStatus:
-        return self._history[job_id]
+    async def listen_for(self, job_id: str, callback: WorkCallback):
+        self._callbacks[job_id] = callback
+        if job_id in self._pending_job_ids:
+            await callback(WorkStatus(status='pending'))
+
+        # if job_id in self._history:
+        #     await callback(self._history[job_id])
+
+    def stop(self, job_id: str):
+        self._callbacks.pop(job_id, None)
 
     def _poll(self):
         async def poll_internal():
@@ -139,21 +156,48 @@ class MPWorkerService(IWorkerService):
                     # handle message
                     if isinstance(data, WorkerMessages.JobUpdate):
                         update: WorkerMessages.JobUpdate = data
-                        self._history[update.job_id].status = 'running'
-                        self._history[update.job_id].message += update.message
+
+                        if update.job_id in self._pending_job_ids:
+                            self._pending_job_ids.remove(update.job_id)
+
+                        # self._history[update.job_id].status = 'running'
+                        # self._history[update.job_id].message += update.message
                         self._log.debug(f'job {update.job_id} update, message={update.message}')
+
+                        if update.job_id in self._callbacks:
+                            await self._callbacks[update.job_id](WorkStatus(
+                                status='running',
+                                message=update.message,
+                            ))
 
                     elif isinstance(data, WorkerMessages.JobDone):
                         update: WorkerMessages.JobDone = data
-                        self._history[update.job_id].status = 'done'
+
+                        if update.job_id in self._pending_job_ids:
+                            self._pending_job_ids.remove(update.job_id)
+
+                        # self._history[update.job_id].status = 'done'
                         self._log.debug(
-                            f'job {update.job_id} done, message={self._history[update.job_id].message}')
+                            f'job {update.job_id} done')
+
+                        if update.job_id in self._callbacks:
+                            await self._callbacks[update.job_id](WorkStatus(status='done'))
 
                     elif isinstance(data, WorkerMessages.JobError):
                         error: WorkerMessages.JobError = data
-                        self._history[error.job_id].status = 'failed'
-                        self._history[error.job_id].message = error.error
+
+                        if error.job_id in self._pending_job_ids:
+                            self._pending_job_ids.remove(error.job_id)
+
+                        # self._history[error.job_id].status = 'failed'
+                        # self._history[error.job_id].message = error.error
                         self._log.error(f'job {error.job_id} error, message={error.error}')
+
+                        if error.job_id in self._callbacks:
+                            await self._callbacks[error.job_id](WorkStatus(
+                                status='failed',
+                                message=error.error,
+                            ))
 
                     elif isinstance(data, WorkerMessages.ProcessCrash):
                         error: WorkerMessages.ProcessCrash = data

@@ -4,12 +4,10 @@ from pydantic import BaseModel
 
 from fai_llm.assistant.models import AssistantTemplate, AssistantStreamMessage
 
-OpaqueID = str
-
 
 class WorkStatus(BaseModel):
     status: Literal['pending', 'running', 'cancelled', 'done', 'failed']
-    message: str
+    message: str = ''
 
 
 class WorkerMessages:
@@ -20,14 +18,14 @@ class WorkerMessages:
         query: str
 
     class JobUpdate(BaseModel):
-        job_id: OpaqueID
+        job_id: str
         message: str
 
     class JobDone(BaseModel):
-        job_id: OpaqueID
+        job_id: str
 
     class JobError(BaseModel):
-        job_id: OpaqueID
+        job_id: str
         error: str
 
     class ProcessCrash(BaseModel):

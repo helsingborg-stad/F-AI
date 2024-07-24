@@ -9,6 +9,7 @@ class Settings(BaseSettings, extra='ignore'):
     LISTEN_PORT: int = 8001
     LOG_LEVEL: str = 'info'
     LOG_FORMAT: str = '%(asctime)s:%(name)s:%(process)d:%(thread)d:%(levelname)s:%(message)s'
+    LOG_FILE: bool = True
     LOG_STDOUT: bool = True
 
     class Config:

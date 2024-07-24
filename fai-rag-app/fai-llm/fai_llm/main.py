@@ -9,6 +9,7 @@ from fai_llm.log.service import MPLogging
 from fai_llm.service_locator.service import global_locator
 from fai_llm.worker.factory import DefaultWorkerFactory
 from llm.routes import router as llm_router
+from ws.routes import router as ws_router
 
 
 @asynccontextmanager
@@ -29,6 +30,7 @@ app = FastAPI(
 )
 
 app.include_router(llm_router)
+app.include_router(ws_router)
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host=settings.LISTEN_ADDRESS, port=settings.LISTEN_PORT, reload=True)
