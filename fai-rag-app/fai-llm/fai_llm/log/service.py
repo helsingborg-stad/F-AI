@@ -32,11 +32,13 @@ class MPLogging:
         log_level = logging.getLevelNamesMapping()[settings.LOG_LEVEL.upper()]
         new_logger.setLevel(log_level)
 
-        file_handler = logging.FileHandler(f'{name}.log')
-        file_handler.setLevel(log_level)
         formatter = logging.Formatter(settings.LOG_FORMAT)
-        file_handler.setFormatter(formatter)
-        new_logger.addHandler(file_handler)
+
+        if settings.LOG_FILE:
+            file_handler = logging.FileHandler(f'{name}.log')
+            file_handler.setLevel(log_level)
+            file_handler.setFormatter(formatter)
+            new_logger.addHandler(file_handler)
 
         if settings.LOG_STDOUT:
             stdout_handler = logging.StreamHandler(sys.stdout)
