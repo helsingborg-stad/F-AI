@@ -1,31 +1,24 @@
-from typing import Type
+from typing import Type, Callable, Any, Awaitable
 
 from fai_llm.assistant.models import AssistantTemplate, AssistantTemplateMeta, AssistantStreamConfig, \
     AssistantStreamMessage
 from fai_llm.serializer.impl.json import JSONSerializer
 from fai_llm.service_locator.service import global_locator
-from fai_llm.worker.model import WorkStatus
+from fai_llm.worker.model import WorkerMessages
 from fai_llm.ws.model import WsMessages
-from fai_llm.ws.protocol import IWebsocketClientConnection
+from fai_llm.ws.protocol import IWebsocketClientConnection, IWebSocketClientHandler
+from fai_llm.ws.worker_ws_adapter import WorkerToWsMessagesAdapter
 
 
-class WebSocketClient:
-    def __init__(self, conn: IWebsocketClientConnection, dc_exc_type: Type[Exception]):
-        self._conn = conn
-        self._dc_exc_type = dc_exc_type
-        self._log = global_locator.services.main_logger.scope('WebSocketClient')
-        self._serializer = JSONSerializer[WsMessages.Client]()
-        self._my_job_ids = []
-        self._payload_type_handlers = {
-            'add': self._handle_add,
-            'cancel': self._handle_cancel,
-            'query': self._handle_query
-        }
+class Handler(IWebSocketClientHandler):
+    def __init__(self, sender_func: Callable[[Any], Awaitable[None]]):
+        self._log = global_locator.services.main_logger.scope('WebSocketClientHandler')
+        self._sender_func = sender_func
 
-    async def _handle_add(self, payload: WsMessages.Client):
-        self._log.debug(f'add, {payload.job_id} query={payload.query}')
-        global_locator.services.worker_service.enqueue(
-            job_id=payload.job_id,
+    async def add(self, payload: WsMessages.AddRequest):
+        data = WsMessages.AddRequest.model_validate(payload)
+        self._log.debug(f"add {payload}")
+        new_job_id = global_locator.services.worker_service.enqueue(
             assistant=AssistantTemplate(
                 id='test',
                 meta=AssistantTemplateMeta(),
@@ -47,22 +40,39 @@ class WebSocketClient:
             history=payload.history,
             query=payload.query
         )
-        await self._add_job_handler(payload.job_id)
+        self._log.debug(f"add {data.id}={new_job_id}")
+        await self._sender_func(WsMessages.AddResponse(
+            id=data.id,
+            job_id=new_job_id
+        ))
+        await self.listen(WsMessages.ListenRequest(job_id=new_job_id))
 
-    async def _handle_cancel(self, payload: WsMessages.Client):
-        self._log.debug(f'cancel, {payload.job_id}')
+    async def listen(self, payload: WsMessages.ListenRequest):
+        self._log.debug(f"listen {payload}")
+        await global_locator.services.worker_service.listen_for(payload.job_id, self._send_job_update)
 
-    async def _handle_query(self, payload: WsMessages.Client):
-        self._log.debug(f'query, {payload.job_id}')
-        await self._add_job_handler(payload.job_id)
+    async def _send_job_update(self, payload: WorkerMessages.Base):
+        converted = WorkerToWsMessagesAdapter.to_ws(payload)
+        await self._sender_func(converted)
 
-    async def _add_job_handler(self, job_id: str):
-        self._my_job_ids.append(job_id)
-        await global_locator.services.worker_service.listen_for(job_id, self._on_job_update)
 
-    async def _on_job_update(self, payload: WorkStatus):
-        data = self._serializer.serialize(payload)
-        await self._conn.send(data)
+class WebSocketClient:
+    def __init__(self, conn: IWebsocketClientConnection, dc_exc_type: Type[Exception]):
+        self._conn = conn
+        self._dc_exc_type = dc_exc_type
+        self._log = global_locator.services.main_logger.scope('WebSocketClient')
+        self._serializer = JSONSerializer[WsMessages.Base]()
+        self._handler = Handler(sender_func=self._send)
+
+        self._my_job_ids = []
+        self._payload_type_handlers = {
+            'add': self._handler.add,
+            'listen': self._handler.listen
+        }
+
+    async def _send(self, data: Any):
+        serialized = self._serializer.serialize(data)
+        await self._conn.send(serialized)
 
     async def run(self):
         self._log.info('connected')
@@ -70,8 +80,10 @@ class WebSocketClient:
             while True:
                 msg = await self._conn.receive()
                 self._log.info(f'received {msg}')
-                payload = self._serializer.deserialize(msg, WsMessages.Client)
-                await self._payload_type_handlers[payload.command](payload)
+                payload = self._serializer.deserialize(msg, WsMessages.Base)
+                model_type = WsMessages.incoming_type_map[payload.type]
+                validated = model_type.model_validate(payload.model_dump())
+                await self._payload_type_handlers[payload.type](validated)
 
         except self._dc_exc_type:
             self._log.info('disconnected')
