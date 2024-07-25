@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Type, Callable, Awaitable
 
 from pydantic import BaseModel
 
@@ -11,22 +11,36 @@ class WorkStatus(BaseModel):
 
 
 class WorkerMessages:
-    class RunRequest(BaseModel):
+    class Base(BaseModel, extra='allow'):
+        type: str
+
+    class AddRequest(Base):
+        type: str = 'add'
         job_id: str
         assistant: AssistantTemplate
         history: list[AssistantStreamMessage]
         query: str
 
-    class JobUpdate(BaseModel):
+    class JobUpdate(Base):
+        type: str = 'update'
         job_id: str
         message: str
 
-    class JobDone(BaseModel):
+    class JobDone(Base):
+        type: str = 'done'
         job_id: str
 
-    class JobError(BaseModel):
+    class JobError(Base):
+        type: str = 'error'
         job_id: str
         error: str
 
-    class ProcessCrash(BaseModel):
-        error: str
+    type_map: dict[str, Type[Base]] = {
+        'add': AddRequest,
+        'update': JobUpdate,
+        'done': JobDone,
+        'error': JobError,
+    }
+
+
+WorkCallback = Callable[[WorkerMessages.Base], Awaitable[None]]

@@ -1,15 +1,12 @@
-from typing import Protocol, Callable, Awaitable
+from typing import Protocol
 
 from fai_llm.assistant.models import AssistantStreamMessage, AssistantTemplate
-from fai_llm.worker.model import WorkStatus
-
-WorkCallback = Callable[[WorkStatus], Awaitable[None]]
+from fai_llm.worker.model import WorkCallback
 
 
 class IWorkerService(Protocol):
     def enqueue(
             self,
-            job_id: str,
             assistant: AssistantTemplate,
             history: list[AssistantStreamMessage],
             query: str

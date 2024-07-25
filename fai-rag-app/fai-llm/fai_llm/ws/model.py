@@ -1,19 +1,53 @@
-from typing import Literal
+from typing import Type
 
 from pydantic import BaseModel
 
-from fai_llm.assistant.models import AssistantTemplate, AssistantStreamMessage
+from fai_llm.assistant.models import AssistantStreamMessage
 
 
 class WsMessages:
-    class Client(BaseModel):
-        command: Literal['add', 'cancel', 'query']
-        job_id: str
-        assistant: AssistantTemplate | None = None
-        history: list[AssistantStreamMessage] = []
-        query: str | None = None
+    class Base(BaseModel, extra='allow'):
+        type: str
 
-    class Server(BaseModel):
+    class AddRequest(Base):
+        type: str = 'add'
+        id: str
+        # assistant: AssistantTemplate
+        history: list[AssistantStreamMessage] = []
+        query: str
+
+    class ListenRequest(Base):
+        type: str = 'listen'
         job_id: str
-        status: Literal['created', 'cancelled', 'update', 'finished', 'failed']
+
+    class AddResponse(Base):
+        type: str = 'add'
+        id: str
+        job_id: str
+
+    class JobPendingResponse(Base):
+        type: str = 'pending'
+        job_id: str
+
+    class JobDoneResponse(Base):
+        type: str = 'done'
+        job_id: str
+
+    class JobFailedResponse(Base):
+        type: str = 'failed'
+        job_id: str
         message: str
+
+    class JobRunningResponse(Base):
+        type: str = 'running'
+        job_id: str
+
+    class JobUpdateResponse(Base):
+        type: str = 'running'
+        job_id: str
+        message: str
+
+    incoming_type_map: dict[str, Type[Base]] = {
+        'add': AddRequest,
+        'listen': ListenRequest,
+    }
