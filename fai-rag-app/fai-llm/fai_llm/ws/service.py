@@ -1,7 +1,5 @@
 from typing import Type, Callable, Any, Awaitable
 
-from fai_llm.assistant.models import AssistantTemplate, AssistantTemplateMeta, AssistantStreamConfig, \
-    AssistantStreamMessage
 from fai_llm.serializer.impl.json import JSONSerializer
 from fai_llm.service_locator.service import global_locator
 from fai_llm.worker.model import WorkerMessages
@@ -19,24 +17,7 @@ class Handler(IWebSocketClientHandler):
         data = WsMessages.AddRequest.model_validate(payload)
         self._log.debug(f"add {payload}")
         new_job_id = global_locator.services.worker_service.enqueue(
-            assistant=AssistantTemplate(
-                id='test',
-                meta=AssistantTemplateMeta(),
-                streams=[AssistantStreamConfig(
-                    provider='openai',
-                    settings={'model': 'gpt-3.5-turbo'},
-                    messages=[
-                        AssistantStreamMessage(
-                            role='system',
-                            content='You are an unhelpful assistant that answers questions in a sarcastic way.'
-                        ),
-                        AssistantStreamMessage(
-                            role='user',
-                            content='{query}'
-                        )
-                    ]
-                )]
-            ),
+            assistant=payload.assistant,
             history=payload.history,
             query=payload.query
         )

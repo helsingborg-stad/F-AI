@@ -2,7 +2,7 @@ from typing import Type
 
 from pydantic import BaseModel
 
-from fai_llm.assistant.models import AssistantStreamMessage
+from fai_llm.assistant.models import AssistantStreamMessage, AssistantTemplate
 
 
 class WsMessages:
@@ -12,7 +12,7 @@ class WsMessages:
     class AddRequest(Base):
         type: str = 'add'
         id: str
-        # assistant: AssistantTemplate
+        assistant: AssistantTemplate
         history: list[AssistantStreamMessage] = []
         query: str
 
@@ -21,7 +21,7 @@ class WsMessages:
         job_id: str
 
     class AddResponse(Base):
-        type: str = 'add'
+        type: str = 'resp_add'
         id: str
         job_id: str
 
@@ -37,10 +37,6 @@ class WsMessages:
         type: str = 'failed'
         job_id: str
         message: str
-
-    class JobRunningResponse(Base):
-        type: str = 'running'
-        job_id: str
 
     class JobUpdateResponse(Base):
         type: str = 'running'

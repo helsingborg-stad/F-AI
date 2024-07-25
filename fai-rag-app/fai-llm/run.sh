@@ -1,0 +1,1 @@
+PYTHONPATH=./ poetry run python fai_llm/main.py
