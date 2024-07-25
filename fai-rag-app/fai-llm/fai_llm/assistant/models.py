@@ -4,12 +4,6 @@ from typing import Optional, Any, Literal
 from pydantic import BaseModel
 
 
-class LLMClientChatMessage(BaseModel):
-    date: datetime
-    source: str | None = None
-    content: str | None = None
-
-
 class AssistantStreamMessage(BaseModel):
     role: Literal["system", "user", "assistant", "function"]
     content: str
@@ -29,15 +23,7 @@ class AssistantStreamPipelineDef(BaseModel):
     pipeline: str
 
 
-class AssistantTemplateMeta(BaseModel):
-    name: str = ""
-    description: str = ""
-    sample_questions: list[str] = []
-
-
-class AssistantTemplate(BaseModel):
-    id: str
-    meta: AssistantTemplateMeta
+class AssistantTemplate(BaseModel, extra='ignore'):
     files_collection_id: Optional[str] = None
     streams: list[AssistantStreamConfig | AssistantStreamPipelineDef]
 
