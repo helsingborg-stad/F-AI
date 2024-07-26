@@ -55,7 +55,7 @@ async def test_composite_list_items(composite_repo, items_to_create):
 async def test_composite_update_item(composite_repo, item, updated_data):
     created_item = await composite_repo.create(item)
 
-    updated_item = await composite_repo.update(created_item.id, updated_data)
+    updated_item = await composite_repo.update_id(created_item.id, updated_data)
     assert updated_item.name == 'NewItem'
     assert updated_item.value == 20
 
@@ -78,7 +78,7 @@ async def test_composite_non_existent_item(composite_repo, non_existent_id):
     retrieved_item = await composite_repo.get(non_existent_id)
     assert retrieved_item is None
 
-    updated_item = await composite_repo.update(non_existent_id, {'name': 'NoItem'})
+    updated_item = await composite_repo.update_id(non_existent_id, {'name': 'NoItem'})
     assert updated_item is None
 
     deleted_item = await composite_repo.delete(non_existent_id)

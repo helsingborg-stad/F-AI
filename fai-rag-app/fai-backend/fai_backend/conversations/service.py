@@ -85,7 +85,7 @@ class ConversationService:
             conversation_id: UUID4,
             messages: list[Message]
     ) -> Conversation:
-        return await self.conversations_repo.update(str(conversation_id), {'messages': messages})
+        return await self.conversations_repo.update_id(str(conversation_id), {'messages': messages})
 
     async def update(self, conversation: Conversation) -> Conversation:
         return await self.conversations_repo.update(conversation)
