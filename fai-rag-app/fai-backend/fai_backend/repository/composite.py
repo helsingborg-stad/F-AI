@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar
 
 from fai_backend.repository.interface import IAsyncRepo
+from fai_backend.repository.query.component import QueryComponent
 
 T = TypeVar('T')
 
@@ -16,7 +17,7 @@ class CompositeRepo(Generic[T], IAsyncRepo[T]):
                 return item
         return None
 
-    async def list(self) -> list[T]:
+    async def list(self, query: QueryComponent = None, sort_by: str = None, sort_order: str = 'asc') -> list[T]:
         all_items = []
         for repo in self._repos:
             items = await repo.list()
@@ -34,7 +35,7 @@ class CompositeRepo(Generic[T], IAsyncRepo[T]):
     async def update_id(self, item_id: str, item: dict) -> T | None:
         for repo in self._repos:
             try:
-                updated_item = await repo.update(item_id, item)
+                updated_item = await repo.update_id(item_id, item)
                 if updated_item is not None:
                     return updated_item
             except NotImplementedError:
