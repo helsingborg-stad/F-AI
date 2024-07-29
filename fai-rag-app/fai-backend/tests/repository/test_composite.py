@@ -63,6 +63,10 @@ async def test_composite_update_item_by_object(composite_repo, item, updated_dat
     assert updated_item.value == updated_data.get('value')
 
 
+@pytest.mark.parametrize(
+    'item, updated_data',
+    [(Item(name='OldItem', value=15), {'name': 'NewItem', 'value': 20})],
+)
 @pytest.mark.asyncio
 async def test_composite_update_item_by_id(composite_repo, item, updated_data):
     created_item = await composite_repo.create(item)
