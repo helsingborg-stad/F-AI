@@ -34,9 +34,9 @@ class Conversation(BaseModel):
     created_by: str
     participants: List[str]
     messages: List[Message] = Field(default_factory=list)
-    conversation_id: UUID4 = Field(default_factory=uuid4)
-    conversation_root_id: UUID4 | None = None
-    conversation_active_id: UUID4
+    conversation_id: UUID4 = Field(default_factory=uuid4)   # ID used to track the conversation and its copies
+    conversation_root_id: UUID4 | None = None               # Any copy of the conversation will have the same root ID
+    conversation_active_id: UUID4                           # The root conversation will track the active conversation
     timestamp: Timestamp = Timestamp()
     metadata: dict = Field(default_factory=dict)
     tags: List[str] | None = Field(default_factory=list)

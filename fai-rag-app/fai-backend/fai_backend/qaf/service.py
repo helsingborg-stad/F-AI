@@ -41,7 +41,6 @@ class QAFService:
             tags: list[str] | None = None,
     ) -> QuestionDetails:
         conversation_request = CreateConversationRequest(
-            # id=project_user.project_id,
             type='question',
             messages=[
                 CreateMessageRequest(
