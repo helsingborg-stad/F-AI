@@ -52,7 +52,19 @@ async def test_composite_list_items(composite_repo, items_to_create):
     [(Item(name='OldItem', value=15), {'name': 'NewItem', 'value': 20})],
 )
 @pytest.mark.asyncio
-async def test_composite_update_item(composite_repo, item, updated_data):
+async def test_composite_update_item_by_object(composite_repo, item, updated_data):
+    created_item = await composite_repo.create(item)
+
+    created_item.name = updated_data.get('name')
+    created_item.value = updated_data.get('value')
+
+    updated_item = await composite_repo.update(created_item)
+    assert updated_item.name == updated_data.get('name')
+    assert updated_item.value == updated_data.get('value')
+
+
+@pytest.mark.asyncio
+async def test_composite_update_item_by_id(composite_repo, item, updated_data):
     created_item = await composite_repo.create(item)
 
     updated_item = await composite_repo.update_id(created_item.id, updated_data)

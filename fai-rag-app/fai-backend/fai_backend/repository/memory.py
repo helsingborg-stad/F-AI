@@ -23,6 +23,12 @@ class InMemoryRepo(Generic[T], IAsyncRepo[T]):
     async def list(self, query: QueryComponent = None, sort_by: str = None, sort_order: str = 'asc') -> list[T]:
         return list(self._items.values())
 
+    async def update(self, item: T) -> T | None:
+        if int(item.id) in self._items:
+            self._items[int(item.id)] = item
+            return item
+        return
+
     async def update_id(self, item_id: str, item_data: dict) -> T | None:
         if int(item_id) in self._items:
             item = self._items[int(item_id)]

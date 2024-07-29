@@ -32,6 +32,14 @@ class CompositeRepo(Generic[T], IAsyncRepo[T]):
                 continue
         return None
 
+    async def update(self, item: T) -> T | None:
+        for repo in self._repos:
+            try:
+                return await repo.update(item)
+            except NotImplementedError:
+                continue
+        return None
+
     async def update_id(self, item_id: str, item: dict) -> T | None:
         for repo in self._repos:
             try:
