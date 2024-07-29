@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar
 
 from fai_backend.repository.interface import IAsyncRepo
+from fai_backend.repository.query.component import QueryComponent
 
 T = TypeVar('T')
 
@@ -19,10 +20,10 @@ class InMemoryRepo(Generic[T], IAsyncRepo[T]):
     async def get(self, item_id: str) -> T | None:
         return self._items.get(int(item_id))
 
-    async def list(self) -> list[T]:
+    async def list(self, query: QueryComponent = None, sort_by: str = None, sort_order: str = 'asc') -> list[T]:
         return list(self._items.values())
 
-    async def update(self, item_id: str, item_data: dict) -> T | None:
+    async def update_id(self, item_id: str, item_data: dict) -> T | None:
         if int(item_id) in self._items:
             item = self._items[int(item_id)]
             for key, value in item_data.items():
