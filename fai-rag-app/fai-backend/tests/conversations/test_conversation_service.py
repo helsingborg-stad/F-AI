@@ -1,11 +1,10 @@
 from tests.conversations.test_fixtures import *
-from fai_backend.qaf.schema import QuestionFilterParams, GenerateAnswerPayload
+from fai_backend.qaf.schema import QuestionFilterParams
 from fai_backend.repository.query.component import LogicalExpression, AttributeAssignment
 
 
 @pytest.mark.asyncio
 async def test_create_conversation(
-        setup_db,
         conversation_service,
         project_admin_user,
         create_dark_matter_question
@@ -24,7 +23,6 @@ async def test_create_conversation(
 
 @pytest.mark.asyncio
 async def test_filter_and_list_conversation(
-        setup_db,
         conversation_service,
         project_admin_user,
         create_dark_matter_question
@@ -53,7 +51,6 @@ async def test_filter_and_list_conversation(
 
 @pytest.mark.asyncio
 async def test_create_inactive_copy_of_conversation(
-        setup_db,
         conversation_service,
         project_admin_user,
         create_dark_matter_question
@@ -79,7 +76,6 @@ async def test_create_inactive_copy_of_conversation(
 
 @pytest.mark.asyncio
 async def test_set_active_conversation(
-        setup_db,
         conversation_service,
         project_admin_user,
         create_dark_matter_question

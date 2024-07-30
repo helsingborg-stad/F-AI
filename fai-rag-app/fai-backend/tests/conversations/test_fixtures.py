@@ -1,14 +1,14 @@
-import uuid
-
 import pytest
 import pytest_asyncio
 from beanie import init_beanie
 from bson import ObjectId
-from mongomock_motor import AsyncMongoMockClient
+from motor.motor_asyncio import AsyncIOMotorClient
 
+from fai_backend.conversations.models import Conversation
 from fai_backend.conversations.schema import CreateConversationRequest, CreateMessageRequest
 from fai_backend.conversations.service import ConversationService
-from fai_backend.repositories import conversation_repo, ProjectModel, PinCodeModel, ConversationDocument
+from fai_backend.repositories import ConversationDocument, ConversationRepository
+from fai_backend.repository.mongodb import MongoDBRepo
 from fai_backend.schema import ProjectUser
 
 TEST_USER_EMAIL = "user@example.com"
@@ -19,17 +19,16 @@ MEANING_OF_LIFE_QUESTION = "What is the meaning of life?"
 
 
 @pytest_asyncio.fixture
-async def conversation_service():
-    return ConversationService(conversation_repo=conversation_repo)
+async def conversation_repo() -> ConversationRepository:
+    client = AsyncIOMotorClient()
+    await init_beanie(database=client['test-db'], document_models=[ConversationDocument])
+    yield MongoDBRepo[Conversation, ConversationDocument](Conversation, ConversationDocument)
+    await ConversationDocument.get_motor_collection().drop()
 
 
 @pytest_asyncio.fixture
-async def setup_db():
-    client = AsyncMongoMockClient().test_db
-    await init_beanie(
-        database=client,
-        document_models=[ProjectModel, PinCodeModel, ConversationDocument]
-    )
+async def conversation_service(conversation_repo):
+    return ConversationService(conversation_repo=conversation_repo)
 
 
 @pytest.fixture

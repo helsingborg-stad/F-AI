@@ -5,9 +5,8 @@ from fai_backend.conversations.utils import *
 @pytest.mark.asyncio
 async def test_get_active_conversations_when_no_conversation_created_by_user_then_expect_no_conversations(
         conversation_service,
-        setup_db,
-        project_admin_user,
-        create_dark_matter_question,
+        conversation_repo,
+        project_admin_user
 ):
     active_conversations = await get_root_conversations_created_by_user(
         conversation_repo,
@@ -21,7 +20,7 @@ async def test_get_active_conversations_when_no_conversation_created_by_user_the
 @pytest.mark.asyncio
 async def test_create_one_active_conversation_then_expect_one_active_conversation_created(
         conversation_service,
-        setup_db,
+        conversation_repo,
         project_admin_user,
         create_dark_matter_question,
 ):
@@ -44,7 +43,7 @@ async def test_create_one_active_conversation_then_expect_one_active_conversatio
 @pytest.mark.asyncio
 async def test_create_two_active_conversation_then_expect_two_active_conversation_created(
         conversation_service,
-        setup_db,
+        conversation_repo,
         project_admin_user,
         create_dark_matter_question,
         create_meaning_of_life_question
@@ -79,7 +78,6 @@ async def test_create_two_active_conversation_then_expect_two_active_conversatio
 @pytest.mark.asyncio
 async def test_get_first_message_in_conversation_with_no_messages_then_expect_empty_list(
         conversation_service,
-        setup_db,
         project_admin_user,
         create_dark_matter_question
 ):
@@ -103,7 +101,6 @@ async def test_get_first_message_in_conversation_with_no_messages_then_expect_em
 @pytest.mark.asyncio
 async def test_get_first_message_in_conversation(
         conversation_service,
-        setup_db,
         project_admin_user,
         create_dark_matter_question
 ):
@@ -121,7 +118,6 @@ async def test_get_first_message_in_conversation(
 @pytest.mark.asyncio
 async def test_get_last_message_in_conversation(
         conversation_service,
-        setup_db,
         project_admin_user,
         create_dark_matter_question
 ):
@@ -139,7 +135,6 @@ async def test_get_last_message_in_conversation(
 @pytest.mark.asyncio
 async def test_get_all_messages_in_conversation(
         conversation_service,
-        setup_db,
         project_admin_user,
         create_dark_matter_question,
         create_meaning_of_life_question
