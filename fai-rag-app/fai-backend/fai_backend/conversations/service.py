@@ -51,7 +51,6 @@ class ConversationService:
         root_id = AttributeAssignment('conversation_id', conversation_to_activate.conversation_root_id)
         root_conversation = (await self.conversations_repo.list(query=root_id))[0]
 
-        root_conversation.conversation_active_id = conversation_to_activate.conversation_id
         new_conversation_active_id = {'conversation_active_id': conversation_to_activate.conversation_id}
         return await self.conversations_repo.update(root_conversation.id, new_conversation_active_id)
 
