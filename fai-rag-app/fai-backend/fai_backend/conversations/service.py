@@ -1,4 +1,6 @@
-from pydantic import EmailStr
+from uuid import uuid4
+
+from pydantic import EmailStr, UUID4
 
 from fai_backend.conversations.models import Conversation
 from fai_backend.conversations.schema import (
@@ -7,6 +9,7 @@ from fai_backend.conversations.schema import (
     ResponseMessage,
 )
 from fai_backend.repositories import ConversationRepository
+from fai_backend.repository.query.component import LogicalExpression, AttributeAssignment
 
 
 class ConversationService:
@@ -30,6 +33,26 @@ class ConversationService:
         return Conversation.model_validate((await self.conversations_repo.create(
             Conversation.model_validate(conversation.model_dump(exclude={'id'}))
         )).model_dump())
+
+    @staticmethod
+    def get_conversation_copy(conversation: Conversation) -> Conversation:
+        conversation_copy = conversation.dict()
+
+        conversation_copy.update({
+            'id': str(uuid4()),
+            'conversation_id': uuid4(),
+            'conversation_root_id': conversation.conversation_id,
+            'conversation_active_id': None
+        })
+
+        return Conversation.model_validate(conversation_copy)
+
+    async def set_active_conversation(self, conversation_to_activate: Conversation):
+        root_id = AttributeAssignment('conversation_id', conversation_to_activate.conversation_root_id)
+        root_conversation = (await self.conversations_repo.list(query=root_id))[0]
+
+        new_conversation_active_id = {'conversation_active_id': conversation_to_activate.conversation_id}
+        return await self.conversations_repo.update(root_conversation.id, new_conversation_active_id)
 
     async def add_feedback(self, message, email, body) -> FeedbackResponse | None:
         pass

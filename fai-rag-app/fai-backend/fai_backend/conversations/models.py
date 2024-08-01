@@ -1,5 +1,6 @@
+from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, UUID4
 
 from fai_backend.schema import Timestamp
 
@@ -31,3 +32,7 @@ class Conversation(BaseModel):
     timestamp: Timestamp = Timestamp()
     metadata: dict = Field(default_factory=dict)
     tags: list[str] | None = Field(default_factory=list)
+    conversation_id: UUID4 = Field(default_factory=uuid4)   # ID used to track the conversation and its copies
+    conversation_root_id: UUID4 | None = None               # Any copy of the conversation will have the same root ID
+    conversation_active_id: UUID4 | None = None             # The root conversation will track the active conversation
+
