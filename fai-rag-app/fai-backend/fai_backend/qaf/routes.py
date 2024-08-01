@@ -9,6 +9,8 @@ from fai_backend.dependencies import (
 )
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
+from fai_backend.framework.display import DisplayAs
+from fai_backend.framework.table import ColumnFilter, DataColumn
 from fai_backend.llm.service import ask_llm_question, ask_llm_raq_question
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
@@ -18,12 +20,11 @@ from fai_backend.qaf.dependencies import (
     add_answer_action,
     add_feedback_action,
     question_details_loader,
-    questions_filter_params,
     questions_loader,
     run_llm_on_question_create_action,
 )
-from fai_backend.qaf.schema import QuestionDetails, QuestionFilterParams
-from fai_backend.qaf.views import QuestionForm, QuestionsDataTable, ReviewDetails
+from fai_backend.qaf.schema import QuestionDetails
+from fai_backend.qaf.views import QuestionForm, ReviewDetails
 from fai_backend.schema import ProjectUser, User
 from fai_backend.utils import format_datetime_human_readable
 
@@ -81,35 +82,108 @@ def chat_index_view(
     )
 
 
+def to_table_data(question: QuestionDetails) -> dict[str, Any]:
+    return {
+        'subject': question.subject,
+        'errand_id': question.errand_id,
+        'timestamp.created': question.timestamp.created.date(),
+        'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
+        'tags': question.tags,
+        'review_status': question.review_status,
+        'link': f'/questions/{question.id}',
+    }
+
+
+def question_fields() -> list[dict]:
+    return [
+        {'key': 'subject', 'label': 'Subject'},
+        {'key': 'errand_id', 'label': 'Errand ID'},
+        {'key': 'tags', 'label': 'Tags'},
+        {'key': 'review_status', 'label': 'Review Status'},
+        {'key': 'timestamp.modified', 'label': 'Modified'},
+        {'key': 'timestamp.created', 'label': 'Created'},
+        {'key': 'link', 'label': '', 'link_text': 'View'},
+    ]
+
+
 @router.get('/questions', response_model=list, response_model_exclude_none=True)
-def questions(
-        data: list[QuestionDetails] = Depends(questions_loader),
-        query_params: QuestionFilterParams = Depends(questions_filter_params),
-        view=Depends(get_page_template_for_logged_in_users)
-) -> list:
-    return QuestionsDataTable(
-        data=[
-            {
-                'subject': question.subject,
-                'errand_id': question.errand_id,
-                'timestamp.created': question.timestamp.created.date(),
-                'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
-                'tags': question.tags,
-                'review_status': question.review_status,
-                'link': f'/questions/{question.id}',
-            }
-            for question in data
-        ],
-        columns=[
-            {'key': 'subject', 'label': 'Subject'},
-            {'key': 'errand_id', 'label': 'Errand ID'},
-            {'key': 'timestamp.modified', 'label': 'Modified'},
-            {'key': 'timestamp.created', 'label': 'Created'},
-            {'key': 'review_status', 'label': 'Review Status'},
-            {'key': 'link', 'label': '', 'link_text': 'View'},
-        ],
-        query_params=query_params.model_dump(exclude_none=True),
-        view=view,
+def questions(data: list[QuestionDetails] = Depends(questions_loader),
+              view=Depends(get_page_template_for_logged_in_users)):
+    return view(
+        [c.DataTable(
+            data=data,
+            columns=[
+                DataColumn(
+                    key='id',
+                    id='id',
+                    label=_('id', 'ID'),
+                    hidden=True,
+                ),
+                DataColumn(
+                    key='question.content',
+                    id='question',
+                    label=_('question', 'Question'),
+                    display=DisplayAs.link,
+                    on_click=e.GoToEvent(url='/questions/{id}'),
+                    sortable=True,
+                    # filter=ColumnFilter.search,
+                ),
+                DataColumn(
+                    key='answer.content',
+                    id='answer',
+                    label=_('answer', 'Answer'),
+                    sortable=True,
+                    # filter=ColumnFilter.search,
+                ),
+                DataColumn(
+                    key='subject',
+                    label=_('subject', 'Subject'),
+                    filter=ColumnFilter.search,
+                    sortable=True
+                ),
+                DataColumn(
+                    key='errand_id',
+                    label=_('errand_id', 'Errand ID'),
+                    filter=ColumnFilter.search,
+                    sortable=True
+                ),
+                DataColumn(
+                    key='tags',
+                    label=_('tags', 'Tags'),
+                    filter=ColumnFilter.multi_select,
+                ),
+                DataColumn(
+                    key='review_status',
+                    label=_('review_status', 'Review Status'),
+                    filter=ColumnFilter.multi_select,
+                    filter_options=[
+                        ('approved', 'Approved'),
+                        ('rejected', 'Rejected'),
+                        ('in-progress', 'In Progress'),
+                        ('closed', 'Closed'),
+                        ('blocked', 'Blocked'),
+                        ('open', 'Open'),
+                    ],
+                    sortable=True
+
+                ),
+                DataColumn(
+                    key='timestamp.modified',
+                    label=_('modified', 'Modified'),
+                    id='modified',
+                    display=DisplayAs.date,
+                    sortable=True,
+                ),
+                DataColumn(
+                    key='timestamp.created',
+                    id='created',
+                    label=_('created', 'Created'),
+                    display=DisplayAs.date,
+                    sortable=True,
+                ),
+            ]
+        )],
+        _('questions', 'Questions'),
     )
 
 
@@ -140,7 +214,7 @@ async def question_details(
     if not data:
         return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
 
-    return ReviewDetails(authenticated_user, data, view)
+    return ReviewDetails(authenticated_user, data, view, meta_data=to_table_data(data), meta_fields=question_fields())
 
 
 @router.post('/questions/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)

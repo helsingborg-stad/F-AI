@@ -20,7 +20,7 @@ from fai_backend.schema import ProjectUser
 
 async def questions_filter_params(
         q: str = None,
-        tags: list[str] = None,
+        tags: str = None,
         status: str = None,
         review_status: str = None,
         sort: str = None,
@@ -28,7 +28,7 @@ async def questions_filter_params(
 ) -> QuestionFilterParams:
     return QuestionFilterParams(
         q=q,
-        tags=tags,
+        tags=tags.split(',') if tags else None,
         status=status,
         review_status=review_status,
         sort=sort or 'timestamp.modified',
@@ -37,6 +37,13 @@ async def questions_filter_params(
 
 
 async def questions_loader(
+        service: QAFService = Depends(QAFService.factory),
+        user: ProjectUser = Depends(get_project_user),
+) -> list[QuestionEntry]:
+    return await service.list_submitted_questions(user)
+
+
+async def filterable_questions_loader(
         service: QAFService = Depends(QAFService.factory),
         user: ProjectUser = Depends(get_project_user),
         query_params: QuestionFilterParams = Depends(questions_filter_params),

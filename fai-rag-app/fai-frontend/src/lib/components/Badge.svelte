@@ -17,7 +17,7 @@
         class:badge-outline={variants === 'outline'}
         class:badge-ghost={variants === 'ghost'}
         class:badge-primary={state === 'primary'}
-        class:badge-netural={state === 'neutral'}
+        class:badge-neutral={state === 'neutral'}
         class:badge-secondary={state === 'secondary'}
         class:badge-accent={state === 'accent'}
         class:badge-success={state === 'success'}

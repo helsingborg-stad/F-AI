@@ -26,11 +26,13 @@ __all__ = (
     'ChatBubble',
     'FileInput',
     'SSEChat',
+    'DataTable',
     # then `AnyComponent` itself
     'AnyUI',
 )
 
 from fai_backend.framework import events as e
+from fai_backend.framework.table import DataTable
 
 
 class UIComponent(BaseModel, extra='forbid'):
@@ -86,6 +88,7 @@ class Button(UIComponent):
     badge_state: Literal[
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = Field(
         None, serialization_alias='badgeState')
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
 
 
 class Form(UIComponent):
@@ -282,6 +285,6 @@ AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading |
      AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
      PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | Radio |
-     ChatBubble | FileInput | SSEChat),
+     ChatBubble | FileInput | SSEChat | DataTable),
     Field(discriminator='type')
 ]
