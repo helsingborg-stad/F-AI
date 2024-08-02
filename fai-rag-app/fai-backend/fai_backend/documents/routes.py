@@ -27,20 +27,23 @@ def list_view(
         project_user: ProjectUser = Depends(get_project_user),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
-    documents = file_service.list_files(project_user.project_id)
+    files = file_service.list_files(project_user.project_id)
+    most_recent_collection = max(files, key=lambda file: file.upload_date).collection if files else []
+    most_recent_upload_files = [file for file in files if file.collection == most_recent_collection]
+
     return view(
         c.Div(components=[
             c.Div(components=[
                 c.Table(
                     data=[
                         {
-                            'file_name': document.file_name,
-                            'file_size': document.file_size.human_readable(),
-                            'collection': document.collection,
-                            'mime_type': document.mime_type,
-                            'upload_date': document.upload_date.date(),
+                            'file_name': file.file_name,
+                            'file_size': file.file_size.human_readable(),
+                            'collection': file.collection,
+                            'mime_type': file.mime_type,
+                            'upload_date': file.upload_date.date(),
                         }
-                        for document in documents
+                        for file in most_recent_upload_files
                     ],
                     columns=[
                         {'key': 'file_name', 'label': _('file_name', 'File name')},
