@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import random
 import threading
 import uuid
 from multiprocessing import Process, Pipe
@@ -29,25 +28,23 @@ class AssistantWorkerProcess(Process):
 
         async def wrap():
             try:
-                while True:
-                    while self._parent_connection.poll():
-                        request = WorkerMessages.AddRequest(**self._parent_connection.recv().dict())
-                        self._parent_connection.send(WorkerMessages.JobUpdate(job_id=request.job_id, message=''))
-                        self._log.info(f'starting job {request.job_id}')
-                        self._log.debug(request)
+                while self._parent_connection.poll(None):
+                    request = WorkerMessages.AddRequest(**self._parent_connection.recv().dict())
+                    self._parent_connection.send(WorkerMessages.JobUpdate(job_id=request.job_id, message=''))
+                    self._log.info(f'starting job {request.job_id}')
+                    self._log.debug(request)
 
-                        try:
-                            async for part in self._run_assistant(request.assistant, request.history, request.query):
-                                if part.final:
-                                    self._parent_connection.send(
-                                        WorkerMessages.JobUpdate(job_id=request.job_id, message=part.data))
-                            self._parent_connection.send(WorkerMessages.JobDone(job_id=request.job_id))
-                            self._log.info(f'job {request.job_id} completed successfully')
-                        except Exception as e:
-                            self._log.error(f'job {request.job_id} failed', exc_info=True)
-                            self._parent_connection.send(WorkerMessages.JobError(job_id=request.job_id, error=str(e)))
+                    try:
+                        async for part in self._run_assistant(request.assistant, request.history, request.query):
+                            if part.final:
+                                self._parent_connection.send(
+                                    WorkerMessages.JobUpdate(job_id=request.job_id, message=part.data))
+                        self._parent_connection.send(WorkerMessages.JobDone(job_id=request.job_id))
+                        self._log.info(f'job {request.job_id} completed successfully')
+                    except Exception as e:
+                        self._log.error(f'job {request.job_id} failed', exc_info=True)
+                        self._parent_connection.send(WorkerMessages.JobError(job_id=request.job_id, error=str(e)))
 
-                    await asyncio.sleep(self.POLL_INTERVAL)
             except:
                 self._log.critical(f'crashed', exc_info=True)
                 raise

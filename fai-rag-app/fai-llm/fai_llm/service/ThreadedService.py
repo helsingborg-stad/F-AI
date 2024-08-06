@@ -21,7 +21,7 @@ class ThreadedService:
 
     def __init__(self):
         self._log = global_locator.services.main_logger.scope(type(self).__name__)
-        self._thread = threading.Thread(target=self.__internal_thread_entry_point)
+        self._thread = threading.Thread(target=self.__internal_thread_entry_point, daemon=True)
         self._thread.start()
         global_locator.services.app_life.add_on_shutdown(self._on_shutdown)
 
