@@ -31,6 +31,7 @@ class Settings(BaseSettings, extra=Extra.ignore):
     DEFAULT_LANGUAGE: str = 'en'
     FILE_UPLOAD_PATH: str = 'uploads'
     LLM_BACKEND: Literal['parrot', 'openai'] = 'parrot'
+    LLM_WORKER_URI: str = 'ws://localhost:8001/ws/'
     SENTRY_ENABLED: bool = False
     SENTRY_DSN: SecretStr = ''
     SENTRY_LOGGING_LEVEL: str = 'ERROR'

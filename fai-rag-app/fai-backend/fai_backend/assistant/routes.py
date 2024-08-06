@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, Security
 from langstream import join_final_output
 
 from fai_backend.assistant.models import AssistantTemplate
-from fai_backend.assistant.service import AssistantFactory
 from fai_backend.dependencies import get_authenticated_user
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.projects.dependencies import list_projects_request, get_project_request, get_project_service, \
@@ -16,24 +15,6 @@ router = APIRouter(
     route_class=LoggingAPIRouter,
     dependencies=[],
 )
-
-
-@router.get(
-    '/assistant/{project_id}/ask/{assistant_id}',
-    summary="Ask an assistant a question.",
-    dependencies=[Security(get_authenticated_user)]
-)
-async def ask_assistant(
-        project_id: str,
-        assistant_id: str,
-        question: str,
-        projects: list[ProjectResponse] = Depends(list_projects_request),
-):
-    print(f"Assistant: {project_id}/{assistant_id} - {question}")
-    factory = AssistantFactory([a for p in projects for a in p.assistants if p.id == project_id])
-    assistant = factory.create_assistant_stream(assistant_id)
-    stream = await assistant.create()
-    return await join_final_output(stream(question))
 
 
 @router.get(

@@ -1,3 +1,4 @@
+import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime
 
@@ -7,10 +8,10 @@ from sentry_sdk import Hub, capture_message
 from sse_starlette import EventSourceResponse, ServerSentEvent
 from starlette.responses import HTMLResponse, RedirectResponse
 
-from fai_backend.assistant.assistant import Assistant
-from fai_backend.assistant.models import AssistantChatHistoryModel, AssistantStreamMessage, LLMClientChatMessage
+from fai_backend.assistant.models import GenerateRequest, LLMClientChatMessage, AssistantChatHistoryModel, \
+    AssistantStreamMessage
 from fai_backend.assistant.routes import router as templates_router
-from fai_backend.assistant.service import AssistantFactory
+from fai_backend.assistant.service import LLMWorkerConnection
 from fai_backend.auth.router import router as auth_router
 from fai_backend.config import settings
 from fai_backend.dependencies import get_project_user
@@ -30,6 +31,13 @@ from fai_backend.serializer.impl.base64 import Base64Serializer
 from fai_backend.setup import setup_db, setup_project, setup_sentry
 from fai_backend.vector.routes import router as vector_router
 
+llm_worker: LLMWorkerConnection | None = None
+
+
+def get_worker() -> LLMWorkerConnection:
+    global llm_worker
+    return llm_worker
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -37,6 +45,10 @@ async def lifespan(_app: FastAPI):
     await setup_sentry()
     console.log('Try setup db')
     await setup_db()
+
+    global llm_worker
+    llm_worker = LLMWorkerConnection()
+
     console.log('Try setup initial project')
     await setup_project()
     yield
@@ -69,45 +81,58 @@ frontend = get_frontend_environment(settings.ENV_MODE)
 frontend.configure(app)
 
 
-async def event_source_llm_generator(question: str, assistant: Assistant, conversation_id: str | None):
-    serializer = Base64Serializer()
+@app.get('/api/assistant-stream/{project}/{assistant}')
+async def assistant_stream(
+        project: str,
+        assistant: str,
+        question: str,
+        conversation_id: str | None = None,
+        projects: list[ProjectResponse] = Depends(list_projects_request),
+        llm_worker_connection: LLMWorkerConnection = Depends(get_worker),
+):
+    template = next(a for p in projects for a in p.assistants if p.assistants if p.id == project and a.id == assistant)
 
-    used_conversation_id = conversation_id
+    async def sse_generator():
+        final_output = ""
 
-    if not used_conversation_id:
-        new_item = await chat_history_repo.create(AssistantChatHistoryModel())
-        used_conversation_id = str(new_item.id)
+        used_conversation_id = conversation_id
 
-    stream = await assistant.create_stream(used_conversation_id)
+        if not used_conversation_id:
+            new_item = await chat_history_repo.create(AssistantChatHistoryModel())
+            used_conversation_id = str(new_item.id)
 
-    async def generator(conversation_id_to_send):
-        yield ServerSentEvent(
-            event='conversation_id',
-            data=conversation_id_to_send,
-        )
-
-        history = await chat_history_repo.get(conversation_id_to_send)
+        history = await chat_history_repo.get(used_conversation_id)
         history.history.append(
             AssistantStreamMessage(
                 role='user',
                 content=question
             )
         )
-        await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
+        await chat_history_repo.update(used_conversation_id, history.model_dump(exclude='id'))
 
-        final_output = ''
+        serializer = Base64Serializer()
+        yield ServerSentEvent(event='conversation_id', data=used_conversation_id)
 
-        async for output in stream(question):
-            if output.final:
-                final_output += output.data
-                yield ServerSentEvent(
+        print(f'{conversation_id=} {used_conversation_id=}')
+
+        async for msg in llm_worker_connection.ask_generator(GenerateRequest(
+                id=uuid.uuid4().hex,
+                assistant=template,
+                query=question,
+                history=history.history,
+        )):
+            final_output += msg.part
+            if msg.is_final:
+                break
+
+            yield ServerSentEvent(
                     event='message',
-                    data=serializer.serialize(LLMClientChatMessage(
-                        date=datetime.now(),
-                        source='Chat AI',
-                        content=output.data
-                    )),
-                )
+                data=serializer.serialize(LLMClientChatMessage(
+                    date=datetime.now(),
+                    source='Chat AI',
+                    content=msg.part
+                )),
+            )
 
         history.history.append(
             AssistantStreamMessage(
@@ -115,7 +140,7 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
                 content=final_output
             )
         )
-        await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
+        await chat_history_repo.update(used_conversation_id, history.model_dump(exclude='id'))
 
         yield ServerSentEvent(
             event='message_end',
@@ -124,20 +149,7 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
             ))
         )
 
-    return EventSourceResponse(generator(used_conversation_id))
-
-
-@app.get('/api/assistant-stream/{project}/{assistant}')
-async def assistant_stream(
-        project: str,
-        assistant: str,
-        question: str,
-        conversation_id: str | None = None,
-        projects: list[ProjectResponse] = Depends(list_projects_request)
-):
-    factory = AssistantFactory([a for p in projects for a in p.assistants if p.id == project])
-    assistant_instance = factory.create_assistant(assistant)
-    return await event_source_llm_generator(question, assistant_instance, conversation_id)
+    return EventSourceResponse(sse_generator())
 
 
 @app.get('/health', include_in_schema=False)
