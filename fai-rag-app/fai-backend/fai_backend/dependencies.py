@@ -67,8 +67,8 @@ async def get_page_template_for_logged_in_users(
         page_title=page_title,
         menus=[
             *chat_menu(user_permissions=permissions),
-            *(qa_menu(user_permissions=permissions)),
-            *document_menu_items(),
+            *qa_menu(user_permissions=permissions),
+            *document_menu_items(user_permissions=permissions),
             *mock_menu(user_permissions=permissions),
         ]
     ))

@@ -37,6 +37,7 @@ async def setup_project():
                 'can_ask_questions',
                 'can_review_answers',
                 'can_edit_questions_and_answers',
+                'can_upload_document'
             ]
             return {
                 x: y
@@ -67,6 +68,7 @@ async def setup_project():
                     )
                 ],
                 roles={
+                    'basic': ProjectRole(permissions={'can_ask_questions': True}),
                     'admin': ProjectRole(permissions=create_permissions(True)),
                     'manager': ProjectRole(permissions=create_permissions(False)),
                     'reviewer': ProjectRole(permissions=create_permissions(False)),
