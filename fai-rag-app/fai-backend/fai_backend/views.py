@@ -22,8 +22,7 @@ def permission_required(required_permissions: list[str]) -> Callable[[T], T]:
                 kwargs.pop('user_permissions')
 
             if not required_permissions or all(
-                    (permission in user_permissions) for permission in required_permissions
-            ):
+                    (permission in user_permissions) for permission in required_permissions):
                 return func(*args, **kwargs)
             else:
                 return []

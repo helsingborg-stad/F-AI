@@ -1,7 +1,9 @@
 from fai_backend.framework import components as c
 from fai_backend.phrase import phrase as _
+from fai_backend.views import permission_required
 
 
+@permission_required(['can_upload_document'])
 def menu_items() -> list:
     return [
         c.Menu(
