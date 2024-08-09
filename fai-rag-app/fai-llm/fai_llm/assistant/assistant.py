@@ -1,12 +1,9 @@
-from typing import Any
-
 from langstream import Stream
 
-from fai_backend.assistant.config import provider_map, pipeline_map, insert_map
-from fai_backend.assistant.models import AssistantTemplate, AssistantStreamPipelineDef, \
-    AssistantStreamConfig
-from fai_backend.assistant.protocol import IAssistantContextStore, IAssistantMessageInsert
-from fai_backend.repositories import chat_history_repo
+from fai_llm.assistant.config import provider_map, pipeline_map, insert_map
+from fai_llm.assistant.models import AssistantTemplate, AssistantStreamPipelineDef, \
+    AssistantStreamConfig, AssistantStreamMessage
+from fai_llm.assistant.protocol import IAssistantContextStore, IAssistantMessageInsert
 
 
 class Assistant:
@@ -18,7 +15,7 @@ class Assistant:
         self.template = template
         self.context_store = context_store
 
-    async def create_stream(self, conversation_id: str) -> Stream[str, str]:
+    async def create_stream(self, history: list[AssistantStreamMessage]) -> Stream[str, str]:
 
         def set_query(user_query: str):
             current_context = self.context_store.get_mutable()
@@ -33,8 +30,7 @@ class Assistant:
 
         context = self.context_store.get_mutable()
         context.files_collection_id = self.template.files_collection_id
-        history_model = await chat_history_repo.get(conversation_id)
-        context.history = history_model.history if history_model else []
+        context.history = history
 
         stream = Stream('start', set_query)
 

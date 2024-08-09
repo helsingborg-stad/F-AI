@@ -2,8 +2,8 @@ from typing import Callable, Any
 
 from langstream import Stream
 
-from fai_backend.assistant.models import AssistantStreamMessage, AssistantStreamInsert
-from fai_backend.assistant.protocol import IAssistantContextStore, IAssistantMessageInsert
+from fai_llm.assistant.models import AssistantStreamMessage, AssistantStreamInsert
+from fai_llm.assistant.protocol import IAssistantContextStore, IAssistantMessageInsert
 
 
 def messages_expander_stream(

@@ -1,8 +1,8 @@
 from langstream import join_final_output
 from langstream.contrib import OpenAIChatStream, OpenAIChatDelta, OpenAIChatMessage
 
-from fai_backend.assistant.models import AssistantStreamMessage
-from fai_backend.assistant.protocol import IAssistantMessageInsert, IAssistantContextStore
+from fai_llm.assistant.models import AssistantStreamMessage
+from fai_llm.assistant.protocol import IAssistantMessageInsert, IAssistantContextStore
 
 
 class AssistantHistorySummaryInsert(IAssistantMessageInsert):

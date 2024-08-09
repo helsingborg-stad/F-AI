@@ -1,5 +1,5 @@
-from fai_backend.assistant.models import AssistantStreamMessage
-from fai_backend.assistant.protocol import IAssistantMessageInsert, IAssistantContextStore
+from fai_llm.assistant.models import AssistantStreamMessage
+from fai_llm.assistant.protocol import IAssistantMessageInsert, IAssistantContextStore
 
 
 class AssistantHistoryInsert(IAssistantMessageInsert):

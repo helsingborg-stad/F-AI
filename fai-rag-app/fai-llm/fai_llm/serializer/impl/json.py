@@ -2,7 +2,7 @@ from typing import Type
 
 from pydantic import BaseModel
 
-from fai_backend.serializer.protocol import ISerializer, T
+from fai_llm.serializer.protocol import ISerializer, T
 
 
 class JSONSerializer(ISerializer[T]):

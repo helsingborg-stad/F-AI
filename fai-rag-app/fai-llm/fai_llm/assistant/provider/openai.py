@@ -4,9 +4,9 @@ from langstream import Stream
 from langstream.contrib import OpenAIChatStream, OpenAIChatDelta, OpenAIChatMessage
 from pydantic import BaseModel
 
-from fai_backend.assistant.helper import messages_expander_stream
-from fai_backend.assistant.models import AssistantStreamMessage, AssistantStreamInsert
-from fai_backend.assistant.protocol import IAssistantLLMProvider, IAssistantContextStore, IAssistantMessageInsert
+from fai_llm.assistant.helper import messages_expander_stream
+from fai_llm.assistant.models import AssistantStreamMessage, AssistantStreamInsert
+from fai_llm.assistant.protocol import IAssistantLLMProvider, IAssistantContextStore, IAssistantMessageInsert
 
 
 class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
@@ -14,8 +14,9 @@ class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
         model: str
         temperature: float = 0
 
-    def __init__(self, settings: Settings):
+    def __init__(self, settings: Settings, stream_class=OpenAIChatStream[str, OpenAIChatDelta]):
         self.settings = settings
+        self._stream_class = stream_class
 
     async def create_llm_stream(
             self,
@@ -27,7 +28,7 @@ class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
             converted = [self._to_openai_message(m, context_store) for m in in_list]
             return converted
 
-        main_stream = OpenAIChatStream[str, OpenAIChatDelta](
+        main_stream = self._stream_class(
             "openai",
             lambda in_data: convert_messages(in_data[0]),
             **self.settings.dict(),

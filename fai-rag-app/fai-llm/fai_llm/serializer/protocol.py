@@ -1,4 +1,4 @@
-from typing import Protocol, Type, TypeVar
+from typing import Protocol, TypeVar, Type
 
 from pydantic import BaseModel
 
