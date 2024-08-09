@@ -11,6 +11,8 @@ class Settings(BaseSettings, extra='ignore'):
     LOG_FORMAT: str = '%(asctime)s:%(name)s:%(process)d:%(thread)d:%(levelname)s:%(message)s'
     LOG_FILE: bool = True
     LOG_STDOUT: bool = True
+    VLLM_URI: str = ''
+    VLLM_API_KEY: str = ''
 
     class Config:
         env_file = '.env'
