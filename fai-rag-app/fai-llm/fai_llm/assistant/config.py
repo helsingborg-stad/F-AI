@@ -5,9 +5,11 @@ from fai_llm.assistant.insert.history_summary import AssistantHistorySummaryInse
 # from fai_llm.assistant.pipeline.rag_scoring import RagScoringPipeline
 from fai_llm.assistant.protocol import IAssistantLLMProvider, IAssistantPipelineStrategy, IAssistantMessageInsert
 from fai_llm.assistant.provider.openai import OpenAIAssistantLLMProvider
+from fai_llm.assistant.provider.vllm import VLLMAssistantLLMProvider
 
 provider_map: dict[str, Callable[[dict[str, Any]], IAssistantLLMProvider]] = {
-    'openai': lambda in_settings: OpenAIAssistantLLMProvider(OpenAIAssistantLLMProvider.Settings(**in_settings))
+    'openai': lambda in_settings: OpenAIAssistantLLMProvider(OpenAIAssistantLLMProvider.Settings(**in_settings)),
+    'vllm': lambda in_settings: VLLMAssistantLLMProvider(OpenAIAssistantLLMProvider.Settings(**in_settings))
 }
 
 pipeline_map: dict[str, Callable[[], IAssistantPipelineStrategy]] = {
