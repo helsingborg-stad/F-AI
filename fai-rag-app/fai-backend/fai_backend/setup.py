@@ -10,6 +10,7 @@ from fai_backend.config import settings
 from fai_backend.projects.schema import ProjectMember, ProjectRole
 from fai_backend.repositories import ConversationDocument, PinCodeModel, ProjectModel, projects_repo
 from fai_backend.assistant.models import AssistantTemplate, AssistantChatHistoryModel
+from fai_backend.sentry.watcher import Watcher
 
 
 def use_route_names_as_operation_ids(app: FastAPI) -> None:
@@ -91,3 +92,18 @@ async def setup_db():
         database=client[settings.MONGO_DB_NAME],
         document_models=[ProjectModel, PinCodeModel, ConversationDocument, AssistantChatHistoryModel],
     )
+
+
+async def setup_sentry():
+    if not settings.SENTRY_ENABLED:
+        return
+
+    sentry_logger = Watcher(
+        dsn=settings.SENTRY_DSN.get_secret_value(),
+        environment=settings.SENTRY_ENVIRONMENT,
+        level=settings.SENTRY_LOGGING_LEVEL,
+        event_level=settings.SENTRY_EVENT_LEVEL,
+        trace_sample_rate=settings.SENTRY_TRACE_SAMPLE_RATE
+    )
+
+    sentry_logger.initialize()
