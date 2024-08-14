@@ -1,171 +1,188 @@
 <script lang="ts">
-  import Div from "./Div.svelte";
-  import Button from "./Button.svelte";
-  import ChatBubble from "./ChatBubble.svelte";
-  import SvelteMarkdown from "svelte-markdown";
+  import Div from './Div.svelte'
+  import Button from './Button.svelte'
+  import ChatBubble from './ChatBubble.svelte'
+  import SvelteMarkdown from 'svelte-markdown'
 
   interface SSEMessage {
-    type: string;
-    date: string;
-    source: string | null;
-    content: string | null;
+    type: string
+    date: string
+    source: string | null
+    content: string | null
   }
 
   interface ChatMessage {
-    id: string;
-    user: string;
-    content: string;
-    time: string;
-    isSelf: boolean;
+    id: string
+    user: string
+    content: string
+    time: string
+    isSelf: boolean
   }
 
   interface Assistant {
-    id: string;
-    name: string;
-    project: string;
-    description: string;
-    sampleQuestions: string[];
+    id: string
+    name: string
+    project: string
+    description: string
+    sampleQuestions: string[]
   }
 
-  export let endpoint: string;
-  export let assistants: Assistant[];
+  export let endpoint: string
+  export let assistants: Assistant[]
 
-  let selectedAssistantId: string;
-  let selectedAssistant: Assistant | null = null;
-  let activeConversationId: string | null = null;
-  let messages: ChatMessage[] = [];
-  let currentMessageInput: string = "";
-  let eventSource: EventSource | null = null;
+  let selectedAssistantId: string
+  let selectedAssistant: Assistant | null = null
+  let activeConversationId: string | null = null
+  let messages: ChatMessage[] = []
+  let currentMessageInput: string = ''
+  let eventSource: EventSource | null = null
 
-  let contentScrollDiv: Element;
-  let isContentAtBottom: Boolean = true;
+  let contentScrollDiv: Element
+  let isContentAtBottom: Boolean = true
 
-  $: isContentAtBottom = messages.length == 0 || isContentAtBottom;
-  $: selectedAssistant = assistants.find(a => a.id === selectedAssistantId) || null;
+  $: isContentAtBottom = messages.length == 0 || isContentAtBottom
+  $: selectedAssistant = assistants.find((a) => a.id === selectedAssistantId) || null
 
   function handleContentScroll() {
-    const scrollPadding = 10;
-    const isScrollable = contentScrollDiv.scrollHeight > contentScrollDiv.clientHeight || contentScrollDiv.scrollWidth > contentScrollDiv.clientWidth;
-    isContentAtBottom = !isScrollable || (contentScrollDiv.scrollHeight - contentScrollDiv.scrollTop < contentScrollDiv.clientHeight + scrollPadding);
+    const scrollPadding = 10
+    const isScrollable =
+      contentScrollDiv.scrollHeight > contentScrollDiv.clientHeight ||
+      contentScrollDiv.scrollWidth > contentScrollDiv.clientWidth
+    isContentAtBottom =
+      !isScrollable ||
+      contentScrollDiv.scrollHeight - contentScrollDiv.scrollTop <
+        contentScrollDiv.clientHeight + scrollPadding
   }
 
   function scrollContentToBottom() {
-    contentScrollDiv.scrollTop = contentScrollDiv.scrollHeight;
+    contentScrollDiv.scrollTop = contentScrollDiv.scrollHeight
   }
 
   function addErrorMessage(message: string) {
-    messages = [...messages, {
-      id: `error${messages.length}`,
-      user: "Error",
-      content: message,
-      time: new Date().toTimeString().split(" ")[0],
-      isSelf: false
-    }];
+    messages = [
+      ...messages,
+      {
+        id: `error${messages.length}`,
+        user: 'Error',
+        content: message,
+        time: new Date().toTimeString().split(' ')[0],
+        isSelf: false,
+      },
+    ]
   }
 
   function toChatMessage(sse: SSEMessage): ChatMessage {
     return {
       id: sse.date,
-      user: sse.source ?? "",
-      content: sse.content ?? "",
+      user: sse.source ?? '',
+      content: sse.content ?? '',
       time: sse.date,
-      isSelf: false
-    };
+      isSelf: false,
+    }
   }
 
   function clearChat() {
-    messages = [];
-    activeConversationId = null;
+    messages = []
+    activeConversationId = null
   }
 
   function closeSSE() {
-    eventSource?.close();
-    eventSource = null;
+    eventSource?.close()
+    eventSource = null
   }
 
   function createSSE(question: string) {
     try {
-      if (question.length == 0) return;
-      currentMessageInput = "";
+      if (question.length == 0) return
+      currentMessageInput = ''
 
-      messages = [...messages, {
-        id: `self${messages.length}`,
-        isSelf: true,
-        user: "Me",
-        content: question,
-        time: new Date().toTimeString().split(" ")[0]
-      }, {
-        id: `placeholder${messages.length}`,
-        isSelf: false,
-        user: "",
-        content: "",
-        time: ""
-      }];
+      messages = [
+        ...messages,
+        {
+          id: `self${messages.length}`,
+          isSelf: true,
+          user: 'Me',
+          content: question,
+          time: new Date().toTimeString().split(' ')[0],
+        },
+        {
+          id: `placeholder${messages.length}`,
+          isSelf: false,
+          user: '',
+          content: '',
+          time: '',
+        },
+      ]
 
-      closeSSE();
+      closeSSE()
 
-      eventSource = new EventSource(`${endpoint}/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}&conversation_id=${activeConversationId ?? ""}`);
+      eventSource = new EventSource(
+        `${endpoint}/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}&conversation_id=${activeConversationId ?? ''}`,
+      )
 
       eventSource.onerror = (e) => {
-        addErrorMessage(`unknown error / ${e}`);
-        closeSSE();
-      };
+        addErrorMessage(`unknown error / ${e}`)
+        closeSSE()
+      }
 
-      eventSource.addEventListener("message_end", () => {
-        closeSSE();
-        return;
-      });
+      eventSource.addEventListener('message_end', () => {
+        closeSSE()
+        return
+      })
 
-      eventSource.addEventListener("conversation_id", (e) => {
-        activeConversationId = e.data;
-        console.log(`got conversation id ${e.data}`);
-      });
+      eventSource.addEventListener('conversation_id', (e) => {
+        activeConversationId = e.data
+        console.log(`got conversation id ${e.data}`)
+      })
 
-      eventSource.addEventListener("message", (e) => {
+      eventSource.addEventListener('message', (e) => {
         try {
-          const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!);
-          const jsonString = new TextDecoder().decode(bytes);
-          const messagePayload = JSON.parse(jsonString) as SSEMessage;
-          const chatMessage = toChatMessage(messagePayload);
+          const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!)
+          const jsonString = new TextDecoder().decode(bytes)
+          const messagePayload = JSON.parse(jsonString) as SSEMessage
+          const chatMessage = toChatMessage(messagePayload)
 
-          messages = [...messages.slice(0, -1), {
-            ...messages.at(-1),
-            ...chatMessage,
-            content: messages.at(-1)!.content + chatMessage.content
-          }];
+          messages = [
+            ...messages.slice(0, -1),
+            {
+              ...messages.at(-1),
+              ...chatMessage,
+              content: messages.at(-1)!.content + chatMessage.content,
+            },
+          ]
         } catch (ex) {
-          console.error("Failed to parse raw message", ex, e);
-          closeSSE();
+          console.error('Failed to parse raw message', ex, e)
+          closeSSE()
         }
-      });
+      })
     } catch (e) {
-      closeSSE();
-      console.error("createSSE error", e);
-      addErrorMessage(e?.toString() ?? "unknown");
+      closeSSE()
+      console.error('createSSE error', e)
+      addErrorMessage(e?.toString() ?? 'unknown')
     }
   }
 
   function handleTextareaKeypress(event: KeyboardEvent) {
-    if (event.key == "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      createSSE(currentMessageInput);
+    if (event.key == 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      createSSE(currentMessageInput)
     }
   }
 
   function formatMessageForMarkdown(content: string): string {
-    return content
-      .replace(/\n/g, `\n\n  `);
+    return content.replace(/\n/g, `\n\n  `)
   }
 
   function askSampleQuestion(question: string) {
-    createSSE(question);
+    createSSE(question)
   }
 </script>
 
-<Div class="h-full relative">
-
+<Div class="relative h-full">
   <!-- Document picker -->
-  <Div class="h-24 p-4 absolute inset-x-0 top-0 flex flex-col gap-1 justify-center items-center">
+  <Div
+    class="absolute inset-x-0 top-0 flex h-24 flex-col items-center justify-center gap-1 p-4"
+  >
     <select
       class="select select-bordered w-full max-w-xs"
       bind:value={selectedAssistantId}
@@ -176,15 +193,18 @@
         <option value={assistant.id}>{assistant.name}</option>
       {/each}
     </select>
-    <p class="text-sm" class:invisible={!activeConversationId}>conversation id: {activeConversationId}</p>
+    <p class="text-sm" class:invisible={!activeConversationId}>
+      conversation id: {activeConversationId}
+    </p>
   </Div>
 
   <!-- Chat content -->
-  <Div class="w-full grow flex flex-col gap-2 items-center justify-center absolute top-24 bottom-28">
-
+  <Div
+    class="absolute bottom-28 top-24 flex w-full grow flex-col items-center justify-center gap-2"
+  >
     <!-- Chat bubbles -->
     <div
-      class="grow w-full relative max-w-prose overflow-y-auto"
+      class="relative w-full max-w-prose grow overflow-y-auto"
       bind:this={contentScrollDiv}
       on:scroll={handleContentScroll}
     >
@@ -204,12 +224,15 @@
               {#each selectedAssistant.sampleQuestions as question}
                 <button
                   class="btn btn-outline"
-                  on:click={() => askSampleQuestion(question)}
-                >{question}</button>
+                  on:click={() => askSampleQuestion(question)}>{question}</button
+                >
               {/each}
             </div>
           {:else}
-            <p>Here you can chat with any specialized assistant that has been created for you.</p>
+            <p>
+              Here you can chat with any specialized assistant that has been created for
+              you.
+            </p>
             <p>Choose an assistant from the dropdown to begin.</p>
           {/if}
         </div>
@@ -218,9 +241,9 @@
       <span class="loading loading-spinner" class:opacity-0={!eventSource} />
     </div>
 
-
-    <div class="flex justify-center absolute inset-x-0 bottom-20"
-         class:hidden={isContentAtBottom}
+    <div
+      class="absolute inset-x-0 bottom-20 flex justify-center"
+      class:hidden={isContentAtBottom}
     >
       <Button
         onClick={scrollContentToBottom}
@@ -235,26 +258,24 @@
         onClick={clearChat}
         label="Rensa chat"
         state="secondary"
-        disabled={!!eventSource} />
+        disabled={!!eventSource}
+      />
     {/if}
   </Div>
 
   <!-- Form controls -->
-  <Div class="h-28 p-3 absolute inset-x-0 bottom-0">
-    <form class="w-full h-full">
-      <fieldset
-        disabled={!selectedAssistantId}
-        class="h-full"
-      >
-        <Div class="flex gap-2 w-full h-full items-end">
-        <textarea
-          name="message"
-          bind:value={currentMessageInput}
-          on:keydown={handleTextareaKeypress}
-          class="textarea textarea-bordered grow h-full"
-        />
+  <Div class="absolute inset-x-0 bottom-0 h-28 p-3">
+    <form class="h-full w-full">
+      <fieldset disabled={!selectedAssistantId} class="h-full">
+        <Div class="flex h-full w-full items-end gap-2">
+          <textarea
+            name="message"
+            bind:value={currentMessageInput}
+            on:keydown={handleTextareaKeypress}
+            class="textarea textarea-bordered h-full grow"
+          />
           <Button
-            onClick={()=>createSSE(currentMessageInput)}
+            onClick={() => createSSE(currentMessageInput)}
             label=""
             iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlbmQiPjxwYXRoIGQ9Im0yMiAyLTcgMjAtNC05LTktNFoiLz48cGF0aCBkPSJNMjIgMiAxMSAxMyIvPjwvc3ZnPg=="
           />
