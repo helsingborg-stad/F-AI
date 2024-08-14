@@ -210,9 +210,7 @@
     >
       {#each messages as message (message.id)}
         <ChatBubble
-          user={message.user}
           content={formatMessageForMarkdown(message.content)}
-          time={message.time}
           isSelf={message.isSelf}
         />
       {:else}
