@@ -1,4 +1,3 @@
-import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime
 
@@ -8,7 +7,7 @@ from sse_starlette import EventSourceResponse, ServerSentEvent
 from starlette.responses import HTMLResponse, RedirectResponse
 
 from fai_backend.assistant.assistant import Assistant
-from fai_backend.assistant.models import LLMClientChatMessage, AssistantStreamMessage, AssistantChatHistoryModel
+from fai_backend.assistant.models import AssistantChatHistoryModel, AssistantStreamMessage, LLMClientChatMessage
 from fai_backend.assistant.routes import router as templates_router
 from fai_backend.assistant.service import AssistantFactory
 from fai_backend.auth.router import router as auth_router
@@ -18,7 +17,8 @@ from fai_backend.documents.routes import router as documents_router
 from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash
-from fai_backend.phrase import phrase as _, set_language
+from fai_backend.phrase import phrase as _
+from fai_backend.phrase import set_language
 from fai_backend.projects.dependencies import list_projects_request
 from fai_backend.projects.router import router as projects_router
 from fai_backend.projects.schema import ProjectResponse
@@ -75,7 +75,7 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
 
     async def generator(conversation_id_to_send):
         yield ServerSentEvent(
-            event="conversation_id",
+            event='conversation_id',
             data=conversation_id_to_send,
         )
 
@@ -88,16 +88,16 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
         )
         await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
 
-        final_output = ""
+        final_output = ''
 
         async for output in stream(question):
             if output.final:
                 final_output += output.data
                 yield ServerSentEvent(
-                    event="message",
+                    event='message',
                     data=serializer.serialize(LLMClientChatMessage(
                         date=datetime.now(),
-                        source="Chat AI",
+                        source='Chat AI',
                         content=output.data
                     )),
                 )
@@ -111,7 +111,7 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
         await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
 
         yield ServerSentEvent(
-            event="message_end",
+            event='message_end',
             data=serializer.serialize(LLMClientChatMessage(
                 date=datetime.now(),
             ))
@@ -146,7 +146,7 @@ async def greet(language: str = Header(default='en')):
 
 @app.get('/api', include_in_schema=True)
 async def root(project_user: ProjectUser = Depends(get_project_user)):
-    return RedirectResponse(url='/api/questions', status_code=302)
+    return RedirectResponse(url='/api/chat', status_code=302)
 
 
 @app.get('/api/{path:path}', status_code=404)
