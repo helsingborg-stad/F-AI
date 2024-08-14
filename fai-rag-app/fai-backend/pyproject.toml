@@ -26,6 +26,7 @@ langstream = "~0.3.1"
 openai = "~1.33.0"
 python-dotenv = "~1.0.1"
 sse-starlette = "~2.1.0"
+sentry-sdk = "1.31.0"
 
 [tool.poetry.group.unstructured.dependencies]
 unstructured = { extras = ["md", "pdf", "docx"], version = "0.13.7" }

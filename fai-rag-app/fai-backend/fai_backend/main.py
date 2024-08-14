@@ -3,6 +3,7 @@ from datetime import datetime
 
 from fastapi import Depends, FastAPI, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
+from sentry_sdk import Hub, capture_message
 from sse_starlette import EventSourceResponse, ServerSentEvent
 from starlette.responses import HTMLResponse, RedirectResponse
 
@@ -26,18 +27,24 @@ from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.repositories import chat_history_repo
 from fai_backend.schema import ProjectUser
 from fai_backend.serializer.impl.base64 import Base64Serializer
-from fai_backend.setup import setup_db, setup_project
+from fai_backend.setup import setup_db, setup_project, setup_sentry
 from fai_backend.vector.routes import router as vector_router
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    console.log('Try setup Sentry')
+    await setup_sentry()
     console.log('Try setup db')
     await setup_db()
     console.log('Try setup initial project')
     await setup_project()
     yield
     console.log('😴 Unmounting app ...')
+    console.log('Shutting down Sentry')
+    client = Hub.current.client
+    if client is not None:
+        client.close(timeout=2.0)
 
 
 app = FastAPI(title='FAI RAG App', redirect_slashes=True, lifespan=lifespan)
