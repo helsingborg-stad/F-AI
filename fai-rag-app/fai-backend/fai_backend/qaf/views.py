@@ -208,7 +208,7 @@ def ReviewDetails(user: ProjectUser, question: QuestionDetails, view, meta_data:
     review_state = {
         'open': lambda: [
             c.Form(
-                submit_url=f'/api/questions/{question.id}/feedback',
+                submit_url=f'/api/view/questions/{question.id}/feedback',
                 method='POST',
                 submit_text=_('create_question_submit_button', 'Submit'),
                 components=[
@@ -233,7 +233,7 @@ def ReviewDetails(user: ProjectUser, question: QuestionDetails, view, meta_data:
         ],
         'in-progress': lambda: [
             c.Form(
-                submit_url=f'/api/questions/{question.id}/answer',
+                submit_url=f'/api/view/questions/{question.id}/answer',
                 method='POST',
                 submit_text=_('create_question_submit_button', 'Submit'),
                 components=[

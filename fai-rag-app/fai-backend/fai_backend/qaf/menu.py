@@ -23,7 +23,7 @@ async def qa_menu_loader(
         *[
             (
                 f'{status.capitalize()}',
-                f'/questions?review_status={status}',
+                f'/view/questions?review_status={status}',
                 await get_count_by_review_status(status) or '0',
 
             )
@@ -47,8 +47,8 @@ def qa_menu(
             components=[
                 c.Link(
                     text=_('show_all', 'Visa alla'),
-                    url='/questions',
-                    active='/questions*'
+                    url='/view/questions',
+                    active='/view/questions*'
                 ),
                 *([c.Menu(
                     title=_('status', 'Status'),
@@ -63,8 +63,8 @@ def qa_menu(
                 )] if items else []),
                 c.Link(
                     text=_('Add new question'),
-                    url='/questions/create',
-                    active='/questions/create',
+                    url='/view/questions/create',
+                    active='/view/questions/create',
                     icon_src=icons['plus'],
                 ),
             ],
