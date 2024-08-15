@@ -56,7 +56,7 @@ async def llm_raq_question_endpoint(
         raise HTTPException(status_code=500, detail=str(exception))
 
 
-@router.get('/chat', response_model=list, response_model_exclude_none=True)
+@router.get('/view/chat', response_model=list, response_model_exclude_none=True)
 def chat_index_view(
         authenticated_user: User | None = Depends(get_project_user),
         view=Depends(get_page_template_for_logged_in_users),
