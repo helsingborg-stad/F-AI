@@ -250,15 +250,6 @@
       />
     </div>
 
-    <!-- Clear button -->
-    {#if messages.length > 0}
-      <Button
-        onClick={clearChat}
-        label="Rensa chat"
-        state="secondary"
-        disabled={!!eventSource}
-      />
-    {/if}
   </Div>
 
   <!-- Form controls -->
