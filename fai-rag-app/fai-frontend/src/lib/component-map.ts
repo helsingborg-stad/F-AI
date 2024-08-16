@@ -24,6 +24,7 @@ import Select from './components/Select.svelte'
 import Radio from './components/Radio.svelte'
 import FileInput from './components/FileInput.svelte'
 import SSEChat from './components/SSEChat.svelte'
+import Divider from './components/Divider.svelte'
 import type { ComponentsMap } from '$lib/types'
 
 export const componentMap: ComponentsMap = {
@@ -52,6 +53,7 @@ export const componentMap: ComponentsMap = {
   Radio,
   SSEChat,
   FileInput,
+  Divider,
 }
 
 export default componentMap
