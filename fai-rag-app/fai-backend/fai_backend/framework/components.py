@@ -14,6 +14,7 @@ __all__ = (
     'AppDrawer',
     'AppContent',
     'AppFooter',
+    'Divider',
     'PageHeader',
     'PageContent',
     'Menu',
@@ -262,6 +263,12 @@ class ChatBubble(UIComponent):
     footer: 'list[AnyUI] | None' = Field(None, serialization_alias='slot.footer')
 
 
+class Divider(UIComponent):
+    type: Literal['Divider'] = 'Divider'
+    text: str | None = None
+    state: Literal['primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
+
+
 class SSEDocument(BaseModel):
     id: str
     name: str
@@ -283,7 +290,7 @@ class SSEChat(UIComponent):
 
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading |
-     AppShell | AppDrawer | AppContent | AppFooter | PageHeader |
+     AppShell | AppDrawer | AppContent | AppFooter | Divider | PageHeader |
      PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | Radio |
      ChatBubble | FileInput | SSEChat | DataTable),
     Field(discriminator='type')

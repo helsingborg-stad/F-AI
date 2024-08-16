@@ -7,6 +7,7 @@ import FireEvent from '$lib/components/FireEvent.svelte'
 import AppShell from '$lib/components/AppShell.svelte'
 import AppDrawer from '$lib/components/AppDrawer.svelte'
 import AppContent from '$lib/components/AppContent.svelte'
+import Divider from "$lib/components/Divider.svelte";
 import AppFooter from '$lib/components/AppFooter.svelte'
 import Dropdown from '$lib/components/Dropdown.svelte'
 import Link from '$lib/components/Link.svelte'
@@ -88,6 +89,7 @@ export type ComponentsMap = {
   Radio: typeof Radio
   SSEChat: typeof SSEChat
   FileInput: typeof FileInput
+  Divider: typeof Divider
 }
 
 export type ComponentType = keyof ComponentsMap
