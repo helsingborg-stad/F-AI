@@ -42,20 +42,17 @@
 
   $: isContentAtBottom = messages.length == 0 || isContentAtBottom
   $: selectedAssistant = assistants.find((a) => a.id === selectedAssistantId) || null
-
-  function handleContentScroll() {
-    const scrollPadding = 10
-    const isScrollable =
-      contentScrollDiv.scrollHeight > contentScrollDiv.clientHeight ||
-      contentScrollDiv.scrollWidth > contentScrollDiv.clientWidth
-    isContentAtBottom =
-      !isScrollable ||
-      contentScrollDiv.scrollHeight - contentScrollDiv.scrollTop <
-        contentScrollDiv.clientHeight + scrollPadding
-  }
+  $: contentScrollDiv &&
+    messages &&
+    messages.length > 0 &&
+    scrollToBottom(contentScrollDiv)
 
   function scrollContentToBottom() {
     contentScrollDiv.scrollTop = contentScrollDiv.scrollHeight
+  }
+
+  const scrollToBottom = (node: Element) => {
+    node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
   }
 
   function addErrorMessage(message: string) {
@@ -206,7 +203,6 @@
     <div
       class="relative w-full max-w-prose grow overflow-y-auto"
       bind:this={contentScrollDiv}
-      on:scroll={handleContentScroll}
     >
       {#each messages as message (message.id)}
         <ChatBubble
@@ -249,12 +245,11 @@
         iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg=="
       />
     </div>
-
   </Div>
 
   <!-- Form controls -->
   <Div class="absolute inset-x-0 bottom-0 h-28 p-3">
-    <form class="h-full w-full">
+    <form class="h-full w-full" on:submit={scrollContentToBottom}>
       <fieldset disabled={!selectedAssistantId} class="h-full">
         <Div class="flex h-full w-full items-end gap-2">
           <textarea
