@@ -59,7 +59,6 @@
           return parseErrorResponseObjects(fieldErrors)
         },
         onSuccess: async (response: any, context: any) => {
-          console.log(response)
           const components_response = [
             ...[...(response || [])].filter((item) => item.type),
           ]
