@@ -15,7 +15,7 @@ class JobStatus:
 
 
 class IMessageQueue:
-    def enqueue(self, func: Callable, *args, **kwargs) -> Job:
+    def enqueue(self, func: Callable[..., Any] | str, *args, **kwargs) -> Job:
         """
         Enqueue a task for background execution.
 
