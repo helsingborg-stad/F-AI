@@ -152,3 +152,4 @@ pyrightconfig.json
 src/planning_permission/data/
 output/
 *.xlsx
+/fai-rag-app/worker/.vscode
