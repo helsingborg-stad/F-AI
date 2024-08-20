@@ -1,0 +1,35 @@
+services:
+
+  redis:
+    image: redis:alpine
+    networks:
+      - skynet
+    volumes:
+      - redis_data:/data
+
+  rq-dashboard:
+    image: eoranged/rq-dashboard:latest
+    environment:
+      - RQ_DASHBOARD_REDIS_URL=redis://redis:6379
+    ports:
+      - "9181:9181"
+    networks:
+      - skynet
+    depends_on:
+      - redis
+
+  worker:
+    build: .
+    restart: always
+    depends_on:
+      - redis
+    networks:
+      - skynet
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  skynet: {}
+
+volumes:
+  redis_data:
