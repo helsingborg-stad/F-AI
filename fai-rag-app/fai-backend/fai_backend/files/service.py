@@ -13,6 +13,15 @@ from fai_backend.files.models import FileInfo
 PROJECT_PATH_PREFIX = 'proj'
 
 
+def retrieve_timestamp_from_directory(directory: str) -> tuple[str, str]:
+    timestamp_parts = directory.split('_')[2:4]
+    return timestamp_parts[0], timestamp_parts[1]
+
+
+def sort_directories(directories: list) -> list:
+    return sorted(directories, key=retrieve_timestamp_from_directory, reverse=True)
+
+
 class FileUploadService:
     def __init__(self, upload_dir: str):
         self.upload_dir = os.path.abspath(upload_dir)
@@ -69,14 +78,13 @@ class FileUploadService:
         return sorted(all_files, key=lambda x: x.upload_date, reverse=True)
 
     def get_latest_upload_path(self, project_id: str) -> str | None:
-        project_directories = [d for d in os.listdir(self.upload_dir) if
-                               d.startswith(f'{PROJECT_PATH_PREFIX}_{project_id}_')]
+        project_prefix = f'{PROJECT_PATH_PREFIX}_{project_id}'
+        project_directories = [d for d in os.listdir(self.upload_dir) if d.startswith(project_prefix)]
+
         if not project_directories:
             return None
 
-        latest_directory = sorted(project_directories, key=lambda x: (x.split('_')[2], x.split('_')[3]), reverse=True)[
-            0]
-        return os.path.join(self.upload_dir, latest_directory)
+        return os.path.join(self.upload_dir, sort_directories(project_directories)[0])
 
     def parse_files(self, src_directory_path: str) -> list[str]:
         parsed_files = []
