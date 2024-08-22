@@ -1,4 +1,3 @@
-
 from fai_backend.projects.schema import (
     Project,
     ProjectCreateRequest,
@@ -23,17 +22,15 @@ class ProjectService:
         return await self.repo.get(project_id)
 
     async def update_project(self, project_id: str, project: ProjectUpdateRequest):
-        ignore_keys = ['id', 'timestamp']
-        return await self.repo.update(
-            project_id,
-            {
-                key: project.model_dump()[key]
-                for key in filter(
-                lambda key: key not in ignore_keys,
-                project.model_dump().keys(),
-            )
-            },
-        )
+        updated_fields = self._extract_updated_fields(project)
+        return await self.repo.update(project_id, updated_fields)
 
     async def delete_project(self, project_id: str):
         return await self.repo.delete(project_id)
+
+    @staticmethod
+    def _extract_updated_fields(project: ProjectUpdateRequest) -> dict:
+        ignore_keys = ['id', 'timestamp']
+        model_dump = project.model_dump()
+        return {
+            key: model_dump[key] for key in model_dump.keys() if key not in ignore_keys}
