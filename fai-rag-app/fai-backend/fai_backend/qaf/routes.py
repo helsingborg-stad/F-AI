@@ -56,7 +56,7 @@ async def llm_raq_question_endpoint(
         raise HTTPException(status_code=500, detail=str(exception))
 
 
-@router.get('/chat', response_model=list, response_model_exclude_none=True)
+@router.get('/view/chat', response_model=list, response_model_exclude_none=True)
 def chat_index_view(
         authenticated_user: User | None = Depends(get_project_user),
         view=Depends(get_page_template_for_logged_in_users),
@@ -90,7 +90,7 @@ def to_table_data(question: QuestionDetails) -> dict[str, Any]:
         'timestamp.modified': format_datetime_human_readable(question.timestamp.modified, 1),
         'tags': question.tags,
         'review_status': question.review_status,
-        'link': f'/questions/{question.id}',
+        'link': f'/view/questions/{question.id}',
     }
 
 
@@ -106,7 +106,7 @@ def question_fields() -> list[dict]:
     ]
 
 
-@router.get('/questions', response_model=list, response_model_exclude_none=True)
+@router.get('/view/questions', response_model=list, response_model_exclude_none=True)
 def questions(data: list[QuestionDetails] = Depends(questions_loader),
               view=Depends(get_page_template_for_logged_in_users)):
     return view(
@@ -124,7 +124,7 @@ def questions(data: list[QuestionDetails] = Depends(questions_loader),
                     id='question',
                     label=_('question', 'Question'),
                     display=DisplayAs.link,
-                    on_click=e.GoToEvent(url='/questions/{id}'),
+                    on_click=e.GoToEvent(url='/view/questions/{id}'),
                     sortable=True,
                     # filter=ColumnFilter.search,
                 ),
@@ -187,53 +187,53 @@ def questions(data: list[QuestionDetails] = Depends(questions_loader),
     )
 
 
-@router.get('/questions/create', response_model=list, response_model_exclude_none=True)
+@router.get('/view/questions/create', response_model=list, response_model_exclude_none=True)
 def create_question(
         view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
 ) -> list:
-    return QuestionForm(view, '/api/questions/create')
+    return QuestionForm(view, '/api/view/questions/create')
 
 
-@router.post('/questions/create', response_model=list, response_model_exclude_none=True)
+@router.post('/view/questions/create', response_model=list, response_model_exclude_none=True)
 def on_create_question(
         data: QuestionDetails = Depends(run_llm_on_question_create_action),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     return view(
-        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{data.id}'))],
+        [c.FireEvent(event=e.GoToEvent(url=f'/view/questions/{data.id}'))],
         _('submit_a_question', 'Create Question'''),
     )
 
 
-@router.get('/questions/{conversation_id}', response_model=list, response_model_exclude_none=True)
+@router.get('/view/questions/{conversation_id}', response_model=list, response_model_exclude_none=True)
 async def question_details(
         data: QuestionDetails = Depends(question_details_loader),
         view=Depends(get_page_template_for_logged_in_users),
         authenticated_user: ProjectUser | None = Depends(get_project_user),
 ) -> list:
     if not data:
-        return [c.FireEvent(event=e.GoToEvent(url='/questions'))]
+        return [c.FireEvent(event=e.GoToEvent(url='/view/questions'))]
 
     return ReviewDetails(authenticated_user, data, view, meta_data=to_table_data(data), meta_fields=question_fields())
 
 
-@router.post('/questions/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)
+@router.post('/view/questions/{conversation_id}/feedback', response_model=list, response_model_exclude_none=True)
 def on_submit_feedback(
         data: QuestionDetails = Depends(add_feedback_action),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     return view(
-        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{data.id}'))],
+        [c.FireEvent(event=e.GoToEvent(url=f'/view/questions/{data.id}'))],
         page_title=_('submit_a_question', 'Create Question'''),
     )
 
 
-@router.post('/questions/{conversation_id}/answer', response_model=list, response_model_exclude_none=True)
+@router.post('/view/questions/{conversation_id}/answer', response_model=list, response_model_exclude_none=True)
 def on_submit_answer(
         question: QuestionDetails = Depends(add_answer_action),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
     return view(
-        [c.FireEvent(event=e.GoToEvent(url=f'/questions/{question.id}'))],
+        [c.FireEvent(event=e.GoToEvent(url=f'/view/questions/{question.id}'))],
         _('submit_a_question', 'Create Question'''),
     )

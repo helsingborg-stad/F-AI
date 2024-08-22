@@ -148,7 +148,7 @@ export const withIndexColumnLeft = <T>(table: Table<T>, columns: Column<T>[]) =>
 export const withActionColumnRight = <T>(
   table: Table<T>,
   columns: Column<T>[],
-  path: string = '/questions/',
+  path: string = '/view/questions/',
   key: string = '',
 ) => [
   ...columns,

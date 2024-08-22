@@ -37,9 +37,9 @@ def chat_menu() -> list:
     return [
         c.Link(
             text=_('chat', 'Chat'),
-            url='/chat',
+            url='/view/chat',
             icon_src=icons['message_square_more'],
-            active='/chat*'
+            active='/view/chat*'
         )
     ]
 
