@@ -6,8 +6,6 @@ listen = ['default']
 
 
 def run_worker() -> None:
-    print("WORKER STARTED")
     with Connection(redis_conn):
         w = Worker(map(Queue, listen))
-        w.work()
-    print("WORKER STOPPED")
+        w.work(logging_level="DEBUG")

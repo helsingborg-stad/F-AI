@@ -1,9 +1,9 @@
-from worker_src.protocol import APIClient
-from worker_src.providers import create_client
+from worker_src.providers import TaskType, create_client
 
 
-def external_api_call(api_client_type: str, task_id: str, base_url: str, path: str) -> None:
-    api_client: APIClient = create_client(
-        type=api_client_type, base_url=base_url, path=path)
-    status_code = api_client.execute_task(task_id)
+def external_api_call(**kwargs) -> None:
+    task_id = kwargs.pop("task_id", "N/A")
+    client = create_client(TaskType.EXTERNAL_API_CALL)
+    status_code = client(**kwargs).execute_task(task_id)
+
     print(f"Task executed with status code: {status_code}")
