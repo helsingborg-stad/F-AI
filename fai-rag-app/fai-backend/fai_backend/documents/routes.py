@@ -7,12 +7,15 @@ from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
+from fai_backend.message_broker.dependencies import get_message_queue
+from fai_backend.message_broker.interface import IMessageQueue
 from fai_backend.phrase import phrase as _
 from fai_backend.projects.dependencies import list_projects_request, update_project_request, get_project_service
 from fai_backend.projects.schema import ProjectResponse, ProjectUpdateRequest
 from fai_backend.projects.service import ProjectService
 from fai_backend.schema import ProjectUser
 from fai_backend.vector.dependencies import get_vector_service
+from fai_backend.vector.schema import VectorizeFilesModel
 from fai_backend.vector.service import VectorService
 
 router = APIRouter(
@@ -63,14 +66,11 @@ def list_view(
 
 
 @router.get('/documents/upload', response_model=list, response_model_exclude_none=True)
-def upload_view(
-        project_user: ProjectUser = Depends(get_project_user),
-        view=Depends(get_page_template_for_logged_in_users),
-) -> list:
+def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
     return view(
         c.Form(
             submit_as='form',
-            submit_url='/api/documents/upload_and_vectorize',
+            submit_url='/api/documents/upload_files',
             components=[
                 c.FileInput(
                     name='files',
@@ -101,6 +101,10 @@ async def upload_and_vectorize_handler(
         projects: list[ProjectResponse] = Depends(list_projects_request),
         project_service: ProjectService = Depends(get_project_service),
 ) -> list:
+    """
+    DEPRECATED
+    use upload_files_handler instead
+    """
     upload_path = file_service.save_files(project_user.project_id, files)
 
     upload_directory_name = upload_path.split('/')[-1]
@@ -128,16 +132,30 @@ async def upload_and_vectorize_handler(
     )
 
 
-@router.post('/documents/parse_and_save', response_model=list, response_model_exclude_none=True)
-def parse_documents(
-        src_directory_path: str,
-        dest_directory_path: str,
-        dest_file_name: str,
-        file_service: FileUploadService = Depends(get_file_upload_service),
-) -> list:
-    parsed_files = file_service.parse_files(src_directory_path)
-    stringify_parsed_files = [str(elem) for elem in parsed_files]
+@router.post('/documents/upload_files', response_model=list, response_model_exclude_none=True)
+async def upload_files_handler(files: list[UploadFile],
+                               project_user: ProjectUser = Depends(get_project_user),
+                               message_queue: IMessageQueue = Depends(get_message_queue),
+                               file_service: FileUploadService = Depends(get_file_upload_service),
+                               view=Depends(get_page_template_for_logged_in_users),
+                               projects: list[ProjectResponse] = Depends(list_projects_request),
+                               project_service: ProjectService = Depends(get_project_service)) -> list:
+    project_id = project_user.project_id
+    upload_path = file_service.save_files(project_id, files)
+    message_queue.enqueue(task_id=project_id,
+                          path='api/vector/vectorize_files',
+                          data=VectorizeFilesModel(directory_path=upload_path).model_dump())
 
-    file_service.dump_list_to_json(stringify_parsed_files, dest_directory_path, dest_file_name)
+    # Fix/workaround for updating assistant file collection id
+    # until assistant editor ui is done
+    upload_directory_name = upload_path.split('/')[-1]
+    for project in projects:
+        for assistant in project.assistants:
+            if assistant.files_collection_id is not None:
+                assistant.files_collection_id = upload_directory_name
+                await update_project_request(body=ProjectUpdateRequest(**project.model_dump()),
+                                             existing_project=project,
+                                             project_service=project_service)
 
-    return []
+    return view(c.FireEvent(event=e.GoToEvent(url='/documents')),
+                _('submit_a_question', 'Create Question'))
