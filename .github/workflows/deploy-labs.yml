@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         path_filter:
-          - fai-rag-app/fai-backend/
+          - ./fai-rag-app/fai-backend/**
 
   build-worker:
     runs-on: codebuild-f-ai-builder-${{ github.run_id }}-${{ github.run_attempt }}-ubuntu-7.0-medium
@@ -48,4 +48,4 @@ jobs:
     strategy:
       matrix:
         path_filter:
-          - fai-rag-app/worker/
+          - ./fai-rag-app/worker/**
