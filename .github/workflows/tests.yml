@@ -8,7 +8,7 @@ on:
       - master
 
     paths:
-      - fai-rag-app/fai-backend/**
+      - ./fai-rag-app/fai-backend/**
 
 jobs:
   backend:
