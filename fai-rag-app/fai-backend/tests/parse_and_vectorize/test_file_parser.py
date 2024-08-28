@@ -1,4 +1,6 @@
 import os
+
+import nltk
 import pytest
 import pytest_asyncio
 from unstructured.partition.pdf import partition_pdf
@@ -11,6 +13,9 @@ TEST_PDF_PATH = os.path.join(CURRENT_DIR, 'test_data/Bevprogram_Raa_1991_sbf.pdf
 
 @pytest.fixture(scope='session')
 def document_elements():
+    nltk.download('punkt_tab')
+    nltk.download('averaged_perceptron_tagger_eng')
+
     return partition_pdf(TEST_PDF_PATH, chunking_strategy="basic")
 
 
