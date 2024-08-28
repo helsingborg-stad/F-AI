@@ -153,3 +153,7 @@ src/planning_permission/data/
 output/
 *.xlsx
 /fai-rag-app/worker/.vscode
+
+# Needed for the worker to run
+!/fai-rag-app/worker/Pipfile
+!/fai-rag-app/worker/Pipfile.lock
