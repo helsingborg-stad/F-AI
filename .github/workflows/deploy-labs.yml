@@ -28,10 +28,6 @@ jobs:
     runs-on: codebuild-f-ai-builder-${{ github.run_id }}-${{ github.run_attempt }}-ubuntu-7.0-medium
 
     steps:
-      - name: Echo A
-        run: |
-          echo '${{ toJSON(github.event.commits[][message]) }}' | jq
-
       - name: Checkout code
         uses: actions/checkout@v3
 
