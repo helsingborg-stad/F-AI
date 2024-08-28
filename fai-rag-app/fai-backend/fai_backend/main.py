@@ -27,7 +27,7 @@ from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.repositories import chat_history_repo
 from fai_backend.schema import ProjectUser
 from fai_backend.serializer.impl.base64 import Base64Serializer
-from fai_backend.setup import setup_db, setup_project, setup_sentry
+from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_parser
 from fai_backend.vector.routes import router as vector_router
 
 
@@ -39,6 +39,8 @@ async def lifespan(_app: FastAPI):
     await setup_db()
     console.log('Try setup initial project')
     await setup_project()
+    console.log('Try setup file parser environment')
+    await setup_file_parser()
     yield
     console.log('😴 Unmounting app ...')
     console.log('Shutting down Sentry')
