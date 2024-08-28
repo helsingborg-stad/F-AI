@@ -31,17 +31,17 @@ jobs:
     steps:
       - name: Echo A
         run: |
-          echo '${{ toJSON(github.event.commits[0].modified[*]) }}' | jq
+          echo '${{ toJSON(github.event.commits[][message]) }}' | jq
 
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # - name: Checkout code
+      #   uses: actions/checkout@v3
 
-      - name: Build & Deploy WORKER to Elastx
-        uses: helsingborg-stad/build-deploy-elastx/1.0@main
-        with:
-          JELASTIC_API_KEY: ${{ secrets.JELASTIC_API_KEY }}
-          JELASTIC_NODE_ID: ${{ vars.JELASTIC_LABS_WORKER_NODE_ID }}
-          JELASTIC_ENV_NAME: ${{ vars.JELASTIC_LABS_ENV_NAME }}
-          JELASTIC_TAG: sha-${{ github.sha }}
-          DOCKER_CONTEXT: ${{ vars.DOCKER_LABS_WORKER_CONTEXT }}
-          DOCKER_FILE_PATH: ${{ vars.DOCKER_LABS_WORKER_FILE_PATH }}
+      # - name: Build & Deploy WORKER to Elastx
+      #   uses: helsingborg-stad/build-deploy-elastx/1.0@main
+      #   with:
+      #     JELASTIC_API_KEY: ${{ secrets.JELASTIC_API_KEY }}
+      #     JELASTIC_NODE_ID: ${{ vars.JELASTIC_LABS_WORKER_NODE_ID }}
+      #     JELASTIC_ENV_NAME: ${{ vars.JELASTIC_LABS_ENV_NAME }}
+      #     JELASTIC_TAG: sha-${{ github.sha }}
+      #     DOCKER_CONTEXT: ${{ vars.DOCKER_LABS_WORKER_CONTEXT }}
+      #     DOCKER_FILE_PATH: ${{ vars.DOCKER_LABS_WORKER_FILE_PATH }}
