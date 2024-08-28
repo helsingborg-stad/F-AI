@@ -9,6 +9,9 @@ on:
     branches:
       - master
 
+    paths:
+      - fai-rag-app/fai-backend/**
+
 jobs:
   backend:
     name: backend tests
