@@ -76,7 +76,7 @@ async def setup_project():
                     'reviewer': ProjectRole(permissions=create_permissions(False)),
                     'tester': ProjectRole(permissions=create_permissions(False))
                 },
-                secrets={'openai_api_key': 'sk-1234'},
+                secrets={'openai_api_key': 'sk-123'},
                 meta={}
             )
         )
