@@ -4,6 +4,7 @@ import magic
 from unstructured.partition.docx import partition_docx
 from unstructured.partition.md import partition_md
 from unstructured.partition.pdf import partition_pdf
+from unstructured.partition.xlsx import partition_xlsx
 
 
 class AbstractDocumentParser(ABC):
@@ -27,6 +28,11 @@ class MarkdownParser(AbstractDocumentParser):
         return partition_md(filename)
 
 
+class ExcelParser(AbstractDocumentParser):
+    def parse(self, filename: str):
+        return partition_xlsx(filename)
+
+
 class ParserFactory:
     @staticmethod
     def get_parser(file_path: str) -> AbstractDocumentParser:
@@ -38,5 +44,7 @@ class ParserFactory:
             return MarkdownParser()
         if mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
             return DocxParser()
+        if mime_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            return ExcelParser()
 
         raise ValueError(f'Unsupported file type: {mime_type}')

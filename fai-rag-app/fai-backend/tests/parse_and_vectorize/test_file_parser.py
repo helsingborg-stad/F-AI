@@ -1,8 +1,10 @@
 import os
+
+import nltk
 import pytest
 import pytest_asyncio
+from unstructured.partition.pdf import partition_pdf
 
-from fai_backend.files.file_parser import ParserFactory
 from fai_backend.vector.memory import InMemoryChromaDB
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -11,8 +13,10 @@ TEST_PDF_PATH = os.path.join(CURRENT_DIR, 'test_data/Bevprogram_Raa_1991_sbf.pdf
 
 @pytest.fixture(scope='session')
 def document_elements():
-    pdf_parser = ParserFactory.get_parser(TEST_PDF_PATH)
-    return pdf_parser.parse(TEST_PDF_PATH)
+    nltk.download('punkt_tab')
+    nltk.download('averaged_perceptron_tagger_eng')
+
+    return partition_pdf(TEST_PDF_PATH, chunking_strategy="basic")
 
 
 @pytest_asyncio.fixture

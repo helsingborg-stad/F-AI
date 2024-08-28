@@ -1,6 +1,7 @@
 import json
 import os
 
+import nltk
 from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
@@ -107,3 +108,8 @@ async def setup_sentry():
     )
 
     sentry_logger.initialize()
+
+
+async def setup_file_parser():
+    nltk.download('punkt_tab')
+    nltk.download('averaged_perceptron_tagger_eng')
