@@ -26,10 +26,9 @@ jobs:
     strategy:
       matrix:
         path_filter:
-          - fai-rag-app/fai-backend/**
+          - fai-rag-app/fai-backend/
 
   build-worker:
-    if: contains(github.event.commits[*].modified, 'fai-rag-app/worker/')
     runs-on: codebuild-f-ai-builder-${{ github.run_id }}-${{ github.run_attempt }}-ubuntu-7.0-medium
 
     steps:
@@ -45,3 +44,8 @@ jobs:
           JELASTIC_TAG: sha-${{ github.sha }}
           DOCKER_CONTEXT: ${{ vars.DOCKER_LABS_WORKER_CONTEXT }}
           DOCKER_FILE_PATH: ${{ vars.DOCKER_LABS_WORKER_FILE_PATH }}
+
+    strategy:
+      matrix:
+        path_filter:
+          - fai-rag-app/worker/
