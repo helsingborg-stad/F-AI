@@ -18,13 +18,6 @@ jobs:
         working-directory: ./fai-rag-app/fai-backend
 
     steps:
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          apt-get install -y --no-install-recommends \
-          poppler-utils \
-          tesseract-ocr
-
       - name: checkout
         uses: actions/checkout@v3
 
@@ -52,6 +45,10 @@ jobs:
 
       - name: install dependencies
         run: |
+          apt-get install -y --no-install-recommends \
+          poppler-utils \
+          tesseract-ocr
+
           poetry lock --no-update
           poetry install
 
