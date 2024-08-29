@@ -3,8 +3,8 @@ from beanie import Document
 
 class CollectionMetadataModel(Document):
     collection_id: str
-    label: str | None
-    description: str | None
+    label: str = ''
+    description: str = ''
 
     class Settings:
         name = 'collections'
