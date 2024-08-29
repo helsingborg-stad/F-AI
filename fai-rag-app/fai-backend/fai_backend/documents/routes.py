@@ -40,32 +40,36 @@ async def list_view(
         collection_label = most_recent_collection
 
     return view(
-        c.Div(components=[
-            c.Text(text=f'Collection {collection_label}'),
+        [c.Div(components=[
             c.Div(components=[
-                c.Table(
-                    data=[
-                        {
-                            'file_name': file.file_name,
-                            'file_size': file.file_size.human_readable(),
-                            'collection': file.collection,
-                            'mime_type': file.mime_type,
-                            'upload_date': file.upload_date.date(),
-                        }
-                        for file in most_recent_upload_files
-                    ],
-                    columns=[
-                        {'key': 'file_name', 'label': _('file_name', 'File name')},
-                        {'key': 'collection', 'label': _('collection', 'Collection')},
-                        {'key': 'file_size', 'label': _('file_size', 'File size')},
-                        {'key': 'mime_type', 'label': _('mime_type', 'Mime type')},
-                        {'key': 'upload_date', 'label': _('upload_date', 'Upload date')},
-                    ],
+                c.Div(components=[
+                    c.Text(text=f'Collection {collection_label}'),
+                    c.Div(components=[
+                        c.Table(
+                            data=[
+                                {
+                                    'file_name': file.file_name,
+                                    'file_size': file.file_size.human_readable(),
+                                    'collection': file.collection,
+                                    'mime_type': file.mime_type,
+                                    'upload_date': file.upload_date.date(),
+                                }
+                                for file in most_recent_upload_files
+                            ],
+                            columns=[
+                                {'key': 'file_name', 'label': _('file_name', 'File name')},
+                                {'key': 'collection', 'label': _('collection', 'Collection')},
+                                {'key': 'file_size', 'label': _('file_size', 'File size')},
+                                {'key': 'mime_type', 'label': _('mime_type', 'Mime type')},
+                                {'key': 'upload_date', 'label': _('upload_date', 'Upload date')},
+                            ],
 
-                    class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
-                ),
-            ], class_name='overflow-x-auto space-y-4'),
-        ], class_name='card bg-base-100 w-full max-w-6xl'),
+                            class_name='text-base-content join-item md:table-sm lg:table-md table-auto',
+                        ),
+                    ], class_name='overflow-x-auto space-y-4'),
+                ], class_name='card bg-base-100 w-full max-w-6xl'),
+            ], class_name='card-body'),
+        ], class_name='card')],
         _('documents', 'Documents'),
     )
 
