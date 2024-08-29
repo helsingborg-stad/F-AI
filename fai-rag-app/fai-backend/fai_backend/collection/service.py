@@ -1,5 +1,6 @@
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.repositories import CollectionMetadataRepository, collection_metadata_repo
+from fai_backend.repository.query.component import AttributeAssignment
 
 
 class CollectionService:
@@ -19,4 +20,19 @@ class CollectionService:
             label=label,
             description=description,
         )
+
         return await self.repo.create(collection_metadata)
+
+    async def get_collection_metadata(self, collection_id: str):
+        query = AttributeAssignment('collection_id', collection_id)
+
+        return await self.repo.list(query)
+
+    async def get_collection_metadata_label_or_empty_string(self, collection_id: str):
+        collection_metadata = await self.get_collection_metadata(collection_id)
+
+        label = ''
+        if collection_metadata and collection_metadata[0].label:
+            label = collection_metadata[0].label
+
+        return label

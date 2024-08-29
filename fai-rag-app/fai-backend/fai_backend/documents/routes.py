@@ -25,8 +25,9 @@ router = APIRouter(
 
 
 @router.get('/documents', response_model=list, response_model_exclude_none=True)
-def list_view(
+async def list_view(
         file_service: FileUploadService = Depends(get_file_upload_service),
+        collection_service: CollectionService = Depends(get_collection_service),
         project_user: ProjectUser = Depends(get_project_user),
         view=Depends(get_page_template_for_logged_in_users),
 ) -> list:
@@ -34,8 +35,13 @@ def list_view(
     most_recent_collection = max(files, key=lambda file: file.upload_date).collection if files else []
     most_recent_upload_files = [file for file in files if file.collection == most_recent_collection]
 
+    collection_label = await collection_service.get_collection_metadata_label_or_empty_string(most_recent_collection)
+    if not collection_label:
+        collection_label = most_recent_collection
+
     return view(
         c.Div(components=[
+            c.Text(text=f'Collection {collection_label}'),
             c.Div(components=[
                 c.Table(
                     data=[
