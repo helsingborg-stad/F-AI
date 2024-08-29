@@ -3,6 +3,7 @@
   import Button from './Button.svelte'
   import ChatBubble from './ChatBubble.svelte'
   import SvelteMarkdown from 'svelte-markdown'
+  import SVG from '$lib/components/SVG.svelte'
 
   interface SSEMessage {
     type: string
@@ -40,19 +41,23 @@
   let contentScrollDiv: Element
   let isContentAtBottom: Boolean = true
 
-  $: isContentAtBottom = messages.length == 0 || isContentAtBottom
+  function updateBottomCheck() {
+    const margin = 100
+    isContentAtBottom = contentScrollDiv && contentScrollDiv.scrollHeight - contentScrollDiv.scrollTop - contentScrollDiv.clientHeight <= margin
+  }
+
   $: selectedAssistant = assistants.find((a) => a.id === selectedAssistantId) || null
   $: contentScrollDiv &&
-    messages &&
-    messages.length > 0 &&
-    scrollToBottom(contentScrollDiv)
-
-  function scrollContentToBottom() {
-    contentScrollDiv.scrollTop = contentScrollDiv.scrollHeight
-  }
+  messages &&
+  messages.length > 0 &&
+  scrollContentToBottom()
 
   const scrollToBottom = (node: Element) => {
     node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+  }
+
+  function scrollContentToBottom() {
+    scrollToBottom(contentScrollDiv)
   }
 
   function addErrorMessage(message: string) {
@@ -199,51 +204,59 @@
   <Div
     class="absolute bottom-28 top-24 flex w-full grow flex-col items-center justify-center gap-2"
   >
-    <!-- Chat bubbles -->
     <div
-      class="relative w-full max-w-prose grow overflow-y-auto"
-      bind:this={contentScrollDiv}
+      class="relative w-full max-w-prose h-full overflow-hidden"
     >
-      {#each messages as message (message.id)}
-        <ChatBubble
-          content={formatMessageForMarkdown(message.content)}
-          isSelf={message.isSelf}
-        />
-      {:else}
-        <div class="prose text-center">
-          {#if selectedAssistant}
-            <SvelteMarkdown source={selectedAssistant.description} />
+      <div
+        class="absolute bottom-5 right-10 flex justify-center z-10 transition"
+        class:opacity-0={isContentAtBottom}
+      >
+        <!--  -->
+        <button
+          on:click={scrollContentToBottom}
+          class="bg-white rounded-full shadow p-2 hover:bg-gray-100 active:scale-95 transition"
+        >
+          <SVG
+            width="24"
+            src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg==" />
+        </button>
+      </div>
 
-            <div class="flex gap-2 max-w-full flex-wrap justify-center">
-              {#each selectedAssistant.sampleQuestions as question}
-                <button
-                  class="btn btn-outline"
-                  on:click={() => askSampleQuestion(question)}>{question}</button
-                >
-              {/each}
-            </div>
-          {:else}
-            <p>
-              Here you can chat with any specialized assistant that has been created for
-              you.
-            </p>
-            <p>Choose an assistant from the dropdown to begin.</p>
-          {/if}
-        </div>
-      {/each}
+      <!-- Chat bubbles -->
+      <div
+        class="w-full max-h-full overflow-y-auto bg-white rounded-lg"
+        bind:this={contentScrollDiv}
+        on:scroll={updateBottomCheck}
+      >
+        {#each messages as message (message.id)}
+          <ChatBubble
+            content={formatMessageForMarkdown(message.content)}
+            isSelf={message.isSelf}
+          />
+        {:else}
+          <div class="prose text-center">
+            {#if selectedAssistant}
+              <SvelteMarkdown source={selectedAssistant.description} />
 
-      <span class="loading loading-spinner" class:opacity-0={!eventSource} />
-    </div>
-
-    <div
-      class="absolute inset-x-0 bottom-20 flex justify-center"
-      class:hidden={isContentAtBottom}
-    >
-      <Button
-        onClick={scrollContentToBottom}
-        label=""
-        iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg=="
-      />
+              <div class="flex gap-2 max-w-full flex-wrap justify-center">
+                {#each selectedAssistant.sampleQuestions as question}
+                  <button
+                    class="btn btn-outline"
+                    on:click={() => askSampleQuestion(question)}>{question}</button
+                  >
+                {/each}
+              </div>
+            {:else}
+              <p>
+                Here you can chat with any specialized assistant that has been created for
+                you.
+              </p>
+              <p>Choose an assistant from the dropdown to begin.</p>
+            {/if}
+          </div>
+        {/each}
+        <span class="loading loading-spinner" class:opacity-0={!eventSource} />
+      </div>
     </div>
   </Div>
 
@@ -259,7 +272,7 @@
             class="textarea textarea-bordered h-full grow"
           />
           <Button
-            onClick={() => createSSE(currentMessageInput)}
+            on:click={() => createSSE(currentMessageInput)}
             label=""
             iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlbmQiPjxwYXRoIGQ9Im0yMiAyLTcgMjAtNC05LTktNFoiLz48cGF0aCBkPSJNMjIgMiAxMSAxMyIvPjwvc3ZnPg=="
           />
