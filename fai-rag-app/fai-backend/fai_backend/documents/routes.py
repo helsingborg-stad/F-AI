@@ -14,9 +14,7 @@ from fai_backend.projects.dependencies import list_projects_request, update_proj
 from fai_backend.projects.schema import ProjectResponse, ProjectUpdateRequest
 from fai_backend.projects.service import ProjectService
 from fai_backend.schema import ProjectUser
-from fai_backend.vector.dependencies import get_vector_service
 from fai_backend.vector.schema import VectorizeFilesModel
-from fai_backend.vector.service import VectorService
 
 router = APIRouter(
     prefix='/api',
@@ -25,7 +23,7 @@ router = APIRouter(
 )
 
 
-@router.get('/documents', response_model=list, response_model_exclude_none=True)
+@router.get('/view/documents', response_model=list, response_model_exclude_none=True)
 def list_view(
         file_service: FileUploadService = Depends(get_file_upload_service),
         project_user: ProjectUser = Depends(get_project_user),
@@ -65,7 +63,7 @@ def list_view(
     )
 
 
-@router.get('/documents/upload', response_model=list, response_model_exclude_none=True)
+@router.get('/view/documents/upload_form', response_model=list, response_model_exclude_none=True)
 def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
     return view(
         c.Form(
@@ -88,47 +86,6 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
             class_name='card bg-base-100 w-full max-w-6xl',
         ),
         _('upload_documents', 'Upload documents'),
-    )
-
-
-@router.post('/documents/upload_and_vectorize', response_model=list, response_model_exclude_none=True)
-async def upload_and_vectorize_handler(
-        files: list[UploadFile],
-        project_user: ProjectUser = Depends(get_project_user),
-        file_service: FileUploadService = Depends(get_file_upload_service),
-        vector_service: VectorService = Depends(get_vector_service),
-        view=Depends(get_page_template_for_logged_in_users),
-        projects: list[ProjectResponse] = Depends(list_projects_request),
-        project_service: ProjectService = Depends(get_project_service),
-) -> list:
-    """
-    DEPRECATED
-    use upload_files_handler instead
-    """
-    upload_path = file_service.save_files(project_user.project_id, files)
-
-    upload_directory_name = upload_path.split('/')[-1]
-    await vector_service.create_collection(collection_name=upload_directory_name)
-
-    parsed_files = file_service.parse_files(upload_path)
-    await vector_service.add_documents_without_id_to_empty_collection(
-        collection_name=upload_directory_name,
-        documents=parsed_files,
-    )
-
-    # Fix/workaround for updating assistant file collection id until assistant editor ui is done
-    for project in projects:
-        for assistant in project.assistants:
-            if assistant.files_collection_id is not None:
-                assistant.files_collection_id = upload_directory_name
-                await update_project_request(
-                    body=ProjectUpdateRequest(**project.model_dump()),
-                    existing_project=project,
-                    project_service=project_service)
-
-    return view(
-        c.FireEvent(event=e.GoToEvent(url='/documents')),
-        _('submit_a_question', 'Create Question'),
     )
 
 
@@ -159,5 +116,5 @@ async def upload_files_handler(files: list[UploadFile],
                                              existing_project=project,
                                              project_service=project_service)
 
-    return view(c.FireEvent(event=e.GoToEvent(url='/documents')),
+    return view(c.FireEvent(event=e.GoToEvent(url='/view/documents')),
                 _('submit_a_question', 'Create Question'))
