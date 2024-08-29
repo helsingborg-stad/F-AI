@@ -16,7 +16,7 @@ class Settings(BaseSettings, extra=Extra.ignore):
     APP_VECTOR_DB: Literal['memory', 'chromadb'] = 'chromadb'
     APP_VECTOR_DB_PATH: str = 'vector_db'
     APP_MESSAGE_BROKER: Literal['memory', 'redis_queue'] = 'redis_queue'
-    APP_MESSAGE_BROKER_WORKER_HOST: str = 'localhost'
+    APP_MESSAGE_BROKER_HOST: str = 'localhost'
     APP_MESSAGE_BROKER_BASE_URL: str = 'http://host.docker.internal:8000'
     APP_MESSAGE_BROKER_TASK_FUNC: str = 'worker_src.task.external_api_call'
     SECRET_KEY: SecretStr
