@@ -7,5 +7,5 @@ def get_message_queue() -> IMessageQueue:
     return MessageBroker.create(broker_type=settings.APP_MESSAGE_BROKER_TYPE,
                                 redis_host=settings.APP_MESSAGE_BROKER_HOST,
                                 redis_port=settings.APP_MESSAGE_BROKER_PORT,
-                                redis_password=settings.APP_MESSAGE_BROKER_PASSWORD,
-                                redis_username=settings.APP_MESSAGE_BROKER_USERNAME,)
+                                redis_password=settings.APP_MESSAGE_BROKER_PASSWORD.get_secret_value(),
+                                redis_username=settings.APP_MESSAGE_BROKER_USERNAME.get_secret_value())
