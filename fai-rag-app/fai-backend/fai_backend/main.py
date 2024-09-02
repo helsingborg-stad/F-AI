@@ -1,9 +1,10 @@
+import random
 from contextlib import asynccontextmanager
 from datetime import datetime
 
 from fastapi import Depends, FastAPI, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
-from sentry_sdk import Hub, capture_message
+from sentry_sdk import Hub
 from sse_starlette import EventSourceResponse, ServerSentEvent
 from starlette.responses import HTMLResponse, RedirectResponse
 
@@ -88,43 +89,48 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
             data=conversation_id_to_send,
         )
 
-        history = await chat_history_repo.get(conversation_id_to_send)
-        history.history.append(
-            AssistantStreamMessage(
-                role='user',
-                content=question
-            )
-        )
-        await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
+        try:
+            history = await chat_history_repo.get(conversation_id_to_send)
 
-        final_output = ''
+            final_output = ''
+            async for output in stream(question):
+                if output.final:
+                    final_output += output.data
+                    yield ServerSentEvent(
+                        event='message',
+                        data=serializer.serialize(LLMClientChatMessage(
+                            date=datetime.now(),
+                            source='Chat AI',
+                            content=output.data
+                        )),
+                    )
 
-        async for output in stream(question):
-            if output.final:
-                final_output += output.data
-                yield ServerSentEvent(
-                    event='message',
-                    data=serializer.serialize(LLMClientChatMessage(
-                        date=datetime.now(),
-                        source='Chat AI',
-                        content=output.data
-                    )),
+            history.history += [
+                AssistantStreamMessage(
+                    role='user',
+                    content=question
+                ),
+                AssistantStreamMessage(
+                    role='system',
+                    content=final_output
                 )
+            ]
+            await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
 
-        history.history.append(
-            AssistantStreamMessage(
-                role='system',
-                content=final_output
+        except Exception as e:
+            yield ServerSentEvent(
+                event='exception',
+                data=''
             )
-        )
-        await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
+            raise e
 
-        yield ServerSentEvent(
-            event='message_end',
-            data=serializer.serialize(LLMClientChatMessage(
-                date=datetime.now(),
-            ))
-        )
+        finally:
+            yield ServerSentEvent(
+                event='message_end',
+                data=serializer.serialize(LLMClientChatMessage(
+                    date=datetime.now(),
+                ))
+            )
 
     return EventSourceResponse(generator(used_conversation_id))
 
