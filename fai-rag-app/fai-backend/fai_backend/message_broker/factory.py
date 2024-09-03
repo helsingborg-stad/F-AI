@@ -36,4 +36,4 @@ def create_queue(broker_type: Type[T], *args, **kwargs) -> IMessageQueue:
 
 
 MessageBroker.register('redis_queue')(lambda *args, **kwargs: create_queue(RedisQueue, *args, **kwargs))
-MessageBroker.register('memory_queue')(lambda *args, **kwargs: create_queue(MemoryQueue, *args, **kwargs))
+MessageBroker.register('memory_queue')(lambda *args, **kwargs: create_queue(MemoryQueue))

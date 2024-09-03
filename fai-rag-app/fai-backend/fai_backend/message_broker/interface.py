@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Protocol
 
 
 class Job:
@@ -14,7 +14,7 @@ class JobStatus:
     CANCELED = "canceled"
 
 
-class IMessageQueue:
+class IMessageQueue(Protocol):
     def enqueue(self, func: Callable[..., Any] | str, *args, **kwargs) -> Job:
         """
         Enqueue a task for background execution.

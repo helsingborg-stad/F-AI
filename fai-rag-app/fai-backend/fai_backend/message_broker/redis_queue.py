@@ -4,14 +4,14 @@ import redis
 from rq import Queue
 from rq.job import Job
 from rq.job import JobStatus
-from fai_backend.message_broker.interface import IMessageQueue
 
 
-class RedisQueue(IMessageQueue):
-    def __init__(self, redis_host, redis_port, redis_password, redis_username, redis_db: int = 0,
-                 queue_name: str = 'default'):
-        self.redis = redis.StrictRedis(host=redis_host, port=redis_port, password=redis_password,
-                                       username=redis_username, db=redis_db)
+class RedisQueue:
+    def __init__(self, host, port,
+                 password: str | None = None,
+                 username: str | None = None,
+                 db: int = 0, queue_name: str = 'default') -> None:
+        self.redis = redis.StrictRedis(host, port, password, db)
         self.queue = Queue(queue_name, connection=self.redis)
 
     def enqueue(self, func, *args, **kwargs) -> Job:

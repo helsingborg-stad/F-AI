@@ -4,10 +4,10 @@ import fakeredis
 from rq import Queue
 from rq.job import Job
 
-from fai_backend.message_broker.interface import IMessageQueue, JobStatus
+from fai_backend.message_broker.interface import JobStatus
 
 
-class MemoryQueue(IMessageQueue):
+class MemoryQueue:
     def __init__(self):
         self.fake_redis = fakeredis.FakeStrictRedis()
         self.queue = Queue(is_async=False, connection=self.fake_redis)
