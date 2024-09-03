@@ -11,7 +11,7 @@ class RedisQueue:
                  password: str | None = None,
                  username: str | None = None,
                  db: int = 0, queue_name: str = 'default') -> None:
-        self.redis = redis.StrictRedis(host, port, password, db, username)
+        self.redis = redis.StrictRedis(host=host, port=port, db=db, password=password, username=username)
         self.queue = Queue(queue_name, connection=self.redis)
 
     def enqueue(self, func, *args, **kwargs) -> Job:
