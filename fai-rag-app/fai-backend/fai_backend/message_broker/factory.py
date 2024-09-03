@@ -23,7 +23,7 @@ class MessageBroker:
     @classmethod
     def create(cls, broker_type, *broker_args, **broker_kwargs) -> IMessageQueue:
         if broker_type not in cls._builders:
-            raise KeyError(f"No builder registered for type {broker_type}")
+            raise KeyError(f"No builder registered for type {broker_type}.")
         return cls._builders[broker_type](*broker_args, **broker_kwargs)
 
     @classmethod
