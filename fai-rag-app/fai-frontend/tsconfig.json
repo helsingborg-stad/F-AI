@@ -3,7 +3,7 @@
   "compilerOptions": {
     "lib": [
       "DOM",
-      "ES2017",
+      "ES2022",
       "WebWorker"
     ],
     "resolveJsonModule": true,

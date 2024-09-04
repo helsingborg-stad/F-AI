@@ -52,6 +52,9 @@ class Assistant:
             context_store: IAssistantContextStore
     ) -> Stream[list[str], str]:
         if isinstance(config, AssistantStreamConfig):
+            if config.provider not in provider_map:
+                raise ValueError(f'Unsupported provider "{config.provider}"')
+
             llm = provider_map[config.provider](config.settings)
             return await llm.create_llm_stream(config.messages, context_store, self.get_insert)
 

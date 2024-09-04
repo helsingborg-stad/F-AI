@@ -4,6 +4,7 @@
   import ChatBubble from './ChatBubble.svelte'
   import SvelteMarkdown from 'svelte-markdown'
   import SVG from '$lib/components/SVG.svelte'
+  import { findLastIndex } from '../../util/array'
 
   interface SSEMessage {
     type: string
@@ -40,6 +41,7 @@
 
   let contentScrollDiv: Element
   let isContentAtBottom: Boolean = true
+  let lastMessageErrored: Boolean = false
 
   function updateBottomCheck() {
     const margin = 100
@@ -51,6 +53,7 @@
   messages &&
   messages.length > 0 &&
   scrollContentToBottom()
+  $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
 
   const scrollToBottom = (node: Element) => {
     node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
@@ -58,19 +61,6 @@
 
   function scrollContentToBottom() {
     scrollToBottom(contentScrollDiv)
-  }
-
-  function addErrorMessage(message: string) {
-    messages = [
-      ...messages,
-      {
-        id: `error${messages.length}`,
-        user: 'Error',
-        content: message,
-        time: new Date().toTimeString().split(' ')[0],
-        isSelf: false,
-      },
-    ]
   }
 
   function toChatMessage(sse: SSEMessage): ChatMessage {
@@ -94,74 +84,71 @@
   }
 
   function createSSE(question: string) {
-    try {
-      if (question.length == 0) return
-      currentMessageInput = ''
+    if (question.length == 0) return
+    currentMessageInput = ''
 
-      messages = [
-        ...messages,
-        {
-          id: `self${messages.length}`,
-          isSelf: true,
-          user: 'Me',
-          content: question,
-          time: new Date().toTimeString().split(' ')[0],
-        },
-        {
-          id: `placeholder${messages.length}`,
-          isSelf: false,
-          user: '',
-          content: '',
-          time: '',
-        },
-      ]
+    messages = [
+      ...messages,
+      {
+        id: `self${messages.length}`,
+        isSelf: true,
+        user: 'Me',
+        content: question,
+        time: new Date().toTimeString().split(' ')[0],
+      },
+      {
+        id: `placeholder${messages.length}`,
+        isSelf: false,
+        user: '',
+        content: '',
+        time: '',
+      },
+    ]
 
+    closeSSE()
+
+    eventSource = new EventSource(
+      `${endpoint}/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}&conversation_id=${activeConversationId ?? ''}`,
+    )
+
+    eventSource.onerror = (e) => {
+      console.error(e)
+      lastMessageErrored = true
       closeSSE()
+    }
 
-      eventSource = new EventSource(
-        `${endpoint}/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}&conversation_id=${activeConversationId ?? ''}`,
-      )
+    eventSource.addEventListener('message_end', () => {
+      closeSSE()
+    })
 
-      eventSource.onerror = (e) => {
-        addErrorMessage(`unknown error / ${e}`)
+    eventSource.addEventListener('conversation_id', (e) => {
+      activeConversationId = e.data
+    })
+
+    eventSource.addEventListener('exception', () => {
+      lastMessageErrored = true
+    })
+
+    eventSource.addEventListener('message', (e) => {
+      try {
+        const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!)
+        const jsonString = new TextDecoder().decode(bytes)
+        const messagePayload = JSON.parse(jsonString) as SSEMessage
+        const chatMessage = toChatMessage(messagePayload)
+
+        messages = [
+          ...messages.slice(0, -1),
+          {
+            ...messages.at(-1),
+            ...chatMessage,
+            content: messages.at(-1)!.content + chatMessage.content,
+          },
+        ]
+      } catch (ex) {
+        console.error('Failed to parse raw message', ex, e)
         closeSSE()
       }
-
-      eventSource.addEventListener('message_end', () => {
-        closeSSE()
-        return
-      })
-
-      eventSource.addEventListener('conversation_id', (e) => {
-        activeConversationId = e.data
-        console.log(`got conversation id ${e.data}`)
-      })
-
-      eventSource.addEventListener('message', (e) => {
-        try {
-          const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!)
-          const jsonString = new TextDecoder().decode(bytes)
-          const messagePayload = JSON.parse(jsonString) as SSEMessage
-          const chatMessage = toChatMessage(messagePayload)
-
-          messages = [
-            ...messages.slice(0, -1),
-            {
-              ...messages.at(-1),
-              ...chatMessage,
-              content: messages.at(-1)!.content + chatMessage.content,
-            },
-          ]
-        } catch (ex) {
-          console.error('Failed to parse raw message', ex, e)
-          closeSSE()
-        }
-      })
-    } catch (e) {
-      closeSSE()
-      console.error('createSSE error', e)
-      addErrorMessage(e?.toString() ?? 'unknown')
-    }
+    })
   }
 
   function handleTextareaKeypress(event: KeyboardEvent) {
@@ -177,6 +164,14 @@
 
   function askSampleQuestion(question: string) {
     createSSE(question)
+  }
+
+  function retryLastMessage() {
+    lastMessageErrored = false
+    const lastUserMessageIndex = findLastIndex(messages, m => m.isSelf)
+    const lastQuestion = messages[lastUserMessageIndex].content
+    messages = messages.slice(0, lastUserMessageIndex)
+    createSSE(lastQuestion)
   }
 </script>
 
@@ -255,6 +250,14 @@
             {/if}
           </div>
         {/each}
+
+        {#if lastMessageErrored}
+          <div class="flex items-center gap-2">
+            <span>Ett fel uppstod ⚠️️</span>
+            <button class="btn btn-link active:opacity-60" on:click={retryLastMessage}>Försök igen</button>
+          </div>
+        {/if}
+
         <span class="loading loading-spinner" class:opacity-0={!eventSource} />
       </div>
     </div>
@@ -263,7 +266,7 @@
   <!-- Form controls -->
   <Div class="absolute inset-x-0 bottom-0 h-28 p-3">
     <form class="h-full w-full" on:submit={scrollContentToBottom}>
-      <fieldset disabled={!selectedAssistantId} class="h-full">
+      <fieldset disabled={!selectedAssistantId || !!lastMessageErrored} class="h-full">
         <Div class="flex h-full w-full items-end gap-2">
           <textarea
             name="message"
