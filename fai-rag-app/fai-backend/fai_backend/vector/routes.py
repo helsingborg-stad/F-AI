@@ -1,11 +1,12 @@
 from fastapi import Depends, APIRouter
+from fastapi.concurrency import run_in_threadpool
 
 from fai_backend.files.dependecies import get_file_upload_service
 from fai_backend.files.service import FileUploadService
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.vector.dependencies import get_vector_service
 from fai_backend.vector.service import VectorService
-from fai_backend.vector.schema import VectorData
+from fai_backend.vector.schema import VectorData, VectorizeFilesModel
 from fai_backend.vector.router_error_handler import handle_errors
 
 router = APIRouter(
@@ -99,16 +100,20 @@ async def list_collections(
 
 @router.post('/vector/vectorize_files', response_model=dict)
 @handle_errors
-async def vectorize_files(
-        directory_path: str,
-        vector_service: VectorService = Depends(get_vector_service),
-        file_service: FileUploadService = Depends(get_file_upload_service),
-):
-    directory_name = directory_path.split('/')[-1]
-    await vector_service.create_collection(collection_name=directory_name)
+async def vectorize_files(model: VectorizeFilesModel,
+                          vector_service: VectorService = Depends(get_vector_service),
+                          file_service: FileUploadService = Depends(get_file_upload_service)):
+    dir_path = model.directory_path
+    dir_name = dir_path.split('/')[-1]
 
-    parsed_files = file_service.parse_files(directory_path)
+    parsed_files = await run_in_threadpool(file_service.parse_files, dir_path)
+
+    await vector_service.create_collection(collection_name=dir_name)
     await vector_service.add_documents_without_id_to_empty_collection(
-        collection_name=directory_name,
-        documents=parsed_files,
-    )
+        collection_name=dir_name,
+        documents=parsed_files)
+
+    return {
+        'message': 'Successfully vectorized files',
+        'collection_name': dir_name,
+    }
