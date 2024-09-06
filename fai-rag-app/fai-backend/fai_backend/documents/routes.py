@@ -99,8 +99,8 @@ async def upload_files_handler(files: list[UploadFile],
                                project_service: ProjectService = Depends(get_project_service)) -> list:
     project_id = project_user.project_id
     upload_path = file_service.save_files(project_id, files)
-    message_queue.enqueue(settings.APP_MESSAGE_BROKER_TASK_FUNC,
-                          base_url=settings.APP_MESSAGE_BROKER_BASE_URL,
+    message_queue.enqueue(settings.MESSAGE_BROKER_TASK_FUNC,
+                          base_url=settings.MESSAGE_BROKER_REST_BASE_URL,
                           task_id=project_id,
                           path='api/vector/vectorize_files',
                           data=VectorizeFilesModel(directory_path=upload_path).model_dump())
