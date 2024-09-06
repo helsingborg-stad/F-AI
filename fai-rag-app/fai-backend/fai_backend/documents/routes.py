@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile
 
+from fai_backend.config import settings
 from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
 from fai_backend.files.dependecies import get_file_upload_service
 from fai_backend.files.service import FileUploadService
@@ -76,6 +77,7 @@ def upload_view(
                     title=_('file', 'File'),
                     required=True,
                     multiple=True,
+                    file_size_limit=settings.FILE_SIZE_LIMIT,
                 ),
                 c.Button(
                     html_type='submit',

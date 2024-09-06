@@ -14,57 +14,42 @@
     export let variant: 'ghost' | 'bordered' = 'bordered'
     export let autoFocus: boolean | null = null;
     export let multiple: boolean | null = null;
+    export let fileSizeLimit: number | null = null;
 
     let ref: HTMLInputElement;
     let notification: string = '';
-    const FILE_SIZE_LIMIT = 10; // MB
 
     onMount(() => autoFocus && (ref?.focus() !== undefined));
 
-    function calculateTotalFilesSize(files: FileList): { totalFiles: number, totalFileSize: number } {
-        const totalFiles = files.length;
-        let totalFileSize = 0;
-
-        for (let i = 0; i < totalFiles; i++) {
-            totalFileSize += files[i].size;
+    function calculateTotalFilesSize(files: FileList): number {
+        let size = 0;
+        for (let i = 0; i < files.length; i++) {
+            size += files[i].size;
         }
-
-        return { totalFiles, totalFileSize };
+        return size;
     }
 
     const handleFileChange = (event: Event) => {
       const t = event.target as HTMLInputElement
       if (t.files && t.files.length) {
-        const { totalFiles, totalFileSize } = calculateTotalFilesSize(t.files);
-        const maxFileSizeInBytes = FILE_SIZE_LIMIT * 1024 * 1024;
+        const totalFileSize = calculateTotalFilesSize(t.files);
+        const maxFileSizeInBytes = fileSizeLimit! * 1024 * 1024;
         if (totalFileSize > maxFileSizeInBytes) {
-          notification = `Total file size is too large. Max file size is ${FILE_SIZE_LIMIT} MB`;
+          notification = `Total file size is too large. Max file size is ${fileSizeLimit} MB`;
           t.value = '';
           t.files = null;
         } else {
           notification = '';
         }
-        console.log(`Total Files: ${totalFiles}`);
-        console.log(`Total File Size: ${totalFileSize} bytes`);
       }
     };
 </script>
 
-<style>
-  .notification {
-    background-color: #ffcccc;
-    border: 1px solid #ff0000;
-    color: #ff0000;
-    border-radius: 5px;
-    margin: 1rem;
-    padding: 1rem;
-}
-</style>
+{#if notification}
+  <p class="alert alert-warning">{notification}</p>
+{/if}
 
 <label class:form-control={1}>
-    {#if notification}
-      <div class="notification">{notification}</div>
-    {/if}
     <input
             bind:this={ref}
             class:file-input={1}
@@ -81,7 +66,7 @@
             {title}
             {placeholder}
             {value}
-            on:change={handleFileChange}
+            on:change={fileSizeLimit ? handleFileChange : null}
     />
     {#if error}
         <div class="label label-text text-error mt-1">{error}</div>
