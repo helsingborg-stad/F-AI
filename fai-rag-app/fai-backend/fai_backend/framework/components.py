@@ -123,8 +123,7 @@ class FileInput(InputField):
     title: str | None = None
     required: bool | None = None
     accept: str | None = None
-    min_size: ByteSize | None = None
-    max_size: ByteSize | None = None
+    file_size_limit: int | None = Field(None, serialization_alias='fileSizeLimit')
     multiple: bool | None = None
 
     # Remove the following fields from the base class

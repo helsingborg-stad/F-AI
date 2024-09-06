@@ -14,14 +14,42 @@
     export let variant: 'ghost' | 'bordered' = 'bordered'
     export let autoFocus: boolean | null = null;
     export let multiple: boolean | null = null;
+    export let fileSizeLimit: number | null = null;
 
     let ref: HTMLInputElement;
+    let notification: string = '';
 
-    onMount(() => autoFocus && (ref?.focus() !== undefined))
+    onMount(() => autoFocus && (ref?.focus() !== undefined));
+
+    function calculateTotalFilesSize(files: FileList): number {
+        let size = 0;
+        for (let i = 0; i < files.length; i++) {
+            size += files[i].size;
+        }
+        return size;
+    }
+
+    const handleFileChange = (event: Event) => {
+      const t = event.target as HTMLInputElement
+      if (t.files && t.files.length) {
+        const totalFileSize = calculateTotalFilesSize(t.files);
+        const maxFileSizeInBytes = fileSizeLimit! * 1024 * 1024;
+        if (totalFileSize > maxFileSizeInBytes) {
+          notification = `Total file size is too large. Max file size is ${fileSizeLimit} MB`;
+          t.value = '';
+          t.files = null;
+        } else {
+          notification = '';
+        }
+      }
+    };
 </script>
 
-<label
-        class:form-control={1}>
+{#if notification}
+  <p class="alert alert-warning">{notification}</p>
+{/if}
+
+<label class:form-control={1}>
     <input
             bind:this={ref}
             class:file-input={1}
@@ -38,13 +66,9 @@
             {title}
             {placeholder}
             {value}
-
-
+            on:change={fileSizeLimit ? handleFileChange : null}
     />
     {#if error}
         <div class="label label-text text-error mt-1">{error}</div>
     {/if}
 </label>
-
-
-
