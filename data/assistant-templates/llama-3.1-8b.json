@@ -1,0 +1,30 @@
+{
+  "id": "llama-3.1-8b",
+  "meta": {
+    "name": "LLama 3.1 (8b) Assistant",
+    "description": "LLama 3.1 (8b) exempel. Modellen körs på egen-managerad vLLM instans.",
+    "sample_questions": []
+  },
+  "streams": [
+    {
+      "provider": "vllm",
+      "settings": {
+        "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+        "temperature": 0
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a helpful AI assistant that answers questions. The questions are going to be asked in Swedish. Your response must always be in Swedish."
+        },
+        {
+          "insert": "history"
+        },
+        {
+          "role": "user",
+          "content": "{query}"
+        }
+      ]
+    }
+  ]
+}
