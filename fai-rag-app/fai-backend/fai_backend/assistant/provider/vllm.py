@@ -1,16 +1,27 @@
 import asyncio
+import json
+
 import openai
 from typing import TypeVar, Callable, List, Optional, Dict, Any, Union, Literal, AsyncGenerator, cast
 
 from langstream import Stream, StreamOutput
 from langstream.contrib import OpenAIChatDelta, OpenAIChatMessage
+from pydantic import BaseModel, RootModel
 from retry import retry
 
 from fai_backend.assistant.provider.openai import OpenAIAssistantLLMProvider
-from fai_backend.config import settings
+from fai_backend.config import settings as fai_backend_settings
 
 T = TypeVar("T")
 U = TypeVar("U")
+
+
+class VllmConfig(BaseModel, extra='ignore'):
+    url: str
+    key: str
+
+
+VllmConfigRoot = RootModel[Dict[str, VllmConfig]]
 
 
 class VLLMStream(Stream[T, U]):
@@ -26,6 +37,8 @@ class VLLMStream(Stream[T, U]):
                 List[OpenAIChatMessage],
             ],
             model: str,
+            vllm_url: str,
+            vllm_api_key: str,
             functions: Optional[List[Dict[str, Any]]] = None,
             function_call: Optional[Union[Literal["none", "auto"], Dict[str, Any]]] = None,
             temperature: Optional[float] = 0,
@@ -34,8 +47,8 @@ class VLLMStream(Stream[T, U]):
             retries: int = 3,
     ) -> None:
         self._client = openai.OpenAI(
-            base_url=settings.VLLM_URI,
-            api_key=settings.VLLM_API_KEY,
+            base_url=vllm_url,
+            api_key=vllm_api_key,
         )
 
         async def chat_completion(
@@ -115,4 +128,15 @@ class VLLMStream(Stream[T, U]):
 
 class VLLMAssistantLLMProvider(OpenAIAssistantLLMProvider):
     def __init__(self, settings: OpenAIAssistantLLMProvider.Settings):
-        super().__init__(settings, stream_class=VLLMStream)
+        def config_injected_vllmstream_constructor(*args, **kwargs):
+            model = kwargs['model']
+            parsed = VllmConfigRoot.model_validate_json(fai_backend_settings.VLLM_CONFIG)
+
+            config = parsed.root[model] if model in parsed.root else None
+
+            if config is None:
+                raise ValueError(f"No VLLM config for model '{model}'")
+
+            return VLLMStream(*args, **kwargs, vllm_url=config.url, vllm_api_key=config.key)
+
+        super().__init__(settings, stream_class=config_injected_vllmstream_constructor)

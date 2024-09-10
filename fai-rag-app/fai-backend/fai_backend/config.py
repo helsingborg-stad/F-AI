@@ -37,9 +37,8 @@ class Settings(BaseSettings, extra=Extra.ignore):
     SENTRY_EVENT_LEVEL: str = 'ERROR'
     SENTRY_TRACE_SAMPLE_RATE: float = 0.1
     SENTRY_ENVIRONMENT: str = 'development'
-    VLLM_URI: str = ''
-    VLLM_API_KEY: str = ''
-    FILE_SIZE_LIMIT: int = 10 # MB
+    VLLM_CONFIG: str = ''
+    FILE_SIZE_LIMIT: int = 10  # MB
 
     class Config:
         env_file = '.env'
