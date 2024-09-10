@@ -18,7 +18,7 @@ from fai_backend.dependencies import get_project_user
 from fai_backend.documents.routes import router as documents_router
 from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.logger.console import console
-from fai_backend.middleware import remove_trailing_slash
+from fai_backend.middleware import remove_trailing_slash, add_git_revision_to_request_header
 from fai_backend.phrase import phrase as _
 from fai_backend.phrase import set_language
 from fai_backend.projects.dependencies import list_projects_request
@@ -58,6 +58,7 @@ app.include_router(documents_router)
 app.include_router(vector_router)
 app.include_router(templates_router)
 
+app.middleware('http')(add_git_revision_to_request_header)
 app.middleware('http')(remove_trailing_slash)
 
 app.add_middleware(
