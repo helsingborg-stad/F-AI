@@ -1,6 +1,7 @@
 from langstream import join_final_output
 from langstream.contrib import OpenAIChatStream, OpenAIChatDelta, OpenAIChatMessage
 
+from fai_backend.assistant.helper import get_message_content
 from fai_backend.assistant.models import AssistantStreamMessage
 from fai_backend.assistant.protocol import IAssistantMessageInsert, IAssistantContextStore
 
@@ -16,7 +17,7 @@ class AssistantHistorySummaryInsert(IAssistantMessageInsert):
             "openai",
             lambda in_data: [
                                 OpenAIChatMessage(
-                                    content=message.content.format(**context.dict()),
+                                    content=get_message_content(message, context),
                                     role=message.role
                                 ) for message in context.history
                             ] + [OpenAIChatMessage(

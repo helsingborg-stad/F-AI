@@ -14,6 +14,7 @@ class LLMClientChatMessage(BaseModel):
 class AssistantStreamMessage(BaseModel):
     role: Literal["system", "user", "assistant", "function"]
     content: str
+    should_format: bool = False
 
 
 class AssistantStreamInsert(BaseModel):

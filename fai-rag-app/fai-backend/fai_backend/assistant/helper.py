@@ -2,7 +2,7 @@ from typing import Callable, Any
 
 from langstream import Stream
 
-from fai_backend.assistant.models import AssistantStreamMessage, AssistantStreamInsert
+from fai_backend.assistant.models import AssistantStreamMessage, AssistantStreamInsert, AssistantContext
 from fai_backend.assistant.protocol import IAssistantContextStore, IAssistantMessageInsert
 
 
@@ -13,7 +13,11 @@ def messages_expander_stream(
 ) -> Stream[Any, list[AssistantStreamMessage]]:
     async def _expand_message(message: AssistantStreamMessage | AssistantStreamInsert) -> list[AssistantStreamMessage]:
         if isinstance(message, AssistantStreamMessage):
-            return [message]
+            return [AssistantStreamMessage(
+                role=message.role,
+                content=message.content,
+                should_format=True
+            )]
         return await get_insert(message.insert).get_messages(context_store)
 
     async def _parse_messages(_):
@@ -21,3 +25,9 @@ def messages_expander_stream(
         yield [m for sublist in lists for m in sublist]
 
     return Stream[Any, [Any, list[AssistantStreamMessage]]]('expander', _parse_messages)
+
+
+def get_message_content(message: AssistantStreamMessage, context: AssistantContext):
+    if message.should_format:
+        return message.content.format(**context.dict())
+    return message.content

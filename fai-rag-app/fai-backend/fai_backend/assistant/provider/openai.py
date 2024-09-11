@@ -4,7 +4,7 @@ from langstream import Stream
 from langstream.contrib import OpenAIChatStream, OpenAIChatDelta, OpenAIChatMessage
 from pydantic import BaseModel
 
-from fai_backend.assistant.helper import messages_expander_stream
+from fai_backend.assistant.helper import messages_expander_stream, get_message_content
 from fai_backend.assistant.models import AssistantStreamMessage, AssistantStreamInsert
 from fai_backend.assistant.protocol import IAssistantLLMProvider, IAssistantContextStore, IAssistantMessageInsert
 
@@ -40,7 +40,7 @@ class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
     def _to_openai_message(message: AssistantStreamMessage, context_store: IAssistantContextStore):
         context = context_store.get_mutable()
         return OpenAIChatMessage(
-            content=message.content.format(**context.dict()),
+            content=get_message_content(message, context),
             role=message.role
         )
 
@@ -57,7 +57,7 @@ class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
         ) -> list[OpenAIChatMessage]:
             if isinstance(message, AssistantStreamMessage):
                 return [OpenAIChatMessage(
-                    content=message.content.format(**context.dict()),
+                    content=get_message_content(message, context),
                     role=message.role
                 )]
             insert_messages = await get_insert(message.insert).get_messages(context_store)
