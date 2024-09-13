@@ -76,6 +76,7 @@
   function clearChat() {
     messages = []
     activeConversationId = null
+    lastMessageErrored = false
   }
 
   function closeSSE() {
@@ -175,11 +176,24 @@
   }
 </script>
 
-<Div class="relative h-full">
-  <!-- Document picker -->
-  <Div
-    class="absolute inset-x-0 top-0 flex h-24 flex-col items-center justify-center gap-1 p-4"
+<div class="w-full lg:w-[calc(100%-20rem)] absolute top-16 bottom-0 overflow-hidden grid grid-rows-[6rem_1fr_7rem]">
+  <!-- Floating controls -->
+  <div
+    class="absolute inset-x-0 bottom-32 translate-y-20 flex justify-center z-10 transition"
+    class:translate-y-0={!isContentAtBottom}
   >
+    <button
+      on:click={scrollContentToBottom}
+      class="bg-white rounded-full shadow p-2 hover:bg-gray-100 active:scale-95 transition"
+    >
+      <SVG
+        width="24"
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg==" />
+    </button>
+  </div>
+
+  <!-- Top controls -->
+  <div class="flex flex-col items-center justify-center gap-1 p-4">
     <select
       class="select select-bordered w-full max-w-xs"
       bind:value={selectedAssistantId}
@@ -193,81 +207,59 @@
     <p class="text-sm" class:invisible={!activeConversationId}>
       conversation id: {activeConversationId}
     </p>
-  </Div>
+  </div>
 
-  <!-- Chat content -->
-  <Div
-    class="absolute bottom-28 top-24 flex w-full grow flex-col items-center justify-center gap-2"
+  <!-- Content -->
+  <div
+    class="overflow-y-scroll flex justify-center"
+    bind:this={contentScrollDiv}
+    on:scroll={updateBottomCheck}
   >
-    <div
-      class="relative w-full max-w-prose h-full overflow-hidden"
-    >
-      <div
-        class="absolute bottom-5 right-10 flex justify-center z-10 transition"
-        class:opacity-0={isContentAtBottom}
-      >
-        <!--  -->
-        <button
-          on:click={scrollContentToBottom}
-          class="bg-white rounded-full shadow p-2 hover:bg-gray-100 active:scale-95 transition"
-        >
-          <SVG
-            width="24"
-            src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg==" />
-        </button>
-      </div>
+    <div class="max-w-prose w-full h-fit">
+      {#each messages as message (message.id)}
+        <ChatBubble
+          content={formatMessageForMarkdown(message.content)}
+          isSelf={message.isSelf}
+        />
+      {:else}
+        <div class="prose text-center">
+          {#if selectedAssistant}
+            <SvelteMarkdown source={selectedAssistant.description} />
 
-      <!-- Chat bubbles -->
-      <div
-        class="w-full max-h-full overflow-y-auto bg-white rounded-lg"
-        bind:this={contentScrollDiv}
-        on:scroll={updateBottomCheck}
-      >
-        {#each messages as message (message.id)}
-          <ChatBubble
-            content={formatMessageForMarkdown(message.content)}
-            isSelf={message.isSelf}
-          />
-        {:else}
-          <div class="prose text-center">
-            {#if selectedAssistant}
-              <SvelteMarkdown source={selectedAssistant.description} />
+            <div class="flex gap-2 max-w-full flex-wrap justify-center">
+              {#each selectedAssistant.sampleQuestions as question}
+                <button
+                  class="btn btn-outline"
+                  on:click={() => askSampleQuestion(question)}>{question}</button
+                >
+              {/each}
+            </div>
+          {:else}
+            <p>
+              Here you can chat with any specialized assistant that has been created for
+              you.
+            </p>
+            <p>Choose an assistant from the dropdown to begin.</p>
+          {/if}
+        </div>
+      {/each}
 
-              <div class="flex gap-2 max-w-full flex-wrap justify-center">
-                {#each selectedAssistant.sampleQuestions as question}
-                  <button
-                    class="btn btn-outline"
-                    on:click={() => askSampleQuestion(question)}>{question}</button
-                  >
-                {/each}
-              </div>
-            {:else}
-              <p>
-                Here you can chat with any specialized assistant that has been created for
-                you.
-              </p>
-              <p>Choose an assistant from the dropdown to begin.</p>
-            {/if}
-          </div>
-        {/each}
+      {#if lastMessageErrored}
+        <div class="flex items-center gap-2">
+          <span>Ett fel uppstod ⚠️️</span>
+          <button class="btn btn-link active:opacity-60" on:click={retryLastMessage}>Försök igen</button>
+        </div>
+      {/if}
 
-        {#if lastMessageErrored}
-          <div class="flex items-center gap-2">
-            <span>Ett fel uppstod ⚠️️</span>
-            <button class="btn btn-link active:opacity-60" on:click={retryLastMessage}>Försök igen</button>
-          </div>
-        {/if}
-
-        <span class="loading loading-spinner" class:opacity-0={!eventSource} />
-      </div>
+      <span class="loading loading-spinner" class:opacity-0={!eventSource} />
     </div>
-  </Div>
+  </div>
 
-  <!-- Form controls -->
-  <Div class="absolute inset-x-0 bottom-0 h-28 p-3">
+  <!-- Bottom controls -->
+  <div class="p-3 z-10">
     <form class="h-full w-full" on:submit={scrollContentToBottom}>
       <fieldset disabled={!selectedAssistantId || !!lastMessageErrored} class="h-full">
-        <Div class="flex h-full w-full items-end gap-2">
+        <div class="flex h-full w-full items-end gap-2">
           <textarea
             name="message"
             bind:value={currentMessageInput}
@@ -279,8 +271,8 @@
             label=""
             iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlbmQiPjxwYXRoIGQ9Im0yMiAyLTcgMjAtNC05LTktNFoiLz48cGF0aCBkPSJNMjIgMiAxMSAxMyIvPjwvc3ZnPg=="
           />
-        </Div>
+        </div>
       </fieldset>
     </form>
-  </Div>
-</Div>
+  </div>
+</div>
