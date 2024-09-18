@@ -26,6 +26,7 @@ import FileInput from './components/FileInput.svelte'
 import SSEChat from './components/SSEChat.svelte'
 import Divider from './components/Divider.svelte'
 import type { ComponentsMap } from '$lib/types'
+import Range from './components/Range.svelte'
 
 export const componentMap: ComponentsMap = {
   Heading,
@@ -53,6 +54,7 @@ export const componentMap: ComponentsMap = {
   Radio,
   SSEChat,
   FileInput,
+  Range,
   Divider,
 }
 
