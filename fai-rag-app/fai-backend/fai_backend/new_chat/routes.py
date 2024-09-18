@@ -3,6 +3,9 @@ from fastapi import APIRouter, Depends
 from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
+from fai_backend.framework.display import DisplayAs
+from fai_backend.framework.table import DataColumn
+from fai_backend.new_chat.dependencies import ChatHistoryService, get_chat_history_service
 from fai_backend.phrase import phrase as _
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.projects.dependencies import list_projects_request
@@ -16,7 +19,7 @@ router = APIRouter(
 )
 
 
-@router.get('/view/chat', response_model=list, response_model_exclude_none=True)
+@router.get('/chat', response_model=list, response_model_exclude_none=True)
 def chat_index_view(
         authenticated_user: User | None = Depends(get_project_user),
         view=Depends(get_page_template_for_logged_in_users),
@@ -39,4 +42,25 @@ def chat_index_view(
             endpoint='/api/assistant-stream'
         )],
         _('chat', 'Chat'),
+    )
+
+
+@router.get('/chat/history', response_model=list, response_model_exclude_none=True)
+async def chat_history_view(view=Depends(get_page_template_for_logged_in_users),
+                            history_service: ChatHistoryService = Depends(get_chat_history_service)) -> list:
+    return view(
+        [c.DataTable(
+            data=history_service.get_chat_history(),
+            columns=[
+                DataColumn(
+                    key='title',
+                    id='title',
+                    display=DisplayAs.link,
+                    on_click=e.GoToEvent(url='/view/chat/{id}'),
+                    sortable=True,
+                    label=_('title', 'Title'),
+                )
+            ],
+        )],
+        _('chat_history', 'History')
     )

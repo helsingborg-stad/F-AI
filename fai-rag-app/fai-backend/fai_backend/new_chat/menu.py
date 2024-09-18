@@ -15,14 +15,13 @@ def menu_items() -> list:
             components=[
                 c.Link(
                     text=_('start_new_chat', 'Start new'),
-                    url='/view/chat',
-                    active='/view/chat',
+                    url='/chat',
+                    active='/chat',
                     icon_src=icons['message_square_more']
                 ),
                 c.Link(
                     text=_('chat_history', 'History'),
-                    url='/view/chat/history',
-                    active='/view/chat/history',
+                    url='/chat/history',
                     icon_src=icons['history']
                 ),
             ],

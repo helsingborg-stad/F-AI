@@ -164,7 +164,7 @@ async def greet(language: str = Header(default='en')):
 
 @app.get('/api', include_in_schema=True)
 async def root(project_user: ProjectUser = Depends(get_project_user)):
-    return RedirectResponse(url='/api/view/chat', status_code=302)
+    return RedirectResponse(url='/api/chat', status_code=302)
 
 
 @app.get('/api/{path:path}', status_code=404)
