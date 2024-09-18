@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional, Any, Literal
 
 from beanie import Document
@@ -6,12 +5,13 @@ from pydantic import BaseModel
 
 
 class LLMClientChatMessage(BaseModel):
-    date: datetime
+    timestamp: str
     source: str | None = None
     content: str | None = None
 
 
 class AssistantStreamMessage(BaseModel):
+    timestamp: str = ""
     role: Literal["system", "user", "assistant", "function"]
     content: str
     should_format: bool = False
@@ -52,7 +52,16 @@ class AssistantContext(BaseModel):
     rag_output: Optional[str] = None
 
 
+class ClientChatState(BaseModel):
+    chat_id: str
+    timestamp: str
+    title: str
+    history: list[LLMClientChatMessage]
+
+
 class AssistantChatHistoryModel(Document):
+    user: str
+    assistant: AssistantTemplate
     history: list[AssistantStreamMessage] = []
 
     class Settings:

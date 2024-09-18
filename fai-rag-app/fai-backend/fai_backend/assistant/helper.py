@@ -14,6 +14,7 @@ def messages_expander_stream(
     async def _expand_message(message: AssistantStreamMessage | AssistantStreamInsert) -> list[AssistantStreamMessage]:
         if isinstance(message, AssistantStreamMessage):
             return [AssistantStreamMessage(
+                timestamp=message.timestamp,
                 role=message.role,
                 content=message.content,
                 should_format=True

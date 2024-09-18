@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Div from './Div.svelte'
   import Button from './Button.svelte'
   import ChatBubble from './ChatBubble.svelte'
   import SvelteMarkdown from 'svelte-markdown'
@@ -8,7 +7,7 @@
 
   interface SSEMessage {
     type: string
-    date: string
+    timestamp: string
     source: string | null
     content: string | null
   }
@@ -17,7 +16,7 @@
     id: string
     user: string
     content: string
-    time: string
+    timestamp: string
     isSelf: boolean
   }
 
@@ -65,10 +64,10 @@
 
   function toChatMessage(sse: SSEMessage): ChatMessage {
     return {
-      id: sse.date,
+      id: sse.timestamp,
       user: sse.source ?? '',
       content: sse.content ?? '',
-      time: sse.date,
+      timestamp: sse.timestamp,
       isSelf: false,
     }
   }
@@ -95,14 +94,14 @@
         isSelf: true,
         user: 'Me',
         content: question,
-        time: new Date().toTimeString().split(' ')[0],
+        timestamp: new Date().toISOString(),
       },
       {
         id: `placeholder${messages.length}`,
         isSelf: false,
         user: '',
         content: '',
-        time: '',
+        timestamp: '',
       },
     ]
 
