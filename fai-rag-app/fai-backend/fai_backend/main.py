@@ -30,6 +30,7 @@ from fai_backend.schema import ProjectUser
 from fai_backend.serializer.impl.base64 import Base64Serializer
 from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_parser
 from fai_backend.vector.routes import router as vector_router
+from fai_backend.new_chat.routes import router as new_chat_router
 
 
 @asynccontextmanager
@@ -54,6 +55,7 @@ app = FastAPI(title='FAI RAG App', redirect_slashes=True, lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(projects_router)
 app.include_router(qaf_router)
+app.include_router(new_chat_router)
 app.include_router(documents_router)
 app.include_router(vector_router)
 app.include_router(templates_router)

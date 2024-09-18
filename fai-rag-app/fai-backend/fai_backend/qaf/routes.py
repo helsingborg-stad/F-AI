@@ -14,8 +14,6 @@ from fai_backend.framework.table import ColumnFilter, DataColumn
 from fai_backend.llm.service import ask_llm_question, ask_llm_raq_question
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
-from fai_backend.projects.dependencies import list_projects_request
-from fai_backend.projects.schema import ProjectResponse
 from fai_backend.qaf.dependencies import (
     add_answer_action,
     add_feedback_action,
@@ -25,7 +23,7 @@ from fai_backend.qaf.dependencies import (
 )
 from fai_backend.qaf.schema import QuestionDetails
 from fai_backend.qaf.views import QuestionForm, ReviewDetails
-from fai_backend.schema import ProjectUser, User
+from fai_backend.schema import ProjectUser
 from fai_backend.utils import format_datetime_human_readable
 
 router = APIRouter(
@@ -54,32 +52,6 @@ async def llm_raq_question_endpoint(
         return {'response': response}
     except Exception as exception:
         raise HTTPException(status_code=500, detail=str(exception))
-
-
-@router.get('/view/chat', response_model=list, response_model_exclude_none=True)
-def chat_index_view(
-        authenticated_user: User | None = Depends(get_project_user),
-        view=Depends(get_page_template_for_logged_in_users),
-        projects: list[ProjectResponse] = Depends(list_projects_request),
-) -> list:
-    if not authenticated_user:
-        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
-
-    assistants = [c.Assistant(
-        id=a.id,
-        name=a.meta.name,
-        project=p.id,
-        description=a.meta.description,
-        sampleQuestions=a.meta.sample_questions
-    ) for p in projects for a in p.assistants]
-
-    return view(
-        [c.SSEChat(
-            assistants=assistants,
-            endpoint='/api/assistant-stream'
-        )],
-        _('chat', 'Chat'),
-    )
 
 
 def to_table_data(question: QuestionDetails) -> dict[str, Any]:

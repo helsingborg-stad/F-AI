@@ -12,7 +12,8 @@ from fai_backend.auth.service import AuthService
 from fai_backend.documents.menu import menu_items as document_menu_items
 from fai_backend.qaf.menu import qa_menu
 from fai_backend.schema import ProjectUser, User
-from fai_backend.views import chat_menu, mock_menu, page_template
+from fai_backend.views import mock_menu, page_template
+from fai_backend.new_chat.menu import menu_items as chat_menu_items
 
 
 async def try_get_authenticated_user(
@@ -62,13 +63,20 @@ def get_project_user_permissions(
 async def get_page_template_for_logged_in_users(
         permissions: list[str] = Depends(get_project_user_permissions),
 ) -> Callable[[list[Any] | Any, str | None], list[Any]]:
-    return (lambda components, page_title: page_template(
-        *components if isinstance(components, list) else [components],
-        page_title=page_title,
-        menus=[
-            *chat_menu(user_permissions=permissions),
-            *qa_menu(user_permissions=permissions),
-            *document_menu_items(user_permissions=permissions),
-            *mock_menu(user_permissions=permissions),
+
+    def create_menus(p: list[str]) -> list:
+        return [
+            *chat_menu_items(user_permissions=p),
+            *qa_menu(user_permissions=p),
+            *document_menu_items(user_permissions=p),
+            *mock_menu(user_permissions=p),
         ]
-    ))
+
+    def page_template_function(components: list[Any] | Any, page_title: str | None) -> list[Any]:
+        return page_template(
+            *(components if isinstance(components, list) else [components]),
+            page_title=page_title,
+            menus=create_menus(permissions)
+        )
+
+    return page_template_function
