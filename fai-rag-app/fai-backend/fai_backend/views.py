@@ -35,12 +35,6 @@ def permission_required(required_permissions: list[str]) -> Callable[[T], T]:
 def mock_menu() -> list:
     return [
         c.Link(
-            text=_('assistant', 'Assistant'),
-            url='#',
-            disabled=True,
-            icon_src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWJyYWluLWNpcmN1aXQiPjxwYXRoIGQ9Ik0xMiA0LjVhMi41IDIuNSAwIDAgMC00Ljk2LS40NiAyLjUgMi41IDAgMCAwLTEuOTggMyAyLjUgMi41IDAgMCAwLTEuMzIgNC4yNCAzIDMgMCAwIDAgLjM0IDUuNTggMi41IDIuNSAwIDAgMCAyLjk2IDMuMDggMi41IDIuNSAwIDAgMCA0LjkxLjA1TDEyIDIwVjQuNVoiLz48cGF0aCBkPSJNMTYgOFY1YzAtMS4xLjktMiAyLTIiLz48cGF0aCBkPSJNMTIgMTNoNCIvPjxwYXRoIGQ9Ik0xMiAxOGg2YTIgMiAwIDAgMSAyIDJ2MSIvPjxwYXRoIGQ9Ik0xMiA4aDgiLz48cGF0aCBkPSJNMjAuNSA4YS41LjUgMCAxIDEtMSAwIC41LjUgMCAwIDEgMSAwWiIvPjxwYXRoIGQ9Ik0xNi41IDEzYS41LjUgMCAxIDEtMSAwIC41LjUgMCAwIDEgMSAwWiIvPjxwYXRoIGQ9Ik0yMC41IDIxYS41LjUgMCAxIDEtMSAwIC41LjUgMCAwIDEgMSAwWiIvPjxwYXRoIGQ9Ik0xOC41IDNhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDAgMSAxIDBaIi8+PC9zdmc+'
-        ),
-        c.Link(
             text=_('users', 'Users'),
             url='/users',
             active='/users*',
