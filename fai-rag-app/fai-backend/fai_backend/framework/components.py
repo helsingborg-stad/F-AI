@@ -28,6 +28,7 @@ __all__ = (
     'FileInput',
     'SSEChat',
     'DataTable',
+    'Range',
     # then `AnyComponent` itself
     'AnyUI',
 )
@@ -288,10 +289,28 @@ class SSEChat(UIComponent):
     chat_initial_state: ClientChatState | None = Field(None, serialization_alias='initialState')
 
 
+class Range(UIComponent):
+    type: Literal['Range'] = 'Range'
+    name: str
+    title: str | None = None
+    label: str | None = None
+    required: bool | None = None
+    hidden: bool = None
+    disabled: bool | None = None
+    readonly: bool | None = None
+    input_state: Literal[
+                     'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
+    value: str | None = None
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
+    min: int | float | None = None
+    max: int | float | None = None
+    step: int | float | None = None
+
+
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading |
      AppShell | AppDrawer | AppContent | AppFooter | Divider | PageHeader |
      PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | Radio |
-     ChatBubble | FileInput | SSEChat | DataTable),
+     ChatBubble | FileInput | SSEChat | DataTable | Range),
     Field(discriminator='type')
 ]
