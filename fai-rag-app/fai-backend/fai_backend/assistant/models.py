@@ -67,10 +67,3 @@ class AssistantChatHistoryModel(Document):
     class Settings:
         name = 'chat_history'
         use_state_management = True
-
-
-class ClientChatState(BaseModel):
-    id: str
-    timestamp: str
-    title: str
-    history: list[LLMClientChatMessage]
