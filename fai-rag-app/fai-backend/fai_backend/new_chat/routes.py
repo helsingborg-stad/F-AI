@@ -56,7 +56,7 @@ async def chat_history_view(view=Depends(get_page_template_for_logged_in_users),
                     key='title',
                     id='title',
                     display=DisplayAs.link,
-                    on_click=e.GoToEvent(url='/view/chat/{id}'),
+                    on_click=e.GoToEvent(url='/chat/{id}'),
                     sortable=True,
                     label=_('title', 'Title'),
                 )
