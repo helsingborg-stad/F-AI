@@ -285,7 +285,7 @@ class Assistant(BaseModel):
 class SSEChat(UIComponent):
     type: Literal['SSEChat'] = 'SSEChat'
     assistants: list[Assistant] = []
-    chat_initial_state: ClientChatState | None = Field(None, serialization_alias='chatInitialState')
+    chat_initial_state: ClientChatState | None = Field(None, serialization_alias='initialState')
 
 
 AnyUI = Annotated[

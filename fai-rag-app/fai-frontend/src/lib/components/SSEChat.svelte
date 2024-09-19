@@ -5,11 +5,10 @@
   import SVG from '$lib/components/SVG.svelte'
   import { findLastIndex } from '../../util/array'
 
-  interface SSEMessage {
-    type: string
+  interface IncomingMessage {
     timestamp: string
-    source: string | null
-    content: string | null
+    source?: string
+    content: string
   }
 
   interface ChatMessage {
@@ -28,7 +27,13 @@
     sampleQuestions: string[]
   }
 
-  export let assistants: Assistant[]
+  interface InitialState {
+    chat_id: string
+    history: IncomingMessage[]
+  }
+
+  export let assistants: Assistant[] = []
+  export let initialState: InitialState | undefined
 
   let selectedAssistantId: string
   let selectedAssistant: Assistant | null = null
@@ -40,6 +45,13 @@
   let contentScrollDiv: Element
   let isContentAtBottom: Boolean = true
   let lastMessageErrored: Boolean = false
+
+  $: {
+    if (initialState) {
+      activeConversationId = initialState.chat_id
+      messages = initialState.history.map(toChatMessage)
+    }
+  }
 
   function updateBottomCheck() {
     const margin = 100
@@ -61,13 +73,13 @@
     scrollToBottom(contentScrollDiv)
   }
 
-  function toChatMessage(sse: SSEMessage): ChatMessage {
+  function toChatMessage(sse: IncomingMessage): ChatMessage {
     return {
       id: sse.timestamp,
       user: sse.source ?? '',
       content: sse.content ?? '',
       timestamp: sse.timestamp,
-      isSelf: false,
+      isSelf: sse.source == 'user',
     }
   }
 
@@ -134,7 +146,7 @@
       try {
         const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!)
         const jsonString = new TextDecoder().decode(bytes)
-        const messagePayload = JSON.parse(jsonString) as SSEMessage
+        const messagePayload = JSON.parse(jsonString) as IncomingMessage
         const chatMessage = toChatMessage(messagePayload)
 
         messages = [
