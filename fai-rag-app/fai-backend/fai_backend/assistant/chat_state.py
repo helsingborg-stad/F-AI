@@ -22,6 +22,7 @@ class ChatStateService:
             chat_history_model: AssistantChatHistoryModel
     ) -> ClientChatState:
         return ClientChatState(
+            user=chat_history_model.user,
             chat_id=str(chat_history_model.id),
             timestamp=chat_history_model.history[0].timestamp,
             title=chat_history_model.history[0].content[0:30],  # TODO: replace with pre-generated AI title

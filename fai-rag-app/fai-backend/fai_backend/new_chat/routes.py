@@ -10,7 +10,7 @@ from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
 from fai_backend.projects.dependencies import list_projects_request
 from fai_backend.projects.schema import ProjectResponse
-from fai_backend.schema import User, ProjectUser
+from fai_backend.schema import ProjectUser
 
 router = APIRouter(
     prefix='/api',
@@ -20,9 +20,10 @@ router = APIRouter(
 
 
 @router.get('/chat', response_model=list, response_model_exclude_none=True)
-def chat_index_view(authenticated_user: User | None = Depends(get_project_user),
+def chat_index_view(authenticated_user: ProjectUser | None = Depends(get_project_user),
                     view=Depends(get_page_template_for_logged_in_users),
                     projects: list[ProjectResponse] = Depends(list_projects_request)) -> list:
+
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
@@ -37,11 +38,13 @@ def chat_index_view(authenticated_user: User | None = Depends(get_project_user),
 
 
 @router.get('/chat/history', response_model=list, response_model_exclude_none=True)
-async def chat_history_view(
-        view=Depends(get_page_template_for_logged_in_users),
-        chat_state_service: ChatStateService = Depends(get_chat_state_service),
-        user: ProjectUser = Depends(get_project_user),
-) -> list:
+async def chat_history_view(view=Depends(get_page_template_for_logged_in_users),
+                            chat_state_service: ChatStateService = Depends(get_chat_state_service),
+                            user: ProjectUser = Depends(get_project_user)) -> list:
+
+    if not user:
+        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
+
     states = await chat_state_service.get_states(user=user.email)
     return view(
         [c.DataTable(data=states,
@@ -53,3 +56,18 @@ async def chat_history_view(
                                          label=_('title', 'Title'))])],
         _('chat_history', 'History')
     )
+
+
+@router.get('/chat/{chat_id}', response_model=list, response_model_exclude_none=True)
+async def chat_view(chat_id: str,
+                    view=Depends(get_page_template_for_logged_in_users),
+                    chat_state_service: ChatStateService = Depends(get_chat_state_service),
+                    project_user: ProjectUser = Depends(get_project_user)) -> list:
+
+    chat_history = await chat_state_service.get_state(chat_id)
+
+    if chat_history is None or chat_history.user != project_user.email:
+        return [c.FireEvent(event=e.GoToEvent(url='/login'))]
+
+    return view([c.SSEChat(chat_initial_state=chat_history)],
+                _('continue_chat', 'Continue chat'))
