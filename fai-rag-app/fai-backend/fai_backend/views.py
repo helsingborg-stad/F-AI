@@ -3,7 +3,6 @@ from functools import wraps
 from typing import Any, TypeVar, cast
 
 from fai_backend.framework import components as c
-from fai_backend.icons import icons
 from fai_backend.phrase import phrase as _
 
 T = TypeVar('T', bound=Callable[..., list[Any]])
@@ -30,18 +29,6 @@ def permission_required(required_permissions: list[str]) -> Callable[[T], T]:
         return cast(T, wrapper)
 
     return decorator
-
-
-@permission_required(['can_ask_questions'])
-def chat_menu() -> list:
-    return [
-        c.Link(
-            text=_('chat', 'Chat'),
-            url='/view/chat',
-            icon_src=icons['message_square_more'],
-            active='/view/chat*'
-        )
-    ]
 
 
 @permission_required(['can_edit_questions_and_answers'])
