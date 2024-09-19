@@ -284,7 +284,6 @@ class Assistant(BaseModel):
 class SSEChat(UIComponent):
     type: Literal['SSEChat'] = 'SSEChat'
     assistants: list[Assistant]
-    endpoint: str
 
 
 AnyUI = Annotated[

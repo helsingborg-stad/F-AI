@@ -9,8 +9,12 @@ class AssistantFactory:
 
     def create_assistant(self, assistant_id) -> Assistant:
         template = next(a for a in self.assistant_templates if a.id == assistant_id)
-        assistant = Assistant(template, InMemoryAssistantContextStore())
+        assistant = self.create_assistant_from_template(template)
         return assistant
+
+    @staticmethod
+    def create_assistant_from_template(template):
+        return Assistant(template, InMemoryAssistantContextStore())
 
 
 class InMemoryAssistantContextStore(IAssistantContextStore):

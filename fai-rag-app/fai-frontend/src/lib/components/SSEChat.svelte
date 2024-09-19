@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Div from './Div.svelte'
   import Button from './Button.svelte'
   import ChatBubble from './ChatBubble.svelte'
   import SvelteMarkdown from 'svelte-markdown'
@@ -8,7 +7,7 @@
 
   interface SSEMessage {
     type: string
-    date: string
+    timestamp: string
     source: string | null
     content: string | null
   }
@@ -17,7 +16,7 @@
     id: string
     user: string
     content: string
-    time: string
+    timestamp: string
     isSelf: boolean
   }
 
@@ -29,7 +28,6 @@
     sampleQuestions: string[]
   }
 
-  export let endpoint: string
   export let assistants: Assistant[]
 
   let selectedAssistantId: string
@@ -65,10 +63,10 @@
 
   function toChatMessage(sse: SSEMessage): ChatMessage {
     return {
-      id: sse.date,
+      id: sse.timestamp,
       user: sse.source ?? '',
       content: sse.content ?? '',
-      time: sse.date,
+      timestamp: sse.timestamp,
       isSelf: false,
     }
   }
@@ -95,22 +93,24 @@
         isSelf: true,
         user: 'Me',
         content: question,
-        time: new Date().toTimeString().split(' ')[0],
+        timestamp: new Date().toISOString(),
       },
       {
         id: `placeholder${messages.length}`,
         isSelf: false,
         user: '',
         content: '',
-        time: '',
+        timestamp: '',
       },
     ]
 
     closeSSE()
 
-    eventSource = new EventSource(
-      `${endpoint}/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}&conversation_id=${activeConversationId ?? ''}`,
-    )
+    const fullEndpoint = activeConversationId
+      ? `/api/sse/chat/stream/continue/${activeConversationId}?question=${question}`
+      : `/api/sse/chat/stream/new/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}`
+
+    eventSource = new EventSource(fullEndpoint)
 
     eventSource.onerror = (e) => {
       console.error(e)
