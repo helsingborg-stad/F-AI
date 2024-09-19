@@ -16,15 +16,13 @@ def menu_items() -> list:
                 c.Link(
                     text=_('start_new_chat', 'Start new'),
                     url='/chat',
-                    active='/chat',
-                    icon_src=icons['message_square_more']
+                    active='/chat'
                 ),
                 c.Link(
-                    text=_('chat_history', 'History'),
-                    url='/chat/history',
-                    icon_src=icons['history']
+                    text=_('chat_history', 'Chat history'),
+                    url='/chat/history'
                 ),
             ],
-            icon_src=icons['messages_square']
+            icon_src=icons['chat_bot']
         )
     ]
