@@ -28,7 +28,6 @@
     sampleQuestions: string[]
   }
 
-  export let endpoint: string
   export let assistants: Assistant[]
 
   let selectedAssistantId: string
@@ -107,9 +106,11 @@
 
     closeSSE()
 
-    eventSource = new EventSource(
-      `${endpoint}/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}&conversation_id=${activeConversationId ?? ''}`,
-    )
+    const fullEndpoint = activeConversationId
+      ? `/api/sse/chat/stream/continue/${activeConversationId}?question=${question}`
+      : `/api/sse/chat/stream/new/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}`
+
+    eventSource = new EventSource(fullEndpoint)
 
     eventSource.onerror = (e) => {
       console.error(e)
