@@ -5,11 +5,10 @@
   import SVG from '$lib/components/SVG.svelte'
   import { findLastIndex } from '../../util/array'
 
-  interface SSEMessage {
-    type: string
+  interface IncomingMessage {
     timestamp: string
-    source: string | null
-    content: string | null
+    source?: string
+    content: string
   }
 
   interface ChatMessage {
@@ -28,7 +27,13 @@
     sampleQuestions: string[]
   }
 
-  export let assistants: Assistant[]
+  interface InitialState {
+    chat_id: string
+    history: IncomingMessage[]
+  }
+
+  export let assistants: Assistant[] = []
+  export let initialState: InitialState | undefined
 
   let selectedAssistantId: string
   let selectedAssistant: Assistant | null = null
@@ -40,6 +45,15 @@
   let contentScrollDiv: Element
   let isContentAtBottom: Boolean = true
   let lastMessageErrored: Boolean = false
+
+  $: {
+    if (initialState) {
+      activeConversationId = initialState.chat_id
+      messages = initialState.history.map(toChatMessage)
+    } else {
+      messages = []
+    }
+  }
 
   function updateBottomCheck() {
     const margin = 100
@@ -61,13 +75,13 @@
     scrollToBottom(contentScrollDiv)
   }
 
-  function toChatMessage(sse: SSEMessage): ChatMessage {
+  function toChatMessage(sse: IncomingMessage): ChatMessage {
     return {
       id: sse.timestamp,
       user: sse.source ?? '',
       content: sse.content ?? '',
       timestamp: sse.timestamp,
-      isSelf: false,
+      isSelf: sse.source == 'user',
     }
   }
 
@@ -134,7 +148,7 @@
       try {
         const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!)
         const jsonString = new TextDecoder().decode(bytes)
-        const messagePayload = JSON.parse(jsonString) as SSEMessage
+        const messagePayload = JSON.parse(jsonString) as IncomingMessage
         const chatMessage = toChatMessage(messagePayload)
 
         messages = [
@@ -176,7 +190,8 @@
   }
 </script>
 
-<div class="w-full lg:w-[calc(100%-20rem)] absolute top-16 bottom-0 overflow-hidden grid grid-rows-[6rem_1fr_7rem]">
+<div class="w-full lg:w-[calc(100%-20rem)] absolute top-16 bottom-0 overflow-hidden grid grid-rows-[6rem_1fr_7rem]"
+     class:grid-rows-[1fr_7rem]={initialState}>
   <!-- Floating controls -->
   <div
     class="absolute inset-x-0 bottom-32 translate-y-20 flex justify-center z-10 transition"
@@ -193,21 +208,24 @@
   </div>
 
   <!-- Top controls -->
-  <div class="flex flex-col items-center justify-center gap-1 p-4">
-    <select
-      class="select select-bordered w-full max-w-xs"
-      bind:value={selectedAssistantId}
-      on:change={clearChat}
-    >
-      <option disabled selected value="">Choose assistant</option>
-      {#each assistants as assistant (`${assistant.project}/${assistant.id}`)}
-        <option value={assistant.id}>{assistant.name}</option>
-      {/each}
-    </select>
-    <p class="text-sm" class:invisible={!activeConversationId}>
-      conversation id: {activeConversationId}
-    </p>
-  </div>
+  {#if !initialState}
+    <div class="flex flex-col items-center justify-center gap-1 p-4">
+      <select
+        class="select select-bordered w-full max-w-xs"
+        bind:value={selectedAssistantId}
+        on:change={clearChat}
+      >
+        <option disabled selected value="">Choose assistant</option>
+        {#each assistants as assistant (`${assistant.project}/${assistant.id}`)}
+          <option value={assistant.id}>{assistant.name}</option>
+        {/each}
+      </select>
+      <p class="text-sm" class:invisible={!activeConversationId}>
+        conversation id: {activeConversationId}
+      </p>
+    </div>
+  {/if}
+
 
   <!-- Content -->
   <div
@@ -258,7 +276,7 @@
   <!-- Bottom controls -->
   <div class="p-3 z-10">
     <form class="h-full w-full" on:submit={scrollContentToBottom}>
-      <fieldset disabled={!selectedAssistantId || !!lastMessageErrored} class="h-full">
+      <fieldset disabled={(!selectedAssistantId || !!lastMessageErrored) && !initialState} class="h-full">
         <div class="flex h-full w-full items-end gap-2">
           <textarea
             name="message"

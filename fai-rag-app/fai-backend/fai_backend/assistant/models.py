@@ -53,6 +53,7 @@ class AssistantContext(BaseModel):
 
 
 class ClientChatState(BaseModel):
+    user: str
     chat_id: str
     timestamp: str
     title: str

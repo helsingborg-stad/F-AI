@@ -32,6 +32,7 @@ __all__ = (
     'AnyUI',
 )
 
+from fai_backend.assistant.models import ClientChatState
 from fai_backend.framework import events as e
 from fai_backend.framework.table import DataTable
 
@@ -283,7 +284,8 @@ class Assistant(BaseModel):
 
 class SSEChat(UIComponent):
     type: Literal['SSEChat'] = 'SSEChat'
-    assistants: list[Assistant]
+    assistants: list[Assistant] = []
+    chat_initial_state: ClientChatState | None = Field(None, serialization_alias='initialState')
 
 
 AnyUI = Annotated[
