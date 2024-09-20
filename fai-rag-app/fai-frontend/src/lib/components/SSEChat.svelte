@@ -3,7 +3,7 @@
   import ChatBubble from './ChatBubble.svelte'
   import SvelteMarkdown from 'svelte-markdown'
   import SVG from '$lib/components/SVG.svelte'
-  import { findLastIndex } from '../../util/array'
+  import {findLastIndex} from '../../util/array'
 
   interface IncomingMessage {
     timestamp: string
@@ -66,7 +66,7 @@
   $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
 
   const scrollToBottom = (node: Element) => {
-    node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+    node.scroll({top: node.scrollHeight, behavior: 'smooth'})
   }
 
   function scrollContentToBottom() {
@@ -188,7 +188,8 @@
   }
 </script>
 
-<div class="w-full lg:w-[calc(100%-20rem)] absolute top-16 bottom-0 overflow-hidden grid grid-rows-[6rem_1fr_7rem]">
+<div class="w-full lg:w-[calc(100%-20rem)] absolute top-16 bottom-0 overflow-hidden grid grid-rows-[6rem_1fr_7rem]"
+     class:grid-rows-[1fr_7rem]={initialState}>
   <!-- Floating controls -->
   <div
     class="absolute inset-x-0 bottom-32 translate-y-20 flex justify-center z-10 transition"
@@ -200,26 +201,29 @@
     >
       <SVG
         width="24"
-        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg==" />
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg=="/>
     </button>
   </div>
 
   <!-- Top controls -->
-  <div class="flex flex-col items-center justify-center gap-1 p-4">
-    <select
-      class="select select-bordered w-full max-w-xs"
-      bind:value={selectedAssistantId}
-      on:change={clearChat}
-    >
-      <option disabled selected value="">Choose assistant</option>
-      {#each assistants as assistant (`${assistant.project}/${assistant.id}`)}
-        <option value={assistant.id}>{assistant.name}</option>
-      {/each}
-    </select>
-    <p class="text-sm" class:invisible={!activeConversationId}>
-      conversation id: {activeConversationId}
-    </p>
-  </div>
+  {#if !initialState}
+    <div class="flex flex-col items-center justify-center gap-1 p-4">
+      <select
+        class="select select-bordered w-full max-w-xs"
+        bind:value={selectedAssistantId}
+        on:change={clearChat}
+      >
+        <option disabled selected value="">Choose assistant</option>
+        {#each assistants as assistant (`${assistant.project}/${assistant.id}`)}
+          <option value={assistant.id}>{assistant.name}</option>
+        {/each}
+      </select>
+      <p class="text-sm" class:invisible={!activeConversationId}>
+        conversation id: {activeConversationId}
+      </p>
+    </div>
+  {/if}
+
 
   <!-- Content -->
   <div
@@ -236,7 +240,7 @@
       {:else}
         <div class="prose text-center">
           {#if selectedAssistant}
-            <SvelteMarkdown source={selectedAssistant.description} />
+            <SvelteMarkdown source={selectedAssistant.description}/>
 
             <div class="flex gap-2 max-w-full flex-wrap justify-center">
               {#each selectedAssistant.sampleQuestions as question}
@@ -263,14 +267,14 @@
         </div>
       {/if}
 
-      <span class="loading loading-spinner" class:opacity-0={!eventSource} />
+      <span class="loading loading-spinner" class:opacity-0={!eventSource}/>
     </div>
   </div>
 
   <!-- Bottom controls -->
   <div class="p-3 z-10">
     <form class="h-full w-full" on:submit={scrollContentToBottom}>
-      <fieldset disabled={!selectedAssistantId || !!lastMessageErrored} class="h-full">
+      <fieldset disabled={(!selectedAssistantId || !!lastMessageErrored) && !initialState} class="h-full">
         <div class="flex h-full w-full items-end gap-2">
           <textarea
             name="message"
