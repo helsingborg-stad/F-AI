@@ -3,7 +3,7 @@
   import ChatBubble from './ChatBubble.svelte'
   import SvelteMarkdown from 'svelte-markdown'
   import SVG from '$lib/components/SVG.svelte'
-  import {findLastIndex} from '../../util/array'
+  import { findLastIndex } from '../../util/array'
 
   interface IncomingMessage {
     timestamp: string
@@ -50,6 +50,8 @@
     if (initialState) {
       activeConversationId = initialState.chat_id
       messages = initialState.history.map(toChatMessage)
+    } else {
+      messages = []
     }
   }
 
@@ -66,7 +68,7 @@
   $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
 
   const scrollToBottom = (node: Element) => {
-    node.scroll({top: node.scrollHeight, behavior: 'smooth'})
+    node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
   }
 
   function scrollContentToBottom() {
@@ -201,7 +203,7 @@
     >
       <SVG
         width="24"
-        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg=="/>
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg==" />
     </button>
   </div>
 
@@ -240,7 +242,7 @@
       {:else}
         <div class="prose text-center">
           {#if selectedAssistant}
-            <SvelteMarkdown source={selectedAssistant.description}/>
+            <SvelteMarkdown source={selectedAssistant.description} />
 
             <div class="flex gap-2 max-w-full flex-wrap justify-center">
               {#each selectedAssistant.sampleQuestions as question}
@@ -267,7 +269,7 @@
         </div>
       {/if}
 
-      <span class="loading loading-spinner" class:opacity-0={!eventSource}/>
+      <span class="loading loading-spinner" class:opacity-0={!eventSource} />
     </div>
   </div>
 
