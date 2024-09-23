@@ -27,6 +27,8 @@
   export let autoFocus: boolean | null = null
   export let readonly: boolean | null = null
 
+  export let disabled: boolean | null = null
+
   let ref: HTMLInputElement
 
   onMount(() => autoFocus && ref?.focus() !== undefined)
@@ -44,15 +46,17 @@
   <div
     class:font-normal={true}
     class:input={html_type !== 'hidden'}
-    class:input-xs={size === 'xs'}
-    class:input-sm={size === 'sm'}
-    class:input-md={size === 'md'}
-    class:input-lg={size === 'lg'}
+    class:input-xs={size === 'xs' && html_type !== 'hidden'}
+    class:input-sm={size === 'sm' && html_type !== 'hidden'}
+    class:input-md={size === 'md' && html_type !== 'hidden'}
+    class:input-lg={size === 'lg' && html_type !== 'hidden'}
     class:input-error={error}
-    class:input-bordered={variant === 'bordered'}
-    class:input-ghost={variant === 'ghost'}
+    class:input-bordered={variant === 'bordered' && html_type !== 'hidden'}
+    class:input-ghost={variant === 'ghost' && html_type !== 'hidden'}
     class:w-full={block}
+    class:bg-base-200={readonly && html_type !== 'hidden'}
     class={'flex items-center space-x-3 ' + (className ?? '')}
+    {disabled}
   >
     <slot name="prefix" />
     <Input
@@ -62,11 +66,14 @@
       {placeholder}
       {readonly}
       {autocomplete}
+      {required}
+      type={html_type}
       bind:value={inputValue}
       on:input
       on:blur
       on:change
       on:focus
+      {disabled}
     />
     <slot name="suffix" />
   </div>
