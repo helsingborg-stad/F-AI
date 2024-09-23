@@ -106,6 +106,7 @@ class InputField(UIComponent):
     type: Literal['InputField'] = 'InputField'
     name: str
     title: str | None = None
+    label: str | None = None
     placeholder: str | None = None
     required: bool | None = None
     html_type: Literal['text', 'password', 'hidden', 'number', 'email', 'tel', 'file'] = 'text'
@@ -117,6 +118,7 @@ class InputField(UIComponent):
     input_state: Literal[
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
     value: str | None = None
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
 
 
 class FileInput(InputField):
@@ -143,6 +145,7 @@ class Textarea(UIComponent):
     type: Literal['Textarea'] = 'Textarea'
     name: str
     title: str | None = None
+    label: str | None = None
     placeholder: str | None = None
     required: bool | None = None
     initial: str | None = Field(None, serialization_alias='value')
@@ -154,6 +157,8 @@ class Textarea(UIComponent):
     rows: int | None = None
     state: Literal[
                'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success'] | None = None
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
+    value: str | None = None
 
 
 class AppShell(UIComponent):
@@ -233,6 +238,7 @@ class Select(BaseModel):
     class_name: str | None = Field(None, serialization_alias='class')
     name: str
     title: str | None = None
+    label: str | None = None
     placeholder: str | None = None
     required: bool | None = None
 
@@ -244,6 +250,7 @@ class Select(BaseModel):
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
     value: str | None = None
     options: list[tuple[str, str | None]] | None = None
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
 
 
 class Radio(UIComponent):
@@ -300,7 +307,7 @@ class Range(UIComponent):
     readonly: bool | None = None
     input_state: Literal[
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
-    value: str | None = None
+    value: int | float | None = None
     size: Literal['xs', 'sm', 'md', 'lg'] | None = None
     min: int | float | None = None
     max: int | float | None = None
