@@ -4,7 +4,7 @@ from fai_backend.phrase import phrase as _
 from fai_backend.views import permission_required
 
 
-@permission_required(['can_edit_questions_and_answers'])
+@permission_required(['can_edit_assistant'])
 def assistant_menu() -> list:
     return [
         c.Menu(
