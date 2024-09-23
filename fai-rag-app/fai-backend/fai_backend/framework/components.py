@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ByteSize, Field
+from pydantic import BaseModel, Field
 
 __all__ = (
     'Div',
@@ -42,7 +42,7 @@ class UIComponent(BaseModel, extra='forbid'):
     type: str
     id: str | None = None
     class_name: str | None = Field(None, serialization_alias='class')
-    components: 'list[AnyUI] | None' = Field(None, serialization_alias='renderProps.components')
+    components: list | None = Field(None, serialization_alias='renderProps.components')
 
 
 class Div(UIComponent):
