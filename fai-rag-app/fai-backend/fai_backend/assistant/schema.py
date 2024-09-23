@@ -8,5 +8,5 @@ class TemplatePayload(BaseModel):
     id: str = ''
     temperature: float = 1.0
     description: str | None = None
-    sample_questions: list[str] | None = None
+    sample_questions: list[str | None] | None = None
     files_collection_id: str | None = None

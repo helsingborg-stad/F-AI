@@ -89,7 +89,10 @@ class TemplatePayloadAdapter:
             meta=AssistantTemplateMeta(
                 name=payload.name,
                 description=payload.description or '',
-                sample_questions=payload.sample_questions or []
+                sample_questions=filter(
+                    lambda q: q and q != '',
+                    list(payload.sample_questions)) if payload.sample_questions and len(
+                    payload.sample_questions) > 0 else []
             ),
             files_collection_id=payload.files_collection_id,
             streams=[

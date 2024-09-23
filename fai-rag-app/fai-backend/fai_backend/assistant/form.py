@@ -62,6 +62,39 @@ def AssistantForm(
                         step=0.01,
                     ),
 
+                    c.InputField(
+                        name='sample_questions[0]',
+                        label=_('Example question 1'),
+                        placeholder=_('What is the capital of Sweden?'),
+                        required=False,
+                        html_type='text',
+                        size='sm',
+                        value=data.sample_questions[0] if data and data.sample_questions and len(
+                            data.sample_questions) > 0 else '',
+                    ),
+
+                    c.InputField(
+                        name='sample_questions[1]',
+                        label=_('Example question 2'),
+                        placeholder=_('What is the capital of Norway?'),
+                        required=False,
+                        html_type='text',
+                        size='sm',
+                        value=data.sample_questions[1] if data and data.sample_questions and len(
+                            data.sample_questions) > 1 else '',
+                    ),
+
+                    c.InputField(
+                        name='sample_questions[2]',
+                        label=_('Example question 3'),
+                        placeholder=_('What is the capital of Denmark?'),
+                        required=False,
+                        html_type='text',
+                        size='sm',
+                        value=data.sample_questions[2] if data and data.sample_questions and len(
+                            data.sample_questions) > 2 else '',
+                    ),
+
                     c.Select(
                         name='files_collection_id',
                         label=_('Collection ID'),
