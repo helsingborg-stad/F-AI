@@ -190,8 +190,11 @@
   }
 </script>
 
-<div class="w-full lg:w-[calc(100%-20rem)] absolute top-16 bottom-0 overflow-hidden grid grid-rows-[6rem_1fr_7rem]"
-     class:grid-rows-[1fr_7rem]={initialState}>
+<div
+  class="w-full lg:w-[calc(100%-20rem)] absolute top-16 bottom-0 overflow-hidden grid"
+  class:grid-rows-[6rem_1fr_7rem]={!initialState}
+  class:grid-rows-[1fr_7rem]={initialState}
+>
   <!-- Floating controls -->
   <div
     class="absolute inset-x-0 bottom-32 translate-y-20 flex justify-center z-10 transition"
