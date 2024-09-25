@@ -14,6 +14,7 @@ from fai_backend.qaf.menu import qa_menu
 from fai_backend.schema import ProjectUser, User
 from fai_backend.views import mock_menu, page_template
 from fai_backend.new_chat.menu import menu_items as chat_menu_items
+from fai_backend.feedback.menu import menu_items as feedback_menu_items
 
 
 async def try_get_authenticated_user(
@@ -69,6 +70,7 @@ async def get_page_template_for_logged_in_users(
             *chat_menu_items(user_permissions=p),
             *qa_menu(user_permissions=p),
             *document_menu_items(user_permissions=p),
+            *feedback_menu_items(),
             *mock_menu(user_permissions=p),
         ]
 
