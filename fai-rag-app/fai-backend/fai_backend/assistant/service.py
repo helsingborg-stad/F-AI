@@ -5,6 +5,7 @@ from fai_backend.assistant.models import (
     AssistantContext,
     AssistantStreamConfig,
     AssistantStreamMessage,
+    AssistantStreamPipelineDef,
     AssistantTemplate,
     AssistantTemplateMeta,
 )
@@ -72,30 +73,36 @@ class AssistantTemplateStore:
 class TemplatePayloadAdapter:
     @staticmethod
     def to_template_payload(template: AssistantTemplate) -> TemplatePayload:
-        return TemplatePayload(
-            id=template.id,
-            name=template.meta.name,
-            description=template.meta.description,
-            sample_questions=template.meta.sample_questions,
-            model=template.streams[0].settings['model'] or '',
-            temperature=template.streams[0].settings['temperature'] or 1.0,
-            instructions=template.streams[0].messages[0].content or '',
-        )
+        def basic_stream_adapter():
+            return TemplatePayload(
+                id=template.id,
+                name=template.meta.name,
+                description=template.meta.description,
+                sample_questions=template.meta.sample_questions,
+                model=template.streams[0].settings['model'] or '',
+                temperature=template.streams[0].settings['temperature'] or 1.0,
+                instructions=template.streams[0].messages[0].content or '',
+                files_collection_id=template.files_collection_id,
+            )
+
+        def rag_stream_adapter():
+            return TemplatePayload(
+                id=template.id,
+                name=template.meta.name,
+                description=template.meta.description,
+                sample_questions=template.meta.sample_questions,
+                model=template.streams[1].settings['model'] or '',
+                temperature=template.streams[1].settings['temperature'] or 1.0,
+                instructions=template.streams[1].messages[0].content or '',
+                files_collection_id=template.files_collection_id,
+            )
+
+        return basic_stream_adapter() if len(template.streams) == 1 else rag_stream_adapter()
 
     @staticmethod
     def from_template_payload(payload: TemplatePayload) -> AssistantTemplate:
-        return AssistantTemplate(
-            id=payload.id,
-            meta=AssistantTemplateMeta(
-                name=payload.name,
-                description=payload.description or '',
-                sample_questions=filter(
-                    lambda q: q and q != '',
-                    list(payload.sample_questions)) if payload.sample_questions and len(
-                    payload.sample_questions) > 0 else []
-            ),
-            files_collection_id=payload.files_collection_id,
-            streams=[
+        def basic_stream():
+            return [
                 AssistantStreamConfig(
                     provider='openai',
                     settings={
@@ -114,4 +121,45 @@ class TemplatePayloadAdapter:
                     ]
                 )
             ]
+
+        def rag_stream():
+            return [
+                AssistantStreamPipelineDef(
+                    pipeline='rag_scoring'
+                ),
+                AssistantStreamConfig(
+                    provider='openai',
+                    settings={
+                        'model': payload.model,
+                        'temperature': payload.temperature,
+                    },
+                    messages=[
+                        AssistantStreamMessage(
+                            role='system',
+                            content=payload.instructions
+                        ),
+                        AssistantStreamMessage(
+                            role='user',
+                            content='{query}'
+                        ),
+                        AssistantStreamMessage(
+                            role='user',
+                            content='{rag_output}'
+                        ),
+                    ]
+                )
+            ]
+
+        return AssistantTemplate(
+            id=payload.id,
+            meta=AssistantTemplateMeta(
+                name=payload.name,
+                description=payload.description or '',
+                sample_questions=filter(
+                    lambda q: q and q != '',
+                    list(payload.sample_questions)) if payload.sample_questions and len(
+                    payload.sample_questions) > 0 else []
+            ),
+            files_collection_id=payload.files_collection_id,
+            streams=basic_stream() if payload.files_collection_id is None else rag_stream()
         )
