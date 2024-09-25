@@ -11,7 +11,7 @@ class ChatStateService:
 
     async def get_states(self, user: str) -> List[ClientChatState]:
         results = await self.history_repo.list(query=AttributeAssignment('user', user))
-        return [ChatStateService.assistant_chat_history_model_to_chat_state(r) for r in results]
+        return [ChatStateService.assistant_chat_history_model_to_chat_state(r) for r in results if len(r.history) > 0]
 
     async def get_state(self, chat_id: str) -> ClientChatState:
         history = await self.history_repo.get(chat_id)
