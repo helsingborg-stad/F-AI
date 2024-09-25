@@ -144,7 +144,7 @@ class TemplatePayloadAdapter:
                         ),
                         AssistantStreamMessage(
                             role='user',
-                            content='{rag_output}'
+                            content='Here are the results of the search:\n\n {rag_output}'
                         ),
                     ]
                 )
