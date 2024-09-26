@@ -62,6 +62,26 @@ def AssistantForm(
                         step=0.01,
                     ),
 
+                    c.Select(
+                        name='files_collection_id',
+                        label=_('Collection ID'),
+                        required=False,
+                        options=[
+                            ('', _('None')),
+                            *([(cid, cid) for cid in collection_ids] if collection_ids else []),
+                        ],
+                        value=data.files_collection_id if data and data.files_collection_id else '',
+                        size='sm',
+                    ),
+
+                    c.Textarea(
+                        name='description',
+                        label=_('Description (optional)'),
+                        placeholder=_('This is a description that will be shown when starting a new chat'),
+                        required=True,
+                        size='sm',
+                        value=data.description if data and data.description else '',
+                    ),
                     c.InputField(
                         name='sample_questions[0]',
                         label=_('Example question 1 (optional)'),
@@ -93,27 +113,6 @@ def AssistantForm(
                         size='sm',
                         value=data.sample_questions[2] if data and data.sample_questions and len(
                             data.sample_questions) > 2 else '',
-                    ),
-
-                    c.Select(
-                        name='files_collection_id',
-                        label=_('Collection ID'),
-                        required=False,
-                        options=[
-                            ('', _('None')),
-                            *([(cid, cid) for cid in collection_ids] if collection_ids else []),
-                        ],
-                        value=data.files_collection_id if data and data.files_collection_id else '',
-                        size='sm',
-                    ),
-
-                    c.Textarea(
-                        name='description',
-                        label=_('Description (optional)'),
-                        placeholder=_('Enter description here'),
-                        required=True,
-                        size='sm',
-                        value=data.description if data and data.description else '',
                     ),
                 ],
             )
