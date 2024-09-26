@@ -64,7 +64,7 @@ def AssistantForm(
 
                     c.InputField(
                         name='sample_questions[0]',
-                        label=_('Example question 1'),
+                        label=_('Example question 1 (optional)'),
                         placeholder=_('What is the capital of Sweden?'),
                         required=False,
                         html_type='text',
@@ -75,7 +75,7 @@ def AssistantForm(
 
                     c.InputField(
                         name='sample_questions[1]',
-                        label=_('Example question 2'),
+                        label=_('Example question 2 (optional)'),
                         placeholder=_('What is the capital of Norway?'),
                         required=False,
                         html_type='text',
@@ -86,7 +86,7 @@ def AssistantForm(
 
                     c.InputField(
                         name='sample_questions[2]',
-                        label=_('Example question 3'),
+                        label=_('Example question 3 (optional)'),
                         placeholder=_('What is the capital of Denmark?'),
                         required=False,
                         html_type='text',
@@ -105,6 +105,15 @@ def AssistantForm(
                         ],
                         value=data.files_collection_id if data and data.files_collection_id else '',
                         size='sm',
+                    ),
+
+                    c.Textarea(
+                        name='description',
+                        label=_('Description (optional)'),
+                        placeholder=_('Enter description here'),
+                        required=True,
+                        size='sm',
+                        value=data.description if data and data.description else '',
                     ),
                 ],
             )
