@@ -6,7 +6,7 @@ from fai_backend.phrase import phrase as _
 def AssistantForm(
         submit_url: str,
         data: TemplatePayload | None = None,
-        collection_ids: list[str] = ['abc', '123']
+        collection_ids: list[str] | None = None,
 ) -> list:
     return [c.Div(components=[
         c.Div(components=[
@@ -101,9 +101,9 @@ def AssistantForm(
                         required=False,
                         options=[
                             ('', _('None')),
-                            *[(cid, cid) for cid in collection_ids]
+                            *([(cid, cid) for cid in collection_ids] if collection_ids else []),
                         ],
-                        value=data.files_collection_id if data else '',
+                        value=data.files_collection_id if data and data.files_collection_id else '',
                         size='sm',
                     ),
                 ],

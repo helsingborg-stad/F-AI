@@ -16,6 +16,8 @@ from fai_backend.dependencies import (
     get_page_template_for_logged_in_users,
     get_project_user,
 )
+from fai_backend.files.dependecies import get_file_upload_service
+from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.framework.display import DisplayAs
@@ -158,10 +160,19 @@ def assistants(
 @router.get('/assistants/create', response_model=list, response_model_exclude_none=True)
 async def create_assistant_view(
         view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
+        file_service: FileUploadService = Depends(get_file_upload_service),
+        project_user: ProjectUser = Depends(get_project_user),
 ) -> list:
+    files = file_service.list_files(project_user.project_id)
+    most_recent_collection = max(files, key=lambda file: file.upload_date).collection if files else []
+    most_recent_upload_files = [file for file in files if file.collection == most_recent_collection]
+
     return view(
-        AssistantForm('/api/assistants/create'),
-        _('Create assistant')
+        AssistantForm('/api/assistants/create', None, [
+            file.collection for file in most_recent_upload_files
+        ]),
+        _('Create assistant'),
+
     )
 
 
@@ -183,9 +194,20 @@ def edit_assistant(
         assistant_id: str,
         template: TemplatePayload | None = Depends(load_assistant_by_id),
         view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
+        file_service: FileUploadService = Depends(get_file_upload_service),
+        project_user: ProjectUser = Depends(get_project_user),
 ) -> list:
+    files = file_service.list_files(project_user.project_id)
+    most_recent_collection = max(files, key=lambda file: file.upload_date).collection if files else []
+    most_recent_upload_files = [file for file in files if file.collection == most_recent_collection]
+
     return view(
-        [c.Div(components=AssistantForm(f'/api/assistants/{assistant_id}', template))],
+        [c.Div(components=AssistantForm(
+            f'/api/assistants/{assistant_id}', template,
+            [
+                file.collection for file in most_recent_upload_files
+            ])),
+        ],
         _('Edit assistant') + f' ({template.id})'
     ) if template else [
         c.FireEvent(event=e.GoToEvent(url='/assistants'))
