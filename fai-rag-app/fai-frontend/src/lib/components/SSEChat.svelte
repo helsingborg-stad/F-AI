@@ -120,50 +120,63 @@
 
     closeSSE()
 
-    const fullEndpoint = activeConversationId
-      ? `/api/sse/chat/stream/continue/${activeConversationId}?question=${question}`
-      : `/api/sse/chat/stream/new/${selectedAssistant!.project}/${selectedAssistant!.id}?question=${question}`
-
-    eventSource = new EventSource(fullEndpoint)
-
-    eventSource.onerror = (e) => {
-      console.error(e)
-      lastMessageErrored = true
-      closeSSE()
-    }
-
-    eventSource.addEventListener('message_end', () => {
-      closeSSE()
+    fetch('/api/sse/chat/question', {
+      method: 'POST',
+      body: JSON.stringify({ question }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
+      .then(res => res.json())
+      .then((response) => {
+        const questionId = response.id
 
-    eventSource.addEventListener('conversation_id', (e) => {
-      activeConversationId = e.data
-    })
+        const fullEndpoint = activeConversationId
+          ? `/api/sse/chat/stream/continue/${activeConversationId}?stored_question_id=${questionId}`
+          : `/api/sse/chat/stream/new/${selectedAssistant!.project}/${selectedAssistant!.id}?stored_question_id=${questionId}`
 
-    eventSource.addEventListener('exception', () => {
-      lastMessageErrored = true
-    })
+        eventSource = new EventSource(fullEndpoint)
 
-    eventSource.addEventListener('message', (e) => {
-      try {
-        const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!)
-        const jsonString = new TextDecoder().decode(bytes)
-        const messagePayload = JSON.parse(jsonString) as IncomingMessage
-        const chatMessage = toChatMessage(messagePayload)
+        eventSource.onerror = (e) => {
+          console.error(e)
+          lastMessageErrored = true
+          closeSSE()
+        }
 
-        messages = [
-          ...messages.slice(0, -1),
-          {
-            ...messages.at(-1),
-            ...chatMessage,
-            content: messages.at(-1)!.content + chatMessage.content,
-          },
-        ]
-      } catch (ex) {
-        console.error('Failed to parse raw message', ex, e)
-        closeSSE()
-      }
-    })
+        eventSource.addEventListener('message_end', () => {
+          closeSSE()
+        })
+
+        eventSource.addEventListener('conversation_id', (e) => {
+          activeConversationId = e.data
+        })
+
+        eventSource.addEventListener('exception', () => {
+          lastMessageErrored = true
+        })
+
+        eventSource.addEventListener('message', (e) => {
+          try {
+            const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!)
+            const jsonString = new TextDecoder().decode(bytes)
+            const messagePayload = JSON.parse(jsonString) as IncomingMessage
+            const chatMessage = toChatMessage(messagePayload)
+
+            messages = [
+              ...messages.slice(0, -1),
+              {
+                ...messages.at(-1),
+                ...chatMessage,
+                content: messages.at(-1)!.content + chatMessage.content,
+              },
+            ]
+          } catch (ex) {
+            console.error('Failed to parse raw message', ex, e)
+            closeSSE()
+          }
+        })
+      })
+
   }
 
   function handleTextareaKeypress(event: KeyboardEvent) {

@@ -4,7 +4,7 @@ from typing import Protocol
 from beanie import Document, Indexed
 from pydantic import EmailStr, Field
 
-from fai_backend.assistant.models import AssistantChatHistoryModel
+from fai_backend.assistant.models import AssistantChatHistoryModel, StoredQuestionModel
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.conversations.models import Conversation
 from fai_backend.projects.schema import Project
@@ -115,6 +115,10 @@ class CollectionMetadataRepository(IAsyncRepo[CollectionMetadataModel]):
     pass
 
 
+class StoredQuestionsRepository(IAsyncRepo[StoredQuestionModel]):
+    pass
+
+
 repo_factory.register_builder(
     {
         ProjectRepository: lambda: create_repo_from_env(ProjectModel, ProjectModel),
@@ -122,7 +126,8 @@ repo_factory.register_builder(
         PinCodeRepository: lambda: create_repo_from_env(PinCodeModel, PinCodeModel),
         ConversationRepository: lambda: create_repo_from_env(Conversation, ConversationDocument),
         ChatHistoryRepository: lambda: create_repo_from_env(AssistantChatHistoryModel, AssistantChatHistoryModel),
-        CollectionMetadataRepository: lambda: create_repo_from_env(CollectionMetadataModel, CollectionMetadataModel)
+        CollectionMetadataRepository: lambda: create_repo_from_env(CollectionMetadataModel, CollectionMetadataModel),
+        StoredQuestionsRepository: lambda: create_repo_from_env(StoredQuestionModel, StoredQuestionModel),
     }
 )
 
@@ -132,3 +137,4 @@ pins_repo = repo_factory.create(PinCodeRepository)
 conversation_repo = repo_factory.create(ConversationRepository)
 chat_history_repo = repo_factory.create(ChatHistoryRepository)
 collection_metadata_repo = repo_factory.create(CollectionMetadataRepository)
+stored_questions_repo = repo_factory.create(StoredQuestionsRepository)
