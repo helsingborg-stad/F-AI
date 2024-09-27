@@ -37,7 +37,7 @@ def feedback_submit_view(view) -> list:
     return view(
         [c.Div(components=[
             c.Div(components=[
-                c.Text(text=_('feedback_submitted', 'Feedback received. Thank you! 😊')),
+                c.Text(text=_('feedback_submitted', 'Thank you for your feedback! 😊')),
             ], class_name='card-body'),
         ], class_name='card')],
         _('feedback_submitted', 'Send Feedback'),
