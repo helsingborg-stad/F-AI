@@ -68,3 +68,12 @@ class AssistantChatHistoryModel(Document):
     class Settings:
         name = 'chat_history'
         use_state_management = True
+
+
+class StoredQuestionModel(Document):
+    question: str
+    user: str
+
+    class Settings:
+        name = 'stored_questions'
+        use_state_management = True

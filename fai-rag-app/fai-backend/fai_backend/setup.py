@@ -11,7 +11,7 @@ from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.config import settings
 from fai_backend.projects.schema import ProjectMember, ProjectRole
 from fai_backend.repositories import ConversationDocument, PinCodeModel, ProjectModel, projects_repo
-from fai_backend.assistant.models import AssistantTemplate, AssistantChatHistoryModel
+from fai_backend.assistant.models import AssistantTemplate, AssistantChatHistoryModel, StoredQuestionModel
 from fai_backend.sentry.watcher import Watcher
 
 
@@ -98,7 +98,8 @@ async def setup_db():
             PinCodeModel,
             ConversationDocument,
             AssistantChatHistoryModel,
-            CollectionMetadataModel
+            CollectionMetadataModel,
+            StoredQuestionModel
         ]
     )
 
