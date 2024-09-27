@@ -3,6 +3,7 @@ from typing import Any
 
 from fastapi import Depends, HTTPException, Security
 
+from fai_backend.assistant.menu import assistant_menu
 from fai_backend.auth.dependencies import (
     get_auth_service,
     try_get_access_token_payload,
@@ -70,6 +71,7 @@ async def get_page_template_for_logged_in_users(
             *chat_menu_items(user_permissions=p),
             *qa_menu(user_permissions=p),
             *document_menu_items(user_permissions=p),
+            *assistant_menu(user_permissions=permissions),
             *feedback_menu_items(),
             *mock_menu(user_permissions=p),
         ]

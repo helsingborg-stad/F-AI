@@ -6,6 +6,7 @@ declare global {
     interface HTMLAttributes<T> {
       'on:felteerror'?: (event: any) => any
       'on:feltesuccess'?: (event: any) => any
+      disabled?: boolean | null
     }
   }
 

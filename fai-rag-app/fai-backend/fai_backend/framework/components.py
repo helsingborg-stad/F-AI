@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ByteSize, Field
+from pydantic import BaseModel, Field
 
 __all__ = (
     'Div',
@@ -28,6 +28,7 @@ __all__ = (
     'FileInput',
     'SSEChat',
     'DataTable',
+    'Range',
     # then `AnyComponent` itself
     'AnyUI',
 )
@@ -41,7 +42,7 @@ class UIComponent(BaseModel, extra='forbid'):
     type: str
     id: str | None = None
     class_name: str | None = Field(None, serialization_alias='class')
-    components: 'list[AnyUI] | None' = Field(None, serialization_alias='renderProps.components')
+    components: list | None = Field(None, serialization_alias='renderProps.components')
 
 
 class Div(UIComponent):
@@ -105,6 +106,7 @@ class InputField(UIComponent):
     type: Literal['InputField'] = 'InputField'
     name: str
     title: str | None = None
+    label: str | None = None
     placeholder: str | None = None
     required: bool | None = None
     html_type: Literal['text', 'password', 'hidden', 'number', 'email', 'tel', 'file'] = 'text'
@@ -116,6 +118,7 @@ class InputField(UIComponent):
     input_state: Literal[
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
     value: str | None = None
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
 
 
 class FileInput(InputField):
@@ -142,6 +145,7 @@ class Textarea(UIComponent):
     type: Literal['Textarea'] = 'Textarea'
     name: str
     title: str | None = None
+    label: str | None = None
     placeholder: str | None = None
     required: bool | None = None
     initial: str | None = Field(None, serialization_alias='value')
@@ -153,6 +157,8 @@ class Textarea(UIComponent):
     rows: int | None = None
     state: Literal[
                'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success'] | None = None
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
+    value: str | None = None
 
 
 class AppShell(UIComponent):
@@ -232,6 +238,7 @@ class Select(BaseModel):
     class_name: str | None = Field(None, serialization_alias='class')
     name: str
     title: str | None = None
+    label: str | None = None
     placeholder: str | None = None
     required: bool | None = None
 
@@ -243,6 +250,7 @@ class Select(BaseModel):
                      'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
     value: str | None = None
     options: list[tuple[str, str | None]] | None = None
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
 
 
 class Radio(UIComponent):
@@ -288,10 +296,28 @@ class SSEChat(UIComponent):
     chat_initial_state: ClientChatState | None = Field(None, serialization_alias='initialState')
 
 
+class Range(UIComponent):
+    type: Literal['Range'] = 'Range'
+    name: str
+    title: str | None = None
+    label: str | None = None
+    required: bool | None = None
+    hidden: bool = None
+    disabled: bool | None = None
+    readonly: bool | None = None
+    input_state: Literal[
+                     'primary', 'secondary', 'accent', 'info', 'warning', 'error', 'success', 'neutral'] | None = None
+    value: int | float | None = None
+    size: Literal['xs', 'sm', 'md', 'lg'] | None = None
+    min: int | float | None = None
+    max: int | float | None = None
+    step: int | float | None = None
+
+
 AnyUI = Annotated[
     (Div | Form | InputField | Button | FireEvent | Heading |
      AppShell | AppDrawer | AppContent | AppFooter | Divider | PageHeader |
      PageContent | Menu | Link | Textarea | Text | Table | Pagination | Select | Radio |
-     ChatBubble | FileInput | SSEChat | DataTable),
+     ChatBubble | FileInput | SSEChat | DataTable | Range),
     Field(discriminator='type')
 ]

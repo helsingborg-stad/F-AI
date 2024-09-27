@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Action } from 'svelte/action'
-
   export let name: string
   export let placeholder: string | null = null
   export let required: boolean | null = null
@@ -13,7 +12,6 @@
   export let value: string | null = null
   export let autocomplete: HTMLInputElement['autocomplete'] | null = null
   export let autoFocus: boolean | null = null
-
   export let readonly: boolean | null = null
 
   const focusOnMount: Action<HTMLInputElement, boolean | null> = (node, focus) => {
@@ -39,6 +37,7 @@
   {required}
   {autocomplete}
   {readonly}
+  class:bg-base-200={readonly && html_type !== 'hidden'}
   {...$$restProps}
   use:focusOnMount={autoFocus}
 />

@@ -1,7 +1,7 @@
 <script lang="ts">
+  import type { Action } from 'svelte/action'
   import { onMount } from 'svelte'
-  import { FormControl, Input } from '$lib/components/input'
-
+  import { FormControl, Input, Label } from '$lib/components/input'
   export let name: string
   export let label: string | null = null
   export let error: string | null = null
@@ -27,11 +27,18 @@
   export let autoFocus: boolean | null = null
   export let readonly: boolean | null = null
 
+  export let min: number | null = null
+  export let max: number | null = null
+
+  export let step: number | null = null
+
   export let disabled: boolean | null = null
 
   let ref: HTMLInputElement
 
-  onMount(() => autoFocus && ref?.focus() !== undefined)
+  const focusOnMount: Action<HTMLInputElement, boolean | null> = (node, focus) => {
+    focus === true && node.focus()
+  }
 
   $: inputValue = ((v: string | null = null) => v)(value)
 </script>
@@ -43,38 +50,37 @@
   {label}
   class={readonly === true ? 'pointer-events-none' : null}
 >
-  <div
-    class:font-normal={true}
-    class:input={html_type !== 'hidden'}
-    class:input-xs={size === 'xs' && html_type !== 'hidden'}
-    class:input-sm={size === 'sm' && html_type !== 'hidden'}
-    class:input-md={size === 'md' && html_type !== 'hidden'}
-    class:input-lg={size === 'lg' && html_type !== 'hidden'}
-    class:input-error={error}
-    class:input-bordered={variant === 'bordered' && html_type !== 'hidden'}
-    class:input-ghost={variant === 'ghost' && html_type !== 'hidden'}
-    class:w-full={block}
+  <svelte:fragment slot="label">
+    {#if label !== null}
+      <Label altText={inputValue}>{label}</Label>
+    {/if}
+  </svelte:fragment>
+  <input
+    class={className ?? null}
+    type="range"
+    bind:value={inputValue}
+    class:hidden={html_type === 'hidden'}
+    class:mt-0={html_type === 'hidden'}
+    class:range={1}
+    class:range-xs={size === 'xs'}
+    class:range-sm={size === 'sm'}
+    class:range-md={size === 'md'}
+    class:range-lg={size === 'lg'}
+    on:input
+    on:change
+    on:blur
+    on:focus
+    {min}
+    {max}
+    {step}
+    {name}
+    {id}
+    {placeholder}
+    {required}
+    {autocomplete}
+    {readonly}
     class:bg-base-200={readonly && html_type !== 'hidden'}
-    class={'flex items-center space-x-3 ' + (className ?? '')}
-    {disabled}
-  >
-    <slot name="prefix" />
-    <Input
-      class="max-h-full max-w-full grow"
-      {name}
-      {id}
-      {placeholder}
-      {readonly}
-      {autocomplete}
-      {required}
-      type={html_type}
-      bind:value={inputValue}
-      on:input
-      on:blur
-      on:change
-      on:focus
-      {disabled}
-    />
-    <slot name="suffix" />
-  </div>
+    {...$$restProps}
+    use:focusOnMount={autoFocus}
+  />
 </FormControl>

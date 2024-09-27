@@ -2,7 +2,7 @@ import type { SvelteComponent } from 'svelte'
 import Heading from './components/Heading.svelte'
 import Div from './components/Div.svelte'
 import Form from './components/Form.svelte'
-import InputField from './components/InputField.svelte'
+import { TextInput as InputField } from '$lib/components/input'
 import FireEvent from './components/FireEvent.svelte'
 import Dropdown from './components/Dropdown.svelte'
 import Link from './components/Link.svelte'
@@ -26,6 +26,7 @@ import FileInput from './components/FileInput.svelte'
 import SSEChat from './components/SSEChat.svelte'
 import Divider from './components/Divider.svelte'
 import type { ComponentsMap } from '$lib/types'
+import Range from './components/Range.svelte'
 
 export const componentMap: ComponentsMap = {
   Heading,
@@ -53,6 +54,7 @@ export const componentMap: ComponentsMap = {
   Radio,
   SSEChat,
   FileInput,
+  Range,
   Divider,
 }
 

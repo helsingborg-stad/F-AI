@@ -2,7 +2,7 @@ import type { SvelteComponent } from 'svelte'
 import Heading from '$lib/components/Heading.svelte'
 import Div from '$lib/components/Div.svelte'
 import Form from '$lib/components/Form.svelte'
-import InputField from '$lib/components/InputField.svelte'
+import { TextInput as InputField } from '$lib/components/input'
 import FireEvent from '$lib/components/FireEvent.svelte'
 import AppShell from '$lib/components/AppShell.svelte'
 import AppDrawer from '$lib/components/AppDrawer.svelte'
@@ -25,6 +25,7 @@ import FileInput from '$lib/components/FileInput.svelte'
 import PageHeader from './components/AppHeader.svelte'
 import PageContent from './components/Content.svelte'
 import Text from '$lib/components/Text.svelte'
+import Range from '$lib/components/Range.svelte'
 
 type addPrefixToObject<T, P extends string> = {
   [K in keyof T as K extends string ? `${P}${K}` : never]: T[K]
@@ -90,6 +91,7 @@ export type ComponentsMap = {
   SSEChat: typeof SSEChat
   FileInput: typeof FileInput
   Divider: typeof Divider
+  Range: typeof Range
 }
 
 export type ComponentType = keyof ComponentsMap

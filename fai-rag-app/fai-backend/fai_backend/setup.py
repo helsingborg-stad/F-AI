@@ -40,7 +40,8 @@ async def setup_project():
                 'can_ask_questions',
                 'can_review_answers',
                 'can_edit_questions_and_answers',
-                'can_upload_document'
+                'can_upload_document',
+                'can_edit_assistant',
             ]
             return {
                 x: y

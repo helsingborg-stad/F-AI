@@ -23,7 +23,7 @@
   </slot>
   <slot />
   <slot name="helper" {error}>
-    {#if error !== null}
+    {#if error && error !== ''}
       <Label altText={error} />
     {/if}
   </slot>
