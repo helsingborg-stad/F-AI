@@ -78,7 +78,7 @@ def AssistantForm(
                         name='description',
                         label=_('Description (optional)'),
                         placeholder=_('This is a description that will be shown when starting a new chat'),
-                        required=True,
+                        required=False,
                         size='sm',
                         value=data.description if data and data.description else '',
                     ),
