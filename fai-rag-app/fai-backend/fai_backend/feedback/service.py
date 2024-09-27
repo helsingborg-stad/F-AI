@@ -16,14 +16,14 @@ class FeedbackService:
 
 
 def create_feedback_provider(feedback_settings: Settings) -> IFeedbackProvider:
-    api_token = feedback_settings.GITHUB_API_TOKEN.get_secret_value()
+    api_token = feedback_settings.FEEDBACK_GITHUB_API_TOKEN.get_secret_value()
+    repo_owner = feedback_settings.FEEDBACK_GITHUB_REPO_OWNER
+    repo_name = feedback_settings.FEEDBACK_GITHUB_REPO_NAME
 
     if api_token == '':
         return InMemoryProvider()
 
-    return GitHubProvider(api_token=api_token,
-                          repo_owner='helsingborg-stad',
-                          repo_name='F-AI')
+    return GitHubProvider(api_token, repo_owner, repo_name)
 
 
 feedback_provider = create_feedback_provider(settings)
