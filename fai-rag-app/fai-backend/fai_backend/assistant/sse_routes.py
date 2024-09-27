@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -48,6 +49,10 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
                         )),
                     )
 
+            if final_output == '':
+                # Empty LLM response is always an error?
+                raise Exception('LLM output is empty')
+
             history.history += [
                 AssistantStreamMessage(
                     timestamp=start_timestamp,
@@ -56,7 +61,7 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
                 ),
                 AssistantStreamMessage(
                     timestamp=datetime.utcnow().isoformat(),
-                    role='system',
+                    role='assistant',
                     content=final_output
                 )
             ]
@@ -67,6 +72,7 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
                 event='exception',
                 data=''
             )
+            logging.exception(e)
             raise e
 
         finally:

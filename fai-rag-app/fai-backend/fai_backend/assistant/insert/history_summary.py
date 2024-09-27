@@ -31,6 +31,6 @@ class AssistantHistorySummaryInsert(IAssistantMessageInsert):
         summary = await join_final_output(summarize_stream(None))
         return [AssistantStreamMessage(
             timestamp=context.history[0].timestamp,
-            role='system',
+            role='assistant',
             content=summary,
         )] + context.history[-3:]
