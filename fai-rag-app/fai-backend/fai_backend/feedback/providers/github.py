@@ -16,7 +16,7 @@ class GitHubProvider(IFeedbackProvider):
 
         headers = {
             'Authorization': f'token {self.api_token}',
-            'Accept': 'application/vnd.github.v3+json'
+            'Accept': 'application/vnd.github+json'
         }
 
         payload = {
