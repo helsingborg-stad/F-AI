@@ -173,7 +173,7 @@ def on_create_question(
 ) -> list:
     return view(
         [c.FireEvent(event=e.GoToEvent(url=f'/view/questions/{data.id}'))],
-        _('submit_a_question', 'Create Question'''),
+        _('submit_a_question', 'Create Question'),
     )
 
 

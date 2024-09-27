@@ -39,6 +39,9 @@ class Settings(BaseSettings, extra=Extra.ignore):
     SENTRY_ENVIRONMENT: str = 'development'
     VLLM_CONFIG: str = ''
     FILE_SIZE_LIMIT: int = 10  # MB
+    FEEDBACK_GITHUB_API_TOKEN: SecretStr = ''
+    FEEDBACK_GITHUB_REPO_OWNER: str = ''
+    FEEDBACK_GITHUB_REPO_NAME: str = ''
 
     class Config:
         env_file = '.env'
