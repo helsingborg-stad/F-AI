@@ -21,7 +21,8 @@ class GitHubProvider(IFeedbackProvider):
 
         payload = {
             'title': data.feedback_subject,
-            'body': data.feedback
+            'body': data.feedback,
+            'labels': ['feedback']
         }
 
         async with httpx.AsyncClient() as client:
