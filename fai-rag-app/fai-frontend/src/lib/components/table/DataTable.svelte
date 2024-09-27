@@ -15,6 +15,7 @@
   export let data: T[] = []
 
   export let columns: DataColumnSchema[] = []
+  export let includeViewAction: boolean = true
 
   $: dataStore = writable<T[]>(data)
   $: $dataStore = data
@@ -28,7 +29,7 @@
     visibleColumns,
     pluginStates,
     ...rest
-  } = useDataTable<T>(dataStore, columns))
+  } = useDataTable<T>(dataStore, columns, includeViewAction))
 
   $: ({
     filter: { filterValues },

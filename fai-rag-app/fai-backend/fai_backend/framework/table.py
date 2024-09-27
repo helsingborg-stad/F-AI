@@ -34,3 +34,4 @@ class DataTable(BaseModel, Generic[T]):
     columns: list[DataColumn]
     columnOrder: list[str] | None = None
     initialFilterValue: str | None = None
+    include_view_action: bool = Field(True, serialization_alias='includeViewAction')

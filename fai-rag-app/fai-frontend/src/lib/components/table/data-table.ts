@@ -148,35 +148,49 @@ export const withIndexColumnLeft = <T>(table: Table<T>, columns: Column<T>[]) =>
 export const withActionColumnRight = <T>(
   table: Table<T>,
   columns: Column<T>[],
+  includeViewAction: boolean,
   path: string = '/view/questions/',
   key: string = '',
-) => [
-  ...columns,
-  table.display({
-    id: 'view_action',
-    cell: (cell, state) =>
-      createRender(Link, {
-        class:
-          'btn btn-sm btn-link -ml-1 -mr-1"  hover:btn-ghost hover:btn-accent btn-circle',
-        href:
-          path +
-          (typeof cell?.column?.data === 'function'
-            ? accessProperty(cell.column.data(cell, state), 'id', '')
-            : ''),
-      }).slot(
-        createRender(SVG, {
-          width: '20',
-          src: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWV5ZSI+PHBhdGggZD0iTTIgMTJzMy03IDEwLTcgMTAgNyAxMCA3LTMgNy0xMCA3LTEwLTctMTAtN1oiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIi8+PC9zdmc+',
+) => {
+    const className = 'btn btn-sm btn-link -ml-1 -mr-1 hover:btn-ghost hover:btn-accent btn-circle'
+    const svgSrc = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWV5ZSI+PHBhdGggZD0iTTIgMTJzMy03IDEwLTcgMTAgNyAxMCA3LTMgNy0xMCA3LTEwLTctMTAtN1oiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIi8+PC9zdmc+'
+
+    const buildHref = (cellData: any, tableState: any): string => {
+        if (typeof cellData?.column?.data === 'function') {
+            return path + accessProperty(cellData.column.data(cellData, tableState), 'id', '')
+        }
+        return ''
+    }
+
+  const viewActionColumn = includeViewAction
+    ? [
+        table.display({
+          id: 'view_action',
+          cell: (cellData, tableState) =>
+            createRender(Link, {
+              class: className,
+              href: buildHref(cellData, tableState),
+            }).slot(
+              createRender(SVG, {
+                width: '20',
+                src: svgSrc,
+              }),
+            ),
+          data: (cellData, tableState) => (cellData.row.isData() ? cellData.row.original : {}),
+          header: () => 'View',
         }),
-      ),
-    data: (cell, state) => (cell.row.isData() ? cell.row.original : {}),
-    header: (c) => 'View',
-  }),
-]
+      ]
+    : []
+
+    return [...columns, ...viewActionColumn]
+}
+
+
 
 export const useDataTable = <T>(
   dataStore: Writable<T[]>,
   columns: DataColumnSchema[],
+  includeViewAction: boolean
 ) => {
   const plugins = {
     sort: addSortBy<T>({
@@ -200,6 +214,6 @@ export const useDataTable = <T>(
   const table = createTable<T>(dataStore, plugins)
   const dataColumns = columns.map(createColumn(table))
   return table.createViewModel(
-    withActionColumnRight(table, withIndexColumnLeft(table, dataColumns)),
+    withActionColumnRight(table, withIndexColumnLeft(table, dataColumns), includeViewAction),
   )
 }

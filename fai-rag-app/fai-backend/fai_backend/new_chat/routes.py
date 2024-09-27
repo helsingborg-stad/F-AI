@@ -53,7 +53,8 @@ async def chat_history_view(view=Depends(get_page_template_for_logged_in_users),
                                          display=DisplayAs.link,
                                          on_click=e.GoToEvent(url='/chat/{chat_id}'),
                                          sortable=True,
-                                         label=_('title', 'Title'))])],
+                                         label=_('title', 'Title'))],
+                     include_view_action=False,)],
         _('chat_history', 'History')
     )
 
