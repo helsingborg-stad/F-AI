@@ -80,7 +80,8 @@ class TemplatePayloadAdapter:
                 description=template.meta.description,
                 sample_questions=template.meta.sample_questions,
                 model=template.streams[0].settings['model'] or '',
-                temperature=template.streams[0].settings['temperature'] or 1.0,
+                temperature=template.streams[0].settings['temperature'] if template.streams[0].settings[
+                                                                               'temperature'] != 0 else 1.0,
                 instructions=template.streams[0].messages[0].content or '',
                 files_collection_id=template.files_collection_id,
             )
@@ -92,7 +93,8 @@ class TemplatePayloadAdapter:
                 description=template.meta.description,
                 sample_questions=template.meta.sample_questions,
                 model=template.streams[1].settings['model'] or '',
-                temperature=template.streams[1].settings['temperature'] or 1.0,
+                temperature=template.streams[1].settings['temperature'] if template.streams[1].settings[
+                                                                               'temperature'] >= 0 else 1.0,
                 instructions=template.streams[1].messages[0].content or '',
                 files_collection_id=template.files_collection_id,
             )

@@ -57,7 +57,7 @@ def AssistantForm(
                         required=True,
                         value=data.temperature if data else 1.0,
                         size='sm',
-                        min=0.01,
+                        min=0.00,
                         max=2.00,
                         step=0.01,
                     ),
