@@ -41,6 +41,7 @@
   {size}
   {error}
   {label}
+  hidden={html_type === 'hidden'}
   class={readonly === true ? 'pointer-events-none' : null}
 >
   <div
