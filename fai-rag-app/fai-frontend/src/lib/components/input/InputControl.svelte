@@ -5,7 +5,6 @@
   export let error: string | null = null
   export let label: string | null = null
   export let size: 'xs' | 'sm' | 'md' | 'lg' | null = null
-
   export let hidden: boolean = false
 </script>
 
