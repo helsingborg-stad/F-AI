@@ -5,6 +5,7 @@
   export let error: string | null = null
   export let label: string | null = null
   export let size: 'xs' | 'sm' | 'md' | 'lg' | null = null
+  export let hidden: boolean = false
 </script>
 
 <label
@@ -13,6 +14,7 @@
   class:text-sm={size === 'xs'}
   class:text-md={size === 'sm'}
   class:text-lg={size === 'md'}
+  class:hidden
   for={name}
   {...$$restProps}
 >
