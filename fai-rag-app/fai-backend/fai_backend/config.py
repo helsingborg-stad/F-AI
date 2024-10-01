@@ -1,7 +1,7 @@
 from typing import Literal
 
 from dotenv import load_dotenv
-from pydantic import SecretStr, Extra
+from pydantic import Extra, SecretStr
 from pydantic_settings import BaseSettings
 
 from fai_backend.logger.console import console
@@ -42,6 +42,7 @@ class Settings(BaseSettings, extra=Extra.ignore):
     FEEDBACK_GITHUB_API_TOKEN: SecretStr = ''
     FEEDBACK_GITHUB_REPO_OWNER: str = ''
     FEEDBACK_GITHUB_REPO_NAME: str = ''
+    CHAT_MAX_INPUT_LENGTH: int | None = 2500
 
     class Config:
         env_file = '.env'
