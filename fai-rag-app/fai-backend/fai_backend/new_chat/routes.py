@@ -53,9 +53,13 @@ async def chat_history_view(view=Depends(get_page_template_for_logged_in_users),
                                          display=DisplayAs.link,
                                          on_click=e.GoToEvent(url='/chat/{chat_id}'),
                                          sortable=True,
-                                         label=_('title', 'Title'))],
-                     include_view_action=False,)],
-        _('chat_history', 'History')
+                                         label=_('title', 'Title')),
+                              DataColumn(key='delete_label',
+                                         display=DisplayAs.link,
+                                         on_click=e.GoToEvent(url='/chat/delete/{chat_id}'),
+                                         label=_('actions', 'Actions'))],
+                     include_view_action=False)],
+        _('chat_history', 'Chat history')
     )
 
 
@@ -71,4 +75,18 @@ async def chat_view(chat_id: str,
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
     return view([c.SSEChat(chat_initial_state=chat_history)],
-                _('continue_chat', 'Continue chat'))
+                _('chat_history', 'Chat history'))
+
+
+@router.get('/chat/delete/{chat_id}', response_model=list, response_model_exclude_none=True)
+async def chat_delete(chat_id: str,
+                      chat_state_service: ChatStateService = Depends(get_chat_state_service),
+                      project_user: ProjectUser = Depends(get_project_user)) -> list:
+
+    chat_history = await chat_state_service.get_state(chat_id)
+    if chat_history is None or chat_history.user != project_user.email:
+        return [c.FireEvent(event=e.GoToEvent(url='/chat/history'))]
+
+    await chat_state_service.delete_state(chat_id)
+    print(f'Chat history: {chat_id} deleted')
+    return [c.FireEvent(event=e.GoToEvent(url='/chat/history'))]
