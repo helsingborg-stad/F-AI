@@ -44,7 +44,7 @@ class Assistant:
                       .and_then(postprocess_stream)
                       .and_then(new_stream))
 
-        return stream
+        return stream.on_error(lambda e: print(f'assistant stream error: {str(e)}'))
 
     async def _create_stream_from_config(
             self,

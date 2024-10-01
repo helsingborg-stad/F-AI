@@ -1,7 +1,8 @@
-from typing import Callable, Any
+from typing import Callable, Any, List, Optional, AsyncGenerator, cast, Union, Literal
 
-from langstream import Stream
-from langstream.contrib import OpenAIChatStream, OpenAIChatDelta, OpenAIChatMessage
+import openai
+from langstream import Stream, StreamOutput
+from langstream.contrib import OpenAIChatDelta, OpenAIChatMessage
 from pydantic import BaseModel
 
 from fai_backend.assistant.helper import messages_expander_stream, get_message_content
@@ -9,12 +10,70 @@ from fai_backend.assistant.models import AssistantStreamMessage, AssistantStream
 from fai_backend.assistant.protocol import IAssistantLLMProvider, IAssistantContextStore, IAssistantMessageInsert
 
 
+class OpenAIStream(Stream[str, OpenAIChatDelta]):
+    def __init__(
+            self,
+            name: str,
+            call: Callable[
+                [str],
+                List[OpenAIChatMessage],
+            ],
+            model: str,
+            url: str = None,
+            api_key: str = None,
+            temperature: Optional[float] = 0,
+    ) -> None:
+        self._client = openai.AsyncOpenAI(
+            base_url=url,
+            api_key=api_key,
+        )
+
+        async def chat_completion(
+                messages: List[OpenAIChatMessage],
+        ) -> AsyncGenerator[StreamOutput[OpenAIChatDelta], None]:
+            try:
+                completions = await self._client.chat.completions.create(
+                    model=model,
+                    messages=[m.to_dict() for m in messages],
+                    temperature=temperature,
+                    stream=True,
+                )
+
+                async for output in completions:
+                    if len(output.choices) == 0:
+                        continue
+
+                    delta = output.choices[0].delta
+                    if not delta:
+                        continue
+
+                    if delta.content is not None:
+                        role = cast(
+                            Union[Literal["assistant", "function"], None], delta.role
+                        )
+                        yield self._output_wrap(
+                            OpenAIChatDelta(
+                                role=role,
+                                content=delta.content,
+                            )
+                        )
+            except Exception as e:
+                print(f'Exception @ chat_completion: {str(e)}')
+            finally:
+                await self._client.close()
+
+        super().__init__(
+            name,
+            lambda in_data: chat_completion(call(in_data)),
+        )
+
+
 class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
     class Settings(BaseModel):
         model: str
         temperature: float = 0
 
-    def __init__(self, settings: Settings, stream_class=OpenAIChatStream[str, OpenAIChatDelta]):
+    def __init__(self, settings: Settings, stream_class=OpenAIStream):
         self.settings = settings
         self._stream_class = stream_class
 
