@@ -17,6 +17,9 @@ class ChatStateService:
         history = await self.history_repo.get(chat_id)
         return ChatStateService.assistant_chat_history_model_to_chat_state(history)
 
+    async def delete_state(self, chat_id: str) -> None:
+        await self.history_repo.delete(chat_id)
+
     @staticmethod
     def assistant_chat_history_model_to_chat_state(
             chat_history_model: AssistantChatHistoryModel

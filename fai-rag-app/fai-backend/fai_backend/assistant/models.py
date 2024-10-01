@@ -57,6 +57,7 @@ class ClientChatState(BaseModel):
     chat_id: str
     timestamp: str
     title: str
+    delete_label: str = "Delete" # TODO: fix hack for allowing something to show up in list to click on.
     history: list[LLMClientChatMessage]
 
 
