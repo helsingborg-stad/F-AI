@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import datetime
 
@@ -68,12 +69,16 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
             ]
             await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
 
+        except asyncio.CancelledError as e:
+            logging.info(f'client disconnected: {str(e)}')
+            raise e
+
         except Exception as e:
+            logging.exception(e)
             yield ServerSentEvent(
                 event='exception',
                 data=''
             )
-            logging.exception(e)
             raise e
 
         finally:
