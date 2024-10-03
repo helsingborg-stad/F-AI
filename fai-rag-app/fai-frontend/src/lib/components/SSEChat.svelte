@@ -265,8 +265,9 @@
     <div class="max-w-prose w-full h-fit">
       {#each messages as message (message.id)}
         <ChatBubble
-          content={formatMessageForMarkdown(message.content)}
+          content={message.isSelf ? message.content : formatMessageForMarkdown(message.content)}
           isSelf={message.isSelf}
+          enableMarkdown={!message.isSelf}
         />
       {:else}
         <div class="prose text-center">

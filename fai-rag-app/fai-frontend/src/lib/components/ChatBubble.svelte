@@ -8,6 +8,8 @@
   export let time: string | null = null
   export let isSelf: boolean | null = null
   export let content: string | null = null
+
+  export let enableMarkdown: boolean = false
 </script>
 
 <div
@@ -35,9 +37,13 @@
     class:bg-transparent={!isSelf}
     class:before:bg-transparent={!isSelf}
     class:p-0={!isSelf}
-    class="prose chat-bubble min-h-fit text-base-content"
+    class="chat-bubble min-h-fit text-base-content"
   >
-    <SvelteMarkdown source={content} />
+    {#if enableMarkdown}
+      <SvelteMarkdown source={content} />
+    {:else}
+      <span class="whitespace-pre-line">{content}</span>
+    {/if}
     <slot name="below-content" />
   </div>
 
