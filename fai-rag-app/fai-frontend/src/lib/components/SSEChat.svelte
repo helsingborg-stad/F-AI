@@ -56,7 +56,7 @@
   }
 
   function updateBottomCheck() {
-    const margin = 100
+    const margin = 50
     isContentAtBottom = contentScrollDiv && contentScrollDiv.scrollHeight - contentScrollDiv.scrollTop - contentScrollDiv.clientHeight <= margin
   }
 
@@ -64,6 +64,7 @@
   $: contentScrollDiv &&
   messages &&
   messages.length > 0 &&
+  isContentAtBottom &&
   scrollContentToBottom()
   $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
 
@@ -223,8 +224,8 @@
 >
   <!-- Floating controls -->
   <div
-    class="absolute inset-x-0 bottom-32 translate-y-20 flex justify-center z-10 transition"
-    class:translate-y-0={!isContentAtBottom}
+    class="absolute inset-x-0 bottom-32 flex justify-center z-10 transition"
+    class:translate-y-20={isContentAtBottom}
   >
     <button
       on:click={scrollContentToBottom}
@@ -262,7 +263,7 @@
     bind:this={contentScrollDiv}
     on:scroll={updateBottomCheck}
   >
-    <div class="max-w-prose w-full h-fit">
+    <div class="max-w-prose w-full h-fit overflow-x-scroll">
       {#each messages as message (message.id)}
         <ChatBubble
           content={message.isSelf ? message.content : formatMessageForMarkdown(message.content)}
@@ -278,8 +279,10 @@
               {#each selectedAssistant.sampleQuestions as question}
                 <button
                   class="btn btn-outline"
-                  on:click={() => askSampleQuestion(question)}>{question}</button
+                  on:click={() => askSampleQuestion(question)}
                 >
+                  {question}
+                </button>
               {/each}
             </div>
           {:else}
