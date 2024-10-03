@@ -5,6 +5,7 @@ from unstructured.partition.docx import partition_docx
 from unstructured.partition.md import partition_md
 from unstructured.partition.pdf import partition_pdf
 from unstructured.partition.xlsx import partition_xlsx
+from unstructured.partition.html import partition_html
 
 
 class AbstractDocumentParser(ABC):
@@ -33,6 +34,11 @@ class ExcelParser(AbstractDocumentParser):
         return partition_xlsx(filename)
 
 
+class HTMLParser(AbstractDocumentParser):
+    def parse(self, filename: str):
+        return partition_html(filename)
+
+
 class ParserFactory:
     @staticmethod
     def get_parser(file_path: str) -> AbstractDocumentParser:
@@ -46,5 +52,7 @@ class ParserFactory:
             return DocxParser()
         if mime_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
             return ExcelParser()
+        if mime_type == 'text/html':
+            return HTMLParser()
 
         raise ValueError(f'Unsupported file type: {mime_type}')
