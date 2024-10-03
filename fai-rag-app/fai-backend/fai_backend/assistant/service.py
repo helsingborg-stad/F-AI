@@ -163,5 +163,5 @@ class TemplatePayloadAdapter:
                     payload.sample_questions) > 0 else []
             ),
             files_collection_id=payload.files_collection_id,
-            streams=basic_stream() if payload.files_collection_id is None else rag_stream()
+            streams=basic_stream() if payload.files_collection_id is '' else rag_stream()
         )
