@@ -4,6 +4,7 @@ from fai_backend.assistant.assistant import Assistant
 from fai_backend.assistant.models import (
     AssistantContext,
     AssistantStreamConfig,
+    AssistantStreamInsert,
     AssistantStreamMessage,
     AssistantStreamPipelineDef,
     AssistantTemplate,
@@ -115,6 +116,9 @@ class TemplatePayloadAdapter:
                         AssistantStreamMessage(
                             role='system',
                             content=payload.instructions
+                        ),
+                        AssistantStreamInsert(
+                            insert='history'
                         ),
                         AssistantStreamMessage(
                             role='user',
