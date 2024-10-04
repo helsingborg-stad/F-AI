@@ -37,7 +37,7 @@
     class:bg-transparent={!isSelf}
     class:before:bg-transparent={!isSelf}
     class:p-0={!isSelf}
-    class="chat-bubble min-h-fit text-base-content"
+    class="prose chat-bubble min-h-fit text-base-content"
   >
     {#if enableMarkdown}
       <SvelteMarkdown source={content} />
