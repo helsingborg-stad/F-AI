@@ -57,15 +57,20 @@
 
   function updateBottomCheck() {
     const margin = 50
-    isContentAtBottom = contentScrollDiv && contentScrollDiv.scrollHeight - contentScrollDiv.scrollTop - contentScrollDiv.clientHeight <= margin
+    isContentAtBottom =
+      contentScrollDiv &&
+      contentScrollDiv.scrollHeight -
+        contentScrollDiv.scrollTop -
+        contentScrollDiv.clientHeight <=
+        margin
   }
 
   $: selectedAssistant = assistants.find((a) => a.id === selectedAssistantId) || null
   $: contentScrollDiv &&
-  messages &&
-  messages.length > 0 &&
-  isContentAtBottom &&
-  scrollContentToBottom()
+    messages &&
+    messages.length > 0 &&
+    isContentAtBottom &&
+    scrollContentToBottom()
   $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
 
   const scrollToBottom = (node: Element) => {
@@ -128,7 +133,7 @@
         'Content-Type': 'application/json',
       },
     })
-      .then(res => res.json())
+      .then((res) => res.json())
       .then((response) => {
         const questionId = response.id
 
@@ -177,7 +182,6 @@
           }
         })
       })
-
   }
 
   function handleTextareaKeypress(event: KeyboardEvent) {
@@ -197,7 +201,7 @@
 
   function retryLastMessage() {
     lastMessageErrored = false
-    const lastUserMessageIndex = findLastIndex(messages, m => m.isSelf)
+    const lastUserMessageIndex = findLastIndex(messages, (m) => m.isSelf)
     const lastQuestion = messages[lastUserMessageIndex].content
     messages = messages.slice(0, lastUserMessageIndex)
     createSSE(lastQuestion)
@@ -218,22 +222,23 @@
 </script>
 
 <div
-  class="w-full lg:w-[calc(100%-20rem)] absolute top-16 bottom-0 overflow-hidden grid"
+  class="absolute bottom-0 top-16 grid w-full overflow-hidden lg:w-[calc(100%-20rem)]"
   class:grid-rows-[6rem_1fr_7rem]={!initialState}
   class:grid-rows-[1fr_7rem]={initialState}
 >
   <!-- Floating controls -->
   <div
-    class="absolute inset-x-0 bottom-32 flex justify-center z-10 transition"
+    class="absolute inset-x-0 bottom-32 z-10 flex justify-center transition"
     class:translate-y-20={isContentAtBottom}
   >
     <button
       on:click={scrollContentToBottom}
-      class="bg-white rounded-full shadow p-2 hover:bg-gray-100 active:scale-95 transition"
+      class="rounded-full bg-white p-2 shadow transition hover:bg-gray-100 active:scale-95"
     >
       <SVG
         width="24"
-        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg==" />
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWJpZy1kb3duLWRhc2giPjxwYXRoIGQ9Ik0xNSA1SDkiLz48cGF0aCBkPSJNMTUgOXYzaDRsLTcgNy03LTdoNFY5eiIvPjwvc3ZnPg=="
+      />
     </button>
   </div>
 
@@ -256,17 +261,18 @@
     </div>
   {/if}
 
-
   <!-- Content -->
   <div
-    class="overflow-y-scroll flex justify-center"
+    class="flex justify-center overflow-y-scroll"
     bind:this={contentScrollDiv}
     on:scroll={updateBottomCheck}
   >
-    <div class="max-w-prose w-full h-fit overflow-x-scroll">
+    <div class="h-fit w-full max-w-prose">
       {#each messages as message (message.id)}
         <ChatBubble
-          content={message.isSelf ? message.content : formatMessageForMarkdown(message.content)}
+          content={message.isSelf
+            ? message.content
+            : formatMessageForMarkdown(message.content)}
           isSelf={message.isSelf}
           enableMarkdown={!message.isSelf}
         />
@@ -298,7 +304,9 @@
       {#if lastMessageErrored}
         <div class="flex items-center gap-2">
           <span>Ett fel uppstod ⚠️️</span>
-          <button class="btn btn-link active:opacity-60" on:click={retryLastMessage}>Försök igen</button>
+          <button class="btn btn-link active:opacity-60" on:click={retryLastMessage}
+            >Försök igen</button
+          >
         </div>
       {/if}
 
@@ -307,9 +315,12 @@
   </div>
 
   <!-- Bottom controls -->
-  <div class="p-3 z-10">
+  <div class="z-10 p-3">
     <form class="h-full w-full" on:submit={scrollContentToBottom}>
-      <fieldset disabled={(!selectedAssistantId || !!lastMessageErrored) && !initialState} class="h-full">
+      <fieldset
+        disabled={(!selectedAssistantId || !!lastMessageErrored) && !initialState}
+        class="h-full"
+      >
         <div class="flex h-full w-full items-end gap-2">
           <textarea
             name="message"
@@ -317,11 +328,7 @@
             on:keydown={handleTextareaKeypress}
             class="textarea textarea-bordered h-full grow"
           />
-          <Button
-            on:click={formButtonClick}
-            label=""
-            iconSrc={formButtonIcon}
-          />
+          <Button on:click={formButtonClick} label="" iconSrc={formButtonIcon} />
         </div>
       </fieldset>
     </form>
