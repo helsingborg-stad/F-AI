@@ -4,6 +4,7 @@
   import SvelteMarkdown from 'svelte-markdown'
   import SVG from '$lib/components/SVG.svelte'
   import { findLastIndex } from '../../util/array'
+  import type { Action } from 'svelte/action'
 
   interface IncomingMessage {
     timestamp: string
@@ -34,6 +35,7 @@
 
   export let assistants: Assistant[] = []
   export let initialState: InitialState | undefined
+  export let maxInputLength: number | null = null
 
   let selectedAssistantId: string
   let selectedAssistant: Assistant | null = null
@@ -72,6 +74,8 @@
     isContentAtBottom &&
     scrollContentToBottom()
   $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
+  $: invalidInputLength =
+    (maxInputLength ?? 0) > 0 && currentMessageInput.length > (maxInputLength ?? 0)
 
   const scrollToBottom = (node: Element) => {
     node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
@@ -187,7 +191,7 @@
   function handleTextareaKeypress(event: KeyboardEvent) {
     if (event.key == 'Enter' && !event.shiftKey) {
       event.preventDefault()
-      createSSE(currentMessageInput)
+      if (!invalidInputLength) createSSE(currentMessageInput)
     }
   }
 
@@ -280,7 +284,6 @@
         <div class="prose text-center">
           {#if selectedAssistant}
             <SvelteMarkdown source={selectedAssistant.description} />
-
             <div class="flex gap-2 max-w-full flex-wrap justify-center">
               {#each selectedAssistant.sampleQuestions as question}
                 <button
@@ -322,13 +325,30 @@
         class="h-full"
       >
         <div class="flex h-full w-full items-end gap-2">
-          <textarea
-            name="message"
-            bind:value={currentMessageInput}
-            on:keydown={handleTextareaKeypress}
-            class="textarea textarea-bordered h-full grow"
+          <div class="flex h-full w-full grow flex-col gap-1.5">
+            <span
+              class:hidden={(maxInputLength ?? 0) <= 0}
+              class="block text-right text-xs"
+              ><span
+                class:text-error={invalidInputLength}
+                class:text-medium={invalidInputLength}>{currentMessageInput.length}</span
+              >
+              / {maxInputLength}</span
+            >
+            <textarea
+              name="message"
+              bind:value={currentMessageInput}
+              on:keydown={handleTextareaKeypress}
+              class="textarea textarea-bordered h-full grow"
+              class:textarea-error={invalidInputLength}
+            />
+          </div>
+          <Button
+            disabled={invalidInputLength}
+            on:click={formButtonClick}
+            label=""
+            iconSrc={formButtonIcon}
           />
-          <Button on:click={formButtonClick} label="" iconSrc={formButtonIcon} />
         </div>
       </fieldset>
     </form>
