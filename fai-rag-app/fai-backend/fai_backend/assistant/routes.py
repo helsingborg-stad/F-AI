@@ -151,7 +151,12 @@ def assistants(
                     key='temperature',
                     label=_('Temperature'),
                 ),
-            ]
+                DataColumn(key='delete_label',
+                           display=DisplayAs.link,
+                           on_click=e.GoToEvent(url='/assistants/delete/{id}'),
+                           label=_('actions', 'Actions'))
+            ],
+            include_view_action=False
         )],
         _('assistants', 'Assistants'),
     )
@@ -212,6 +217,16 @@ def edit_assistant(
     ) if template else [
         c.FireEvent(event=e.GoToEvent(url='/assistants'))
     ]
+
+
+# TODO: fix delete assistants hack
+@router.get('/assistants/delete/{assistant_id}', response_model=list, response_model_exclude_none=True)
+async def delete_assistant(assistant_id: str,
+                           project_user: ProjectUser = Depends(get_project_user),
+                           template_service: AssistantTemplateStore = Depends(get_template_service)) -> list:
+    print(f'Delete assistant: {assistant_id}')
+    await template_service.delete_assistant_template(project_user.project_id, assistant_id)
+    return [c.FireEvent(event=e.GoToEvent(url='/assistants'))]
 
 
 @router.post('/rest/assistants/create', response_model=TemplatePayload | None, response_model_exclude_none=True)
