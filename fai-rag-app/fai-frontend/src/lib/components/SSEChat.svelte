@@ -37,6 +37,26 @@
   export let initialState: InitialState | undefined
   export let maxInputLength: number | null = null
 
+  export let termOfService: string = `
+---
+
+### Terms of Service for Folkets AI
+Welcome to our AI chat service. By using this service, you agree to the following terms:
+
+**1. Avoid Sharing Personal Information**
+* **Do not enter personal or sensitive data into the chat.** This includes, but is not limited to, social security numbers, addresses, financial information, or any other confidential details.
+
+**2. Data Handling and Third Parties**
+* Information entered into the chat may be stored and processed by third-party services.
+* The chat uses various logging tools to improve the service and user experience.
+
+**3. Limitation of Liability**
+ * The service is provided "as is".
+
+---
+By continuing to use Folkets AI, you confirm that you have read, understood, and agree to these terms of service.
+    `
+
   let selectedAssistantId: string
   let selectedAssistant: Assistant | null = null
   let activeConversationId: string | null = null
@@ -281,7 +301,7 @@
           enableMarkdown={!message.isSelf}
         />
       {:else}
-        <div class="prose text-center">
+        <div class="prose">
           {#if selectedAssistant}
             <SvelteMarkdown source={selectedAssistant.description} />
             <div class="flex gap-2 max-w-full flex-wrap justify-center">
@@ -300,6 +320,9 @@
               you.
             </p>
             <p>Choose an assistant from the dropdown to begin.</p>
+            {#if termOfService}
+              <SvelteMarkdown source={termOfService} />
+            {/if}
           {/if}
         </div>
       {/each}
