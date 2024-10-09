@@ -1,27 +1,29 @@
 from typing import Union, Optional, Mapping, Set
-import numpy as np
-from chromadb import ClientAPI
-import chromadb.utils.embedding_functions as embedding_functions
 
-from fai_backend.config import settings
+import numpy as np
+from chromadb import ClientAPI, EmbeddingFunction
+
 from fai_backend.vector.interface import IVector, OneOrMany, Embedding
 from fai_backend.vector.types import Document, Where
 
 
 class BaseChromaDB(IVector):
-    embedding_functions = embedding_functions.OpenAIEmbeddingFunction(
-        api_key=settings.OPENAI_API_KEY.get_secret_value(),
-        model_name="text-embedding-3-small"
-    )
-
-    def __init__(self, client: ClientAPI):
+    def __init__(self, client: ClientAPI, default_embedding_function: EmbeddingFunction):
         self.client = client
+        self.default_embedding_function = default_embedding_function
+        self.embedding_functions = {}
 
+    def register_embedding_function(self, collection_name: str, embedding_function: EmbeddingFunction):
+        self.embedding_functions[collection_name] = embedding_function
+
+    def _get_embedding_function(self, collection_name: str) -> EmbeddingFunction:
+        return self.embedding_functions.get(collection_name, self.default_embedding_function)
 
     def _get_collection(self, collection_name: str):
+        embedding_function = self._get_embedding_function(collection_name)
         return self.client.get_collection(
             name=collection_name,
-            embedding_function=self.embedding_functions
+            embedding_function=embedding_function
         )
 
     async def add(
@@ -100,7 +102,8 @@ class BaseChromaDB(IVector):
         return self.client.reset()
 
     async def create_collection(self, collection_name: str):
-        return self.client.create_collection(name=collection_name, embedding_function=self.embedding_functions)
+        embedding_function = self._get_embedding_function(collection_name)
+        return self.client.create_collection(name=collection_name, embedding_function=embedding_function)
 
     async def delete_collection(self, collection_name: str):
         return self.client.delete_collection(name=collection_name)
