@@ -124,7 +124,7 @@
   export let className: string | null = ''
   export { className as class }
   export let action: string | null
-  export let method: 'post' | 'get' | null
+  export let method: 'post' | 'get' | 'patch' | null
   export let submit_text: string | null = null
   export let id: string = action || 'form' + method || 'post'
   const attributes = writable({})

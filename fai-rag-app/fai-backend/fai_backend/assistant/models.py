@@ -12,7 +12,7 @@ class LLMClientChatMessage(BaseModel):
 
 class AssistantStreamMessage(BaseModel):
     timestamp: str = ""
-    role: Literal["system", "user", "assistant", "function"]
+    role: str
     content: str
     should_format: bool = False
 
@@ -52,17 +52,9 @@ class AssistantContext(BaseModel):
     rag_output: Optional[str] = None
 
 
-class ClientChatState(BaseModel):
-    user: str
-    chat_id: str
-    timestamp: str
-    title: str
-    delete_label: str = "Delete" # TODO: fix hack for allowing something to show up in list to click on.
-    history: list[LLMClientChatMessage]
-
-
 class AssistantChatHistoryModel(Document):
     user: str
+    title: str = ''
     assistant: AssistantTemplate
     history: list[AssistantStreamMessage] = []
 
