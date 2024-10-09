@@ -17,7 +17,7 @@ async def chat_history_edit_view(view,
                         c.InputField(
                             name='title',
                             title=_('input_title_label', 'Edit title'),
-                            placeholder=_('input_title_placeholder', f'Enter new title here'),
+                            placeholder=_('input_title_placeholder', 'Enter new title here'),
                             required=True,
                             html_type='text',
                         ),
@@ -31,5 +31,5 @@ async def chat_history_edit_view(view,
                 )
             ], class_name='card-body'),
         ], class_name='card')],
-        _('edit_chat_history_title', 'Chat history - Edit') + f' ({chat_history.title})',
+        _('edit_chat_history_title', f'Chat history - Edit ({chat_history.title})'),
     )
