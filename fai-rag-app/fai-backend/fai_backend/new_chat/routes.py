@@ -84,7 +84,7 @@ async def chat_view(chat_id: str,
         return [c.FireEvent(event=e.GoToEvent(url='/logout'))]
 
     return view([c.SSEChat(chat_initial_state=chat_history)],
-                _('chat_history', 'Chat history'))
+                _('chat_history', f'Chat history ({chat_history.title})'))
 
 
 @router.get('/chat/delete/{chat_id}', response_model=list, response_model_exclude_none=True)
