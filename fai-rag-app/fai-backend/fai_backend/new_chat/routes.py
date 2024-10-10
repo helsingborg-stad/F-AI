@@ -5,13 +5,11 @@ from fastapi import APIRouter, Depends
 from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
-from fai_backend.framework.display import DisplayAs
-from fai_backend.framework.table import DataColumn
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.new_chat.dependencies import get_chat_state_service
 from fai_backend.new_chat.service import ChatStateService
 from fai_backend.new_chat.models import ChatHistoryEditPayload
-from fai_backend.new_chat.views import chat_history_edit_view
+from fai_backend.new_chat.views import chat_history_edit_view, chat_history_list_view
 from fai_backend.phrase import phrase as _
 from fai_backend.projects.dependencies import list_projects_request
 from fai_backend.projects.schema import ProjectResponse
@@ -51,26 +49,7 @@ async def chat_history_view(view=Depends(get_page_template_for_logged_in_users),
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
     states = await chat_state_service.get_states(user=user.email)
-    return view(
-        [c.DataTable(data=states,
-                     columns=[DataColumn(key='title',
-                                         id='title',
-                                         display=DisplayAs.link,
-                                         on_click=e.GoToEvent(url='/chat/{chat_id}'),
-                                         sortable=True,
-                                         label=_('title', 'Title')),
-                              DataColumn(key='delete_label',
-                                         display=DisplayAs.link,
-                                         on_click=e.GoToEvent(url='/chat/delete/{chat_id}'),
-                                         label=_('actions', 'Action')),
-                              DataColumn(key='edit_label',
-                                         display=DisplayAs.link,
-                                         on_click=e.GoToEvent(url='/chat/edit/{chat_id}'),
-                                         label=_('actions', 'Action'))],
-                     include_view_action=False)],
-        _('chat_history', 'Chat history')
-    )
-
+    return await chat_history_list_view(view, states)
 
 @router.get('/chat/{chat_id}', response_model=list, response_model_exclude_none=True)
 async def chat_view(chat_id: str,
@@ -108,11 +87,11 @@ async def chat_edit(chat_id: str,
                     view: Callable[[list[Any], str | None], list[Any]] = Depends(
                         get_page_template_for_logged_in_users)) -> list:
 
-    chat_history = await chat_state_service.get_state(chat_id)
-    if chat_history is None or chat_history.user != project_user.email:
+    state = await chat_state_service.get_state(chat_id)
+    if state is None or state.user != project_user.email:
         return [c.FireEvent(event=e.GoToEvent(url='/logout'))]
 
-    return await chat_history_edit_view(view, chat_history, '/api/chat/edit')
+    return await chat_history_edit_view(view, state, '/api/chat/edit')
 
 
 @router.patch('/chat/edit', response_model=list, response_model_exclude_none=True)
