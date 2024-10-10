@@ -15,6 +15,8 @@ class Settings(BaseSettings, extra=Extra.ignore):
     APP_DB: Literal['memory', 'mongodb'] = 'mongodb'
     APP_VECTOR_DB: Literal['memory', 'chromadb'] = 'chromadb'
     APP_VECTOR_DB_PATH: str = 'vector_db'
+    APP_VECTOR_DB_EMBEDDING_MODEL: Literal[
+        'default', 'text-embedding-3-small', 'text-embedding-3-large'] = 'default'
     APP_MESSAGE_BROKER: Literal['memory', 'redis_queue'] = 'redis_queue'
     SECRET_KEY: SecretStr
     BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
@@ -43,6 +45,7 @@ class Settings(BaseSettings, extra=Extra.ignore):
     FEEDBACK_GITHUB_REPO_OWNER: str = ''
     FEEDBACK_GITHUB_REPO_NAME: str = ''
     CHAT_MAX_INPUT_LENGTH: int | None = 2500
+    OPENAI_API_KEY: SecretStr = ''
 
     class Config:
         env_file = '.env'

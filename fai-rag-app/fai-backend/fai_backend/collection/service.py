@@ -14,11 +14,14 @@ class CollectionService:
             collection_id: str,
             label: str,
             description: str = '',
+            embedding_model: str | None = None,
+
     ):
         collection_metadata = CollectionMetadataModel(
             collection_id=collection_id,
             label=label,
             description=description,
+            embedding_model=embedding_model,
         )
 
         return await self.repo.create(collection_metadata)
