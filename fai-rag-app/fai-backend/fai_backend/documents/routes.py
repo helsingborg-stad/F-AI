@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, UploadFile, Form
+from fastapi import APIRouter, Depends, Form, UploadFile
 
-from fai_backend.config import settings
 from fai_backend.collection.dependencies import get_collection_service
 from fai_backend.collection.service import CollectionService
+from fai_backend.config import settings
 from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
 from fai_backend.files.dependecies import get_file_upload_service
 from fai_backend.files.service import FileUploadService
@@ -10,7 +10,7 @@ from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
-from fai_backend.projects.dependencies import list_projects_request, update_project_request, get_project_service
+from fai_backend.projects.dependencies import get_project_service, list_projects_request, update_project_request
 from fai_backend.projects.schema import ProjectResponse, ProjectUpdateRequest
 from fai_backend.projects.service import ProjectService
 from fai_backend.schema import ProjectUser
