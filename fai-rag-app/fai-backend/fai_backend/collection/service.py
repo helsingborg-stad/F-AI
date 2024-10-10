@@ -26,7 +26,7 @@ class CollectionService:
 
         return await self.repo.create(collection_metadata)
 
-    async def get_collection_metadata(self, collection_id: str):
+    async def get_collection_metadata(self, collection_id: str) -> list[CollectionMetadataModel]:
         query = AttributeAssignment('collection_id', collection_id)
 
         return await self.repo.list(query)
