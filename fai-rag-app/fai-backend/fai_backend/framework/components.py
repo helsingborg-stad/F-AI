@@ -33,7 +33,7 @@ __all__ = (
     'AnyUI',
 )
 
-from fai_backend.assistant.models import ClientChatState
+from fai_backend.new_chat.models import ClientChatState
 from fai_backend.config import settings
 from fai_backend.framework import events as e
 from fai_backend.framework.table import DataTable
@@ -98,7 +98,7 @@ class Button(UIComponent):
 class Form(UIComponent):
     type: Literal['Form'] = 'Form'
     submit_url: str = Field(None, serialization_alias='action')
-    method: Literal['POST', 'GET'] = 'POST'
+    method: Literal['POST', 'GET', 'PATCH'] = 'POST'
     submit_text: str | None = None
     submit_as: Literal['json', 'form'] | None = Field('json', serialization_alias='submitAs')
 
