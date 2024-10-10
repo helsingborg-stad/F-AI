@@ -137,7 +137,8 @@ async def upload_and_vectorize_handler(
     await collection_service.create_collection_metadata(
         collection_id=upload_directory_name or '',
         label=collection_label or '',
-        description=''
+        description='',
+        embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
     )
 
     # Fix/workaround for updating assistant file collection id until assistant editor ui is done
