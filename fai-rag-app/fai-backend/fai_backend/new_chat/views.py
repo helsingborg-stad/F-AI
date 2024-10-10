@@ -1,8 +1,8 @@
+from fai_backend.framework import components as c
+from fai_backend.framework import events as e
 from fai_backend.framework.display import DisplayAs
 from fai_backend.framework.table import DataColumn
 from fai_backend.new_chat.models import ClientChatState
-from fai_backend.framework import components as c
-from fai_backend.framework import events as e
 from fai_backend.phrase import phrase as _
 
 
@@ -48,7 +48,7 @@ async def chat_history_list_view(view, states: list[ClientChatState]) -> list:
                                          on_click=e.GoToEvent(url='/chat/{chat_id}'),
                                          sortable=True,
                                          label=_('title', 'Title')),
-                              DataColumn(key='edit_label',
+                              DataColumn(key='rename_label',
                                          display=DisplayAs.link,
                                          on_click=e.GoToEvent(url='/chat/edit/{chat_id}'),
                                          label=_('actions', 'Action')),
