@@ -39,3 +39,8 @@ class CollectionService:
             label = collection_metadata[0].label
 
         return label
+
+    async def list_collection_ids(self) -> list[str]:
+        collections = await self.repo.list()
+        collections.reverse()
+        return [c.collection_id for c in collections]
