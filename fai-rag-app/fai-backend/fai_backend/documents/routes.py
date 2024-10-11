@@ -10,8 +10,8 @@ from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
-from fai_backend.projects.dependencies import get_project_service, list_projects_request, update_project_request
-from fai_backend.projects.schema import ProjectResponse, ProjectUpdateRequest
+from fai_backend.projects.dependencies import get_project_service, list_projects_request
+from fai_backend.projects.schema import ProjectResponse
 from fai_backend.projects.service import ProjectService
 from fai_backend.schema import ProjectUser
 from fai_backend.vector.dependencies import get_vector_service
@@ -142,16 +142,6 @@ async def upload_and_vectorize_handler(
         description='',
         embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
     )
-
-    # Fix/workaround for updating assistant file collection id until assistant editor ui is done
-    for project in projects:
-        for assistant in project.assistants:
-            if assistant.files_collection_id is not None:
-                assistant.files_collection_id = upload_directory_name
-                await update_project_request(
-                    body=ProjectUpdateRequest(**project.model_dump()),
-                    existing_project=project,
-                    project_service=project_service)
 
     return view(
         c.FireEvent(event=e.GoToEvent(url='/documents')),
