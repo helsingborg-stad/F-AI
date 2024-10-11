@@ -126,12 +126,14 @@ async def upload_and_vectorize_handler(
     upload_path = file_service.save_files(project_user.project_id, files)
 
     upload_directory_name = upload_path.split('/')[-1]
-    await vector_service.create_collection(collection_name=upload_directory_name)
+    await vector_service.create_collection(collection_name=upload_directory_name,
+                                           embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL)
 
     parsed_files = file_service.parse_files(upload_path)
     await vector_service.add_documents_without_id_to_empty_collection(
         collection_name=upload_directory_name,
-        documents=parsed_files
+        documents=parsed_files,
+        embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL
     )
 
     await collection_service.create_collection_metadata(
