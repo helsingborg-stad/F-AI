@@ -89,7 +89,7 @@ CHAT_PROMPT_TEMPLATE_ARGS = {
         "results": ' | '.join([doc for doc, _ in list(input)[0]['results']])
     },
     "settings": {
-        "model": os.environ.get("CHAT_MODEL", "gpt-4o"),
+        "model": os.environ.get("CHAT_MODEL", "gpt-4"),
         "temperature": 0
     },
 }
