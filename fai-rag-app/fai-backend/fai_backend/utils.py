@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TypeVar
 
 T = TypeVar('T')
@@ -20,6 +20,10 @@ def try_get_first_match(objects: list[T], condition: Callable[[T], bool]) -> T |
         if condition(obj):
             return obj
     return None
+
+
+def get_iso_timestamp_now_utc() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 def format_datetime_human_readable(

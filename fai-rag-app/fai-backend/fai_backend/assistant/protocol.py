@@ -21,7 +21,7 @@ class IAssistantLLMProvider(Protocol):
             messages: list[AssistantStreamMessage | AssistantStreamInsert],
             context_store: IAssistantContextStore,
             get_insert: Callable[[str], IAssistantMessageInsert],
-    ) -> Stream[Any, Any]:
+    ) -> Stream[list[str], str]:
         ...
 
 

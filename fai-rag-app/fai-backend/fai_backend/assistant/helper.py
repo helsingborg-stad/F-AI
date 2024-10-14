@@ -14,9 +14,7 @@ def messages_expander_stream(
     async def _expand_message(message: AssistantStreamMessage | AssistantStreamInsert) -> list[AssistantStreamMessage]:
         if isinstance(message, AssistantStreamMessage):
             return [AssistantStreamMessage(
-                timestamp=message.timestamp,
-                role=message.role,
-                content=message.content,
+                **message.model_dump(exclude={'should_format'}),  # TODO: eww
                 should_format=True
             )]
         return await get_insert(message.insert).get_messages(context_store)
@@ -25,7 +23,7 @@ def messages_expander_stream(
         lists = [await _expand_message(m) for m in messages]
         yield [m for sublist in lists for m in sublist]
 
-    return Stream[Any, [Any, list[AssistantStreamMessage]]]('expander', _parse_messages)
+    return Stream('expander', _parse_messages)
 
 
 def get_message_content(message: AssistantStreamMessage, context: AssistantContext):

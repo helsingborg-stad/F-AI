@@ -1,14 +1,12 @@
 import asyncio
 import logging
-from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sse_starlette import ServerSentEvent, EventSourceResponse
 
 from fai_backend.assistant.assistant import Assistant
-from fai_backend.assistant.models import LLMClientChatMessage, \
-    AssistantStreamMessage, AssistantChatHistoryModel, StoredQuestionModel
+from fai_backend.assistant.models import LLMClientChatMessage, AssistantChatHistoryModel, StoredQuestionModel
 from fai_backend.assistant.service import AssistantFactory
 from fai_backend.dependencies import get_authenticated_user
 from fai_backend.projects.dependencies import list_projects_request
@@ -16,6 +14,7 @@ from fai_backend.projects.schema import ProjectResponse
 from fai_backend.repositories import chat_history_repo, stored_questions_repo
 from fai_backend.schema import User
 from fai_backend.serializer.impl.base64 import Base64Serializer
+from fai_backend.utils import get_iso_timestamp_now_utc
 
 sse_router = APIRouter(
     prefix='/api/sse',
@@ -27,17 +26,14 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
     serializer = Base64Serializer()
     stream = await assistant.create_stream(conversation_id)
 
+    # TODO: Rollback to original history on errors
     async def generator(conversation_id_to_send):
         yield ServerSentEvent(
             event='conversation_id',
             data=conversation_id_to_send,
         )
 
-        start_timestamp = datetime.utcnow().isoformat()
-
         try:
-            history = await chat_history_repo.get(conversation_id_to_send)
-
             final_output = ''
             async for output in stream(question):
                 if output.final:
@@ -45,7 +41,7 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
                     yield ServerSentEvent(
                         event='message',
                         data=serializer.serialize(LLMClientChatMessage(
-                            timestamp=datetime.utcnow().isoformat(),
+                            timestamp=get_iso_timestamp_now_utc(),
                             source='Chat AI',
                             content=output.data
                         )),
@@ -54,20 +50,6 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
             if final_output == '':
                 # Empty LLM response is always an error?
                 raise Exception('LLM output is empty')
-
-            history.history += [
-                AssistantStreamMessage(
-                    timestamp=start_timestamp,
-                    role='user',
-                    content=question
-                ),
-                AssistantStreamMessage(
-                    timestamp=datetime.utcnow().isoformat(),
-                    role='assistant',
-                    content=final_output
-                )
-            ]
-            await chat_history_repo.update(conversation_id_to_send, history.model_dump(exclude='id'))
 
         except asyncio.CancelledError as e:
             logging.info(f'client disconnected: {str(e)}')
@@ -85,7 +67,7 @@ async def event_source_llm_generator(question: str, assistant: Assistant, conver
             yield ServerSentEvent(
                 event='message_end',
                 data=serializer.serialize(LLMClientChatMessage(
-                    timestamp=datetime.utcnow().isoformat(),
+                    timestamp=get_iso_timestamp_now_utc(),
                 ))
             )
 

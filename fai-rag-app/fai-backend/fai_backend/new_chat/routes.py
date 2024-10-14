@@ -74,6 +74,8 @@ async def chat_view(chat_id: str,
     if chat_history is None or chat_history.user != project_user.email:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
+    chat_history.history = [h for h in chat_history.history if h.source == 'user' or h.source == 'assistant']
+
     return view([c.SSEChat(chat_initial_state=chat_history)],
                 _('chat_history', 'Chat history'))
 

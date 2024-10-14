@@ -1,0 +1,57 @@
+{
+  "id": "example-function",
+  "meta": {
+    "name": "Function Example",
+    "description": "Example of running a function (technical).",
+    "sample_questions": [
+      "Where is my package?",
+      "Where is my package? My order id is abc123",
+      "When will my order be delivered?"
+    ]
+  },
+  "files_collection_id": null,
+  "streams": [
+    {
+      "provider": "openai",
+      "settings": {
+        "model": "gpt-4o",
+        "temperature": 0,
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "get_delivery_date",
+              "description": "Get the delivery date for a customer's order. Call this whenever you need to know the delivery date, for example when a customer asks 'Where is my package'",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string",
+                    "description": "The customer's order ID."
+                  }
+                },
+                "required": [
+                  "order_id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a helpful customer support assistant. Use the supplied tools to assist the user."
+        },
+        {
+          "insert": "history"
+        },
+        {
+          "role": "user",
+          "content": "{query}"
+        }
+      ]
+    }
+  ]
+}
