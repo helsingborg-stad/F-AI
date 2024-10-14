@@ -4,6 +4,7 @@ from typing import Optional, Union
 import numpy as np
 from chromadb import ClientAPI, EmbeddingFunction
 
+from fai_backend.vector.embedding import EmbeddingFnFactory
 from fai_backend.vector.interface import Embedding, IVector, OneOrMany
 from fai_backend.vector.types import Document, Where
 
@@ -15,7 +16,7 @@ class BaseChromaDB(IVector):
     def _get_collection(self, collection_name: str, embedding_function: EmbeddingFunction | None = None):
         return self.client.get_collection(
             name=collection_name,
-            embedding_function=embedding_function
+            embedding_function=embedding_function or EmbeddingFnFactory.create('default')
         )
 
     async def add(
@@ -81,8 +82,12 @@ class BaseChromaDB(IVector):
             self,
             collection_name: str,
             ids: Optional[OneOrMany[str]] = None,
+            embedding_function: Callable[[str], np.ndarray] | None = None,
     ):
-        collection = self._get_collection(collection_name)
+        collection = self._get_collection(
+            collection_name,
+            embedding_function
+        )
 
         return collection.get(
             ids=ids,
@@ -97,7 +102,10 @@ class BaseChromaDB(IVector):
 
     async def create_collection(self, collection_name: str,
                                 embedding_function: Callable[[str], np.ndarray] | None = None):
-        return self.client.create_collection(name=collection_name, embedding_function=embedding_function)
+        return self.client.create_collection(
+            name=collection_name,
+            embedding_function=embedding_function or EmbeddingFnFactory.create('default')
+        )
 
     async def delete_collection(self, collection_name: str):
         return self.client.delete_collection(name=collection_name)
