@@ -7,7 +7,6 @@ from mongomock_motor import AsyncMongoMockClient
 
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.collection.service import CollectionService
-from fai_backend.repositories import collection_metadata_repo
 from fai_backend.repository.mongodb import MongoDBRepo
 from fai_backend.vector.memory import InMemoryChromaDB
 from fai_backend.vector.service import VectorService
@@ -23,7 +22,7 @@ async def collection_meta_repo():
 
 @pytest_asyncio.fixture
 async def collection_meta_service(collection_meta_repo):
-    yield CollectionService(collection_metadata_repo)
+    yield CollectionService(collection_meta_repo)
 
 
 @pytest_asyncio.fixture
