@@ -16,30 +16,6 @@ class PromptTemplate:
     settings: dict[str, Any]
 
 
-chatPromptTemplate = PromptTemplate(
-    name="ChatStream",
-    messages=[
-        SystemChatPrompt(
-            "You are a helpful AI assistant that helps people with answering questions."
-            "<br> If you can't find the answer in the search result below, just say (in Swedish) "
-            "\"Tyvärr kan jag inte svara på det.\" Don't try to make up an answer.<br> If the "
-            "question is not related to the context, politely respond that you are tuned to only "
-            "answer questions that are related to the context.<br> The questions are going to be "
-            "asked in Swedish. Your response must always be in Swedish."
-        ),
-        UserChatPrompt("{query}"),
-        UserChatPrompt("Here are the results of the search:\n\n {results}"),
-    ],
-    input_map_fn=lambda vector_results: {
-        "query": list(vector_results)[0]['query'],
-        "results": ' | '.join([doc for doc, _ in list(vector_results)[0]['results']])
-    },
-    settings={
-        "model": os.environ.get("CHAT_MODEL", "gpt-4o"),
-        "temperature": 0
-    }
-)
-
 scoringPromptTemplate = PromptTemplate(
     name="ScoringStream",
     messages=[
@@ -89,7 +65,7 @@ CHAT_PROMPT_TEMPLATE_ARGS = {
         "results": ' | '.join([doc for doc, _ in list(input)[0]['results']])
     },
     "settings": {
-        "model": os.environ.get("CHAT_MODEL", "gpt-4o"),
+        "model": os.environ.get("CHAT_MODEL", "gpt-4"),
         "temperature": 0
     },
 }
