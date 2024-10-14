@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, UploadFile, Form
+from fastapi import APIRouter, Depends, Form, UploadFile
 
-from fai_backend.config import settings
 from fai_backend.collection.dependencies import get_collection_service
 from fai_backend.collection.service import CollectionService
+from fai_backend.config import settings
 from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
 from fai_backend.files.dependecies import get_file_upload_service
 from fai_backend.files.service import FileUploadService
@@ -10,8 +10,8 @@ from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
-from fai_backend.projects.dependencies import list_projects_request, update_project_request, get_project_service
-from fai_backend.projects.schema import ProjectResponse, ProjectUpdateRequest
+from fai_backend.projects.dependencies import get_project_service, list_projects_request
+from fai_backend.projects.schema import ProjectResponse
 from fai_backend.projects.service import ProjectService
 from fai_backend.schema import ProjectUser
 from fai_backend.vector.dependencies import get_vector_service
@@ -126,29 +126,22 @@ async def upload_and_vectorize_handler(
     upload_path = file_service.save_files(project_user.project_id, files)
 
     upload_directory_name = upload_path.split('/')[-1]
-    await vector_service.create_collection(collection_name=upload_directory_name)
+    await vector_service.create_collection(collection_name=upload_directory_name,
+                                           embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL)
 
     parsed_files = file_service.parse_files(upload_path)
     await vector_service.add_documents_without_id_to_empty_collection(
         collection_name=upload_directory_name,
-        documents=parsed_files
+        documents=parsed_files,
+        embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL
     )
 
     await collection_service.create_collection_metadata(
         collection_id=upload_directory_name or '',
         label=collection_label or '',
-        description=''
+        description='',
+        embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
     )
-
-    # Fix/workaround for updating assistant file collection id until assistant editor ui is done
-    for project in projects:
-        for assistant in project.assistants:
-            if assistant.files_collection_id is not None:
-                assistant.files_collection_id = upload_directory_name
-                await update_project_request(
-                    body=ProjectUpdateRequest(**project.model_dump()),
-                    existing_project=project,
-                    project_service=project_service)
 
     return view(
         c.FireEvent(event=e.GoToEvent(url='/documents')),

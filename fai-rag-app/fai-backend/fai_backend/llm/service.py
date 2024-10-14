@@ -5,6 +5,7 @@ from langstream.contrib import OpenAIChatStream, OpenAIChatMessage, OpenAIChatDe
 
 from fai_backend.chat.stream import create_chat_stream_from_prompt
 from fai_backend.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
+from fai_backend.collection.dependencies import get_collection_service
 from fai_backend.vector.factory import vector_db
 from fai_backend.vector.service import VectorService
 
@@ -52,7 +53,7 @@ async def ask_llm_question(question: str):
 
 
 async def create_rag_stream(query: str, vector_collection_name: str) -> Stream[str, str]:
-    vector_service = VectorService(vector_db=vector_db)
+    vector_service = VectorService(vector_db=vector_db, collection_meta_service=get_collection_service())
     scoring_stream, _ = create_chat_stream_from_prompt(SCORING_PROMPT_TEMPLATE_ARGS)
 
     vector_db_query_result = await query_vector(

@@ -1,8 +1,9 @@
-from typing import Optional, Mapping, Union, Protocol, TypeVar
+from collections.abc import Callable, Mapping
+from typing import Optional, Protocol, TypeVar, Union
 
 import numpy as np
 
-from fai_backend.vector.types import OneOrMany, Embedding, Document, Where
+from fai_backend.vector.types import Document, Embedding, OneOrMany, Where
 
 T = TypeVar('T')
 
@@ -15,13 +16,14 @@ class IVector(Protocol[T]):
         raise NotImplementedError('reset not implemented')
 
     async def add(
-        self,
-        collection_name: str,
-        ids: OneOrMany[str],
-        embeddings: Optional[OneOrMany[Embedding]] = None,
-        metadatas: Optional[OneOrMany[Mapping[str, Union[str, int, float, bool]]]] = None,
-        documents: Optional[OneOrMany[str]] = None,
-        uris: Optional[OneOrMany[str]] = None,
+            self,
+            collection_name: str,
+            ids: OneOrMany[str],
+            embeddings: Optional[OneOrMany[Embedding]] = None,
+            metadatas: Optional[OneOrMany[Mapping[str, Union[str, int, float, bool]]]] = None,
+            documents: Optional[OneOrMany[str]] = None,
+            uris: Optional[OneOrMany[str]] = None,
+            embedding_function: Callable[[str], np.ndarray] | None = None,
     ) -> None:
         raise NotImplementedError('add not implemented')
 
@@ -37,6 +39,7 @@ class IVector(Protocol[T]):
             query_texts: Optional[OneOrMany[Document]] = None,
             n_results: int = 10,
             where: Optional[Where] = None,
+            embedding_function: Callable[[str], np.ndarray] | None = None,
     ) -> T:
         raise NotImplementedError('query not implemented')
 
@@ -49,7 +52,7 @@ class IVector(Protocol[T]):
     async def get_or_create_collection(self, collection_name: str) -> T:
         raise NotImplementedError('get_or_create_collection not implemented')
 
-    async def create_collection(self, name: str) -> T:
+    async def create_collection(self, name: str, embedding_function: Callable[[str], np.ndarray] | None = None) -> T:
         raise NotImplementedError('create_collection not implemented')
 
     async def delete_collection(self, name: str) -> T:

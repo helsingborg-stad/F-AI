@@ -11,13 +11,13 @@ from fai_backend.assistant.models import (
 )
 from fai_backend.assistant.schema import TemplatePayload
 from fai_backend.assistant.service import AssistantFactory, AssistantTemplateStore, TemplatePayloadAdapter
+from fai_backend.collection.dependencies import get_collection_service
+from fai_backend.collection.service import CollectionService
 from fai_backend.dependencies import (
     get_authenticated_user,
     get_page_template_for_logged_in_users,
     get_project_user,
 )
-from fai_backend.files.dependecies import get_file_upload_service
-from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.framework.display import DisplayAs
@@ -165,19 +165,12 @@ def assistants(
 @router.get('/assistants/create', response_model=list, response_model_exclude_none=True)
 async def create_assistant_view(
         view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
-        file_service: FileUploadService = Depends(get_file_upload_service),
-        project_user: ProjectUser = Depends(get_project_user),
+        collection_meta_service: CollectionService = Depends(get_collection_service),
 ) -> list:
-    files = file_service.list_files(project_user.project_id)
-    most_recent_collection = max(files, key=lambda file: file.upload_date).collection if files else []
-    most_recent_upload_files = [file for file in files if file.collection == most_recent_collection]
-
     return view(
-        AssistantForm('/api/assistants/create', None, [
-            file.collection for file in most_recent_upload_files
-        ]),
+        AssistantForm('/api/assistants/create', None,
+                      await collection_meta_service.list_collection_ids()),
         _('Create assistant'),
-
     )
 
 
@@ -195,23 +188,16 @@ async def load_assistant_by_id(
 
 
 @router.get('/assistants/{assistant_id}', response_model=list, response_model_exclude_none=True)
-def edit_assistant(
+async def edit_assistant(
         assistant_id: str,
         template: TemplatePayload | None = Depends(load_assistant_by_id),
         view: Callable[[list[Any], str | None], list[Any]] = Depends(get_page_template_for_logged_in_users),
-        file_service: FileUploadService = Depends(get_file_upload_service),
-        project_user: ProjectUser = Depends(get_project_user),
+        collection_meta_service: CollectionService = Depends(get_collection_service),
 ) -> list:
-    files = file_service.list_files(project_user.project_id)
-    most_recent_collection = max(files, key=lambda file: file.upload_date).collection if files else []
-    most_recent_upload_files = [file for file in files if file.collection == most_recent_collection]
-
     return view(
         [c.Div(components=AssistantForm(
             f'/api/assistants/{assistant_id}', template,
-            [
-                file.collection for file in most_recent_upload_files
-            ])),
+            await collection_meta_service.list_collection_ids())),
         ],
         _('Edit assistant') + f' ({template.id})'
     ) if template else [

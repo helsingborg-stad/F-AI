@@ -14,16 +14,19 @@ class CollectionService:
             collection_id: str,
             label: str,
             description: str = '',
+            embedding_model: str | None = None,
+
     ):
         collection_metadata = CollectionMetadataModel(
             collection_id=collection_id,
             label=label,
             description=description,
+            embedding_model=embedding_model,
         )
 
         return await self.repo.create(collection_metadata)
 
-    async def get_collection_metadata(self, collection_id: str):
+    async def get_collection_metadata(self, collection_id: str) -> list[CollectionMetadataModel]:
         query = AttributeAssignment('collection_id', collection_id)
 
         return await self.repo.list(query)
@@ -36,3 +39,8 @@ class CollectionService:
             label = collection_metadata[0].label
 
         return label
+
+    async def list_collection_ids(self) -> list[str]:
+        collections = await self.repo.list()
+        collections.reverse()
+        return [c.collection_id for c in collections]
