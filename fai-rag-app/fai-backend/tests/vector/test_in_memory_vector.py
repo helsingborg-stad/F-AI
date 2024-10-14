@@ -8,6 +8,7 @@ from mongomock_motor import AsyncMongoMockClient
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.collection.service import CollectionService
 from fai_backend.repositories import collection_metadata_repo
+from fai_backend.repository.mongodb import MongoDBRepo
 from fai_backend.vector.memory import InMemoryChromaDB
 from fai_backend.vector.service import VectorService
 
@@ -15,7 +16,8 @@ from fai_backend.vector.service import VectorService
 @pytest_asyncio.fixture
 async def collection_meta_repo():
     await init_beanie(database=(AsyncMongoMockClient()).test_db, document_models=[CollectionMetadataModel])
-    yield collection_metadata_repo
+    yield MongoDBRepo[CollectionMetadataModel, CollectionMetadataModel](CollectionMetadataModel,
+                                                                        CollectionMetadataModel)
     await CollectionMetadataModel.get_motor_collection().drop()
 
 
