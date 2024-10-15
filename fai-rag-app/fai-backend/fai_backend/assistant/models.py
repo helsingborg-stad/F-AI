@@ -88,15 +88,18 @@ class StoredQuestionModel(Document):
 
 
 class AssistantContext(BaseModel):
-    conversation_id: str = ""
+    conversation_id: str | None = None
     query: str = ""
     files_collection_id: Optional[str] = None
     previous_stream_output: Optional[str] = None
     history: list[AssistantStreamMessage] = []
+    rag_document: Optional[str] = None
     rag_output: Optional[str] = None
 
     async def add_to_history(self, new_messages: list[AssistantStreamMessage],
                              repo: IAsyncRepo[AssistantChatHistoryModel]):
+        if self.conversation_id is None:
+            return
         new_history = await repo.get(self.conversation_id)
         for message in new_messages:
             new_history.history.append(message)

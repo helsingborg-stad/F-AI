@@ -1,5 +1,5 @@
 import json
-from typing import Callable, List, Optional, AsyncGenerator, TypeAlias
+from typing import Callable, List, Optional, AsyncGenerator, TypeAlias, Any
 
 import openai
 from langstream import Stream, StreamOutput
@@ -36,7 +36,11 @@ EmptyResponseDelta = ResponseDelta(role=None, content="")
 
 # TODO fill with functions from somewhere
 function_map = {
-    'get_delivery_date': lambda _: "2024-12-30T08:30:00.000Z"
+    'get_delivery_date': lambda data:
+    "no delivery date set" if data["order_id"][0] == 'x'
+    else "delivery has been cancelled" if data["order_id"][0] == 'y'
+    else "2024-12-30T08:30:00.000Z",
+    'score_document': lambda score: score
 }
 
 
@@ -53,7 +57,8 @@ class OpenAIStream(StreamType):
             url: str = None,
             api_key: str = None,
             temperature: Optional[float] = 0,
-            tools: List[ChatCompletionToolParam] = None
+            tools: List[ChatCompletionToolParam] = None,
+            response_format: Optional[Any] = None
     ) -> None:
         self._client = openai.AsyncOpenAI(
             base_url=url,
@@ -73,7 +78,8 @@ class OpenAIStream(StreamType):
                     messages=[m.model_dump(exclude_none=True) for m in messages],
                     temperature=temperature,
                     stream=True,
-                    tools=tools
+                    tools=tools,
+                    response_format=response_format
                 )
 
                 pending_function_name: Optional[str] = None
@@ -214,10 +220,11 @@ class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
                     new_entry.role = output.role
                     new_entry.content += output.content
                     context_store.get_mutable().history[index] = new_entry
-                    new_history = await chat_history_repo.get(context_store.get_mutable().conversation_id)
-                    new_history.history = context_store.get_mutable().history
-                    await chat_history_repo.update(context_store.get_mutable().conversation_id,
-                                                   new_history.model_dump(exclude={'id'}, exclude_none=True))
+                    if context_store.get_mutable().conversation_id is not None:
+                        new_history = await chat_history_repo.get(context_store.get_mutable().conversation_id)
+                        new_history.history = context_store.get_mutable().history
+                        await chat_history_repo.update(context_store.get_mutable().conversation_id,
+                                                       new_history.model_dump(exclude={'id'}, exclude_none=True))
                     yield output
 
             yield ResponseDelta(role='assistant', content='')

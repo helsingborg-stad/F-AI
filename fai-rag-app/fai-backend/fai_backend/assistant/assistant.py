@@ -19,11 +19,11 @@ class Assistant:
         self.template = template
         self.context_store = context_store
 
-    async def create_stream(self, conversation_id: str) -> Stream[str, str]:
+    async def create_stream(self, conversation_id: str | None = None) -> Stream[str, str]:
         context = self.context_store.get_mutable()
         context.conversation_id = conversation_id
         context.files_collection_id = self.template.files_collection_id
-        history_model = await chat_history_repo.get(conversation_id)
+        history_model = await chat_history_repo.get(conversation_id) if conversation_id else None
         context.history = history_model.history if history_model else []
 
         def set_query(user_query: str):

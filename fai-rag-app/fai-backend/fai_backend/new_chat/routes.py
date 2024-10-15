@@ -23,7 +23,6 @@ router = APIRouter(
 def chat_index_view(authenticated_user: ProjectUser | None = Depends(get_project_user),
                     view=Depends(get_page_template_for_logged_in_users),
                     projects: list[ProjectResponse] = Depends(list_projects_request)) -> list:
-
     if not authenticated_user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
@@ -31,7 +30,8 @@ def chat_index_view(authenticated_user: ProjectUser | None = Depends(get_project
                               name=a.meta.name,
                               project=p.id,
                               description=a.meta.description,
-                              sampleQuestions=a.meta.sample_questions) for p in projects for a in p.assistants]
+                              sampleQuestions=a.meta.sample_questions) for p in projects for a in p.assistants if
+                  not a.id.startswith('_')]
 
     return view([c.SSEChat(assistants=assistants)],
                 _('chat', 'Chat'))
@@ -41,7 +41,6 @@ def chat_index_view(authenticated_user: ProjectUser | None = Depends(get_project
 async def chat_history_view(view=Depends(get_page_template_for_logged_in_users),
                             chat_state_service: ChatStateService = Depends(get_chat_state_service),
                             user: ProjectUser = Depends(get_project_user)) -> list:
-
     if not user:
         return [c.FireEvent(event=e.GoToEvent(url='/login'))]
 
@@ -68,7 +67,6 @@ async def chat_view(chat_id: str,
                     view=Depends(get_page_template_for_logged_in_users),
                     chat_state_service: ChatStateService = Depends(get_chat_state_service),
                     project_user: ProjectUser = Depends(get_project_user)) -> list:
-
     chat_history = await chat_state_service.get_state(chat_id)
 
     if chat_history is None or chat_history.user != project_user.email:
@@ -84,7 +82,6 @@ async def chat_view(chat_id: str,
 async def chat_delete(chat_id: str,
                       chat_state_service: ChatStateService = Depends(get_chat_state_service),
                       project_user: ProjectUser = Depends(get_project_user)) -> list:
-
     chat_history = await chat_state_service.get_state(chat_id)
     if chat_history is None or chat_history.user != project_user.email:
         return [c.FireEvent(event=e.GoToEvent(url='/chat/history'))]
