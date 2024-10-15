@@ -49,6 +49,7 @@ class AssistantContext(BaseModel):
     files_collection_id: Optional[str] = None
     previous_stream_output: Optional[str] = None
     history: list[AssistantStreamMessage] = []
+    rag_document: Optional[str] = None
     rag_output: Optional[str] = None
 
 
