@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from langstream import Stream
 
@@ -18,7 +18,7 @@ class Assistant:
         self.template = template
         self.context_store = context_store
 
-    async def create_stream(self, conversation_id: str) -> Stream[str, str]:
+    async def create_stream(self, conversation_id: Optional[str] = None) -> Stream[str, str]:
 
         def set_query(user_query: str):
             current_context = self.context_store.get_mutable()
@@ -33,7 +33,7 @@ class Assistant:
 
         context = self.context_store.get_mutable()
         context.files_collection_id = self.template.files_collection_id
-        history_model = await chat_history_repo.get(conversation_id)
+        history_model = await chat_history_repo.get(conversation_id) if conversation_id else None
         context.history = history_model.history if history_model else []
 
         stream = Stream('start', set_query)
@@ -44,7 +44,7 @@ class Assistant:
                       .and_then(postprocess_stream)
                       .and_then(new_stream))
 
-        return stream.on_error(lambda e: print(f'assistant stream error: {str(e)}'))
+        return stream
 
     async def _create_stream_from_config(
             self,

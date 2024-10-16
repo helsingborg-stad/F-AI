@@ -22,6 +22,7 @@ class OpenAIStream(Stream[str, OpenAIChatDelta]):
             url: str = None,
             api_key: str = None,
             temperature: Optional[float] = 0,
+            response_format: Optional[Any] = None
     ) -> None:
         self._client = openai.AsyncOpenAI(
             base_url=url,
@@ -37,6 +38,7 @@ class OpenAIStream(Stream[str, OpenAIChatDelta]):
                     messages=[m.to_dict() for m in messages],
                     temperature=temperature,
                     stream=True,
+                    response_format=response_format
                 )
 
                 async for output in completions:
@@ -69,7 +71,7 @@ class OpenAIStream(Stream[str, OpenAIChatDelta]):
 
 
 class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
-    class Settings(BaseModel):
+    class Settings(BaseModel, extra='allow'):
         model: str
         temperature: float = 0
 
