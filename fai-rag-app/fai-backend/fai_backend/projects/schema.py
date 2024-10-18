@@ -6,6 +6,7 @@ from fai_backend.schema import Timestamp
 
 class ProjectMember(BaseModel):
     email: EmailStr
+    is_pattern: bool
     role: str
 
 
