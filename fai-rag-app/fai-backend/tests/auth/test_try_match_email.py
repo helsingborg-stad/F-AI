@@ -1,24 +1,4 @@
-import re
-
-
-def try_match_email(email: str, pattern: str) -> bool:
-    def pattern_to_regex(p: str) -> str:
-        escaped = re.escape(p).replace(r'\*', '.*')
-        return f'^{escaped}$'
-
-    if '@' not in pattern:
-        raise ValueError('Pattern must contain @')
-
-    pattern_local, pattern_domain = pattern.split('@')
-    email_local, email_domain = email.split('@')
-
-    local_regex = pattern_to_regex(pattern_local)
-    domain_regex = pattern_to_regex(pattern_domain)
-
-    if re.match(local_regex, email_local) and re.match(domain_regex, email_domain):
-        return True
-
-    return False
+from fai_backend.auth.security import try_match_email
 
 
 def test_try_match_email():

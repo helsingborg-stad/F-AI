@@ -5,9 +5,10 @@ from beanie import Document, Indexed
 from pydantic import EmailStr, Field
 
 from fai_backend.assistant.models import AssistantChatHistoryModel, StoredQuestionModel
+from fai_backend.auth.security import try_match_email
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.conversations.models import Conversation
-from fai_backend.projects.schema import Project
+from fai_backend.projects.schema import Project, ProjectMember
 from fai_backend.repository.composite import CompositeRepo
 from fai_backend.repository.factory import create_repo_from_env
 from fai_backend.repository.factory import factory as repo_factory
@@ -43,43 +44,49 @@ class UserRepoImp(UserRepository, CompositeRepo[ProjectModel]):
         ]
 
     async def get_user_by_email(self, email: str) -> User | None:
-        projects = await self.list()
-        user_projects = [
-            project
-            for project in projects
-            if email in [member.email for member in project.members]
-        ]
 
-        def user_projects_to_user_roles(
-                project_list: list[Project],
-        ) -> list[ProjectUserRole]:
+        def filter_user_projects(project_list: list[Project], _email: str) -> list[Project]:
+            # TODO: fix hack handling wildcard
+            exact_match = [project for project in project_list if
+                           _email in [member.email for member in project.members if member.is_pattern is False]]
+
+            if exact_match:
+                return exact_match
+
+            pattern_matches = [[m for m in project.members if m.is_pattern] for project in project_list]
+
+            for pattern_entry in pattern_matches:
+                pattern = next(p.email for p in pattern_entry)
+
+                if try_match_email(_email, pattern):
+                    new_project = project_list[0].model_copy(deep=True)
+
+                    new_project.members = [
+                        ProjectMember(email=_email, is_pattern=False, role=member.role) if member.is_pattern else member
+                        for member in new_project.members
+                    ]
+
+                    return [new_project]
+                else:
+                    return []
+
+        def user_projects_to_user_roles(project_list: list[Project]) -> list[ProjectUserRole]:
             return [
                 ProjectUserRole(
                     project_id=str(project.id),
-                    role=next(
-                        member.role
-                        for member in project.members
-                        if member.email == email
-                    ),
+                    role=next(member.role for member in project.members if member.email == email),
                     permissions=(project.model_dump())['roles'][
-                        next(
-                            member.role
-                            for member in project.members
-                            if member.email == email
-                        )
+                        next(member.role for member in project.members if member.email == email)
                     ]['permissions'],
-                )
-                for project in project_list
+                ) for project in project_list
             ]
 
-        return (
-            User(
-                email=email,
-                projects=user_projects_to_user_roles(user_projects),
-            )
-            if len(user_projects) > 0
-            else None
-        )
+        user_projects = filter_user_projects(await self.list(), email)
+
+        return User(
+            email=email,
+            projects=user_projects_to_user_roles(user_projects)
+        ) if len(user_projects) > 0 else None
 
 
 class PinCodeModel(Document):
