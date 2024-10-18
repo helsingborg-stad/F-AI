@@ -56,31 +56,29 @@ async def get_project_user(
     return user
 
 
-def get_project_user_permissions(
-        project_user: ProjectUser = Depends(get_project_user),
-) -> list[str]:
-    return list(map(lambda x: x[0], filter(lambda x: x[1], project_user.permissions.items())))
+def get_project_user_permissions(project_user: ProjectUser = Depends(get_project_user)) -> list[str]:
+    def extract_permission_keys() -> list[str]:
+        return [permission for permission, is_granted in project_user.permissions.items() if is_granted]
+
+    return extract_permission_keys()
 
 
-async def get_page_template_for_logged_in_users(
-        permissions: list[str] = Depends(get_project_user_permissions),
-) -> Callable[[list[Any] | Any, str | None], list[Any]]:
+async def get_page_template_for_logged_in_users(permissions: list[str] = Depends(get_project_user_permissions)) -> \
+        Callable[[list[Any] | Any, str | None], list[Any]]:
 
-    def create_menus(p: list[str]) -> list:
-        return [
-            *chat_menu_items(user_permissions=p),
-            *qa_menu(user_permissions=p),
-            *document_menu_items(user_permissions=p),
-            *assistant_menu(user_permissions=permissions),
-            *feedback_menu_items(),
-            *mock_menu(user_permissions=p),
-        ]
+    def create_menus() -> list:
+        return [*chat_menu_items(user_permissions=permissions),
+                *qa_menu(user_permissions=permissions),
+                *document_menu_items(user_permissions=permissions),
+                *assistant_menu(user_permissions=permissions),
+                *feedback_menu_items(),
+                *mock_menu(user_permissions=permissions)]
 
     def page_template_function(components: list[Any] | Any, page_title: str | None) -> list[Any]:
         return page_template(
             *(components if isinstance(components, list) else [components]),
             page_title=page_title,
-            menus=create_menus(permissions)
+            menus=create_menus()
         )
 
     return page_template_function
