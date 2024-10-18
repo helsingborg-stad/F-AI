@@ -1,13 +1,7 @@
-import json
-
 from langstream import Stream, join_final_output, as_async_generator
 from langstream.contrib import OpenAIChatStream, OpenAIChatMessage, OpenAIChatDelta
 
-from fai_backend.chat.stream import create_chat_stream_from_prompt
-from fai_backend.chat.template import CHAT_PROMPT_TEMPLATE_ARGS, SCORING_PROMPT_TEMPLATE_ARGS
-from fai_backend.collection.dependencies import get_collection_service
-from fai_backend.vector.factory import vector_db
-from fai_backend.vector.service import VectorService
+from fai_backend.projects.dependencies import get_project_service
 
 SYSTEM_TEMPLATE = "You are a helpful AI assistant that helps people with answering questions about planning "
 "permission.<br> If you can't find the answer in the search result below, just say (in Swedish) "
@@ -52,57 +46,13 @@ async def ask_llm_question(question: str):
     return await join_final_output(llm_stream(question))
 
 
-async def create_rag_stream(query: str, vector_collection_name: str) -> Stream[str, str]:
-    vector_service = VectorService(vector_db=vector_db, collection_meta_service=get_collection_service())
-    scoring_stream, _ = create_chat_stream_from_prompt(SCORING_PROMPT_TEMPLATE_ARGS)
-
-    vector_db_query_result = await query_vector(
-        vector_service=vector_service,
-        collection_name=vector_collection_name,
-        query=query,
-    )
-
-    scoring_stream = scoring_stream.map(
-        lambda delta: json.loads(delta.content)['score']
-        if delta.role == "function" and delta.name == "score_document"
-        else 0
-    )
-
-    documents: [str] = []
-
-    def store_and_return_document(document: str):
-        documents.append(document)
-        return document
-
-    def pair_query_document(document: str):
-        return {"query": query, "document": document}
-
-    def append_score_to_documents(scores):
-        return zip(documents, [s[0] for s in scores])
-
-    def sort_and_slice_documents(scored_documents, slice_size: int):
-        first_element = list(scored_documents)[0]
-        sorted_scores = sorted(first_element, key=lambda x: x[1], reverse=True)
-        return sorted_scores[:slice_size]
-
-    return (
-        vector_db_query_result
-        .map(store_and_return_document)
-        .map(pair_query_document)
-        .map(scoring_stream)
-        .gather()
-        .and_then(append_score_to_documents)
-        .and_then(lambda scored_documents: sort_and_slice_documents(scored_documents, 6))
-        .and_then(lambda results: {"query": query, "results": results[0]})
-    )
-
-
 async def ask_llm_raq_question(question: str, collection_name: str):
-    rag_stream = await create_rag_stream(question, collection_name)
-    chat_stream, _ = create_chat_stream_from_prompt(CHAT_PROMPT_TEMPLATE_ARGS)
-
-    final_generator = (rag_stream
-                       .and_then(chat_stream)
-                       .map(lambda delta: delta.content)(question))
-
-    return await join_final_output(final_generator)
+    from fai_backend.assistant.assistant import Assistant
+    from fai_backend.assistant.service import InMemoryAssistantContextStore
+    projects = await get_project_service().read_projects()
+    template = next(a for a in projects[0].assistants if a.id == '_qaf')
+    template.files_collection_id = collection_name
+    context = InMemoryAssistantContextStore()
+    assistant = Assistant(template, context)
+    stream = await assistant.create_stream()
+    return await join_final_output(stream(question))
