@@ -5,7 +5,7 @@ from beanie import Document, Indexed
 from pydantic import EmailStr, Field
 
 from fai_backend.assistant.models import AssistantChatHistoryModel, StoredQuestionModel
-from fai_backend.auth.security import try_match_email
+from fai_backend.auth.security import is_mail_pattern, try_match_email
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.conversations.models import Conversation
 from fai_backend.projects.schema import Project, ProjectMember
@@ -45,43 +45,43 @@ class UserRepoImp(UserRepository, CompositeRepo[ProjectModel]):
 
     async def get_user_by_email(self, email: str) -> User | None:
 
-        def filter_user_projects(project_list: list[Project], _email: str) -> list[Project]:
-            # TODO: fix hack handling wildcard
-            exact_match = [project for project in project_list if
-                           _email in [member.email for member in project.members if member.is_pattern is False]]
+        def extract_member_emails(member_list: list[ProjectMember]) -> list[str]:
+            return [m.email for m in member_list]
 
-            if exact_match:
-                return exact_match
+        def find_exact_matches(project_list: list[Project]) -> list[Project]:
+            return [p for p in project_list if
+                    email in extract_member_emails(p.members) and not is_mail_pattern(email)]
 
-            pattern_matches = [[m for m in project.members if m.is_pattern] for project in project_list]
+        def filter_user_projects(project_list: list[Project]) -> list[Project]:
+            exact_match_projects = find_exact_matches(project_list)
 
-            for pattern_entry in pattern_matches:
-                pattern = next(p.email for p in pattern_entry)
+            if exact_match_projects:
+                return exact_match_projects
 
-                if try_match_email(_email, pattern):
-                    new_project = project_list[0].model_copy(deep=True)
+            for proj in project_list:
+                pattern = next(pattern for pattern in extract_member_emails(proj.members) if is_mail_pattern(pattern))
 
-                    new_project.members = [
-                        ProjectMember(email=_email, is_pattern=False, role=member.role) if member.is_pattern else member
-                        for member in new_project.members
-                    ]
-
+                if try_match_email(email, pattern):
+                    new_project = proj.model_copy(deep=True)
+                    new_project.members.append(
+                        ProjectMember(email=email,
+                                      role=next(m.role for m in new_project.members if m.email == pattern)))
                     return [new_project]
-                else:
-                    return []
+
+            return []
 
         def user_projects_to_user_roles(project_list: list[Project]) -> list[ProjectUserRole]:
             return [
                 ProjectUserRole(
-                    project_id=str(project.id),
-                    role=next(member.role for member in project.members if member.email == email),
-                    permissions=(project.model_dump())['roles'][
-                        next(member.role for member in project.members if member.email == email)
+                    project_id=str(project_.id),
+                    role=next(member.role for member in project_.members if member.email == email),
+                    permissions=(project_.model_dump())['roles'][
+                        next(member.role for member in project_.members if member.email == email)
                     ]['permissions'],
-                ) for project in project_list
+                ) for project_ in project_list
             ]
 
-        user_projects = filter_user_projects(await self.list(), email)
+        user_projects = filter_user_projects(await self.list())
 
         return User(
             email=email,

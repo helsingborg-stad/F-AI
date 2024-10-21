@@ -14,7 +14,10 @@ def test_try_match_email():
         ['mr.spex@example.com', 'mr.spex@example.*', True],
         ['mr.spex@example.com', 'mr.spex@example', False],
         ['mr.spex@example.com', 'mr.spex@*.*', True],
-        ['mr.spex@example.com', 'mr.spex@*', True]
+        ['mr.spex@example.com', 'mr.spex@*', True],
+        ['*@example.com', 'mr.spex@*', False],
+        ['*@example.com', '*@example.com', False],
+        ['*@example.com', '*@*', False]
     ]
 
     for email, pattern, expected in test_cases:

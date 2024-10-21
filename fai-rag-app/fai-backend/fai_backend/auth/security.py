@@ -43,10 +43,17 @@ def create_pin_factory_from_env() -> Callable[[], str]:
     return (lambda: str(settings.FIXED_PIN)) if settings.FIXED_PIN else (lambda: str(random.randint(1000, 9999)))
 
 
+def is_mail_pattern(email: str) -> bool:
+    return '*' in email
+
+
 def try_match_email(email: str, pattern: str) -> bool:
     def pattern_to_regex(p: str) -> str:
         escaped = re.escape(p).replace(r'\*', '.*')
         return f'^{escaped}$'
+
+    if is_mail_pattern(email):
+        return False
 
     if '@' not in pattern:
         raise ValueError('Pattern must contain @')
@@ -61,5 +68,6 @@ def try_match_email(email: str, pattern: str) -> bool:
         return True
 
     return False
+
 
 generate_pin_code = create_pin_factory_from_env()
