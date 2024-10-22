@@ -114,6 +114,15 @@ def AssistantForm(
                         value=data.sample_questions[2] if data and data.sample_questions and len(
                             data.sample_questions) > 2 else '',
                     ),
+
+                    c.Textarea(
+                        name='response_format',
+                        label=_('Response format (advanced)'),
+                        placeholder=_('Force a specific response format. For advanced use only!'),
+                        required=False,
+                        size='sm',
+                        value=data.response_format if data and data.response_format else '',
+                    )
                 ],
             )
         ], class_name='card-body'),
