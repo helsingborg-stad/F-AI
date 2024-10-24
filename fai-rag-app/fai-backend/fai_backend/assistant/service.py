@@ -1,3 +1,5 @@
+import json
+
 import bson
 
 from fai_backend.assistant.assistant import Assistant
@@ -83,6 +85,9 @@ class TemplatePayloadAdapter:
                 model=template.streams[0].settings['model'] or '',
                 temperature=template.streams[0].settings['temperature'] if template.streams[0].settings[
                                                                                'temperature'] != 0 else 1.0,
+                response_format=json.dumps(template.streams[0].settings['response_format']) if 'response_format' in
+                                                                                               template.streams[
+                                                                                                   0].settings else None,
                 instructions=template.streams[0].messages[0].content or '',
                 files_collection_id=template.files_collection_id,
             )
@@ -96,6 +101,9 @@ class TemplatePayloadAdapter:
                 model=template.streams[1].settings['model'] or '',
                 temperature=template.streams[1].settings['temperature'] if template.streams[1].settings[
                                                                                'temperature'] >= 0 else 1.0,
+                response_format=json.dumps(template.streams[1].settings['response_format']) if 'response_format' in
+                                                                                               template.streams[
+                                                                                                   1].settings else None,
                 instructions=template.streams[1].messages[0].content or '',
                 files_collection_id=template.files_collection_id,
             )
@@ -111,6 +119,7 @@ class TemplatePayloadAdapter:
                     settings={
                         'model': payload.model,
                         'temperature': payload.temperature,
+                        'response_format': json.loads(payload.response_format),
                     },
                     messages=[
                         AssistantStreamMessage(
@@ -138,6 +147,7 @@ class TemplatePayloadAdapter:
                     settings={
                         'model': payload.model,
                         'temperature': payload.temperature,
+                        'response_format': payload.response_format,
                     },
                     messages=[
                         AssistantStreamMessage(

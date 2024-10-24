@@ -14,9 +14,7 @@ def messages_expander_stream(
     async def _expand_message(message: AssistantStreamMessage | AssistantStreamInsert) -> list[AssistantStreamMessage]:
         if isinstance(message, AssistantStreamMessage):
             return [AssistantStreamMessage(
-                timestamp=message.timestamp,
-                role=message.role,
-                content=message.content,
+                **message.model_dump(exclude={'should_format'}),
                 should_format=True
             )]
         return await get_insert(message.insert).get_messages(context_store)
