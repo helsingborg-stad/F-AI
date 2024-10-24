@@ -85,6 +85,7 @@ class TemplatePayloadAdapter:
                                                                                'temperature'] != 0 else 1.0,
                 instructions=template.streams[0].messages[0].content or '',
                 files_collection_id=template.files_collection_id,
+                max_tokens=template.max_tokens
             )
 
         def rag_stream_adapter():
