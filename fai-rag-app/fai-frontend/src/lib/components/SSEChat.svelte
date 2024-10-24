@@ -4,7 +4,6 @@
   import SvelteMarkdown from 'svelte-markdown'
   import SVG from '$lib/components/SVG.svelte'
   import { findLastIndex } from '../../util/array'
-  import type { Action } from 'svelte/action'
 
   interface IncomingMessage {
     timestamp: string
@@ -26,16 +25,17 @@
     project: string
     description: string
     sampleQuestions: string[]
+    maxTokens: number
   }
 
   interface InitialState {
     chat_id: string
+    max_tokens: number
     history: IncomingMessage[]
   }
 
   export let assistants: Assistant[] = []
   export let initialState: InitialState | undefined
-  export let maxInputLength: number | null = null
 
   export let termOfService: string = `
 ---
@@ -68,6 +68,49 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
   let isContentAtBottom: Boolean = true
   let lastMessageErrored: Boolean = false
 
+  let tokenCount = -1
+  let tokenTimeoutHandle = -1
+  $: maxTokens = initialState?.max_tokens ?? selectedAssistant?.maxTokens ?? -1
+  $: invalidInputLength = maxTokens > 0 && tokenCount > maxTokens
+  $: {
+    if (selectedAssistantId) {
+      tokenCount = -1
+    }
+  }
+
+  $: console.log(initialState)
+
+  // TODO: send assistant_id as well
+  function updateTokenCount(text: string, conversationId: string | null, assistantId: string | null) {
+    console.log(text, conversationId, assistantId)
+    fetch(`/api/count-tokens`, {
+        method: 'POST',
+        body: JSON.stringify({ text, conversation_id: conversationId, assistant_id: assistantId }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    ).then(res => res.json())
+      .then(res => {
+        tokenCount = res?.count ?? -1
+      })
+      .catch(() => {
+        tokenCount = -1
+      })
+      .finally(() => {
+        tokenTimeoutHandle = -1
+      })
+  }
+
+  function queueUpdateTokenCount(text: string, conversationId: string | null, assistantId: string | null) {
+    clearTimeout(tokenTimeoutHandle)
+    tokenTimeoutHandle = setTimeout(() => updateTokenCount(text, conversationId, assistantId), 1000)
+  }
+
+  $: activeConversationId && queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
+  $: messages && activeConversationId && queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
+  $: selectedAssistantId && queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
+
   $: {
     if (initialState) {
       activeConversationId = initialState.chat_id
@@ -82,20 +125,18 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
     isContentAtBottom =
       contentScrollDiv &&
       contentScrollDiv.scrollHeight -
-        contentScrollDiv.scrollTop -
-        contentScrollDiv.clientHeight <=
-        margin
+      contentScrollDiv.scrollTop -
+      contentScrollDiv.clientHeight <=
+      margin
   }
 
   $: selectedAssistant = assistants.find((a) => a.id === selectedAssistantId) || null
   $: contentScrollDiv &&
-    messages &&
-    messages.length > 0 &&
-    isContentAtBottom &&
-    scrollContentToBottom()
+  messages &&
+  messages.length > 0 &&
+  isContentAtBottom &&
+  scrollContentToBottom()
   $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
-  $: invalidInputLength =
-    (maxInputLength ?? 0) > 0 && currentMessageInput.length > (maxInputLength ?? 0)
 
   const scrollToBottom = (node: Element) => {
     node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
@@ -331,7 +372,8 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
         <div class="flex items-center gap-2">
           <span>Ett fel uppstod ⚠️️</span>
           <button class="btn btn-link active:opacity-60" on:click={retryLastMessage}
-            >Försök igen</button
+          >Försök igen
+          </button
           >
         </div>
       {/if}
@@ -350,14 +392,14 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
         <div class="flex h-full w-full items-end gap-2">
           <div class="flex h-full w-full grow flex-col gap-1.5">
             <span
-              class:hidden={(maxInputLength ?? 0) <= 0}
-              class="block text-right text-xs"
-              ><span
-                class:text-error={invalidInputLength}
-                class:text-medium={invalidInputLength}>{currentMessageInput.length}</span
-              >
-              / {maxInputLength}</span
-            >
+              class:hidden={maxTokens <= 0}
+              class="block text-right text-xs">
+              {#if tokenTimeoutHandle >= 0}
+                ...
+              {:else}
+                {tokenCount}/{maxTokens}
+              {/if}
+            </span>
             <textarea
               name="message"
               bind:value={currentMessageInput}

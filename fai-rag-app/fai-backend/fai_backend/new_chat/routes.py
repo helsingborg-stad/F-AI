@@ -34,6 +34,7 @@ def chat_index_view(authenticated_user: ProjectUser | None = Depends(get_project
                               name=a.meta.name,
                               project=p.id,
                               description=a.meta.description,
+                              maxTokens=a.max_tokens,
                               sampleQuestions=a.meta.sample_questions) for p in projects for a in p.assistants]
 
     return view([c.SSEChat(assistants=assistants)],

@@ -40,6 +40,7 @@ class AssistantTemplateMeta(BaseModel):
 class AssistantTemplate(BaseModel):
     id: str
     meta: AssistantTemplateMeta
+    max_tokens: int = -1
     files_collection_id: Optional[str] = None
     streams: list[AssistantStreamConfig | AssistantStreamPipelineDef]
 
@@ -70,3 +71,13 @@ class StoredQuestionModel(Document):
     class Settings:
         name = 'stored_questions'
         use_state_management = True
+
+
+class CountTokenRequestBody(BaseModel):
+    text: str
+    assistant_id: str | None = None
+    conversation_id: str | None = None
+
+
+class CountTokenResponseBody(BaseModel):
+    count: int

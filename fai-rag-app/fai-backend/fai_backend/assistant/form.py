@@ -62,6 +62,17 @@ def AssistantForm(
                         step=0.01,
                     ),
 
+                    c.Range(
+                        name='max_tokens',
+                        label=_('input_max_tokens', 'Max Tokens'),
+                        required=True,
+                        value=data.max_tokens if data else 2500,
+                        size='sm',
+                        min=500,
+                        max=128000,
+                        step=500,
+                    ),
+
                     c.Select(
                         name='files_collection_id',
                         label=_('Collection ID'),

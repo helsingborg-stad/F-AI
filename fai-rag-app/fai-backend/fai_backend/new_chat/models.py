@@ -11,6 +11,7 @@ class ClientChatState(BaseModel):
     delete_label: str = "Delete"  # TODO: fix hack for allowing something to show up in list to click on.
     rename_label: str = "Rename"  # TODO: fix hack for allowing something to show up in list to click on.
     history: list[LLMClientChatMessage]
+    max_tokens: int
 
 
 class ChatHistoryEditPayload(BaseModel):

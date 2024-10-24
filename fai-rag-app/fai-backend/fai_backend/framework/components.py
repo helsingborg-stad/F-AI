@@ -289,13 +289,13 @@ class Assistant(BaseModel):
     project: str
     description: str
     sampleQuestions: list[str]
+    maxTokens: int
 
 
 class SSEChat(UIComponent):
     type: Literal['SSEChat'] = 'SSEChat'
     assistants: list[Assistant] = []
     chat_initial_state: ClientChatState | None = Field(None, serialization_alias='initialState')
-    max_input_length: int | None = Field(settings.CHAT_MAX_INPUT_LENGTH, serialization_alias='maxInputLength')
 
 
 class Range(UIComponent):
