@@ -5,7 +5,7 @@
 </script>
 
 <nav
-  class="navbar sticky top-0 z-50 w-full border-b border-neutral border-opacity-25 bg-base-100 bg-opacity-40 px-0 tracking-tight backdrop-blur"
+  class="navbar sticky top-0 z-20 w-full border-b border-neutral border-opacity-25 bg-base-100 bg-opacity-40 px-0 tracking-tight backdrop-blur"
 >
   <div class="w-full px-4">
     <div class="flex-1 lg:hidden lg:flex-none">
