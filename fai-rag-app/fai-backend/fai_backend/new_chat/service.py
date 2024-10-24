@@ -53,4 +53,5 @@ class ChatStateService:
                                chat_id=str(chat_history_model.id),
                                timestamp=chat_history_model.history[0].timestamp,
                                title=default_title,
+                               max_tokens=chat_history_model.assistant.max_tokens,
                                history=[convert_message(message) for message in chat_history_model.history])

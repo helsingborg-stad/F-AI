@@ -106,6 +106,7 @@ class TemplatePayloadAdapter:
                                                                                                    1].settings else None,
                 instructions=template.streams[1].messages[0].content or '',
                 files_collection_id=template.files_collection_id,
+                max_tokens=template.max_tokens
             )
 
         return basic_stream_adapter() if len(template.streams) == 1 else rag_stream_adapter()
@@ -176,6 +177,7 @@ class TemplatePayloadAdapter:
                     list(payload.sample_questions)) if payload.sample_questions and len(
                     payload.sample_questions) > 0 else []
             ),
+            max_tokens=payload.max_tokens,
             files_collection_id=payload.files_collection_id,
             streams=basic_stream() if payload.files_collection_id is '' else rag_stream()
         )
