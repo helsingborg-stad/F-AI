@@ -121,7 +121,7 @@ class TemplatePayloadAdapter:
                     settings={
                         'model': payload.model,
                         'temperature': payload.temperature,
-                        'response_format': json.loads(payload.response_format),
+                        'response_format': json.loads(payload.response_format) if payload.response_format else None,
                     },
                     messages=[
                         AssistantStreamMessage(
@@ -149,7 +149,7 @@ class TemplatePayloadAdapter:
                     settings={
                         'model': payload.model,
                         'temperature': payload.temperature,
-                        'response_format': payload.response_format,
+                        'response_format': json.loads(payload.response_format) if payload.response_format else None,
                     },
                     messages=[
                         AssistantStreamMessage(
