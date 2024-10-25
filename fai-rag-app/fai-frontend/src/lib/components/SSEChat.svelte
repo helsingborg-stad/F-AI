@@ -395,8 +395,10 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
               class="block text-right text-xs">
               {#if tokenTimeoutHandle >= 0}
                 ...
-              {:else}
+              {:else if tokenCount >= 0}
                 {tokenCount}/{maxTokens}
+              {:else}
+                ?
               {/if}
             </span>
             <textarea

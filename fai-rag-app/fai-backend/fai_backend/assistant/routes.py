@@ -276,15 +276,6 @@ async def count_tokens(
         project_user: ProjectUser = Depends(get_project_user),
         project_service: ProjectService = Depends(get_project_service),
 ):
-    # TODO: Maybe this can be used for non-OpenAI models?
-    # From here: https://docs.llamaindex.ai/en/stable/module_guides/models/llms/#a-note-on-tokenization
-    #
-    # from transformers import AutoTokenizer
-    #
-    # Settings.tokenizer = AutoTokenizer.from_pretrained(
-    #     "HuggingFaceH4/zephyr-7b-beta"
-    # )
-
     if body.assistant_id is None and body.conversation_id is None:
         raise HTTPException(400, 'Either assistant_id or conversation_id must be provided')
 
@@ -306,6 +297,19 @@ async def count_tokens(
         if assistant is None:
             raise HTTPException(400, 'Assistant does not exist')
         assistant_template = assistant
+
+    if assistant_template.streams[-1].provider != 'openai':
+        # Only OpenAI supported atm
+
+        # TODO: Maybe this can be used for non-OpenAI models?
+        # From here: https://docs.llamaindex.ai/en/stable/module_guides/models/llms/#a-note-on-tokenization
+        #
+        # from transformers import AutoTokenizer
+        #
+        # Settings.tokenizer = AutoTokenizer.from_pretrained(
+        #     "HuggingFaceH4/zephyr-7b-beta"
+        # )
+        return CountTokenResponseBody(count=-1)
 
     model = assistant_template.streams[-1].settings['model']
     context_store = InMemoryAssistantContextStore()
