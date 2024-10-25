@@ -1,16 +1,20 @@
 from collections.abc import Callable
 from typing import Any
 
-from fastapi import APIRouter, Depends, Security
+import tiktoken
+from fastapi import APIRouter, Depends, Security, HTTPException
 from langstream import join_final_output
 
+from fai_backend.assistant.assistant import Assistant
 from fai_backend.assistant.dependencies import get_template_service
 from fai_backend.assistant.form import AssistantForm
+from fai_backend.assistant.helper import messages_expander_stream, get_message_content
 from fai_backend.assistant.models import (
-    AssistantTemplate,
+    AssistantTemplate, AssistantStreamMessage, CountTokenResponseBody, CountTokenRequestBody,
 )
 from fai_backend.assistant.schema import TemplatePayload
-from fai_backend.assistant.service import AssistantFactory, AssistantTemplateStore, TemplatePayloadAdapter
+from fai_backend.assistant.service import AssistantFactory, AssistantTemplateStore, TemplatePayloadAdapter, \
+    InMemoryAssistantContextStore
 from fai_backend.collection.dependencies import get_collection_service
 from fai_backend.collection.service import CollectionService
 from fai_backend.dependencies import (
@@ -32,6 +36,7 @@ from fai_backend.projects.dependencies import (
 )
 from fai_backend.projects.schema import ProjectResponse, ProjectUpdateRequest
 from fai_backend.projects.service import ProjectService
+from fai_backend.repositories import chat_history_repo
 from fai_backend.schema import ProjectUser
 
 router = APIRouter(
@@ -263,3 +268,57 @@ def on_update_assistant(
         [c.FireEvent(event=e.GoToEvent(url=f'/assistants/{data.id}'))],
         _('Edit assistant') + f' ({data.id})'
     )
+
+
+@router.post('/count-tokens', response_model=CountTokenResponseBody)
+async def count_tokens(
+        body: CountTokenRequestBody,
+        project_user: ProjectUser = Depends(get_project_user),
+        project_service: ProjectService = Depends(get_project_service),
+):
+    if body.assistant_id is None and body.conversation_id is None:
+        raise HTTPException(400, 'Either assistant_id or conversation_id must be provided')
+
+    assistant_template: AssistantTemplate | None = None
+    history: list[AssistantStreamMessage] = []
+
+    if body.conversation_id is not None:
+        chat_history = await chat_history_repo.get(body.conversation_id)
+
+        if chat_history is None or chat_history.user != project_user.email:
+            raise HTTPException(400, 'Conversation does not exist')
+
+        assistant_template = chat_history.assistant
+        history = chat_history.history
+
+    elif body.assistant_id is not None:
+        assistant = next(
+            (a for p in await project_service.read_projects() for a in p.assistants if a.id == body.assistant_id), None)
+        if assistant is None:
+            raise HTTPException(400, 'Assistant does not exist')
+        assistant_template = assistant
+
+    model = assistant_template.streams[-1].settings['model']
+    context_store = InMemoryAssistantContextStore()
+    context_store.get_mutable().query = body.text
+    context_store.get_mutable().history = history
+    stream = messages_expander_stream(assistant_template.streams[-1].messages, context_store,
+                                      Assistant.get_insert)
+
+    messages = []
+    async for o in stream(body.text):
+        if o.final:
+            messages = messages + [get_message_content(m, context_store.get_mutable()) for m in o.data]
+
+    if assistant_template.streams[-1].provider == 'openai':
+        enc = tiktoken.encoding_for_model(model)
+        lengths = [len(enc.encode(msg)) for msg in messages]
+        total = sum(lengths)
+        return CountTokenResponseBody(count=total)
+
+    # vLLM (HuggingFace) token counting
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model)
+    lengths = [len(tokenizer.encode(msg)) for msg in messages]
+    total = sum(lengths)
+    return CountTokenResponseBody(count=total)

@@ -7,6 +7,7 @@ class TemplatePayload(BaseModel):
     instructions: str = ''
     id: str = ''
     temperature: float = 1.0
+    max_tokens: int = 2500
     description: str | None = None
     sample_questions: list[str | None] | None = None
     files_collection_id: str | None = None
