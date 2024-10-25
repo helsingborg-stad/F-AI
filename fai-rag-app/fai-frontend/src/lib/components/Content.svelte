@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { path, searchParams, url } from 'elegua'
+  import { pageDataStore } from '$lib/store'
 </script>
 
-{#key $url}
+{#key $pageDataStore}
   <slot />
 {/key}
