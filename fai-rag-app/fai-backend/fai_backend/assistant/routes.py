@@ -298,19 +298,6 @@ async def count_tokens(
             raise HTTPException(400, 'Assistant does not exist')
         assistant_template = assistant
 
-    if assistant_template.streams[-1].provider != 'openai':
-        # Only OpenAI supported atm
-
-        # TODO: Maybe this can be used for non-OpenAI models?
-        # From here: https://docs.llamaindex.ai/en/stable/module_guides/models/llms/#a-note-on-tokenization
-        #
-        # from transformers import AutoTokenizer
-        #
-        # Settings.tokenizer = AutoTokenizer.from_pretrained(
-        #     "HuggingFaceH4/zephyr-7b-beta"
-        # )
-        return CountTokenResponseBody(count=-1)
-
     model = assistant_template.streams[-1].settings['model']
     context_store = InMemoryAssistantContextStore()
     context_store.get_mutable().query = body.text
@@ -323,7 +310,15 @@ async def count_tokens(
         if o.final:
             messages = messages + [get_message_content(m, context_store.get_mutable()) for m in o.data]
 
-    enc = tiktoken.encoding_for_model(model)
-    lengths = [len(enc.encode(msg)) for msg in messages]
+    if assistant_template.streams[-1].provider == 'openai':
+        enc = tiktoken.encoding_for_model(model)
+        lengths = [len(enc.encode(msg)) for msg in messages]
+        total = sum(lengths)
+        return CountTokenResponseBody(count=total)
+
+    # vLLM (HuggingFace) token counting
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model)
+    lengths = [len(tokenizer.encode(msg)) for msg in messages]
     total = sum(lengths)
     return CountTokenResponseBody(count=total)
