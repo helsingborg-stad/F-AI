@@ -8,7 +8,7 @@
   class="navbar sticky top-0 z-20 w-full border-b border-neutral border-opacity-25 bg-base-100 bg-opacity-40 px-0 tracking-tight backdrop-blur"
 >
   <div class="w-full px-4">
-    <div class="flex-1 lg:hidden lg:flex-none">
+    <div class="flex-0 lg:hidden lg:flex-none">
       <label for="my-drawer-2" aria-label="open sidebar" class="btn btn-square btn-ghost">
         <svg
           xmlns="http://www.w3.org/2000/svg"

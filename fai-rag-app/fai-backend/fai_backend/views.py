@@ -89,7 +89,7 @@ def page_template(*components, page_title: str = None, menus: list | None = None
     def page_title_component() -> list:
         return [c.Heading(
             text=page_title,
-            class_name='flex-1 lg:flex-none font-semibold text-base-content',
+            class_name='flex-1 text-center lg:text-left lg:flex-none font-semibold text-base-content truncate text-nowrap overflow-hidden',
         )] if page_title else []
 
     return [
