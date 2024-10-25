@@ -61,6 +61,7 @@ class OpenAIStream(Stream[str, OpenAIChatDelta]):
                         )
             except Exception as e:
                 print(f'Exception @ chat_completion: {str(e)}')
+                raise e
             finally:
                 await self._client.close()
 
