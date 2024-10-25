@@ -1,0 +1,839 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7cff8c79-2e2e-4b15-ac7d-054223176e96" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile.base" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose-db.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/.env.example" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/.env.test" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/assistant.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/dependencies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/form.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/helper.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/insert/history.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/insert/history_summary.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/menu.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/pipeline/rag_scoring.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/protocol.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/provider/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/provider/openai.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/provider/parrot.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/provider/vllm.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/routes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/schema.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/assistant/sse_routes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/auth/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/auth/dependencies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/auth/router.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/auth/schema.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/auth/security.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/auth/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/babel.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/collection/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/collection/dependencies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/collection/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/collection/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/conversations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/conversations/dependencies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/conversations/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/conversations/schema.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/conversations/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/dependencies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/documents/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/documents/menu.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/documents/routes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/menu.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/providers/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/providers/dummy.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/providers/github.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/providers/protocol.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/routes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/feedback/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/files/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/files/dependecies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/files/file_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/files/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/files/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/framework/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/framework/components.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/framework/display.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/framework/events.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/framework/frontend.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/framework/table.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/icons.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/llm/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/llm/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/locale/en/LC_MESSAGES/messages.mo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/locale/en/LC_MESSAGES/messages.po" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/locale/messages.pot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/locale/sv/LC_MESSAGES/messages.mo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/locale/sv/LC_MESSAGES/messages.po" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/logger/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/logger/console.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/logger/route_class.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/logger/setup.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/mail/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/mail/client.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/mail/schemas.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/message_broker/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/message_broker/factory.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/message_broker/interface.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/message_broker/memory.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/message_broker/redis_queue.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/middleware.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/new_chat/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/new_chat/dependencies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/new_chat/menu.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/new_chat/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/new_chat/routes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/new_chat/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/new_chat/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/phrase.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/projects/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/projects/dependencies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/projects/router.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/projects/schema.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/projects/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/qaf/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/qaf/dependencies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/qaf/menu.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/qaf/routes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/qaf/schema.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/qaf/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/qaf/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/repositories.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/repository/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/repository/composite.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/repository/factory.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/repository/interface.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/repository/memory.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/repository/mongodb.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/repository/query/component.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/repository/query/mongo.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/schema.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/sentry/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/sentry/watcher.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/serializer/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/serializer/impl/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/serializer/impl/base64.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/serializer/impl/json.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/serializer/protocol.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/setup.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/base_chromadb.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/chromadb.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/dependencies.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/embedding.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/factory.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/interface.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/memory.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/router_error_handler.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/routes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/schema.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/vector/types.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/fai_backend/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/poetry.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/pyproject.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/auth/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/auth/test_try_match_email.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/conversations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/conversations/test_conversations_service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/message_broker/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/message_broker/test_in_memory_broker.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/parse_and_vectorize/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/parse_and_vectorize/test_data/Bevprogram_Raa_1991_sbf.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/parse_and_vectorize/test_file_parser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/repository/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/repository/test_composite.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/repository/test_memory.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/repository/test_mongodb.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/test_main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/test_phrase.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/vector/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-backend/tests/vector/test_in_memory_vector.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/.prettierrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/.vscode/extensions.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/postcss.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/public/vite.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/App.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/additional-svelte-typings.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/app.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/app.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/component-factory.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/component-map.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/AppContent.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/AppDrawer.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/AppFooter.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/AppHeader.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/AppShell.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Badge.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Button.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Card.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/ChatBubble.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Container.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Content.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Div.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Divider.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Dropdown.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/FileInput.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/FireEvent.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Form.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Heading.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/InputField.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Link.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Menu.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/MenuSlot.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/MultiSelect.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/PageHeading.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Pagination.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Paragraph.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Radio.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Range.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Render.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/SSEChat.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/SVG.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Screen.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Select.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Table.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Text.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/Textarea.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/async-view/AsyncView.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/async-view/async-store.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/common/AsComponent.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/common/SlotComponent.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/input/Input.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/input/InputControl.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/input/InputLabel.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/input/TextInput.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/input/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/DataTable.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/array.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/data-table.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/filter-controls/MultiSelectFilter.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/filter-controls/TextFilter.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/filter.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/handlers.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/object.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/sort.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/string.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/toolbar/SearchInput.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/toolbar/ToolBar.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/components/table/types.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/event.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/store.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/lib/types.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/main.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/util/array.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/util/errorHandling.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/util/match-path.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/src/vite-env.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/svelte.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/tailwind.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/tsconfig.node.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fai-frontend/vite.config.ts" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="ChatHistory" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="refactor/ABC-to-Protocol" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;dannil76&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:helsingborg-stad/F-AI.git&quot;,
+    &quot;accountId&quot;: &quot;c0f2b55d-3a5e-4bc4-80db-e0c25a149162&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/Library/Caches/pypoetry/virtualenvs/fai-backend-WQt8xAwO-py3.11/lib/python3.11/site-packages/rq/queue.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/Library/Caches/pypoetry/virtualenvs/fai-backend-WQt8xAwO-py3.11/lib/python3.11/site-packages/rq/types.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/fai-backend/fai_backend/vector/routes.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/fai-frontend/src/lib/component-factory.ts" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2fE7cN5rYmrDf7wHfzngFsPCzAc" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="openDirectoriesWithSingleClick" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Docker.Backend Deps: Compose Deployment.executor": "Run",
+    "Docker.Dockerfile frontend-builder.executor": "Run",
+    "Docker.RedisWorker: Compose Deployment.executor": "Run",
+    "Docker.fai-backend: Compose Deployment.executor": "Run",
+    "Docker.worker.worker: Compose Deployment.executor": "Run",
+    "Docker.worker/Dockerfile base.executor": "Run",
+    "Docker.worker/Dockerfile python-deps.executor": "Run",
+    "HTTP Request.generated-requests | #1.executor": "Run",
+    "HTTP Request.generated-requests | #2.executor": "Run",
+    "HTTP Request.generated-requests | #3.executor": "Run",
+    "Python tests.pytest for auth.test_try_match_email.test_try_match_email.executor": "Run",
+    "Python tests.pytest for message_broker.test_in_memory_broker.test_memory_queue_enqueue_and_result.executor": "Run",
+    "Python tests.pytest for message_broker.test_redis_broker.test_redis_queue_enqueue_and_result.executor": "Run",
+    "Python tests.pytest for parse_and_vectorize.test_file_parser.test_parse_and_vectorize_then_query_correct_result.executor": "Run",
+    "Python tests.pytest for parse_and_vectorize.test_file_parser.test_parser_with_pdf_file_then_expect_parsed_correctly.executor": "Run",
+    "Python tests.pytest for parse_and_vectorize.test_file_parser.test_vectorize_multiple_files_then_query_correct_result.executor": "Run",
+    "Python tests.pytest for parse_and_vectorize.test_file_parser.test_without_metadatas.executor": "Run",
+    "Python tests.pytest for repository.test_composite.test_composite_create_and_get_item.executor": "Run",
+    "Python tests.pytest for repository.test_composite.test_composite_list_items.executor": "Run",
+    "Python tests.pytest for repository.test_composite.test_composite_update_item.executor": "Run",
+    "Python tests.pytest for repository.test_memory.test_create_and_get_item.executor": "Run",
+    "Python tests.pytest for repository.test_mongodb.test_create.executor": "Run",
+    "Python tests.pytest for repository.test_mongodb.test_list.executor": "Run",
+    "Python tests.pytest for test_email.test_try_match_email.executor": "Run",
+    "Python tests.pytest for test_email_wildcard.test_email_wildcard.executor": "Run",
+    "Python tests.pytest for test_email_wildcard.test_stuff.executor": "Run",
+    "Python tests.pytest for test_in_memory_settings.test_create_and_get_setting.executor": "Debug",
+    "Python tests.pytest for test_in_memory_settings.test_email_pattern.executor": "Run",
+    "Python tests.pytest for test_in_memory_settings.test_get_setting.executor": "Run",
+    "Python tests.pytest for test_in_memory_settings.test_match_email.executor": "Run",
+    "Python tests.pytest for test_in_memory_settings.test_try_match_email.executor": "Run",
+    "Python tests.pytest for test_main.test_health_check.executor": "Run",
+    "Python tests.pytest for test_phrase.test_configurable_default_language.executor": "Run",
+    "Python tests.pytest for test_phrase.test_greeting_nonexistent_key.executor": "Run",
+    "Python tests.pytest for test_phrase.test_greeting_swedish.executor": "Run",
+    "Python tests.pytest for test_phrase.test_non_string_key.executor": "Run",
+    "Python tests.pytest for test_phrase.test_placeholders_happy.executor": "Run",
+    "Python tests.pytest for test_phrase.test_set_language.executor": "Run",
+    "Python tests.pytest for test_service.test_service.executor": "Run",
+    "Python tests.pytest for users.test_app.test_user.executor": "Run",
+    "Python tests.pytest for users.test_email.test_try_match_email.executor": "Run",
+    "Python tests.pytest for vector.test_in_memory_vector.test_add.executor": "Run",
+    "Python tests.pytest for vector.test_in_memory_vector.test_add_documents_without_id_to_collection_then_query_correct_result.executor": "Debug",
+    "Python tests.pytest for vector.test_in_memory_vector.test_add_two_collections_then_correctly_list_all_added_collections.executor": "Run",
+    "Python tests.pytest for vector.test_in_memory_vector.test_query.executor": "Run",
+    "Python tests.pytest for vector.test_in_memory_vector.test_query_service_add.executor": "Run",
+    "Python tests.pytest for vector.test_in_memory_vector.test_update_id_document_and_expect_update.executor": "Run",
+    "Python.Backend.executor": "Run",
+    "Python.component.executor": "Run",
+    "Python.factory.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.service.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Shell Script.FAI Queue.executor": "Run",
+    "git-widget-placeholder": "refactor/remove-dead-code-base",
+    "last_opened_file_path": "/Users/dannilsson/work/GIT/F-AI/fai-rag-app/fai-backend/fai_backend/new_chat",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.stylelint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.stylelint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.Frontend.executor": "Run",
+    "prettierjs.PrettierConfiguration.Package": "/Users/dannilsson/work/GIT/F-AI/fai-rag-app/fai-frontend/node_modules/prettier",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "/Users/dannilsson/work/GIT/F-AI/fai-rag-app/fai-frontend/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mongo"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/fai-backend/fai_backend/new_chat" />
+      <recent name="$PROJECT_DIR$/worker" />
+      <recent name="$PROJECT_DIR$/fai-llm" />
+      <recent name="$PROJECT_DIR$/fai-backend/tests/parse_and_vectorize/test_data/multiples" />
+      <recent name="$PROJECT_DIR$/fai-backend/tests/parse_and_vectorize/test_data" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/fai-backend/tests/auth" />
+      <recent name="$PROJECT_DIR$/fai-backend/fai_backend/users/tests" />
+      <recent name="$PROJECT_DIR$/fai-backend/fai_backend/vector" />
+      <recent name="$PROJECT_DIR$/fai-backend/tests/parse_and_vectorize/test_data/multiples" />
+      <recent name="$PROJECT_DIR$/fai-backend/tests/parse_and_vectorize/test_data" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.Frontend">
+    <configuration name="Backend" type="PythonConfigurationType" factoryName="Python" focusToolWindowBeforeRun="true">
+      <module name="fai-rag-app" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fai-backend" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="false" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fai-backend/fai_backend/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2">
+        <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_PyBabel extract" />
+        <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_PyBabel update" />
+        <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_PyBabel compile" />
+      </method>
+    </configuration>
+    <configuration name="FAI Queue" type="ShConfigurationType">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/worker/run.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/worker" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="Frontend" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/fai-frontend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <EXTENSION ID="com.intellij.lang.javascript.buildTools.npm.rc.StartBrowserRunConfigurationExtension">
+        <browser start="true" url="http://localhost:8000" />
+      </EXTENSION>
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for auth.test_try_match_email.test_try_match_email" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="fai-rag-app" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fai-backend/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;auth.test_try_match_email.test_try_match_email&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for repository.test_composite.test_composite_create_and_get_item" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="fai-rag-app" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fai-backend/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;repository.test_composite.test_composite_create_and_get_item&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for repository.test_composite.test_composite_update_item" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="fai-rag-app" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fai-backend/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;repository.test_composite.test_composite_update_item&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_email_wildcard.test_email_wildcard" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="fai-rag-app" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fai-backend/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_email_wildcard.test_email_wildcard&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_email_wildcard.test_stuff" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="fai-rag-app" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/fai-backend/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_email_wildcard.test_stuff&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="npm.Frontend" />
+      <item itemvalue="Python.Backend" />
+      <item itemvalue="Python tests.pytest for auth.test_try_match_email.test_try_match_email" />
+      <item itemvalue="Python tests.pytest for repository.test_composite.test_composite_create_and_get_item" />
+      <item itemvalue="Python tests.pytest for repository.test_composite.test_composite_update_item" />
+      <item itemvalue="Python tests.pytest for test_email_wildcard.test_email_wildcard" />
+      <item itemvalue="Python tests.pytest for test_email_wildcard.test_stuff" />
+      <item itemvalue="Shell Script.FAI Queue" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.pytest for auth.test_try_match_email.test_try_match_email" />
+        <item itemvalue="Python tests.pytest for repository.test_composite.test_composite_update_item" />
+        <item itemvalue="Python tests.pytest for repository.test_composite.test_composite_create_and_get_item" />
+        <item itemvalue="Python tests.pytest for test_email_wildcard.test_email_wildcard" />
+        <item itemvalue="Python tests.pytest for test_email_wildcard.test_stuff" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23726.102" />
+        <option value="bundled-python-sdk-5e1850174b45-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23726.102" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7cff8c79-2e2e-4b15-ac7d-054223176e96" name="Changes" comment="" />
+      <created>1713354462082</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1713354462082</updated>
+      <workItem from="1713354463057" duration="3768000" />
+      <workItem from="1713799401870" duration="1000" />
+      <workItem from="1713809892864" duration="10000" />
+      <workItem from="1713899182186" duration="8253000" />
+      <workItem from="1714120040307" duration="7409000" />
+      <workItem from="1714379379728" duration="410000" />
+      <workItem from="1714379797669" duration="28000" />
+      <workItem from="1714396665828" duration="67000" />
+      <workItem from="1714396736775" duration="343000" />
+      <workItem from="1714397370152" duration="129000" />
+      <workItem from="1714641941491" duration="207000" />
+      <workItem from="1714642427813" duration="355000" />
+      <workItem from="1714642799217" duration="50000" />
+      <workItem from="1714642858160" duration="1000" />
+      <workItem from="1714642873658" duration="108000" />
+      <workItem from="1714643025636" duration="1014000" />
+      <workItem from="1714644198171" duration="631000" />
+      <workItem from="1714644843044" duration="427000" />
+      <workItem from="1714645297714" duration="36000" />
+      <workItem from="1714645421287" duration="371000" />
+      <workItem from="1714645848542" duration="1137000" />
+      <workItem from="1714646997620" duration="14000" />
+      <workItem from="1714647476201" duration="2266000" />
+      <workItem from="1714650507525" duration="2114000" />
+      <workItem from="1714653186744" duration="148000" />
+      <workItem from="1714658107054" duration="13549000" />
+      <workItem from="1714719493183" duration="9927000" />
+      <workItem from="1714741405400" duration="30000" />
+      <workItem from="1714741440671" duration="1616000" />
+      <workItem from="1714743261502" duration="2225000" />
+      <workItem from="1714745508757" duration="96000" />
+      <workItem from="1714745613269" duration="2001000" />
+      <workItem from="1714978140096" duration="11770000" />
+      <workItem from="1715023491449" duration="25932000" />
+      <workItem from="1715157619006" duration="26202000" />
+      <workItem from="1715685818200" duration="713000" />
+      <workItem from="1715686923797" duration="92000" />
+      <workItem from="1715687019391" duration="4133000" />
+      <workItem from="1715695157447" duration="6134000" />
+      <workItem from="1715757660466" duration="8161000" />
+      <workItem from="1715826485288" duration="12900000" />
+      <workItem from="1715849344567" duration="3109000" />
+      <workItem from="1715853437691" duration="8536000" />
+      <workItem from="1717050846862" duration="615000" />
+      <workItem from="1717051472124" duration="29000" />
+      <workItem from="1717051505141" duration="446000" />
+      <workItem from="1717055977118" duration="1658000" />
+      <workItem from="1717093975674" duration="1572000" />
+      <workItem from="1717095713142" duration="23264000" />
+      <workItem from="1717227270892" duration="24199000" />
+      <workItem from="1717357568110" duration="3000" />
+      <workItem from="1717427247457" duration="3331000" />
+      <workItem from="1717511121952" duration="1360000" />
+      <workItem from="1717554103762" duration="6000" />
+      <workItem from="1717555205727" duration="51000" />
+      <workItem from="1717555430275" duration="2820000" />
+      <workItem from="1717588451422" duration="3774000" />
+      <workItem from="1717767471118" duration="680000" />
+      <workItem from="1718099117890" duration="1490000" />
+      <workItem from="1718106654822" duration="7929000" />
+      <workItem from="1718115714815" duration="107000" />
+      <workItem from="1718115825461" duration="24726000" />
+      <workItem from="1718196276442" duration="1265000" />
+      <workItem from="1718747122186" duration="1861000" />
+      <workItem from="1718748993873" duration="255000" />
+      <workItem from="1718749388563" duration="1932000" />
+      <workItem from="1718782742962" duration="786000" />
+      <workItem from="1718784158554" duration="6125000" />
+      <workItem from="1718802341465" duration="4121000" />
+      <workItem from="1719233340418" duration="2773000" />
+      <workItem from="1719244824972" duration="53000" />
+      <workItem from="1719318495811" duration="1195000" />
+      <workItem from="1719401998788" duration="31000" />
+      <workItem from="1719402037282" duration="20000" />
+      <workItem from="1719402059969" duration="5499000" />
+      <workItem from="1719469464053" duration="7532000" />
+      <workItem from="1719586398463" duration="8301000" />
+      <workItem from="1722860036493" duration="2049000" />
+      <workItem from="1722863685419" duration="77000" />
+      <workItem from="1722863767193" duration="38000" />
+      <workItem from="1722863809809" duration="760000" />
+      <workItem from="1722951852042" duration="1013000" />
+      <workItem from="1722953181543" duration="106000" />
+      <workItem from="1722953292226" duration="4839000" />
+      <workItem from="1722967098363" duration="650000" />
+      <workItem from="1723018114295" duration="6984000" />
+      <workItem from="1723111302022" duration="37000" />
+      <workItem from="1723111342027" duration="58000" />
+      <workItem from="1723111403528" duration="20613000" />
+      <workItem from="1723463210359" duration="18000" />
+      <workItem from="1723463232595" duration="37000" />
+      <workItem from="1723463273954" duration="48367000" />
+      <workItem from="1723708953012" duration="13874000" />
+      <workItem from="1723794324222" duration="172000" />
+      <workItem from="1723794500177" duration="720000" />
+      <workItem from="1723795255841" duration="145000" />
+      <workItem from="1723795412163" duration="22814000" />
+      <workItem from="1724146521944" duration="12966000" />
+      <workItem from="1724228341572" duration="9576000" />
+      <workItem from="1724255253809" duration="34092000" />
+      <workItem from="1724421923568" duration="9244000" />
+      <workItem from="1724866292462" duration="14247000" />
+      <workItem from="1725009369325" duration="156000" />
+      <workItem from="1725009529888" duration="372000" />
+      <workItem from="1725017131740" duration="47000" />
+      <workItem from="1725019310792" duration="3343000" />
+      <workItem from="1725281579691" duration="12683000" />
+      <workItem from="1725466214284" duration="399000" />
+      <workItem from="1725466617961" duration="8698000" />
+      <workItem from="1725525303910" duration="2976000" />
+      <workItem from="1725530055601" duration="15128000" />
+      <workItem from="1725959902306" duration="11524000" />
+      <workItem from="1726056551136" duration="18619000" />
+      <workItem from="1726486413776" duration="11905000" />
+      <workItem from="1726573200208" duration="36925000" />
+      <workItem from="1726755614122" duration="561000" />
+      <workItem from="1726756222333" duration="19084000" />
+      <workItem from="1727120601214" duration="22901000" />
+      <workItem from="1727271322577" duration="12742000" />
+      <workItem from="1727357632995" duration="22888000" />
+      <workItem from="1727693152405" duration="7006000" />
+      <workItem from="1727705463101" duration="4932000" />
+      <workItem from="1727785579459" duration="14087000" />
+      <workItem from="1727941445947" duration="29794000" />
+      <workItem from="1728314290972" duration="10265000" />
+      <workItem from="1728378907144" duration="21272000" />
+      <workItem from="1728478741233" duration="19926000" />
+      <workItem from="1728561803557" duration="7946000" />
+      <workItem from="1728649842745" duration="85715000" />
+      <workItem from="1729234952223" duration="33914000" />
+      <workItem from="1729587641122" duration="8000" />
+      <workItem from="1729758278941" duration="5000000" />
+      <workItem from="1729774239124" duration="4262000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="feat/chat-history" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fai-backend/fai_backend/repositories.py</url>
+          <line>73</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="tests">
+        <watch expression="results['documents']" />
+        <watch expression="results['documents']" />
+      </configuration>
+      <configuration name="PythonConfigurationType">
+        <watch expression="payload" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_auth_test_try_match_email_test_try_match_email.coverage" NAME="pytest for auth.test_try_match_email.test_try_match_email Coverage Results" MODIFIED="1729514754543" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_parse_and_vectorize_test_file_parser_test_parser_with_pdf_file_then_expect_parsed_correctly.coverage" NAME="pytest for parse_and_vectorize.test_file_parser.test_parser_with_pdf_file_then_expect_parsed_correctly Coverage Results" MODIFIED="1718750355054" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_main_test_health_check.coverage" NAME="pytest for test_main.test_health_check Coverage Results" MODIFIED="1718750287011" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_vector_test_in_memory_vector_test_update_id_document_and_expect_update.coverage" NAME="pytest for vector.test_in_memory_vector.test_update_id_document_and_expect_update Coverage Results" MODIFIED="1718142972165" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$service.coverage" NAME="service Coverage Results" MODIFIED="1729158615069" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/fai_backend/users" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_phrase_test_non_string_key.coverage" NAME="pytest for test_phrase.test_non_string_key Coverage Results" MODIFIED="1715833392817" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_repository_test_mongodb_test_create.coverage" NAME="pytest for repository.test_mongodb.test_create Coverage Results" MODIFIED="1729156798656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_vector_test_in_memory_vector_test_query_service_add.coverage" NAME="pytest for vector.test_in_memory_vector.test_query_service_add Coverage Results" MODIFIED="1718142942338" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_phrase_test_placeholders_happy.coverage" NAME="pytest for test_phrase.test_placeholders_happy Coverage Results" MODIFIED="1715833381147" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_repository_test_composite_test_composite_create_and_get_item.coverage" NAME="pytest for repository.test_composite.test_composite_create_and_get_item Coverage Results" MODIFIED="1729237538858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_in_memory_settings_test_email_pattern.coverage" NAME="pytest for test_in_memory_settings.test_email_pattern Coverage Results" MODIFIED="1728918763525" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_users_test_email_test_try_match_email.coverage" NAME="pytest for users.test_email.test_try_match_email Coverage Results" MODIFIED="1728926837494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_repository_test_memory_test_create_and_get_item.coverage" NAME="pytest for repository.test_memory.test_create_and_get_item Coverage Results" MODIFIED="1729156763716" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_phrase_test_greeting_swedish.coverage" NAME="pytest for test_phrase.test_greeting_swedish Coverage Results" MODIFIED="1718750345811" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_phrase_test_configurable_default_language.coverage" NAME="pytest for test_phrase.test_configurable_default_language Coverage Results" MODIFIED="1715833376930" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_users_test_app_test_user.coverage" NAME="pytest for users.test_app.test_user Coverage Results" MODIFIED="1728987306967" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_message_broker_test_redis_broker_test_redis_queue_enqueue_and_result.coverage" NAME="pytest for message_broker.test_redis_broker.test_redis_queue_enqueue_and_result Coverage Results" MODIFIED="1723192059280" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_message_broker_test_in_memory_broker_test_memory_queue_enqueue_and_result.coverage" NAME="pytest for message_broker.test_in_memory_broker.test_memory_queue_enqueue_and_result Coverage Results" MODIFIED="1723189995998" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$Backend.coverage" NAME="Backend Coverage Results" MODIFIED="1729758365853" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_parse_and_vectorize_test_file_parser_test_parse_and_vectorize_then_query_correct_result.coverage" NAME="pytest for parse_and_vectorize.test_file_parser.test_parse_and_vectorize_then_query_correct_result Coverage Results" MODIFIED="1718749174314" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_email_test_try_match_email.coverage" NAME="pytest for test_email.test_try_match_email Coverage Results" MODIFIED="1729087538022" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/fai_backend/users/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_vector_test_in_memory_vector_test_add_documents_without_id_to_collection_then_query_correct_result.coverage" NAME="pytest for vector.test_in_memory_vector.test_add_documents_without_id_to_collection_then_query_correct_result Coverage Results" MODIFIED="1718143040459" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_email_wildcard_test_email_wildcard.coverage" NAME="pytest for test_email_wildcard.test_email_wildcard Coverage Results" MODIFIED="1729237494747" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_vector_test_in_memory_vector_test_add_two_collections_then_correctly_list_all_added_collections.coverage" NAME="pytest for vector.test_in_memory_vector.test_add_two_collections_then_correctly_list_all_added_collections Coverage Results" MODIFIED="1718142961592" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_parse_and_vectorize_test_file_parser_test_without_metadatas.coverage" NAME="pytest for parse_and_vectorize.test_file_parser.test_without_metadatas Coverage Results" MODIFIED="1718144416685" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_in_memory_settings_test_match_email.coverage" NAME="pytest for test_in_memory_settings.test_match_email Coverage Results" MODIFIED="1728926266420" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$factory.coverage" NAME="factory Coverage Results" MODIFIED="1723463300270" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/fai_backend/message_broker" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_email_wildcard_test_stuff.coverage" NAME="pytest for test_email_wildcard.test_stuff Coverage Results" MODIFIED="1729236034616" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_phrase_test_greeting_nonexistent_key.coverage" NAME="pytest for test_phrase.test_greeting_nonexistent_key Coverage Results" MODIFIED="1715843608221" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_in_memory_settings_test_create_and_get_setting.coverage" NAME="pytest for test_in_memory_settings.test_create_and_get_setting Coverage Results" MODIFIED="1728917291151" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$main.coverage" NAME="main Coverage Results" MODIFIED="1723722721637" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/worker" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_repository_test_composite_test_composite_list_items.coverage" NAME="pytest for repository.test_composite.test_composite_list_items Coverage Results" MODIFIED="1729156813458" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_service_test_service.coverage" NAME="pytest for test_service.test_service Coverage Results" MODIFIED="1729086328195" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/fai_backend/auth/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_vector_test_in_memory_vector_test_add.coverage" NAME="pytest for vector.test_in_memory_vector.test_add Coverage Results" MODIFIED="1718142879053" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_parse_and_vectorize_test_file_parser_test_vectorize_multiple_files_then_query_correct_result.coverage" NAME="pytest for parse_and_vectorize.test_file_parser.test_vectorize_multiple_files_then_query_correct_result Coverage Results" MODIFIED="1718188905436" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_in_memory_settings_test_try_match_email.coverage" NAME="pytest for test_in_memory_settings.test_try_match_email Coverage Results" MODIFIED="1728926343781" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$component.coverage" NAME="component Coverage Results" MODIFIED="1723560331406" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/fai_backend/repository/query" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_phrase_test_set_language.coverage" NAME="pytest for test_phrase.test_set_language Coverage Results" MODIFIED="1715842647702" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_test_in_memory_settings_test_get_setting.coverage" NAME="pytest for test_in_memory_settings.test_get_setting Coverage Results" MODIFIED="1728916921526" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_repository_test_composite_test_composite_update_item.coverage" NAME="pytest for repository.test_composite.test_composite_update_item Coverage Results" MODIFIED="1729237548511" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_vector_test_in_memory_vector_test_query.coverage" NAME="pytest for vector.test_in_memory_vector.test_query Coverage Results" MODIFIED="1718142914361" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+    <SUITE FILE_PATH="coverage/fai_rag_app$pytest_for_repository_test_mongodb_test_list.coverage" NAME="pytest for repository.test_mongodb.test_list Coverage Results" MODIFIED="1729156790201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fai-backend/tests" />
+  </component>
+</project>
