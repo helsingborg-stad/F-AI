@@ -1,5 +1,5 @@
 <script lang="ts">
-  import SvelteMarkdown from 'svelte-markdown'
+  import SvelteMarkdownWrapper from "$lib/components/SvelteMarkdownWrapper.svelte";
 
   import Text from './Text.svelte'
 
@@ -29,7 +29,7 @@
     {#if time}
       <time class="text-xs opacity-50">{time}</time>
     {/if}
-    <slot name="header" />
+    <slot name="header"/>
   </div>
 
   <div
@@ -40,16 +40,16 @@
     class="prose chat-bubble min-h-fit text-base-content"
   >
     {#if enableMarkdown}
-      <SvelteMarkdown source={content} />
+      <SvelteMarkdownWrapper source={content}/>
     {:else}
       <span class="whitespace-pre-line">{content}</span>
     {/if}
-    <slot name="below-content" />
+    <slot name="below-content"/>
   </div>
 
   {#if $$slots.footer}
     <div class="chat-footer">
-      <slot name="footer" />
+      <slot name="footer"/>
     </div>
   {/if}
 </div>

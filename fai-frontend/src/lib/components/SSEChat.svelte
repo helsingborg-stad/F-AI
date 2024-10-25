@@ -1,10 +1,10 @@
 <script lang="ts">
   import Button from './Button.svelte'
   import ChatBubble from './ChatBubble.svelte'
-  import SvelteMarkdown from 'svelte-markdown'
+  import SvelteMarkdownWrapper from '$lib/components/SvelteMarkdownWrapper.svelte';
   import SVG from '$lib/components/SVG.svelte'
-  import { findLastIndex } from '../../util/array'
-  import type { Action } from 'svelte/action'
+  import {findLastIndex} from '../../util/array'
+  import type {Action} from 'svelte/action'
 
   interface IncomingMessage {
     timestamp: string
@@ -82,23 +82,23 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
     isContentAtBottom =
       contentScrollDiv &&
       contentScrollDiv.scrollHeight -
-        contentScrollDiv.scrollTop -
-        contentScrollDiv.clientHeight <=
-        margin
+      contentScrollDiv.scrollTop -
+      contentScrollDiv.clientHeight <=
+      margin
   }
 
   $: selectedAssistant = assistants.find((a) => a.id === selectedAssistantId) || null
   $: contentScrollDiv &&
-    messages &&
-    messages.length > 0 &&
-    isContentAtBottom &&
-    scrollContentToBottom()
+  messages &&
+  messages.length > 0 &&
+  isContentAtBottom &&
+  scrollContentToBottom()
   $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
   $: invalidInputLength =
     (maxInputLength ?? 0) > 0 && currentMessageInput.length > (maxInputLength ?? 0)
 
   const scrollToBottom = (node: Element) => {
-    node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+    node.scroll({top: node.scrollHeight, behavior: 'smooth'})
   }
 
   function scrollContentToBottom() {
@@ -152,7 +152,7 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
 
     fetch('/api/sse/chat/question', {
       method: 'POST',
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({question}),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -303,7 +303,7 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
       {:else}
         <div class="prose">
           {#if selectedAssistant}
-            <SvelteMarkdown source={selectedAssistant.description} />
+            <SvelteMarkdownWrapper source={selectedAssistant.description}/>
             <div class="flex gap-2 max-w-full flex-wrap justify-center">
               {#each selectedAssistant.sampleQuestions as question}
                 <button
@@ -321,7 +321,7 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
             </p>
             <p>Choose an assistant from the dropdown to begin.</p>
             {#if termOfService}
-              <SvelteMarkdown source={termOfService} />
+              <SvelteMarkdownWrapper source={termOfService}/>
             {/if}
           {/if}
         </div>
@@ -330,13 +330,13 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
       {#if lastMessageErrored}
         <div class="flex items-center gap-2">
           <span>Ett fel uppstod ⚠️️</span>
-          <button class="btn btn-link active:opacity-60" on:click={retryLastMessage}
-            >Försök igen</button
-          >
+          <button class="btn btn-link active:opacity-60" on:click={retryLastMessage}>
+            Försök igen
+          </button>
         </div>
       {/if}
 
-      <span class="loading loading-spinner" class:opacity-0={!eventSource} />
+      <span class="loading loading-spinner" class:opacity-0={!eventSource}/>
     </div>
   </div>
 
@@ -352,10 +352,10 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
             <span
               class:hidden={(maxInputLength ?? 0) <= 0}
               class="block text-right text-xs"
-              ><span
-                class:text-error={invalidInputLength}
-                class:text-medium={invalidInputLength}>{currentMessageInput.length}</span
-              >
+            ><span
+              class:text-error={invalidInputLength}
+              class:text-medium={invalidInputLength}>{currentMessageInput.length}</span
+            >
               / {maxInputLength}</span
             >
             <textarea
