@@ -1,8 +1,12 @@
+import logging
 import re
 import random
+import jwt
 from collections.abc import Callable
 from datetime import timedelta
+from typing import Annotated
 
+from fastapi import HTTPException, Header
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearerCookie
 from passlib.context import CryptContext
 
@@ -68,6 +72,34 @@ def try_match_email(email: str, pattern: str) -> bool:
         return True
 
     return False
+
+
+def is_auth_disabled() -> bool:
+    return settings.ENV_MODE != 'production' and settings.DISABLE_AUTH
+
+
+def read_public_key(file: str) -> str:
+    with open(file, 'r') as f:
+        return f.read()
+
+
+def validate_key(key: str, public_key: str) -> bool:
+    try:
+        jwt.decode(key, public_key, algorithms=['RS256'])
+        return True
+    except Exception as e:
+        logging.debug(msg=str(e), exc_info=True)
+        return False
+
+
+def authenticate(x_api_key: Annotated[str, Header()]) -> None:
+    try:
+        if is_auth_disabled():
+            return
+        if not validate_key(x_api_key, read_public_key(settings.PUBLIC_KEY_FILE)):
+            raise HTTPException(status_code=401, detail='Unauthorized')
+    except Exception as e:
+        raise e
 
 
 generate_pin_code = create_pin_factory_from_env()
