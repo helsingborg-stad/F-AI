@@ -22,9 +22,10 @@ class Settings(BaseSettings, extra=Extra.ignore):
     BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
     BREVO_API_KEY: SecretStr = 'api-key'
     ALGORITHM: str = 'HS256'
+    JWT_DECODE_ALGORITHM: str = 'RS256'
+    DISABLE_API_AUTHENTICATION: bool = False
+    PUBLIC_KEY: str
     ENV_MODE: Literal['testing', 'development', 'production'] = 'production'
-    DISABLE_AUTH: bool = True
-    PUBLIC_KEY_FILE: str | None = 'api-key.pub'
     MONGO_DB_NAME: str = 'fai-rag-app'
     MONGO_DB_URI: str = 'mongodb://localhost:27017'
     FIXED_PIN: int | None = None

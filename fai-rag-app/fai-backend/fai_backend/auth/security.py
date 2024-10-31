@@ -6,7 +6,8 @@ from collections.abc import Callable
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import HTTPException, Header
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearerCookie
 from passlib.context import CryptContext
 
@@ -74,32 +75,29 @@ def try_match_email(email: str, pattern: str) -> bool:
     return False
 
 
-def is_auth_disabled() -> bool:
-    return settings.ENV_MODE != 'production' and settings.DISABLE_AUTH
+def is_authenticate_disabled() -> bool:
+    return settings.DISABLE_API_AUTHENTICATION
 
 
-def read_public_key(file: str) -> str:
-    with open(file, 'r') as f:
-        return f.read()
+def get_public_key() -> str:
+    return settings.PUBLIC_KEY
 
 
-def validate_key(key: str, public_key: str) -> bool:
+def validate_token_adapter(token: str, public_key: str, algorithm: str) -> bool:
     try:
-        jwt.decode(key, public_key, algorithms=['RS256'])
+        jwt.decode(jwt=token, key=public_key, algorithms=[algorithm])
         return True
     except Exception as e:
-        logging.debug(msg=str(e), exc_info=True)
+        logging.info(e)
         return False
 
 
-def authenticate(x_api_key: Annotated[str, Header()] = None) -> None:
-    try:
-        if is_auth_disabled():
-            return
-        if not validate_key(x_api_key, read_public_key(settings.PUBLIC_KEY_FILE)):
-            raise HTTPException(status_code=401, detail='Unauthorized')
-    except Exception as e:
-        raise e
+def authenticate(credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(HTTPBearer())] = None) -> None:
+    if is_authenticate_disabled():
+        return None
+
+    if not validate_token_adapter(credentials.credentials, get_public_key(), settings.JWT_DECODE_ALGORITHM):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 generate_pin_code = create_pin_factory_from_env()
