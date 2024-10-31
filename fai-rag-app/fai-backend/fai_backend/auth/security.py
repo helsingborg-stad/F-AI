@@ -92,7 +92,7 @@ def validate_key(key: str, public_key: str) -> bool:
         return False
 
 
-def authenticate(x_api_key: Annotated[str, Header()]) -> None:
+def authenticate(x_api_key: Annotated[str, Header()] = None) -> None:
     try:
         if is_auth_disabled():
             return
