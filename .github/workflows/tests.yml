@@ -53,4 +53,6 @@ jobs:
           poetry install
 
       - name: Run tests
+        env:
+          PUBLIC_KEY: ""
         run: poetry run pytest -s -vv
