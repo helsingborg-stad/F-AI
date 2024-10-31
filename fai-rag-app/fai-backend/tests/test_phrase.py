@@ -1,9 +1,17 @@
 from fastapi.testclient import TestClient
 
+from fai_backend.auth.security import authenticate
 from fai_backend.main import app
 from fai_backend.phrase import phrase, set_language
 
 client = TestClient(app)
+
+
+def authenticate_override():
+    return True
+
+
+app.dependency_overrides[authenticate] = authenticate_override
 
 
 def test_greeting_swedish():
