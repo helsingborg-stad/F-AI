@@ -1,23 +1,11 @@
 <script lang="ts">
-  import Button from './Button.svelte'
-  import ChatBubble from './ChatBubble.svelte'
+  import Button from '../Button.svelte'
+  import ChatBubble from '../ChatBubble.svelte'
   import SvelteMarkdownWrapper from '$lib/components/SvelteMarkdownWrapper.svelte'
   import SVG from '$lib/components/SVG.svelte'
-  import { findLastIndex } from '../../util/array'
-
-  interface IncomingMessage {
-    timestamp: string
-    source?: string
-    content: string
-  }
-
-  interface ChatMessage {
-    id: string
-    user: string
-    content: string
-    timestamp: string
-    isSelf: boolean
-  }
+  import { findLastIndex } from '../../../util/array'
+  import TokenCounter from '$lib/components/chat/TokenCounter.svelte'
+  import { type ChatMessage, type IncomingMessage, incomingMessageToChatMessage, SSE } from '$lib/components/chat/SSE'
 
   interface Assistant {
     id: string
@@ -60,65 +48,80 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
   let selectedAssistantId: string
   let selectedAssistant: Assistant | null = null
   let activeConversationId: string | null = null
-  let messages: ChatMessage[] = []
-  let currentMessageInput: string = ''
-  let eventSource: EventSource | null = null
-
-  let contentScrollDiv: Element
-  let isContentAtBottom: Boolean = true
-  let lastMessageErrored: Boolean = false
-
-  let tokenCount = -1
-  let tokenTimeoutHandle = -1
-  $: maxTokens = initialState?.max_tokens ?? selectedAssistant?.maxTokens ?? -1
-  $: invalidInputLength = maxTokens > 0 && tokenCount > maxTokens
-  $: {
-    if (selectedAssistantId) {
-      tokenCount = -1
-    }
-  }
-
-  $: console.log(initialState)
-
-  // TODO: send assistant_id as well
-  function updateTokenCount(text: string, conversationId: string | null, assistantId: string | null) {
-    console.log(text, conversationId, assistantId)
-    fetch(`/api/count-tokens`, {
-        method: 'POST',
-        body: JSON.stringify({ text, conversation_id: conversationId, assistant_id: assistantId }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    ).then(res => res.json())
-      .then(res => {
-        tokenCount = res?.count ?? -1
-      })
-      .catch(() => {
-        tokenCount = -1
-      })
-      .finally(() => {
-        tokenTimeoutHandle = -1
-      })
-  }
-
-  function queueUpdateTokenCount(text: string, conversationId: string | null, assistantId: string | null) {
-    clearTimeout(tokenTimeoutHandle)
-    tokenTimeoutHandle = setTimeout(() => updateTokenCount(text, conversationId, assistantId), 1000)
-  }
-
-  $: activeConversationId && queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
-  $: messages && activeConversationId && queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
-  $: selectedAssistantId && queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
-
+  $: selectedAssistant = assistants.find((a) => a.id === selectedAssistantId) || null
   $: {
     if (initialState) {
       activeConversationId = initialState.chat_id
-      messages = initialState.history.map(toChatMessage)
+      messages = initialState.history.map(incomingMessageToChatMessage)
     } else {
       messages = []
     }
   }
+
+  /** SSE */
+  let messages: ChatMessage[] = []
+  let currentMessageInput: string = ''
+  let isRequestRunning: boolean = false
+  let lastMessageErrored: Boolean = false
+
+  let sse = new SSE(
+    onSSEError,
+    onSSEConversationIdUpdate,
+    onAddOrUpdateMessage,
+    onSSEStatusChanged,
+  )
+
+  function onSSEError() {
+    lastMessageErrored = true
+  }
+
+  function onSSEConversationIdUpdate(id: string) {
+    activeConversationId = id
+  }
+
+  function onAddOrUpdateMessage(message: ChatMessage) {
+    const existingIndex = messages.findIndex(m => m.id === message.id)
+    if (existingIndex > -1) {
+      messages.splice(existingIndex, 1, {
+        ...messages[existingIndex],
+        ...message,
+      })
+      messages = [...messages]
+      return
+    }
+    messages = [...messages, message]
+  }
+
+  function onSSEStatusChanged(inIsRequestRunning: boolean) {
+    isRequestRunning = inIsRequestRunning
+  }
+
+  function createSSE(question: string) {
+    lastMessageErrored = false
+    sse.create(question, activeConversationId, selectedAssistant?.project, selectedAssistant?.id)
+    currentMessageInput = ''
+  }
+
+  function closeSSE() {
+    sse.close()
+  }
+
+  /** Token Counting */
+  let exceededTokenCount: false
+  let tokenCounter: TokenCounter
+  $: activeConversationId && tokenCounter?.queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
+  $: messages && activeConversationId && tokenCounter?.queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
+  $: selectedAssistantId && tokenCounter?.queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
+
+  /** Scrolling */
+  let contentScrollDiv: Element
+  let isContentAtBottom: Boolean = true
+  $: contentScrollDiv &&
+  messages &&
+  messages.length > 0 &&
+  isContentAtBottom &&
+  scrollContentToBottom()
+  $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
 
   function updateBottomCheck() {
     const margin = 50
@@ -130,14 +133,6 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
       margin
   }
 
-  $: selectedAssistant = assistants.find((a) => a.id === selectedAssistantId) || null
-  $: contentScrollDiv &&
-  messages &&
-  messages.length > 0 &&
-  isContentAtBottom &&
-  scrollContentToBottom()
-  $: lastMessageErrored && setTimeout(scrollContentToBottom, 100)
-
   const scrollToBottom = (node: Element) => {
     node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
   }
@@ -146,113 +141,17 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
     scrollToBottom(contentScrollDiv)
   }
 
-  function toChatMessage(sse: IncomingMessage): ChatMessage {
-    return {
-      id: sse.timestamp,
-      user: sse.source ?? '',
-      content: sse.content ?? '',
-      timestamp: sse.timestamp,
-      isSelf: sse.source == 'user',
-    }
-  }
-
+  /** Misc UI */
   function clearChat() {
     messages = []
     activeConversationId = null
     lastMessageErrored = false
   }
 
-  function closeSSE() {
-    eventSource?.close()
-    eventSource = null
-  }
-
-  function createSSE(question: string) {
-    if (question.length == 0) return
-    currentMessageInput = ''
-
-    messages = [
-      ...messages,
-      {
-        id: `self${messages.length}`,
-        isSelf: true,
-        user: 'Me',
-        content: question,
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: `placeholder${messages.length}`,
-        isSelf: false,
-        user: '',
-        content: '',
-        timestamp: '',
-      },
-    ]
-
-    closeSSE()
-
-    fetch('/api/sse/chat/question', {
-      method: 'POST',
-      body: JSON.stringify({ question }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((response) => {
-        const questionId = response.id
-
-        const fullEndpoint = activeConversationId
-          ? `/api/sse/chat/stream/continue/${activeConversationId}?stored_question_id=${questionId}`
-          : `/api/sse/chat/stream/new/${selectedAssistant!.project}/${selectedAssistant!.id}?stored_question_id=${questionId}`
-
-        eventSource = new EventSource(fullEndpoint)
-
-        eventSource.onerror = (e) => {
-          console.error(e)
-          lastMessageErrored = true
-          closeSSE()
-        }
-
-        eventSource.addEventListener('message_end', () => {
-          closeSSE()
-        })
-
-        eventSource.addEventListener('conversation_id', (e) => {
-          activeConversationId = e.data
-        })
-
-        eventSource.addEventListener('exception', () => {
-          lastMessageErrored = true
-        })
-
-        eventSource.addEventListener('message', (e) => {
-          try {
-            const bytes = Uint8Array.from(atob(e.data), (m) => m.codePointAt(0)!)
-            const jsonString = new TextDecoder().decode(bytes)
-            const messagePayload = JSON.parse(jsonString) as IncomingMessage
-            const chatMessage = toChatMessage(messagePayload)
-
-            messages = [
-              ...messages.slice(0, -1),
-              {
-                ...messages.at(-1),
-                ...chatMessage,
-                content: messages.at(-1)!.content + chatMessage.content,
-              },
-            ]
-          } catch (ex) {
-            console.error('Failed to parse raw message', ex, e)
-            closeSSE()
-          }
-        })
-      })
-  }
-
   function handleTextareaKeypress(event: KeyboardEvent) {
     if (event.key == 'Enter' && !event.shiftKey) {
       event.preventDefault()
-      if (!invalidInputLength) createSSE(currentMessageInput)
+      if (!exceededTokenCount) createSSE(currentMessageInput)
     }
   }
 
@@ -273,7 +172,7 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
   }
 
   function formButtonClick() {
-    if (eventSource) {
+    if (isRequestRunning) {
       closeSSE()
       return
     }
@@ -281,7 +180,7 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
     createSSE(currentMessageInput)
   }
 
-  $: formButtonIcon = eventSource
+  $: formButtonIcon = isRequestRunning
     ? 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNpcmNsZS1zdG9wIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjxyZWN0IHg9IjkiIHk9IjkiIHdpZHRoPSI2IiBoZWlnaHQ9IjYiIHJ4PSIxIi8+PC9zdmc+'
     : 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlbmQiPjxwYXRoIGQ9Im0yMiAyLTcgMjAtNC05LTktNFoiLz48cGF0aCBkPSJNMjIgMiAxMSAxMyIvPjwvc3ZnPg=='
 </script>
@@ -377,7 +276,7 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
         </div>
       {/if}
 
-      <span class="loading loading-spinner" class:opacity-0={!eventSource} />
+      <span class="loading loading-spinner" class:opacity-0={!isRequestRunning} />
     </div>
   </div>
 
@@ -390,27 +289,21 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
       >
         <div class="flex h-full w-full items-end gap-2">
           <div class="flex h-full w-full grow flex-col gap-1.5">
-            <span
-              class:hidden={maxTokens <= 0}
-              class="block text-right text-xs">
-              {#if tokenTimeoutHandle >= 0}
-                ...
-              {:else if tokenCount >= 0}
-                {tokenCount}/{maxTokens}
-              {:else}
-                ?
-              {/if}
-            </span>
+            <TokenCounter
+              bind:this={tokenCounter}
+              maxTokens={initialState?.max_tokens ?? selectedAssistant?.maxTokens ?? -1}
+              bind:exceededTokenCount={exceededTokenCount}
+            />
             <textarea
               name="message"
               bind:value={currentMessageInput}
               on:keydown={handleTextareaKeypress}
               class="textarea textarea-bordered h-full grow"
-              class:textarea-error={invalidInputLength}
+              class:textarea-error={exceededTokenCount}
             />
           </div>
           <Button
-            disabled={invalidInputLength}
+            disabled={exceededTokenCount}
             on:click={formButtonClick}
             label=""
             iconSrc={formButtonIcon}
