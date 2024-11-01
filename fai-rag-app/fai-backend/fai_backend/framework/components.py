@@ -290,6 +290,7 @@ class Assistant(BaseModel):
     description: str
     sampleQuestions: list[str]
     maxTokens: int
+    allowInlineFiles: bool
 
 
 class SSEChat(UIComponent):

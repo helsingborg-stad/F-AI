@@ -34,6 +34,7 @@ def chat_index_view(authenticated_user: ProjectUser | None = Depends(get_project
                               project=p.id,
                               description=a.meta.description,
                               maxTokens=a.max_tokens,
+                              allowInlineFiles=a.allow_inline_files,
                               sampleQuestions=a.meta.sample_questions) for p in projects for a in p.assistants if
                   not a.id.startswith('_')]
 

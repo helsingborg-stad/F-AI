@@ -74,6 +74,15 @@ def AssistantForm(
                     ),
 
                     c.Select(
+                        name='allow_inline_files',
+                        label=_('Allow users to attach files in chat'),
+                        required=True,
+                        options=[('True', 'Yes'), ('False', 'No')],
+                        value=str(data.allow_inline_files) if data else "False",
+                        size='sm'
+                    ),
+
+                    c.Select(
                         name='files_collection_id',
                         label=_('Collection ID'),
                         required=False,

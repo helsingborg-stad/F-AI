@@ -15,6 +15,7 @@
     description: string
     sampleQuestions: string[]
     maxTokens: number
+    allowInlineFiles: boolean
   }
 
   interface InitialState {
@@ -417,22 +418,28 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
       </div>
       <div class="w-full h-full" />
 
-      <div class="w-full h-full flex items-end">
-        <Button
-          on:click={showInlineFileDialog}
-          label=""
-          iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXBhcGVyY2xpcCI+PHBhdGggZD0ibTIxLjQ0IDExLjA1LTkuMTkgOS4xOWE2IDYgMCAwIDEtOC40OS04LjQ5bDguNTctOC41N0E0IDQgMCAxIDEgMTggOC44NGwtOC41OSA4LjU3YTIgMiAwIDAgMS0yLjgzLTIuODNsOC40OS04LjQ4Ii8+PC9zdmc+"
-        />
-        <div class="hidden">
-          <input
-            bind:this={inlineFileInput}
-            type="file"
-            multiple
-            on:change={inlineFilesChanged}
+      {#if selectedAssistant?.allowInlineFiles}
+        <div class="w-full h-full flex items-end">
+          <Button
+            on:click={showInlineFileDialog}
+            label=""
+            iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXBhcGVyY2xpcCI+PHBhdGggZD0ibTIxLjQ0IDExLjA1LTkuMTkgOS4xOWE2IDYgMCAwIDEtOC40OS04LjQ5bDguNTctOC41N0E0IDQgMCAxIDEgMTggOC44NGwtOC41OSA4LjU3YTIgMiAwIDAgMS0yLjgzLTIuODNsOC40OS04LjQ4Ii8+PC9zdmc+"
           />
+          <div class="hidden">
+            <input
+              bind:this={inlineFileInput}
+              type="file"
+              multiple
+              on:change={inlineFilesChanged}
+            />
+          </div>
         </div>
-      </div>
-      <div class="w-full h-full">
+      {/if}
+
+      <div
+        class="w-full h-full"
+        class:col-span-2={!selectedAssistant || !selectedAssistant.allowInlineFiles}
+      >
         <textarea
           name="message"
           bind:value={currentMessageInput}
