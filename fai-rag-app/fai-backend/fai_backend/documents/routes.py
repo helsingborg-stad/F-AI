@@ -1,3 +1,5 @@
+from tempfile import NamedTemporaryFile
+
 from fastapi import APIRouter, Depends, Form, UploadFile
 
 from fai_backend.collection.dependencies import get_collection_service
@@ -5,6 +7,7 @@ from fai_backend.collection.service import CollectionService
 from fai_backend.config import settings
 from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
 from fai_backend.files.dependecies import get_file_upload_service
+from fai_backend.files.file_parser import ParserFactory
 from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
@@ -162,3 +165,16 @@ def parse_documents(
     file_service.dump_list_to_json(stringify_parsed_files, dest_directory_path, dest_file_name)
 
     return []
+
+
+@router.post('/document/parse')
+def parse_document(
+        file: UploadFile
+):
+    with NamedTemporaryFile(delete=False) as temp:
+        temp.write(file.file.read())
+        temp.flush()
+        parser = ParserFactory.get_parser(temp.name)
+        parsed = parser.parse(temp.name)
+        joined = "\n\n".join([p.text for p in parsed])
+        return joined

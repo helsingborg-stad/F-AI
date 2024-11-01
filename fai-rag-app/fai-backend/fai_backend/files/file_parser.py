@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 
 import magic
+from unstructured.documents.elements import Element
 from unstructured.partition.docx import partition_docx
 from unstructured.partition.md import partition_md
 from unstructured.partition.pdf import partition_pdf
@@ -10,7 +11,7 @@ from unstructured.partition.html import partition_html
 
 class AbstractDocumentParser(ABC):
     @abstractmethod
-    def parse(self, filename: str):
+    def parse(self, filename: str) -> list[Element]:
         pass
 
 
