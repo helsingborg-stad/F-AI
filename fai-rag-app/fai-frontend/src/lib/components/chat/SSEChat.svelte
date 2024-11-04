@@ -22,6 +22,7 @@
     chat_id: string
     max_tokens: number
     history: IncomingMessage[]
+    allow_inline_files: boolean
   }
 
   interface InlineFile {
@@ -190,8 +191,10 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
   /** File inlining */
   let inlineFileInput: HTMLInputElement
   let inlineFiles: { [id: string]: InlineFile } = {}
+  let allowInlineFiles = false
   let anyInvalidFiles: boolean = false
   $: anyInvalidFiles = Object.keys(inlineFiles).some(i => inlineFiles[i].status !== 'done')
+  $: allowInlineFiles = !!selectedAssistant?.allowInlineFiles || !!initialState?.allow_inline_files
 
   function parseInlineFile(id: string) {
     if (!inlineFiles[id]) {
@@ -418,7 +421,7 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
       </div>
       <div class="w-full h-full" />
 
-      {#if selectedAssistant?.allowInlineFiles}
+      {#if allowInlineFiles}
         <div class="w-full h-full flex items-end">
           <Button
             on:click={showInlineFileDialog}
@@ -438,7 +441,7 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
 
       <div
         class="w-full h-full"
-        class:col-span-2={!selectedAssistant || !selectedAssistant.allowInlineFiles}
+        class:col-span-2={!allowInlineFiles}
       >
         <textarea
           name="message"

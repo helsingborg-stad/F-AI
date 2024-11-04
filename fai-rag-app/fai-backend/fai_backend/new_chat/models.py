@@ -12,6 +12,7 @@ class ClientChatState(BaseModel):
     rename_label: str = "Rename"  # TODO: fix hack for allowing something to show up in list to click on.
     history: list[LLMClientChatMessage]
     max_tokens: int
+    allow_inline_files: bool
 
 
 class ChatHistoryEditPayload(BaseModel):
