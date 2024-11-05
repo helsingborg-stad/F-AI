@@ -8,6 +8,7 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from fai_backend.assistant.routes import router as assistant_router
 from fai_backend.assistant.sse_routes import sse_router as assistant_sse_router
 from fai_backend.auth.router import router as auth_router
+from fai_backend.auth.security import authenticate_api_access
 from fai_backend.config import settings
 from fai_backend.dependencies import get_project_user
 from fai_backend.documents.routes import router as documents_router
@@ -54,7 +55,6 @@ app.include_router(documents_router)
 app.include_router(vector_router)
 app.include_router(assistant_router)
 
-
 app.middleware('http')(add_git_revision_to_request_header)
 app.middleware('http')(remove_trailing_slash)
 
@@ -75,7 +75,7 @@ async def health_check():
     return {'status': 'healthy'}
 
 
-@app.get('/greet')
+@app.get('/greet', dependencies=[Depends(authenticate_api_access)])
 async def greet(language: str = Header(default='en')):
     set_language(language)
     return {'message': _('greeting', '')}

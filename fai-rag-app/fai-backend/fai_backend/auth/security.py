@@ -1,11 +1,18 @@
+import logging
 import re
 import random
+import jwt
 from collections.abc import Callable
 from datetime import timedelta
+from typing import Annotated
 
+from fastapi import Depends, HTTPException, status
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearerCookie
 from passlib.context import CryptContext
+from starlette.requests import Request
 
+from fai_backend.auth.http_bearer_factory import ApiCredentialsFactory
+from fai_backend.auth.schema import CustomHTTPAuthorizationCredentials
 from fai_backend.config import settings
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -68,6 +75,33 @@ def try_match_email(email: str, pattern: str) -> bool:
         return True
 
     return False
+
+
+async def get_api_credentials(r: Request) -> CustomHTTPAuthorizationCredentials:
+    api_credentials = ApiCredentialsFactory.create(settings.HTTP_AUTHENTICATION_TYPE)
+    return await api_credentials.create(r)
+
+
+def get_public_key() -> str:
+    return settings.PUBLIC_KEY
+
+
+def validate_token_adapter(token: str, public_key: str, algorithm: str) -> bool:
+    try:
+        jwt.decode(jwt=token, key=public_key, algorithms=[algorithm])
+        return True
+    except Exception as e:
+        logging.info(e)
+        return False
+
+
+async def authenticate_api_access(
+        credentials: Annotated[CustomHTTPAuthorizationCredentials, Depends(get_api_credentials)]) -> None:
+    if credentials.is_disabled:
+        return None
+
+    if not validate_token_adapter(credentials.credentials, get_public_key(), settings.JWT_DECODE_ALGORITHM):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 generate_pin_code = create_pin_factory_from_env()
