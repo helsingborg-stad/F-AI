@@ -7,10 +7,12 @@ from datetime import timedelta
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearerCookie
 from passlib.context import CryptContext
+from starlette.requests import Request
 
+from fai_backend.auth.http_bearer_factory import ApiCredentialsFactory
+from fai_backend.auth.schema import CustomHTTPAuthorizationCredentials
 from fai_backend.config import settings
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -75,8 +77,9 @@ def try_match_email(email: str, pattern: str) -> bool:
     return False
 
 
-def is_authenticate_disabled() -> bool:
-    return settings.DISABLE_API_AUTHENTICATION
+async def get_api_credentials(r: Request) -> CustomHTTPAuthorizationCredentials:
+    api_credentials = ApiCredentialsFactory.create(settings.HTTP_AUTHENTICATION_TYPE)
+    return await api_credentials.create(r)
 
 
 def get_public_key() -> str:
@@ -92,8 +95,9 @@ def validate_token_adapter(token: str, public_key: str, algorithm: str) -> bool:
         return False
 
 
-def authenticate(credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(HTTPBearer())] = None) -> None:
-    if is_authenticate_disabled():
+async def authenticate_api_access(
+        credentials: Annotated[CustomHTTPAuthorizationCredentials, Depends(get_api_credentials)]) -> None:
+    if credentials.is_disabled:
         return None
 
     if not validate_token_adapter(credentials.credentials, get_public_key(), settings.JWT_DECODE_ALGORITHM):

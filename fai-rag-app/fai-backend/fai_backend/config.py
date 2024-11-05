@@ -23,8 +23,8 @@ class Settings(BaseSettings, extra=Extra.ignore):
     BREVO_API_KEY: SecretStr = 'api-key'
     ALGORITHM: str = 'HS256'
     JWT_DECODE_ALGORITHM: str = 'RS256'
-    DISABLE_API_AUTHENTICATION: bool = False
-    PUBLIC_KEY: str
+    HTTP_AUTHENTICATION_TYPE: Literal['http_bearer', 'none'] = 'http_bearer'
+    PUBLIC_KEY: str = ''
     ENV_MODE: Literal['testing', 'development', 'production'] = 'production'
     MONGO_DB_NAME: str = 'fai-rag-app'
     MONGO_DB_URI: str = 'mongodb://localhost:27017'

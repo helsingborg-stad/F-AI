@@ -1,3 +1,4 @@
+from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr, SecretStr
 
 
@@ -22,3 +23,7 @@ class RequestPinVerification(BaseModel):
 class ResponseToken(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class CustomHTTPAuthorizationCredentials(HTTPAuthorizationCredentials):
+    is_disabled: bool
