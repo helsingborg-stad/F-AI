@@ -90,7 +90,8 @@ class TemplatePayloadAdapter:
                                                                                                    0].settings else None,
                 instructions=template.streams[0].messages[0].content or '',
                 files_collection_id=template.files_collection_id,
-                max_tokens=template.max_tokens
+                max_tokens=template.max_tokens,
+                allow_inline_files=template.allow_inline_files
             )
 
         def rag_stream_adapter():
@@ -107,7 +108,8 @@ class TemplatePayloadAdapter:
                                                                                                    1].settings else None,
                 instructions=template.streams[1].messages[0].content or '',
                 files_collection_id=template.files_collection_id,
-                max_tokens=template.max_tokens
+                max_tokens=template.max_tokens,
+                allow_inline_files=template.allow_inline_files
             )
 
         return basic_stream_adapter() if len(template.streams) == 1 else rag_stream_adapter()
@@ -179,6 +181,7 @@ class TemplatePayloadAdapter:
                     payload.sample_questions) > 0 else []
             ),
             max_tokens=payload.max_tokens,
+            allow_inline_files=payload.allow_inline_files,
             files_collection_id=payload.files_collection_id,
             streams=basic_stream() if payload.files_collection_id is '' else rag_stream()
         )

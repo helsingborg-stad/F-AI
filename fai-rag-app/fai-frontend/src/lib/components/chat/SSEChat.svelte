@@ -6,6 +6,7 @@
   import { findLastIndex } from '../../../util/array'
   import TokenCounter from '$lib/components/chat/TokenCounter.svelte'
   import { type ChatMessage, type IncomingMessage, incomingMessageToChatMessage, SSE } from '$lib/components/chat/SSE'
+  import AttachedFile from '$lib/components/chat/AttachedFile.svelte'
 
   interface Assistant {
     id: string
@@ -14,13 +15,27 @@
     description: string
     sampleQuestions: string[]
     maxTokens: number
+    allowInlineFiles: boolean
   }
 
   interface InitialState {
     chat_id: string
     max_tokens: number
     history: IncomingMessage[]
+    allow_inline_files: boolean
   }
+
+  interface InlineFile {
+    file: File
+    status: 'parsing' | 'done' | 'error'
+    parsed_content: string | null
+  }
+
+  const inlineFileAttachedFileStatusStateMap = {
+    'parsing': 'pending',
+    'done': 'valid',
+    'error': 'invalid',
+  } as const
 
   export let assistants: Assistant[] = []
   export let initialState: InitialState | undefined
@@ -56,6 +71,36 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
     } else {
       messages = []
     }
+  }
+
+  function redactDocumentText(fullContent: string): string {
+    const beginMatcher = /\[BEGIN DOCUMENT (.*)]/
+    const match = beginMatcher.exec(fullContent)
+    if (match) {
+      const endTag = '\n[END DOCUMENT]\n'
+      const endIndex = fullContent.indexOf(endTag, match.index)
+      if (endIndex !== -1) {
+        const redacted = fullContent.slice(0, match.index)
+          + `[document ${match[1]}]`
+          + fullContent.slice(endIndex + endTag.length)
+        return redactDocumentText(redacted)
+      }
+    }
+    return fullContent
+  }
+
+  function getFullMessageInput(question: string) {
+    let fullQuestion = question
+
+    const fileIds = Object.keys(inlineFiles)
+    if (fileIds.length > 0) {
+      const combinedContent = fileIds
+        .map(id => `[BEGIN DOCUMENT ${inlineFiles[id].file.name}]\n${inlineFiles[id].parsed_content}\n[END DOCUMENT]`)
+        .join('\n\n')
+      fullQuestion = combinedContent + '\n\n' + fullQuestion
+    }
+
+    return fullQuestion
   }
 
   /** SSE */
@@ -98,8 +143,9 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
 
   function createSSE(question: string) {
     lastMessageErrored = false
-    sse.create(question, activeConversationId, selectedAssistant?.project, selectedAssistant?.id)
+    sse.create(getFullMessageInput(question), activeConversationId, selectedAssistant?.project, selectedAssistant?.id)
     currentMessageInput = ''
+    inlineFiles = {}
   }
 
   function closeSSE() {
@@ -109,9 +155,10 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
   /** Token Counting */
   let exceededTokenCount: false
   let tokenCounter: TokenCounter
-  $: activeConversationId && tokenCounter?.queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
-  $: messages && activeConversationId && tokenCounter?.queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
-  $: selectedAssistantId && tokenCounter?.queueUpdateTokenCount(currentMessageInput, activeConversationId, selectedAssistantId)
+  $: activeConversationId && tokenCounter?.queueUpdateTokenCount(getFullMessageInput(currentMessageInput), activeConversationId, selectedAssistantId)
+  $: messages && activeConversationId && tokenCounter?.queueUpdateTokenCount(getFullMessageInput(currentMessageInput), activeConversationId, selectedAssistantId)
+  $: selectedAssistantId && tokenCounter?.queueUpdateTokenCount(getFullMessageInput(currentMessageInput), activeConversationId, selectedAssistantId)
+  $: inlineFiles && tokenCounter?.queueUpdateTokenCount(getFullMessageInput(currentMessageInput), activeConversationId, selectedAssistantId)
 
   /** Scrolling */
   let contentScrollDiv: Element
@@ -141,6 +188,68 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
     scrollToBottom(contentScrollDiv)
   }
 
+  /** File inlining */
+  let inlineFileInput: HTMLInputElement
+  let inlineFiles: { [id: string]: InlineFile } = {}
+  let allowInlineFiles = false
+  let anyInvalidFiles: boolean = false
+  $: anyInvalidFiles = Object.keys(inlineFiles).some(i => inlineFiles[i].status !== 'done')
+  $: allowInlineFiles = !!selectedAssistant?.allowInlineFiles || !!initialState?.allow_inline_files
+
+  function parseInlineFile(id: string) {
+    if (!inlineFiles[id]) {
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('file', inlineFiles[id].file)
+
+    inlineFiles[id].status = 'parsing'
+    fetch('/api/document/parse', {
+      method: 'POST',
+      body: formData,
+    }).then(r => {
+      if (!r.ok) {
+        throw Error(`${r.status} ${r.statusText}`)
+      }
+      return r.text()
+    })
+      .then(data => {
+        console.log('data', data)
+        inlineFiles[id].parsed_content = data
+        inlineFiles[id].status = 'done'
+      })
+      .catch(err => {
+        inlineFiles[id].status = 'error'
+        console.error(`failed to parse`, err, inlineFiles[id])
+      })
+  }
+
+  function showInlineFileDialog() {
+    inlineFileInput.click()
+  }
+
+  function inlineFilesChanged(ev: Event) {
+    const element = ev.currentTarget as HTMLInputElement
+    const files: File[] = element.files ? Array.from(element.files) : []
+    inlineFiles = files.reduce((acc, file) => ({
+      ...acc,
+      [`${file.name}_${file.lastModified}`]: {
+        file,
+        status: 'parsing',
+        parsed_content: null,
+      },
+    }), {})
+
+    Object.keys(inlineFiles).forEach(parseInlineFile)
+  }
+
+  function removeInlineFile(id: string) {
+    delete inlineFiles[id]
+    inlineFiles = { ...inlineFiles }
+  }
+
+
   /** Misc UI */
   function clearChat() {
     messages = []
@@ -151,12 +260,16 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
   function handleTextareaKeypress(event: KeyboardEvent) {
     if (event.key == 'Enter' && !event.shiftKey) {
       event.preventDefault()
-      if (!exceededTokenCount) createSSE(currentMessageInput)
+      if (!exceededTokenCount && !anyInvalidFiles) createSSE(currentMessageInput)
     }
   }
 
   function formatMessageForMarkdown(content: string): string {
     return content.replace(/\n/g, `\n\n  `)
+  }
+
+  function formatSelfMessage(content: string): string {
+    return redactDocumentText(content)
   }
 
   function askSampleQuestion(question: string) {
@@ -187,13 +300,13 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
 
 <div
   class="absolute bottom-0 top-16 grid w-full overflow-hidden lg:w-[calc(100%-20rem)]"
-  class:grid-rows-[6rem_1fr_7rem]={!initialState}
-  class:grid-rows-[1fr_7rem]={initialState}
+  class:grid-rows-[6rem_1fr_12rem]={!initialState}
+  class:grid-rows-[1fr_12rem]={initialState}
 >
   <!-- Floating controls -->
   <div
-    class="absolute inset-x-0 bottom-32 z-10 flex justify-center transition"
-    class:translate-y-20={isContentAtBottom}
+    class="absolute inset-x-0 bottom-52 z-10 flex justify-center transition"
+    class:translate-y-40={isContentAtBottom}
   >
     <button
       on:click={scrollContentToBottom}
@@ -235,7 +348,7 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
       {#each messages as message (message.id)}
         <ChatBubble
           content={message.isSelf
-            ? message.content
+            ? formatSelfMessage(message.content)
             : formatMessageForMarkdown(message.content)}
           isSelf={message.isSelf}
           enableMarkdown={!message.isSelf}
@@ -281,35 +394,72 @@ By continuing to use Folkets AI, you confirm that you have read, understood, and
   </div>
 
   <!-- Bottom controls -->
-  <div class="z-10 p-3">
-    <form class="h-full w-full" on:submit={scrollContentToBottom}>
-      <fieldset
-        disabled={(!selectedAssistantId || !!lastMessageErrored) && !initialState}
-        class="h-full"
-      >
-        <div class="flex h-full w-full items-end gap-2">
-          <div class="flex h-full w-full grow flex-col gap-1.5">
-            <TokenCounter
-              bind:this={tokenCounter}
-              maxTokens={initialState?.max_tokens ?? selectedAssistant?.maxTokens ?? -1}
-              bind:exceededTokenCount={exceededTokenCount}
+  <div class="z-10 p-3 bg-white">
+    <div
+      class="w-full max-w-full overflow-hidden h-full grid grid-cols-[auto_1fr_auto] grid-rows-[auto_auto_1fr] gap-1">
+      <div class="w-full h-full" />
+      <div class="w-full h-full">
+        <div class="flex gap-2 w-full">
+          {#each Object.keys(inlineFiles) as fileId}
+            <AttachedFile
+              title={inlineFiles[fileId].file.name}
+              onRemove={() => removeInlineFile(fileId)}
+              state={inlineFileAttachedFileStatusStateMap[inlineFiles[fileId].status]}
             />
-            <textarea
-              name="message"
-              bind:value={currentMessageInput}
-              on:keydown={handleTextareaKeypress}
-              class="textarea textarea-bordered h-full grow"
-              class:textarea-error={exceededTokenCount}
+          {/each}
+        </div>
+      </div>
+      <div class="w-full h-full" />
+
+      <div class="w-full h-full" />
+      <div class="w-full h-full">
+        <TokenCounter
+          bind:this={tokenCounter}
+          maxTokens={initialState?.max_tokens ?? selectedAssistant?.maxTokens ?? -1}
+          bind:exceededTokenCount={exceededTokenCount}
+        />
+      </div>
+      <div class="w-full h-full" />
+
+      {#if allowInlineFiles}
+        <div class="w-full h-full flex items-end">
+          <Button
+            on:click={showInlineFileDialog}
+            label=""
+            iconSrc="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXBhcGVyY2xpcCI+PHBhdGggZD0ibTIxLjQ0IDExLjA1LTkuMTkgOS4xOWE2IDYgMCAwIDEtOC40OS04LjQ5bDguNTctOC41N0E0IDQgMCAxIDEgMTggOC44NGwtOC41OSA4LjU3YTIgMiAwIDAgMS0yLjgzLTIuODNsOC40OS04LjQ4Ii8+PC9zdmc+"
+          />
+          <div class="hidden">
+            <input
+              bind:this={inlineFileInput}
+              type="file"
+              multiple
+              on:change={inlineFilesChanged}
             />
           </div>
-          <Button
-            disabled={exceededTokenCount}
-            on:click={formButtonClick}
-            label=""
-            iconSrc={formButtonIcon}
-          />
         </div>
-      </fieldset>
-    </form>
+      {/if}
+
+      <div
+        class="w-full h-full"
+        class:col-span-2={!allowInlineFiles}
+      >
+        <textarea
+          name="message"
+          bind:value={currentMessageInput}
+          on:keydown={handleTextareaKeypress}
+          class="textarea textarea-bordered h-full w-full grow leading-tight"
+          placeholder="Message"
+          class:textarea-error={exceededTokenCount}
+        />
+      </div>
+      <div class="w-full h-full flex items-end">
+        <Button
+          disabled={exceededTokenCount || anyInvalidFiles}
+          on:click={formButtonClick}
+          label=""
+          iconSrc={formButtonIcon}
+        />
+      </div>
+    </div>
   </div>
 </div>

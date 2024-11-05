@@ -34,15 +34,21 @@
   }
 </script>
 
-<span
+<div
   class:hidden={maxTokens <= 0}
-  class="block text-right text-xs"
+  class="flex justify-between items-end"
 >
-  {#if tokenTimeoutHandle >= 0}
-    ...
-  {:else if tokenCount >= 0}
-    {tokenCount}/{maxTokens}
-  {:else}
-    ?
-  {/if}
-</span>
+  <div class="text-xs text-red-700 font-bold">
+    <span class:hidden={tokenCount <= maxTokens}>Message and/or file exceeds size limit</span>
+  </div>
+  <div class="text-xs flex">
+    {#if tokenTimeoutHandle >= 0}
+      <span>...</span>
+    {:else if tokenCount >= 0}
+      <span class:text-red-700={tokenCount > maxTokens}>{tokenCount}</span>
+      <span>/{maxTokens}</span>
+    {:else}
+      <span>?</span>
+    {/if}
+  </div>
+</div>

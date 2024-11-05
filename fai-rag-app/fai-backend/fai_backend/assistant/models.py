@@ -41,6 +41,7 @@ class AssistantTemplate(BaseModel):
     id: str
     meta: AssistantTemplateMeta
     max_tokens: int = -1
+    allow_inline_files: bool = False
     files_collection_id: Optional[str] = None
     streams: list[AssistantStreamConfig | AssistantStreamPipelineDef]
 
