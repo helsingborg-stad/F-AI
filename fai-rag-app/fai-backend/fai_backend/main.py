@@ -75,7 +75,7 @@ async def health_check():
     return {'status': 'healthy'}
 
 
-@app.get('/greet', dependencies=[Depends(authenticate_api_access)])
+@app.get('/greet')
 async def greet(language: str = Header(default='en')):
     set_language(language)
     return {'message': _('greeting', '')}
