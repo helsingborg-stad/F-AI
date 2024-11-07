@@ -1,5 +1,6 @@
 from fastapi import Depends, APIRouter
 
+from fai_backend.auth.security import authenticate_api_access
 from fai_backend.files.dependecies import get_file_upload_service
 from fai_backend.files.service import FileUploadService
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
@@ -15,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.post('/vector/create_collection', response_model=dict)
+@router.post('/vector/create_collection', response_model=dict, dependencies=[Depends(authenticate_api_access)])
 @handle_errors
 async def create_collection(
         collection_name: str,
@@ -29,7 +30,7 @@ async def create_collection(
     }
 
 
-@router.post('/vector/delete_collection', response_model=dict)
+@router.post('/vector/delete_collection', response_model=dict, dependencies=[Depends(authenticate_api_access)])
 @handle_errors
 async def delete_collection(
         collection_name: str,
@@ -43,7 +44,7 @@ async def delete_collection(
     }
 
 
-@router.post('/vector/add_to_collection', response_model=dict)
+@router.post('/vector/add_to_collection', response_model=dict, dependencies=[Depends(authenticate_api_access)])
 @handle_errors
 async def add_to_collection(
         collection_name: str,
@@ -63,7 +64,7 @@ async def add_to_collection(
     }
 
 
-@router.get('/vector/query_collection', response_model=dict)
+@router.get('/vector/query_collection', response_model=dict, dependencies=[Depends(authenticate_api_access)])
 @handle_errors
 async def query_vector(
         collection_name: str,
@@ -84,7 +85,7 @@ async def query_vector(
     }
 
 
-@router.get('/vector/list_collections', response_model=dict)
+@router.get('/vector/list_collections', response_model=dict, dependencies=[Depends(authenticate_api_access)])
 @handle_errors
 async def list_collections(
         vector_service: VectorService = Depends(get_vector_service)
@@ -97,7 +98,7 @@ async def list_collections(
     }
 
 
-@router.post('/vector/vectorize_files', response_model=dict)
+@router.post('/vector/vectorize_files', response_model=dict, dependencies=[Depends(authenticate_api_access)])
 @handle_errors
 async def vectorize_files(
         directory_path: str,
