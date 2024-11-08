@@ -47,7 +47,6 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(title='FAI RAG App', redirect_slashes=True, lifespan=lifespan)
 app.include_router(assistant_sse_router)
 app.include_router(auth_router)
-app.include_router(projects_router)
 app.include_router(feedback_router)
 app.include_router(qaf_router)
 app.include_router(new_chat_router)
