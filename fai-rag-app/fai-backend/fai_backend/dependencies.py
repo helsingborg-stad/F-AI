@@ -71,8 +71,7 @@ async def get_page_template_for_logged_in_users(permissions: list[str] = Depends
                 *qa_menu(user_permissions=permissions),
                 *document_menu_items(user_permissions=permissions),
                 *assistant_menu(user_permissions=permissions),
-                *feedback_menu_items(),
-                *mock_menu(user_permissions=permissions)]
+                *feedback_menu_items()]
 
     def page_template_function(components: list[Any] | Any, page_title: str | None) -> list[Any]:
         return page_template(
