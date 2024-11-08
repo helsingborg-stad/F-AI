@@ -52,7 +52,6 @@ app.include_router(feedback_router)
 app.include_router(qaf_router)
 app.include_router(new_chat_router)
 app.include_router(documents_router)
-app.include_router(vector_router)
 app.include_router(assistant_router)
 
 app.middleware('http')(add_git_revision_to_request_header)
