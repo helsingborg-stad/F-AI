@@ -1,11 +1,11 @@
 from tempfile import NamedTemporaryFile
 
-from fastapi import APIRouter, Depends, Form, UploadFile
+from fastapi import APIRouter, Depends, Form, Security, UploadFile
 
 from fai_backend.collection.dependencies import get_collection_service
 from fai_backend.collection.service import CollectionService
 from fai_backend.config import settings
-from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
+from fai_backend.dependencies import get_authenticated_user, get_page_template_for_logged_in_users, get_project_user
 from fai_backend.files.dependecies import get_file_upload_service
 from fai_backend.files.file_parser import ParserFactory
 from fai_backend.files.service import FileUploadService
@@ -152,22 +152,7 @@ async def upload_and_vectorize_handler(
     )
 
 
-@router.post('/documents/parse_and_save', response_model=list, response_model_exclude_none=True)
-def parse_documents(
-        src_directory_path: str,
-        dest_directory_path: str,
-        dest_file_name: str,
-        file_service: FileUploadService = Depends(get_file_upload_service),
-) -> list:
-    parsed_files = file_service.parse_files(src_directory_path)
-    stringify_parsed_files = [str(elem) for elem in parsed_files]
-
-    file_service.dump_list_to_json(stringify_parsed_files, dest_directory_path, dest_file_name)
-
-    return []
-
-
-@router.post('/document/parse')
+@router.post('/document/parse', dependencies=[Security(get_authenticated_user)])
 def parse_document(
         file: UploadFile
 ):
