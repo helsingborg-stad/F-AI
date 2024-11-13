@@ -47,12 +47,10 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(title='FAI RAG App', redirect_slashes=True, lifespan=lifespan)
 app.include_router(assistant_sse_router)
 app.include_router(auth_router)
-app.include_router(projects_router)
 app.include_router(feedback_router)
 app.include_router(qaf_router)
 app.include_router(new_chat_router)
 app.include_router(documents_router)
-app.include_router(vector_router)
 app.include_router(assistant_router)
 
 app.middleware('http')(add_git_revision_to_request_header)
@@ -75,7 +73,7 @@ async def health_check():
     return {'status': 'healthy'}
 
 
-@app.get('/greet', dependencies=[Depends(authenticate_api_access)])
+@app.get('/greet')
 async def greet(language: str = Header(default='en')):
     set_language(language)
     return {'message': _('greeting', '')}

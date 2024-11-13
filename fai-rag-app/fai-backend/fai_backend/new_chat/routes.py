@@ -1,8 +1,8 @@
 from typing import Any, Callable
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Security
 
-from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
+from fai_backend.dependencies import get_authenticated_user, get_page_template_for_logged_in_users, get_project_user
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
@@ -93,7 +93,8 @@ async def chat_edit(chat_id: str,
     return await chat_history_edit_view(view, state, '/api/chat/edit')
 
 
-@router.patch('/chat/edit', response_model=list, response_model_exclude_none=True)
+@router.patch('/chat/edit', response_model=list, response_model_exclude_none=True,
+              dependencies=[Security(get_authenticated_user)])
 async def chat_edit_patch(data: ChatHistoryEditPayload,
                           chat_state_service: ChatStateService = Depends(get_chat_state_service)) -> list:
     old_state = await chat_state_service.get_state(data.chat_id)

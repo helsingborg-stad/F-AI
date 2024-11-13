@@ -1,10 +1,10 @@
 from collections.abc import Callable
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Security
 
 from fai_backend.dependencies import (
-    get_page_template_for_logged_in_users,
+    get_authenticated_user, get_page_template_for_logged_in_users,
     get_project_user,
 )
 from fai_backend.framework import components as c
@@ -33,7 +33,7 @@ router = APIRouter(
 )
 
 
-@router.get('/llm-question', response_model=Any)
+@router.get('/llm-question', response_model=Any, dependencies=[Security(get_authenticated_user)])
 async def llm_question_endpoint(question: str):
     try:
         response = await ask_llm_question(question)
@@ -42,7 +42,7 @@ async def llm_question_endpoint(question: str):
         raise HTTPException(status_code=500, detail=str(exception))
 
 
-@router.get('/llm-raq-question', response_model=Any)
+@router.get('/llm-raq-question', response_model=Any, dependencies=[Security(get_authenticated_user)])
 async def llm_raq_question_endpoint(
         question: str,
         vector_collection_name: str,
