@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from typing import Optional
 
 from fai_backend.collection.service import CollectionService
@@ -26,7 +27,9 @@ class VectorService:
             collection_name: str,
             ids: OneOrMany[str],
             documents: Optional[OneOrMany[str]],
-            embedding_model: str | None = None
+            embedding_model: str | None = None,
+            documents_metadata: Mapping[str, str | int | float | bool] | list[
+                Mapping[str, str | int | float | bool]] | None = None,
     ) -> None:
         await self.vector_db.add(
             collection_name=collection_name,
@@ -39,7 +42,9 @@ class VectorService:
             self,
             collection_name: str,
             documents: list[str],
-            embedding_model: str | None = None
+            embedding_model: str | None = None,
+            documents_metadata: Mapping[str, str | int | float | bool] | list[
+                Mapping[str, str | int | float | bool]] | None = None,
     ) -> None:
         """
         Add documents to a collection without specifying ID's
@@ -47,11 +52,13 @@ class VectorService:
         The collection should be empty before calling this method to avoid ID conflicts.
         """
         ids = [str(i) for i in range(len(documents))]
+
         await self.add_to_collection(
             collection_name=collection_name,
             ids=ids,
             documents=documents,
-            embedding_model=embedding_model
+            embedding_model=embedding_model,
+            documents_metadata=documents_metadata,
         )
 
     async def query_from_collection(
