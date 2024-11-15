@@ -127,20 +127,33 @@ async def upload_and_vectorize_handler(
         collection_service: CollectionService = Depends(get_collection_service),
 ) -> list:
     upload_path = file_service.save_files(project_user.project_id, files)
+    collection_name = upload_path.split('/')[-1]
+    chunks = [
+        {
+            'document': element.text,
+            'document_meta': {
+                'source': element.metadata.filename,
+                'page_number': element.metadata.page_number,
+            }
+        }
+        for file in file_service.get_file_infos(upload_path)
+        for element in ParserFactory.get_parser(file.path).parse(file.path)
+    ]
 
-    upload_directory_name = upload_path.split('/')[-1]
-    await vector_service.create_collection(collection_name=upload_directory_name,
-                                           embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL)
-
-    parsed_files = file_service.parse_files(upload_path)
-    await vector_service.add_documents_without_id_to_empty_collection(
-        collection_name=upload_directory_name,
-        documents=parsed_files,
+    await vector_service.create_collection(
+        collection_name=collection_name,
         embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL
     )
 
+    await vector_service.add_documents_without_id_to_empty_collection(
+        collection_name=collection_name,
+        documents=[chunk['document'] for chunk in chunks],
+        embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
+        documents_metadata=[chunk['document_meta'] for chunk in chunks],
+    )
+
     await collection_service.create_collection_metadata(
-        collection_id=upload_directory_name or '',
+        collection_id=collection_name or '',
         label=collection_label or '',
         description='',
         embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
