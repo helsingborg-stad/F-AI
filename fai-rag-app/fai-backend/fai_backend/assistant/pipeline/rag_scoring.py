@@ -1,9 +1,10 @@
 import json
-from typing import Any, AsyncGenerator
+from collections.abc import AsyncGenerator
+from typing import Any
 
 from langstream import Stream
 
-from fai_backend.assistant.protocol import IAssistantPipelineStrategy, IAssistantContextStore
+from fai_backend.assistant.protocol import IAssistantContextStore, IAssistantPipelineStrategy
 from fai_backend.collection.dependencies import get_collection_service
 from fai_backend.llm.service import query_vector
 from fai_backend.projects.dependencies import get_project_service
@@ -51,7 +52,7 @@ class RagScoringPipeline(IAssistantPipelineStrategy):
                 stream = await assistant.create_stream()
                 scoring_context_store.get_mutable().rag_document = document
 
-                full = ""
+                full = ''
                 async for o in stream(query[0]):
                     if o.final:
                         full += o.data
@@ -66,7 +67,7 @@ class RagScoringPipeline(IAssistantPipelineStrategy):
                 .gather()
                 .and_then(append_score_to_documents)
                 .and_then(lambda scored_documents: sort_and_slice_documents(scored_documents, 6))
-                .and_then(lambda results: {"query": query, "results": results[0]})
+                .and_then(lambda results: {'query': query, 'results': results[0]})
             )
 
             async for r in full_stream(query[0]):
@@ -74,7 +75,7 @@ class RagScoringPipeline(IAssistantPipelineStrategy):
 
         def rag_postprocess(in_data: Any):
             results: list[str] = in_data[0]['results']
-            concatenated = "\n".join([s for (s, _) in results])
+            concatenated = '\n'.join([s for (s, _) in results])
             context_store.get_mutable().rag_output = concatenated
             return concatenated
 
