@@ -13,9 +13,6 @@ from fai_backend.framework import components as c
 from fai_backend.framework import events as e
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
-from fai_backend.projects.dependencies import get_project_service, list_projects_request
-from fai_backend.projects.schema import ProjectResponse
-from fai_backend.projects.service import ProjectService
 from fai_backend.schema import ProjectUser
 from fai_backend.vector.dependencies import get_vector_service
 from fai_backend.vector.service import VectorService
@@ -122,8 +119,6 @@ async def upload_and_vectorize_handler(
         file_service: FileUploadService = Depends(get_file_upload_service),
         vector_service: VectorService = Depends(get_vector_service),
         view=Depends(get_page_template_for_logged_in_users),
-        projects: list[ProjectResponse] = Depends(list_projects_request),
-        project_service: ProjectService = Depends(get_project_service),
         collection_service: CollectionService = Depends(get_collection_service),
 ) -> list:
     upload_path = file_service.save_files(project_user.project_id, files)
