@@ -36,7 +36,6 @@ class FileUploadService:
         return upload_path
 
     def get_file_infos(self, directory_path) -> list[FileInfo]:
-        upload_date = datetime.fromtimestamp(os.path.getctime(directory_path))
         file_infos = []
         for file_name in os.listdir(directory_path):
             file_path = os.path.join(directory_path, file_name)
@@ -50,7 +49,7 @@ class FileUploadService:
                     collection=file_path.split('/')[-2],  # TODO: niceify
                     mime_type=mime_type or 'application/octet-stream',
                     last_modified=datetime.fromtimestamp(stat.st_mtime),
-                    upload_date=upload_date,
+                    upload_date=datetime.fromtimestamp(os.path.getctime(directory_path)),
                     created_date=datetime.fromtimestamp(stat.st_ctime)
                 ))
 
