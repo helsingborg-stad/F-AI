@@ -1,11 +1,11 @@
 import logging
-import re
 import random
-import jwt
+import re
 from collections.abc import Callable
 from datetime import timedelta
 from typing import Annotated
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearerCookie
 from passlib.context import CryptContext
@@ -102,6 +102,15 @@ async def authenticate_api_access(
 
     if not validate_token_adapter(credentials.credentials, get_public_key(), settings.JWT_DECODE_ALGORITHM):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+
+def check_permissions(
+        required: list[str],
+        actual: list[str]
+):
+    for permission in required:
+        if permission not in actual:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
 
 generate_pin_code = create_pin_factory_from_env()

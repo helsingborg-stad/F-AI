@@ -72,3 +72,14 @@ except Exception as e:
 
 
     settings = TestSettings()
+
+
+def get_settings_dict(overrides: dict) -> dict:
+    merged = settings.model_dump() | overrides
+
+    for key in merged.keys():
+        if isinstance(merged[key], SecretStr):
+            secret: SecretStr = merged[key]
+            merged[key] = secret.get_secret_value()
+
+    return merged

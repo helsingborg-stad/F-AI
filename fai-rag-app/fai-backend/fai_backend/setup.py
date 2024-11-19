@@ -31,6 +31,7 @@ async def setup_project():
     if not projects or len(projects) == 0:
         def create_permissions(value: bool):
             permissions = [
+                'can_edit_config',
                 'can_edit_project_users',
                 'can_edit_project_roles',
                 'can_edit_project_secrets',

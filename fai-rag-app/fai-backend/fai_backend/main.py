@@ -24,6 +24,7 @@ from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_
 from fai_backend.vector.routes import router as vector_router
 from fai_backend.new_chat.routes import router as new_chat_router
 from fai_backend.feedback.routes import router as feedback_router
+from fai_backend.config_v2.routes import router as config_router
 
 
 @asynccontextmanager
@@ -52,6 +53,7 @@ app.include_router(qaf_router)
 app.include_router(new_chat_router)
 app.include_router(documents_router)
 app.include_router(assistant_router)
+app.include_router(config_router)
 
 app.middleware('http')(add_git_revision_to_request_header)
 app.middleware('http')(remove_trailing_slash)

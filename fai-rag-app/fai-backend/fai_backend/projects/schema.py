@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field, SecretStr, field_serializer
 
 from fai_backend.assistant.models import AssistantTemplate
+from fai_backend.config_v2.models import Config
 from fai_backend.schema import Timestamp
 
 
@@ -20,6 +21,7 @@ class Project(BaseModel):
     creator: EmailStr
     description: str = ''
     timestamp: Timestamp = Timestamp()
+    config: Config = Config(config={})
     assistants: list[AssistantTemplate] = Field(default_factory=list)
     members: list[ProjectMember] = Field(..., default_factory=list)
     roles: dict[str, ProjectRole] = Field(..., default_factory=dict)
