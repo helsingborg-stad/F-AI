@@ -20,7 +20,7 @@ from fai_backend.phrase import set_language
 from fai_backend.projects.router import router as projects_router
 from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.schema import ProjectUser
-from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_parser
+from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_parser, setup_settings
 from fai_backend.vector.routes import router as vector_router
 from fai_backend.new_chat.routes import router as new_chat_router
 from fai_backend.feedback.routes import router as feedback_router
@@ -29,10 +29,12 @@ from fai_backend.settings.routes import router as config_router
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    console.log('Try setup Sentry')
-    await setup_sentry()
     console.log('Try setup db')
     await setup_db()
+    console.log('Try setup settings')
+    await setup_settings()
+    console.log('Try setup Sentry')
+    await setup_sentry()
     console.log('Try setup initial project')
     await setup_project()
     console.log('Try setup file parser environment')

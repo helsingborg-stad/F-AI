@@ -10,6 +10,7 @@ from fai_backend.config import settings
 from fai_backend.projects.schema import ProjectMember, ProjectRole
 from fai_backend.repositories import ConversationDocument, PinCodeModel, ProjectModel, projects_repo
 from fai_backend.sentry.watcher import Watcher
+from fai_backend.settings.service import SettingsServiceFactory
 
 
 def use_route_names_as_operation_ids(app: FastAPI) -> None:
@@ -112,3 +113,8 @@ async def setup_sentry():
 async def setup_file_parser():
     nltk.download('punkt_tab')
     nltk.download('averaged_perceptron_tagger_eng')
+
+
+async def setup_settings():
+    service = SettingsServiceFactory().get_service()
+    await service.refresh_environment()
