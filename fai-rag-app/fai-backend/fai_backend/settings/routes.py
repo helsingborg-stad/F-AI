@@ -105,7 +105,7 @@ async def edit_settings(
                             required=False,
                             html_type='text',
                             size='sm',
-                            value=str(settings.FIXED_PIN),
+                            value=settings.FIXED_PIN,
                         ),
 
                         c.Heading(text='AI Settings', class_name='font-bold'),

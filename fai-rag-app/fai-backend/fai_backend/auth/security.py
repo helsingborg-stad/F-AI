@@ -46,8 +46,16 @@ def create_refresh_token(subject: dict):
     return refresh_security.create_refresh_token(subject=subject)
 
 
-def create_pin_factory_from_env() -> Callable[[], str]:
-    return (lambda: str(settings.FIXED_PIN)) if settings.FIXED_PIN else (lambda: str(random.randint(1000, 9999)))
+async def generate_pin():
+    try:
+        from fai_backend.settings.service import SettingsServiceFactory, SettingKey
+        settings_service = SettingsServiceFactory().get_service()
+        fixed = await settings_service.get_value(SettingKey.FIXED_PIN)
+        if len(fixed) > 0:
+            return fixed
+    except KeyError:
+        pass
+    return str(random.randint(1000, 9999))
 
 
 def is_mail_pattern(email: str) -> bool:
@@ -111,6 +119,3 @@ def check_permissions(
     for permission in required:
         if permission not in actual:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-
-
-generate_pin_code = create_pin_factory_from_env()

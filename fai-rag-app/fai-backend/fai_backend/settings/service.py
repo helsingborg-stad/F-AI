@@ -9,6 +9,7 @@ from fai_backend.settings.models import SettingsDict
 
 
 class SettingKey(Enum):
+    FIXED_PIN = 'FIXED_PIN'
     OPENAI_API_KEY = 'OPENAI_API_KEY'
 
 
@@ -44,22 +45,23 @@ class SettingsService:
 
     async def get_value(self, key: SettingKey) -> bool | float | int | str:
         project = await self._get_project()
+        str_key = str(key.value)
 
-        if key in project.settings:
-            return project.settings[key]
+        if str_key in project.settings:
+            return project.settings[str_key]
 
         defaults = Settings().model_dump()
-        if key in defaults:
-            return defaults[str(key)]
+        if str_key in defaults:
+            return defaults[str_key]
 
-        raise KeyError(f'Unknown setting key "{key}"')
+        raise KeyError(f'Unknown setting key "{str_key}"')
 
     async def set_value(self, key: SettingKey, value):
         project = await self._get_project()
-        project.settings[key] = value
+        project.settings[key.value] = value
         project_service = get_project_service()
         await project_service.update_project(project.id, project)
-        os.environ[str(key)] = str(value)
+        os.environ[str(key.value)] = str(value)
 
 
 class SettingsServiceFactory:
