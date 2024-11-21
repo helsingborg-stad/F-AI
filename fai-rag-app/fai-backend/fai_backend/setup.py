@@ -31,7 +31,7 @@ async def setup_project():
     if not projects or len(projects) == 0:
         def create_permissions(value: bool):
             permissions = [
-                'can_edit_config',
+                'can_edit_settings',
                 'can_edit_project_users',
                 'can_edit_project_roles',
                 'can_edit_project_secrets',
@@ -68,7 +68,8 @@ async def setup_project():
                     'tester': ProjectRole(permissions=create_permissions(False))
                 },
                 secrets={'openai_api_key': 'sk-123'},
-                meta={}
+                meta={},
+                settings={}
             )
         )
 

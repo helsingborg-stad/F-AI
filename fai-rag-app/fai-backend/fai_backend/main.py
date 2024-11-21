@@ -24,7 +24,7 @@ from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_
 from fai_backend.vector.routes import router as vector_router
 from fai_backend.new_chat.routes import router as new_chat_router
 from fai_backend.feedback.routes import router as feedback_router
-from fai_backend.config_v2.routes import router as config_router
+from fai_backend.settings.routes import router as config_router
 
 
 @asynccontextmanager
