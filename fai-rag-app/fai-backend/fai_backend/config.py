@@ -20,7 +20,7 @@ class Settings(BaseSettings, extra=Extra.ignore):
     APP_MESSAGE_BROKER: Literal['memory', 'redis_queue'] = 'redis_queue'
     SECRET_KEY: SecretStr
     BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
-    BREVO_API_KEY: SecretStr = 'api-key'
+    BREVO_API_KEY: SecretStr = ''
     ALGORITHM: str = 'HS256'
     JWT_DECODE_ALGORITHM: str = 'RS256'
     HTTP_AUTHENTICATION_TYPE: Literal['http_bearer', 'none'] = 'http_bearer'
@@ -49,6 +49,7 @@ class Settings(BaseSettings, extra=Extra.ignore):
     FEEDBACK_GITHUB_REPO_NAME: str = ''
     CHAT_MAX_INPUT_LENGTH: int | None = 2500
     OPENAI_API_KEY: SecretStr = ''
+    ASSISTANT_RAG_SCORING_TEMPLATE_ID: str = '_rag_scoring'
 
     class Config:
         env_file = '.env'

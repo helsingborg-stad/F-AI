@@ -44,7 +44,7 @@ class AuthService:
             )
         )
 
-        self.mail_client.send_mail(
+        await self.mail_client.send_mail(
             EmailPayload(
                 sender=EmailSender(
                     name=settings.MAIL_SENDER_NAME,
