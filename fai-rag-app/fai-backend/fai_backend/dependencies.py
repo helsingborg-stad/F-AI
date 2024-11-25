@@ -14,7 +14,7 @@ from fai_backend.documents.menu import menu_items as document_menu_items
 from fai_backend.qaf.menu import qa_menu
 from fai_backend.schema import ProjectUser, User
 from fai_backend.settings.menu import settings_menu as settings_menu_items
-from fai_backend.views import mock_menu, page_template
+from fai_backend.views import page_template
 from fai_backend.new_chat.menu import menu_items as chat_menu_items
 from fai_backend.feedback.menu import menu_items as feedback_menu_items
 
@@ -66,14 +66,12 @@ def get_project_user_permissions(project_user: ProjectUser = Depends(get_project
 
 async def get_page_template_for_logged_in_users(permissions: list[str] = Depends(get_project_user_permissions)) -> \
         Callable[[list[Any] | Any, str | None], list[Any]]:
-
     def create_menus() -> list:
         return [*chat_menu_items(user_permissions=permissions),
                 *qa_menu(user_permissions=permissions),
                 *document_menu_items(user_permissions=permissions),
                 *assistant_menu(user_permissions=permissions),
                 *feedback_menu_items(),
-                *mock_menu(user_permissions=permissions),
                 *settings_menu_items(user_permissions=permissions)]
 
     def page_template_function(components: list[Any] | Any, page_title: str | None) -> list[Any]:
