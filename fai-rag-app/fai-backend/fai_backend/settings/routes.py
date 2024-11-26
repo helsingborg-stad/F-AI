@@ -118,6 +118,15 @@ async def edit_settings(
                             size='sm',
                             value=settings.OPENAI_API_KEY.get_secret_value(),
                         ),
+                        c.InputField(
+                            name='settings.HF_TOKEN',
+                            label=_('HuggingFace API Token (optional)'),
+                            placeholder='hf_...',
+                            required=False,
+                            html_type='text',
+                            size='sm',
+                            value=settings.HF_TOKEN.get_secret_value(),
+                        ),
 
                         c.Heading(text='E-mail (Brevo)', class_name='font-bold'),
                         c.InputField(

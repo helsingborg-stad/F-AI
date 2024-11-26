@@ -49,6 +49,7 @@ class Settings(BaseSettings, extra=Extra.ignore):
     FEEDBACK_GITHUB_REPO_NAME: str = ''
     CHAT_MAX_INPUT_LENGTH: int | None = 2500
     OPENAI_API_KEY: SecretStr = ''
+    HF_TOKEN: SecretStr = ''
     ASSISTANT_RAG_SCORING_TEMPLATE_ID: str = '_rag_scoring'
 
     class Config:
