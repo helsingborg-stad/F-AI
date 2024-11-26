@@ -21,7 +21,6 @@ class Settings(BaseSettings, extra=Extra.ignore):
     SECRET_KEY: SecretStr
     BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
     BREVO_API_KEY: SecretStr = ''
-    ALGORITHM: str = 'HS256'
     JWT_DECODE_ALGORITHM: str = 'RS256'
     HTTP_AUTHENTICATION_TYPE: Literal['http_bearer', 'none'] = 'http_bearer'
     PUBLIC_KEY: str = ''
@@ -29,13 +28,11 @@ class Settings(BaseSettings, extra=Extra.ignore):
     MONGO_DB_NAME: str = 'fai-rag-app'
     MONGO_DB_URI: str = 'mongodb://localhost:27017'
     FIXED_PIN: str = ''
-    MAIL_CLIENT: Literal['console', 'brevo'] = 'console'
     MAIL_SENDER_NAME: str = 'FAI App'
     MAIL_SENDER_EMAIL: str = 'no-reply@localhost.dev'
     LOG_LEVEL: str = 'INFO'
     DEFAULT_LANGUAGE: str = 'en'
     FILE_UPLOAD_PATH: str = 'uploads'
-    LLM_BACKEND: Literal['parrot', 'openai'] = 'parrot'
     SENTRY_ENABLED: bool = False
     SENTRY_DSN: SecretStr = ''
     SENTRY_LOGGING_LEVEL: str = 'ERROR'
@@ -47,10 +44,8 @@ class Settings(BaseSettings, extra=Extra.ignore):
     FEEDBACK_GITHUB_API_TOKEN: SecretStr = ''
     FEEDBACK_GITHUB_REPO_OWNER: str = ''
     FEEDBACK_GITHUB_REPO_NAME: str = ''
-    CHAT_MAX_INPUT_LENGTH: int | None = 2500
     OPENAI_API_KEY: SecretStr = ''
     HF_TOKEN: SecretStr = ''
-    ASSISTANT_RAG_SCORING_TEMPLATE_ID: str = '_rag_scoring'
 
     class Config:
         env_file = '.env'
