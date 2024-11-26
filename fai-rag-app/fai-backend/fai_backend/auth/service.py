@@ -11,10 +11,10 @@ from fai_backend.auth.security import (
     verify_password,
     generate_pin,
 )
-from fai_backend.config import settings
 from fai_backend.mail.client import MailClient
 from fai_backend.mail.schemas import EmailPayload, EmailRecipient, EmailSender
 from fai_backend.repositories import PinCodeModel, PinCodeRepository, UserRepository
+from fai_backend.settings.service import SettingsServiceFactory, SettingKey
 
 
 class AuthService:
@@ -44,11 +44,15 @@ class AuthService:
             )
         )
 
+        settings_service = SettingsServiceFactory().get_service()
+        sender_name = await settings_service.get_value(SettingKey.MAIL_SENDER_NAME)
+        sender_email = await settings_service.get_value(SettingKey.MAIL_SENDER_EMAIL)
+
         await self.mail_client.send_mail(
             EmailPayload(
                 sender=EmailSender(
-                    name=settings.MAIL_SENDER_NAME,
-                    email=settings.MAIL_SENDER_EMAIL,
+                    name=sender_name,
+                    email=sender_email,
                 ),
                 to=[EmailRecipient(email=email)],
                 subject='Your Login PIN',

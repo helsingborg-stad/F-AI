@@ -137,6 +137,24 @@ async def edit_settings(
                             html_type='text',
                             size='sm',
                             value=settings.BREVO_API_KEY.get_secret_value(),
+                        ),
+                        c.InputField(
+                            name='settings.MAIL_SENDER_NAME',
+                            label=_('Sender name'),
+                            placeholder='',
+                            required=False,
+                            html_type='text',
+                            size='sm',
+                            value=settings.MAIL_SENDER_NAME,
+                        ),
+                        c.InputField(
+                            name='settings.MAIL_SENDER_EMAIL',
+                            label=_('Sender email'),
+                            placeholder='',
+                            required=False,
+                            html_type='text',
+                            size='sm',
+                            value=settings.MAIL_SENDER_EMAIL,
                         )
                     ]
                 )
