@@ -35,12 +35,8 @@ nodes:
       entrypoint: "/bin/sh -c"
       env:
         APP_VECTOR_DB_PATH: "/fai-rag-app/vector_db"
-        APP_DB: "mongodb"
-        DEFAULT_LANGUAGE: "sv"
-        ENV_MODE: "production"
-        APP_VECTOR_DB_EMBEDDING_MODEL: "text-embedding-3-small"
+        APP_ADMIN_EMAIL: "*@*"
         SECRET_KEY: ${fn.password(32)}
-        APP_ADMIN_EMAIL: "dan.nilsson@helsingborg.se"
         FIXED_PIN: "1234"
         MONGO_DB_NAME: "folkets-ai"
         MONGO_DB_URI: mongodb://${globals.DB_USER}:${globals.DB_PASS}@mongodb:27017
@@ -70,7 +66,6 @@ nodes:
     diskLimit: "5G"
     scalingMode: "STATELESS"
     isSLBAccessEnabled: false
-    extip: 1
     nodeType: "mongo"
     nodeGroup: "nosqldb"
     password: "${globals.DB_PASS}"
