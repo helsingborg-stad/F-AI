@@ -2,6 +2,7 @@ import os
 from enum import Enum
 
 import dotenv
+from pydantic import SecretStr
 
 from fai_backend.config import Settings
 from fai_backend.projects.dependencies import get_project_service
@@ -53,7 +54,10 @@ class SettingsService:
 
         defaults = Settings().model_dump()
         if str_key in defaults:
-            return defaults[str_key]
+            value = defaults[str_key]
+            if isinstance(value, SecretStr):
+                return value.get_secret_value()
+            return value
 
         raise KeyError(f'Unknown setting key "{str_key}"')
 
