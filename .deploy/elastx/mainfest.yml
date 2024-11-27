@@ -35,8 +35,8 @@ nodes:
       entrypoint: "/bin/sh -c"
       env:
         APP_VECTOR_DB_PATH: "/fai-rag-app/vector_db"
-        APP_ADMIN_EMAIL: "*@*"
         SECRET_KEY: ${fn.password(32)}
+        APP_ADMIN_EMAIL: "demo@folkets.ai"
         FIXED_PIN: "1234"
         MONGO_DB_NAME: "folkets-ai"
         MONGO_DB_URI: mongodb://${globals.DB_USER}:${globals.DB_PASS}@mongodb:27017
