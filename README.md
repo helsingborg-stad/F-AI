@@ -1,5 +1,9 @@
 # Getting started
 
+## Try it now
+
+[![Install demo](https://raw.githubusercontent.com/jelastic-jps/jpswiki/master/images/getithosted.png)](https://app.jelastic.elastx.net/?manifest=https://raw.githubusercontent.com/helsingborg-stad/F-AI/refs/heads/wip/1-click-install-elastx/.deploy/elastx/mainfest.yml)
+
 ## Development (macOS)
 
 ```bash
