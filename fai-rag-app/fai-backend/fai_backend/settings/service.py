@@ -26,6 +26,8 @@ class SettingKey(Enum):
     SENTRY_TRACE_SAMPLE_RATE = 'SENTRY_TRACE_SAMPLE_RATE'
     SENTRY_ENVIRONMENT = 'SENTRY_ENVIRONMENT'
 
+    VLLM_CONFIG = 'VLLM_CONFIG'
+
 
 class SettingsService:
     def __init__(self):

@@ -1,4 +1,4 @@
-from typing import Callable, Any, List, Optional, AsyncGenerator, cast, Union, Literal
+from typing import Callable, Any, List, Optional, AsyncGenerator, cast, Union, Literal, Awaitable
 
 import openai
 from langstream import Stream, StreamOutput
@@ -71,14 +71,26 @@ class OpenAIStream(Stream[str, OpenAIChatDelta]):
         )
 
 
+MessagesProducerType = Callable[[Any], list[OpenAIChatMessage]]
+StreamProducerType = Callable[[str, MessagesProducerType, ...], Awaitable[OpenAIStream]]
+
+
 class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
     class Settings(BaseModel, extra='allow'):
         model: str
         temperature: float = 0
 
-    def __init__(self, settings: Settings, stream_class=OpenAIStream):
+    @staticmethod
+    async def _default_openai_stream_constructor(name, messages, model, **kwargs):
+        return OpenAIStream(name=name, call=messages, model=model, **kwargs)
+
+    def __init__(
+            self,
+            settings: Settings,
+            stream_producer: StreamProducerType = _default_openai_stream_constructor
+    ):
         self.settings = settings
-        self._stream_class = stream_class
+        self._stream_producer = stream_producer
 
     async def create_llm_stream(
             self,
@@ -90,11 +102,11 @@ class OpenAIAssistantLLMProvider(IAssistantLLMProvider):
             converted = [self._to_openai_message(m, context_store) for m in in_list]
             return converted
 
-        main_stream = self._stream_class(
+        main_stream = (await self._stream_producer(
             "openai",
             lambda in_data: convert_messages(in_data[0]),
             **self.settings.dict(),
-        ).map(lambda delta: delta.content)
+        )).map(lambda delta: delta.content)
 
         return messages_expander_stream(messages, context_store, get_insert).and_then(main_stream)
 

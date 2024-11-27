@@ -100,7 +100,7 @@ async def edit_settings(
                         c.Heading(text='Basic', class_name='font-bold'),
                         c.InputField(
                             name='settings.FIXED_PIN',
-                            label=_('Fixed pin (leave blank to disable)'),
+                            label=_('Fixed login pin (leave blank to disable)'),
                             placeholder='NOTE: Make sure Brevo API is setup correctly to avoid account lock-out!',
                             required=False,
                             html_type='text',
@@ -120,12 +120,20 @@ async def edit_settings(
                         ),
                         c.InputField(
                             name='settings.HF_TOKEN',
-                            label=_('HuggingFace API Token (optional)'),
+                            label=_('HuggingFace API Token (optional, for counting vLLM tokens)'),
                             placeholder='hf_...',
                             required=False,
                             html_type='text',
                             size='sm',
                             value=settings.HF_TOKEN.get_secret_value(),
+                        ),
+                        c.Textarea(
+                            name='settings.VLLM_CONFIG',
+                            label=_('vLLM Config (optional, for non-OpenAI models)'),
+                            placeholder='',
+                            required=False,
+                            size='sm',
+                            value=settings.VLLM_CONFIG,
                         ),
 
                         c.Heading(text='E-mail (Brevo)', class_name='font-bold'),
