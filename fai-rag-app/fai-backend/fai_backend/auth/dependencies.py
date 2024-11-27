@@ -14,12 +14,16 @@ from fai_backend.auth.security import (
     refresh_security,
 )
 from fai_backend.auth.service import AuthService
-from fai_backend.mail.client import mail_client
+from fai_backend.mail.client import create_mail_client
 from fai_backend.repositories import pins_repo, users_repo
 
 
 async def get_auth_service() -> AuthService:
-    return AuthService(users_repo=users_repo, pins_repo=pins_repo, mail_client=mail_client)
+    return AuthService(
+        users_repo=users_repo,
+        pins_repo=pins_repo,
+        mail_client=await create_mail_client()
+    )
 
 
 async def try_get_valid_access_token(

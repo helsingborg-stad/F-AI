@@ -6,10 +6,10 @@ from fai_backend.auth.security import (
     access_security,
     create_access_token,
     create_refresh_token,
-    generate_pin_code,
     get_password_hash,
     refresh_security,
     verify_password,
+    generate_pin,
 )
 from fai_backend.config import settings
 from fai_backend.mail.client import MailClient
@@ -36,7 +36,7 @@ class AuthService:
         return session is not None
 
     async def create_pin(self, email: EmailStr) -> str:
-        generated_pin = generate_pin_code()
+        generated_pin = await generate_pin()
         session = await self.pins_repo.create(
             PinCodeModel(
                 email=email,
@@ -44,7 +44,7 @@ class AuthService:
             )
         )
 
-        self.mail_client.send_mail(
+        await self.mail_client.send_mail(
             EmailPayload(
                 sender=EmailSender(
                     name=settings.MAIL_SENDER_NAME,
@@ -57,13 +57,6 @@ class AuthService:
         )
 
         return session.model_dump()['id']
-
-    async def validate_pin(self, session_id, pin: SecretStr):
-        session = await self.pins_repo.get(session_id)
-        if session and verify_password(pin.get_secret_value(), session.hashed_pin):
-            # await self.pins_repo.delete(session_id)
-            return True
-        return False
 
     async def exchange_pin_for_token(
             self, session_id, pin: SecretStr, response: Response | None = None

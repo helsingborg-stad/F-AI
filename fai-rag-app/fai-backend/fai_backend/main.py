@@ -8,32 +8,32 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from fai_backend.assistant.routes import router as assistant_router
 from fai_backend.assistant.sse_routes import sse_router as assistant_sse_router
 from fai_backend.auth.router import router as auth_router
-from fai_backend.auth.security import authenticate_api_access
 from fai_backend.config import settings
 from fai_backend.dependencies import get_project_user
 from fai_backend.documents.routes import router as documents_router
+from fai_backend.feedback.routes import router as feedback_router
 from fai_backend.framework.frontend import get_frontend_environment
 from fai_backend.logger.console import console
 from fai_backend.middleware import remove_trailing_slash, add_git_revision_to_request_header
+from fai_backend.new_chat.routes import router as new_chat_router
 from fai_backend.phrase import phrase as _
 from fai_backend.phrase import set_language
-from fai_backend.projects.router import router as projects_router
 from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.schema import ProjectUser
-from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_parser
-from fai_backend.vector.routes import router as vector_router
-from fai_backend.new_chat.routes import router as new_chat_router
-from fai_backend.feedback.routes import router as feedback_router
+from fai_backend.settings.routes import router as config_router
+from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_parser, setup_settings
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    console.log('Try setup Sentry')
-    await setup_sentry()
     console.log('Try setup db')
     await setup_db()
     console.log('Try setup initial project')
     await setup_project()
+    console.log('Try setup settings')
+    await setup_settings()
+    console.log('Try setup Sentry')
+    await setup_sentry()
     console.log('Try setup file parser environment')
     await setup_file_parser()
     yield
@@ -52,6 +52,7 @@ app.include_router(qaf_router)
 app.include_router(new_chat_router)
 app.include_router(documents_router)
 app.include_router(assistant_router)
+app.include_router(config_router)
 
 app.middleware('http')(add_git_revision_to_request_header)
 app.middleware('http')(remove_trailing_slash)
