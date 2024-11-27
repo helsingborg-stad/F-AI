@@ -1,8 +1,11 @@
 # Getting started
 
-## Try it now
+## Try it on Elastx
 
-[![Install demo](https://raw.githubusercontent.com/jelastic-jps/jpswiki/master/images/getithosted.png)](https://app.jelastic.elastx.net/?manifest=https://raw.githubusercontent.com/helsingborg-stad/F-AI/refs/heads/wip/1-click-install-elastx/.deploy/elastx/mainfest.yml)
+1. Sign up on Elastx <https://elastx.se/se/signup>
+2. Click install button
+
+[![Install demo](https://raw.githubusercontent.com/helsingborg-stad/F-AI/5e0c8dcac95f2468b4509927ccc2f410c08b0508/.deploy/elastx/elastx_install_demo.png)](https://app.jelastic.elastx.net/?manifest=https://raw.githubusercontent.com/helsingborg-stad/F-AI/refs/heads/wip/1-click-install-elastx/.deploy/elastx/mainfest.yml){:target="\_blank"}
 
 ## Development (macOS)
 
