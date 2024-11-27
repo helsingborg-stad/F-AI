@@ -75,13 +75,6 @@ class SettingsService:
 
         raise KeyError(f'Unknown setting key "{str_key}"')
 
-    async def set_value(self, key: SettingKey, value):
-        project = await self._get_project()
-        project.settings[key.value] = value
-        project_service = get_project_service()
-        await project_service.update_project(project.id, project)
-        os.environ[str(key.value)] = str(value)
-
 
 class SettingsServiceFactory:
     @staticmethod
