@@ -1,8 +1,8 @@
-from fai_backend.config import Settings, settings
 from fai_backend.feedback.models import FeedbackEntry
-from fai_backend.feedback.providers.github import GitHubProvider
 from fai_backend.feedback.providers.dummy import DummyProvider
+from fai_backend.feedback.providers.github import GitHubProvider
 from fai_backend.feedback.providers.protocol import IFeedbackProvider
+from fai_backend.settings.service import SettingsServiceFactory, SettingKey
 
 
 class FeedbackService:
@@ -15,19 +15,15 @@ class FeedbackService:
         await self.provider.create_task(data)
 
 
-def create_feedback_provider(feedback_settings: Settings) -> IFeedbackProvider:
-    api_token = feedback_settings.FEEDBACK_GITHUB_API_TOKEN.get_secret_value()
-    if api_token == '':
-        return DummyProvider()
+class FeedbackServiceFactory:
+    async def get_service(self):
+        settings_service = SettingsServiceFactory().get_service()
+        github_api_token = await settings_service.get_value(SettingKey.FEEDBACK_GITHUB_API_TOKEN)
 
-    repo_owner = feedback_settings.FEEDBACK_GITHUB_REPO_OWNER
-    repo_name = feedback_settings.FEEDBACK_GITHUB_REPO_NAME
+        if github_api_token == '':
+            return FeedbackService(DummyProvider())
 
-    return GitHubProvider(api_token, repo_owner, repo_name)
+        repo_owner = await settings_service.get_value(SettingKey.FEEDBACK_GITHUB_REPO_OWNER)
+        repo_name = await settings_service.get_value(SettingKey.FEEDBACK_GITHUB_REPO_NAME)
 
-
-feedback_provider = create_feedback_provider(settings)
-
-
-def get_feedback_service() -> FeedbackService:
-    return FeedbackService(feedback_provider)
+        return FeedbackService(GitHubProvider(github_api_token, repo_owner, repo_name))

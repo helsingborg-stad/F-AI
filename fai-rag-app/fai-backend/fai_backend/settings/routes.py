@@ -234,7 +234,36 @@ async def edit_settings(
                                 ('DEBUG', 'DEBUG'),
                             ],
                             value=settings.SENTRY_EVENT_LEVEL,
-                        )
+                        ),
+
+                        c.Heading(text='Feedback', class_name='font-bold'),
+                        c.InputField(
+                            name='settings.FEEDBACK_GITHUB_API_TOKEN',
+                            label=_('GitHub API token'),
+                            placeholder='ghp_...',
+                            required=False,
+                            html_type='text',
+                            size='sm',
+                            value=settings.FEEDBACK_GITHUB_API_TOKEN.get_secret_value(),
+                        ),
+                        c.InputField(
+                            name='settings.FEEDBACK_GITHUB_REPO_OWNER',
+                            label=_('GitHub repo owner'),
+                            placeholder='helsingborg-stad',
+                            required=False,
+                            html_type='text',
+                            size='sm',
+                            value=settings.FEEDBACK_GITHUB_REPO_OWNER,
+                        ),
+                        c.InputField(
+                            name='settings.FEEDBACK_GITHUB_REPO_NAME',
+                            label=_('GitHub repo name'),
+                            placeholder='F-AI',
+                            required=False,
+                            html_type='text',
+                            size='sm',
+                            value=settings.FEEDBACK_GITHUB_REPO_NAME,
+                        ),
                     ]
                 )
             ], class_name='card-body')
