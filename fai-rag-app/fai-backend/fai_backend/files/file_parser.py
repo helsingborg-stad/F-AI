@@ -32,27 +32,56 @@ class AbstractDocumentParser(ABC):
 
 class DocxParser(AbstractDocumentParser):
     def parse(self, filename: str) -> list[Element]:
+        if is_url(filename):
+            return partition_docx(
+                url=filename,
+                ssl_verify=settings.ENV_MODE == 'development',
+                chunking_strategy='basic'
+            )
         return partition_docx(filename, chunking_strategy='basic')
 
 
 class PDFParser(AbstractDocumentParser):
     def parse(self, filename: str) -> list[Element]:
+        if is_url(filename):
+            return partition_pdf(
+                url=filename,
+                ssl_verify=settings.ENV_MODE == 'development',
+                chunking_strategy='basic'
+            )
         return partition_pdf(filename, chunking_strategy='basic')
 
 
 class MarkdownParser(AbstractDocumentParser):
     def parse(self, filename: str) -> list[Element]:
+        if is_url(filename):
+            return partition_md(
+                url=filename,
+                ssl_verify=settings.ENV_MODE == 'development',
+                chunking_strategy='basic'
+            )
         return partition_md(filename, chunking_strategy='basic')
 
 
 class ExcelParser(AbstractDocumentParser):
     def parse(self, filename: str) -> list[Element]:
+        if is_url(filename):
+            return partition_xlsx(
+                url=filename,
+                ssl_verify=settings.ENV_MODE == 'development'
+            )
         return partition_xlsx(filename)
 
 
 class HTMLParser(AbstractDocumentParser):
-    def parse(self, filename: str):
-        return partition_html(filename)
+    def parse(self, filename: str) -> list[Element]:
+        if is_url(filename):
+            return partition_html(
+                url=filename,
+                ssl_verify=settings.ENV_MODE == 'development',
+                chunking_strategy='basic'
+            )
+        return partition_html(filename, chunking_strategy='basic')
 
 
 class ParserFactory:
