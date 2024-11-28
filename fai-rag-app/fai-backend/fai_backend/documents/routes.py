@@ -85,7 +85,7 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                     components=[
                         c.InputField(
                             name='collection_label',
-                            title=_('input_fileupload_collection_label',
+                            label=_('input_fileupload_collection_label',
                                     'Collection label (optional)'),
                             placeholder=_('input_fileupload_collection_placeholder',
                                           'Collection label (optional)'),
@@ -94,20 +94,21 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                         ),
                         c.FileInput(
                             name='files',
-                            title=_('file', 'File'),
+                            label=_('file', 'File'),
                             required=True,
                             multiple=True,
                             file_size_limit=settings.FILE_SIZE_LIMIT,
                         ),
+                            name='urls',
                         c.Button(
                             html_type='submit',
                             label=_('upload', 'Upload'),
                             class_name='btn btn-primary',
                         ),
                     ],
-                    class_name='card bg-base-100 w-full max-w-6xl',
+                    class_name='card-body',
                 ),
-            ]),
+            ], class_name='card bg-base-100 w-full max-w-xl'),
         ])], _('upload_documents', 'Upload documents'))
 
 
