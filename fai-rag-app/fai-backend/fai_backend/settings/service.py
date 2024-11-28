@@ -11,6 +11,7 @@ from fai_backend.settings.models import SettingsDict
 
 class SettingKey(Enum):
     FIXED_PIN = 'FIXED_PIN'
+    OPENAI_API_KEY = 'OPENAI_API_KEY'
     BREVO_API_URL = 'BREVO_API_URL'
     BREVO_API_KEY = 'BREVO_API_KEY'
 

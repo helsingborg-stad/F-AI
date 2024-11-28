@@ -16,7 +16,7 @@ class VectorService:
 
     async def create_collection(self, collection_name: str, embedding_model: str | None = None):
         await self.vector_db.create_collection(collection_name,
-                                               EmbeddingFnFactory.create(embedding_model))
+                                               await EmbeddingFnFactory.create(embedding_model))
 
     async def delete_collection(self, collection_name: str):
         await self.vector_db.delete_collection(collection_name)
@@ -32,7 +32,7 @@ class VectorService:
             collection_name=collection_name,
             ids=ids,
             documents=documents,
-            embedding_function=EmbeddingFnFactory.create(embedding_model)
+            embedding_function=await EmbeddingFnFactory.create(embedding_model)
         )
 
     async def add_documents_without_id_to_empty_collection(
@@ -67,7 +67,7 @@ class VectorService:
             collection_name=collection_name,
             query_texts=query_texts,
             n_results=n_results,
-            embedding_function=EmbeddingFnFactory.create(embedding_model),
+            embedding_function=await EmbeddingFnFactory.create(embedding_model),
         )
 
     async def list_collections(self):

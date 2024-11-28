@@ -13,10 +13,10 @@ class BaseChromaDB(IVector):
     def __init__(self, client: ClientAPI):
         self.client = client
 
-    def _get_collection(self, collection_name: str, embedding_function: EmbeddingFunction | None = None):
+    async def _get_collection(self, collection_name: str, embedding_function: EmbeddingFunction | None = None):
         return self.client.get_collection(
             name=collection_name,
-            embedding_function=embedding_function or EmbeddingFnFactory.create('default')
+            embedding_function=embedding_function or await EmbeddingFnFactory.create('default')
         )
 
     async def add(
@@ -29,7 +29,7 @@ class BaseChromaDB(IVector):
             uris: Optional[OneOrMany[str]] = None,
             embedding_function: Callable[[str], np.ndarray] | None = None,
     ) -> None:
-        collection = self._get_collection(collection_name, embedding_function)
+        collection = await self._get_collection(collection_name, embedding_function)
 
         collection.add(
             documents=documents,
@@ -47,7 +47,7 @@ class BaseChromaDB(IVector):
             documents: Optional[OneOrMany[Document]] = None,
             embedding_function: Callable[[str], np.ndarray] | None = None,
     ) -> None:
-        collection = self._get_collection(collection_name, embedding_function)
+        collection = await self._get_collection(collection_name, embedding_function)
         collection.update(
             documents=documents,
             embeddings=embeddings,
@@ -69,7 +69,7 @@ class BaseChromaDB(IVector):
             where: Optional[Where] = None,
             embedding_function: Callable[[str], np.ndarray] | None = None,
     ) -> dict:
-        collection = self._get_collection(collection_name, embedding_function)
+        collection = await self._get_collection(collection_name, embedding_function)
 
         return collection.query(
             query_embeddings=query_embeddings,
@@ -84,7 +84,7 @@ class BaseChromaDB(IVector):
             ids: Optional[OneOrMany[str]] = None,
             embedding_function: Callable[[str], np.ndarray] | None = None,
     ):
-        collection = self._get_collection(
+        collection = await self._get_collection(
             collection_name,
             embedding_function
         )
@@ -104,7 +104,7 @@ class BaseChromaDB(IVector):
                                 embedding_function: Callable[[str], np.ndarray] | None = None):
         return self.client.create_collection(
             name=collection_name,
-            embedding_function=embedding_function or EmbeddingFnFactory.create('default')
+            embedding_function=embedding_function or await EmbeddingFnFactory.create('default')
         )
 
     async def delete_collection(self, collection_name: str):
