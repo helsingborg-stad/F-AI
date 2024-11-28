@@ -6,6 +6,7 @@ class CollectionMetadataModel(Document):
     label: str = ''
     description: str = ''
     embedding_model: str | None = ''
+    urls: list[str] | None = None
 
     class Settings:
         name = 'collections'
