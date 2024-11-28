@@ -7,7 +7,7 @@ from fai_backend.collection.service import CollectionService
 from fai_backend.config import settings
 from fai_backend.dependencies import get_authenticated_user, get_page_template_for_logged_in_users, get_project_user
 from fai_backend.files.dependecies import get_file_upload_service
-from fai_backend.files.file_parser import ParserFactory
+from fai_backend.files.file_parser import ParserFactory, is_url
 from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
@@ -99,7 +99,13 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                             multiple=True,
                             file_size_limit=settings.FILE_SIZE_LIMIT,
                         ),
+                        c.Textarea(
                             name='urls',
+                            title=_('urls', 'URLs'),
+                            placeholder=_('urls', 'URLs'),
+                            label=_('urls', 'URLs'),
+                            required=False,
+                        ),
                         c.Button(
                             html_type='submit',
                             label=_('upload', 'Upload'),
