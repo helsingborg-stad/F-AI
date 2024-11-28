@@ -135,6 +135,17 @@ async def edit_settings(
                             size='sm',
                             value=settings.VLLM_CONFIG,
                         ),
+                        c.Select(
+                            name='settings.APP_VECTOR_DB_EMBEDDING_MODEL',
+                            label=_('Embedding model'),
+                            required=True,
+                            size='sm',
+                            options=[
+                                ('default', 'default'),
+                                ('text-embedding-3-small', 'text-embedding-3-small')
+                            ],
+                            value=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
+                        ),
 
                         c.Heading(text='E-mail (Brevo)', class_name='font-bold'),
                         c.InputField(
