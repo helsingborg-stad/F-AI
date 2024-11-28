@@ -1,0 +1,73 @@
+type: install
+name: Folkets-AI-DEMO
+
+ssl: true
+skipNodeEmails: true
+
+globals:
+  DB_USER: admin
+  DB_PASS: ${fn.password(32)}
+
+nodes:
+  - cloudlets: 1
+    diskLimit: "5G"
+    scalingMode: "STATELESS"
+    isSLBAccessEnabled: true
+    nodeType: "nginx-dockerized"
+    nodeGroup: "bl"
+
+  - docker:
+      image: "helsingborg-stad/f-ai:latest"
+      registry: "ghcr.io"
+      volumes:
+        - "/fai-rag-app"
+      links: "nosqldb:mongodb"
+      volumeMounts:
+        "/fai-rag-app":
+          readOnly: false
+          sourcePath: "/data"
+          sourceNodeGroup: "storage"
+        "/data":
+          readOnly: false
+          sourcePath: "/data"
+          sourceNodeGroup: "storage"
+      cmd: "uvicorn fai_backend.main:app --host 0.0.0.0 --port 80"
+      entrypoint: "/bin/sh -c"
+      env:
+        APP_VECTOR_DB_PATH: "/fai-rag-app/vector_db"
+        SECRET_KEY: ${fn.password(32)}
+        APP_ADMIN_EMAIL: "demo@folkets.ai"
+        FIXED_PIN: "1234"
+        MONGO_DB_NAME: "folkets-ai"
+        MONGO_DB_URI: mongodb://${globals.DB_USER}:${globals.DB_PASS}@mongodb:27017
+        FILE_UPLOAD_PATH: "/fai-rag-app/uploads"
+    fixedCloudlets: 1
+    cloudlets: 8
+    diskLimit: "20G"
+    displayName: "Backend API"
+    mission: "cp"
+    scalingMode: "STATELESS"
+    isSLBAccessEnabled: false
+    nodeGroup: "cp"
+
+  - docker:
+      volumes:
+        - "/data"
+    tag: "2.0-10.5-almalinux-9"
+    cloudlets: 1
+    diskLimit: "20G"
+    scalingMode: "STATELESS"
+    isSLBAccessEnabled: true
+    nodeType: "storage"
+    nodeGroup: "storage"
+
+  - cloudlets: 8
+    tag: "7.0.5-almalinux-9"
+    diskLimit: "5G"
+    scalingMode: "STATELESS"
+    isSLBAccessEnabled: false
+    nodeType: "mongo"
+    nodeGroup: "nosqldb"
+    password: "${globals.DB_PASS}"
+    env:
+      ADMINPANEL_ENABLED: enabled
