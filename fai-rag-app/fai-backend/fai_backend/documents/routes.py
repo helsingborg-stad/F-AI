@@ -113,8 +113,9 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
 
 @router.post('/documents/upload_and_vectorize', response_model=list, response_model_exclude_none=True)
 async def upload_and_vectorize_handler(
-        files: list[UploadFile],
         collection_label: str = Form(None),
+        files: list[UploadFile] | None = Form(None),
+        urls: str = Form(None),
         project_user: ProjectUser = Depends(get_project_user),
         file_service: FileUploadService = Depends(get_file_upload_service),
         vector_service: VectorService = Depends(get_vector_service),
@@ -127,12 +128,16 @@ async def upload_and_vectorize_handler(
         {
             'document': element.text,
             'document_meta': {
-                'source': element.metadata.filename,
-                'page_number': element.metadata.page_number,
+                key: value
+                for key, value in element.metadata.to_dict().items()
+                if key in ['filename', 'url', 'page_number']
             }
         }
-        for file in file_service.get_file_infos(upload_path)
-        for element in ParserFactory.get_parser(file.path).parse(file.path)
+        for file_or_url in [
+            *[file.path for file in file_service.get_file_infos(upload_path)],
+            *[url for url in urls.split('\n') if is_url(url)]
+        ]
+        for element in ParserFactory.get_parser(file_or_url).parse(file_or_url)
     ]
 
     await vector_service.create_collection(
@@ -152,6 +157,7 @@ async def upload_and_vectorize_handler(
         label=collection_label or '',
         description='',
         embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
+        urls=[url for url in urls.split('\n') if is_url(url)]
     )
 
     return view(
