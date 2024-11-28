@@ -13,6 +13,7 @@ class SettingKey(Enum):
     FIXED_PIN = 'FIXED_PIN'
     OPENAI_API_KEY = 'OPENAI_API_KEY'
     VLLM_CONFIG = 'VLLM_CONFIG'
+    OPENAI_API_KEY = 'OPENAI_API_KEY'
 
     # Email
     BREVO_API_URL = 'BREVO_API_URL'
