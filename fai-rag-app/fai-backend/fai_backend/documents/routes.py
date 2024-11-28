@@ -85,23 +85,20 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                     components=[
                         c.InputField(
                             name='collection_label',
-                            label=_('input_fileupload_collection_label',
-                                    'Collection label (optional)'),
-                            placeholder=_('input_fileupload_collection_placeholder',
-                                          'Collection label (optional)'),
+                            label=_('Collection label (optional)'),
+                            placeholder=_('Collection label (optional)'),
                             required=False,
                             html_type='text',
                         ),
                         c.FileInput(
-                            name='files',
+                            name='files[]',
                             label=_('file', 'File'),
-                            required=True,
+                            required=False,
                             multiple=True,
                             file_size_limit=settings.FILE_SIZE_LIMIT,
                         ),
                         c.Textarea(
                             name='urls',
-                            title=_('urls', 'URLs'),
                             placeholder=_('urls', 'URLs'),
                             label=_('urls', 'URLs'),
                             required=False,
@@ -120,8 +117,8 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
 
 @router.post('/documents/upload_and_vectorize', response_model=list, response_model_exclude_none=True)
 async def upload_and_vectorize_handler(
+        files: list[UploadFile] = Form([]),
         collection_label: str = Form(None),
-        files: list[UploadFile] | None = Form(None),
         urls: str = Form(None),
         project_user: ProjectUser = Depends(get_project_user),
         file_service: FileUploadService = Depends(get_file_upload_service),
@@ -142,7 +139,7 @@ async def upload_and_vectorize_handler(
         }
         for file_or_url in [
             *[file.path for file in file_service.get_file_infos(upload_path)],
-            *[url for url in urls.split('\n') if is_url(url)]
+            *[url for url in urls.splitlines() if is_url(url)]
         ]
         for element in ParserFactory.get_parser(file_or_url).parse(file_or_url)
     ]
@@ -164,7 +161,7 @@ async def upload_and_vectorize_handler(
         label=collection_label or '',
         description='',
         embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
-        urls=[url for url in urls.split('\n') if is_url(url)]
+        urls=[url for url in urls.splitlines() if is_url(url)]
     )
 
     return view(
@@ -182,5 +179,5 @@ def parse_document(
         temp.flush()
         parser = ParserFactory.get_parser(temp.name)
         parsed = parser.parse(temp.name)
-        joined = "\n\n".join([p.text for p in parsed])
+        joined = '\n\n'.join([p.text for p in parsed])
         return joined

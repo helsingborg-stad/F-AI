@@ -29,6 +29,9 @@ class FileUploadService:
     def save_files(self, project_id: str, files: list[UploadFile]) -> str:
         upload_path = self._generate_upload_path(project_id)
 
+        if not files:
+            return upload_path
+
         for file in files:
             file_location = os.path.join(upload_path, file.filename)
             with open(file_location, 'wb+') as file_object:
