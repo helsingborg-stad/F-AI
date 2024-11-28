@@ -133,8 +133,8 @@ async def upload_and_vectorize_handler(
             'document': element.text,
             'document_meta': {
                 key: value
-                for key, value in element.metadata.to_dict().items()
-                if key in ['filename', 'url', 'page_number']
+                for key, value in {**element.metadata.to_dict(), }.items()
+                if key in ['filename', 'url', 'page_number', 'page_name']
             }
         }
         for file_or_url in [

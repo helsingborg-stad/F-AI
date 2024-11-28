@@ -74,7 +74,7 @@ class ExcelParser(AbstractDocumentParser):
 
 
 class HTMLParser(AbstractDocumentParser):
-    def parse(self, filename: str) -> list[Element]:
+    def _parse_html(self, filename: str) -> list[Element]:
         if is_url(filename):
             return partition_html(
                 url=filename,
@@ -82,6 +82,13 @@ class HTMLParser(AbstractDocumentParser):
                 chunking_strategy='basic'
             )
         return partition_html(filename, chunking_strategy='basic')
+
+    def parse(self, filename: str) -> list[Element]:
+        chunks = self._parse_html(filename)
+        title = chunks[0].metadata.orig_elements[0].text if len(chunks) > 0 else None
+        for chunk in chunks:
+            chunk.metadata.page_name = title
+        return chunks
 
 
 class ParserFactory:
