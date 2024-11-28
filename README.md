@@ -3,7 +3,7 @@
 ## Try it on Elastx
 
 1. Sign up on Elastx <https://elastx.se/se/signup>
-2. Click button
+2. Click button below 👇 to install demo
 
 [![Install demo](https://raw.githubusercontent.com/helsingborg-stad/F-AI/5e0c8dcac95f2468b4509927ccc2f410c08b0508/.deploy/elastx/elastx_install_demo.png)](https://app.jelastic.elastx.net/?manifest=https://raw.githubusercontent.com/helsingborg-stad/F-AI/refs/heads/master/.deploy/elastx/mainfest.yml)
 
