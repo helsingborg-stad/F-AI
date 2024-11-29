@@ -102,6 +102,8 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                             placeholder=_('urls', 'URLs'),
                             label=_('urls', 'URLs'),
                             required=False,
+                            class_name='whitespace-nowrap',
+                            rows=6
                         ),
                         c.Button(
                             html_type='submit',
