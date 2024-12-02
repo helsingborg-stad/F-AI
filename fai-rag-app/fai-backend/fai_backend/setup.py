@@ -1,10 +1,13 @@
+import json
+import os
+
 import nltk
 from beanie import init_beanie
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from fai_backend.assistant.models import AssistantChatHistoryModel, StoredQuestionModel
+from fai_backend.assistant.models import AssistantChatHistoryModel, StoredQuestionModel, AssistantTemplate
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.config import settings
 from fai_backend.projects.schema import ProjectMember, ProjectRole
@@ -50,11 +53,20 @@ async def setup_project():
                 )
             }
 
+        assistant_templates_dir = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                                '../../../data/assistant-templates'))
+        initial_assistants = \
+            [
+                AssistantTemplate(**json.loads(open(os.path.join(assistant_templates_dir, f)).read()))
+                for f in os.listdir(assistant_templates_dir)
+                if f.endswith('.json')
+            ] if os.path.exists(assistant_templates_dir) else []
+
         initial_project = await projects_repo.create(
             ProjectModel(
                 name='Project',
                 creator=settings.APP_ADMIN_EMAIL,
-                assistants=[],
+                assistants=initial_assistants,
                 members=[
                     ProjectMember(
                         email=settings.APP_ADMIN_EMAIL,
