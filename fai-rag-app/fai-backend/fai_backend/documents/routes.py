@@ -17,6 +17,7 @@ from fai_backend.projects.dependencies import get_project_service, list_projects
 from fai_backend.projects.schema import ProjectResponse
 from fai_backend.projects.service import ProjectService
 from fai_backend.schema import ProjectUser
+from fai_backend.settings.service import SettingsServiceFactory, SettingKey
 from fai_backend.vector.dependencies import get_vector_service
 from fai_backend.vector.service import VectorService
 
@@ -78,7 +79,8 @@ async def list_view(
 
 
 @router.get('/documents/upload', response_model=list, response_model_exclude_none=True)
-def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
+async def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
+    settings_service = SettingsServiceFactory().get_service()
     return view(
         [c.Div(components=[
             c.Div(components=[
@@ -100,7 +102,7 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                             title=_('file', 'File'),
                             required=True,
                             multiple=True,
-                            file_size_limit=settings.FILE_SIZE_LIMIT,
+                            file_size_limit=await settings_service.get_value(SettingKey.FILE_SIZE_LIMIT),
                         ),
                         c.Button(
                             html_type='submit',
@@ -129,21 +131,25 @@ async def upload_and_vectorize_handler(
     upload_path = file_service.save_files(project_user.project_id, files)
 
     upload_directory_name = upload_path.split('/')[-1]
+
+    settings_service = SettingsServiceFactory().get_service()
+    embedding_model = await settings_service.get_value(SettingKey.APP_VECTOR_DB_EMBEDDING_MODEL)
+
     await vector_service.create_collection(collection_name=upload_directory_name,
-                                           embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL)
+                                           embedding_model=embedding_model)
 
     parsed_files = file_service.parse_files(upload_path)
     await vector_service.add_documents_without_id_to_empty_collection(
         collection_name=upload_directory_name,
         documents=parsed_files,
-        embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL
+        embedding_model=embedding_model
     )
 
     await collection_service.create_collection_metadata(
         collection_id=upload_directory_name or '',
         label=collection_label or '',
         description='',
-        embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
+        embedding_model=embedding_model,
     )
 
     return view(

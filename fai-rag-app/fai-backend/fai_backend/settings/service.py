@@ -12,8 +12,27 @@ from fai_backend.settings.models import SettingsDict
 class SettingKey(Enum):
     FIXED_PIN = 'FIXED_PIN'
     OPENAI_API_KEY = 'OPENAI_API_KEY'
+    VLLM_CONFIG = 'VLLM_CONFIG'
+    APP_VECTOR_DB_EMBEDDING_MODEL = 'APP_VECTOR_DB_EMBEDDING_MODEL'
+    FILE_SIZE_LIMIT = 'FILE_SIZE_LIMIT'
+
+    # Email
     BREVO_API_URL = 'BREVO_API_URL'
     BREVO_API_KEY = 'BREVO_API_KEY'
+    MAIL_SENDER_NAME = 'MAIL_SENDER_NAME'
+    MAIL_SENDER_EMAIL = 'MAIL_SENDER_EMAIL'
+
+    # Sentry
+    SENTRY_DSN = 'SENTRY_DSN'
+    SENTRY_LOGGING_LEVEL = 'SENTRY_LOGGING_LEVEL'
+    SENTRY_EVENT_LEVEL = 'SENTRY_EVENT_LEVEL'
+    SENTRY_TRACE_SAMPLE_RATE = 'SENTRY_TRACE_SAMPLE_RATE'
+    SENTRY_ENVIRONMENT = 'SENTRY_ENVIRONMENT'
+
+    # Feedback
+    FEEDBACK_GITHUB_API_TOKEN = 'FEEDBACK_GITHUB_API_TOKEN'
+    FEEDBACK_GITHUB_REPO_OWNER = 'FEEDBACK_GITHUB_REPO_OWNER'
+    FEEDBACK_GITHUB_REPO_NAME = 'FEEDBACK_GITHUB_REPO_NAME'
 
 
 class SettingsService:
@@ -61,13 +80,6 @@ class SettingsService:
             return value
 
         raise KeyError(f'Unknown setting key "{str_key}"')
-
-    async def set_value(self, key: SettingKey, value):
-        project = await self._get_project()
-        project.settings[key.value] = value
-        project_service = get_project_service()
-        await project_service.update_project(project.id, project)
-        os.environ[str(key.value)] = str(value)
 
 
 class SettingsServiceFactory:

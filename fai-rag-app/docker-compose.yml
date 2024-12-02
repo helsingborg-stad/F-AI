@@ -12,7 +12,6 @@ services:
       FIXED_PIN: 1234
       APP_PROJECT_NAME: "your_project_name"
       APP_ADMIN_EMAIL: "admin@helsingborg.io"
-      MAIL_CLIENT: "console"
       MAIL_SENDER_EMAIL: "no-reply@helsingborg.io"
       MAIL_SENDER_NAME: "Folkets AI App"
       BREVO_API_URL: "your_brevo_api_url"

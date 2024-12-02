@@ -42,4 +42,4 @@ def create_memory_queue() -> IMessageQueue:
     return MemoryQueue()
 
 
-message_broker = MessageBroker.create(settings.App_MESSAGE_BROKER)
+message_broker = MessageBroker.create(settings.APP_MESSAGE_BROKER)

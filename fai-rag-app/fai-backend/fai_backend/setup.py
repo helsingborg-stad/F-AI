@@ -10,7 +10,7 @@ from fai_backend.config import settings
 from fai_backend.projects.schema import ProjectMember, ProjectRole
 from fai_backend.repositories import ConversationDocument, PinCodeModel, ProjectModel, projects_repo
 from fai_backend.sentry.watcher import Watcher
-from fai_backend.settings.service import SettingsServiceFactory
+from fai_backend.settings.service import SettingsServiceFactory, SettingKey
 
 
 def use_route_names_as_operation_ids(app: FastAPI) -> None:
@@ -96,15 +96,18 @@ async def setup_db():
 
 
 async def setup_sentry():
-    if not settings.SENTRY_ENABLED:
+    settings_service = SettingsServiceFactory().get_service()
+    dsn = await settings_service.get_value(SettingKey.SENTRY_DSN)
+
+    if len(dsn) == 0:
         return
 
     sentry_logger = Watcher(
-        dsn=settings.SENTRY_DSN.get_secret_value(),
-        environment=settings.SENTRY_ENVIRONMENT,
-        level=settings.SENTRY_LOGGING_LEVEL,
-        event_level=settings.SENTRY_EVENT_LEVEL,
-        trace_sample_rate=settings.SENTRY_TRACE_SAMPLE_RATE
+        dsn=dsn,
+        environment=await settings_service.get_value(SettingKey.SENTRY_ENVIRONMENT),
+        level=await settings_service.get_value(SettingKey.SENTRY_LOGGING_LEVEL),
+        event_level=await settings_service.get_value(SettingKey.SENTRY_EVENT_LEVEL),
+        trace_sample_rate=await settings_service.get_value(SettingKey.SENTRY_TRACE_SAMPLE_RATE)
     )
 
     sentry_logger.initialize()
