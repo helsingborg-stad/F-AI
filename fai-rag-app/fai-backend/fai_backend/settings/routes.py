@@ -107,6 +107,16 @@ async def edit_settings(
                             size='sm',
                             value=settings.FIXED_PIN,
                         ),
+                        c.Range(
+                            name='settings.FILE_SIZE_LIMIT',
+                            label=_('Document upload size limit (MB)'),
+                            required=True,
+                            size='sm',
+                            min=0,
+                            max=2000,
+                            step=10,
+                            value=settings.FILE_SIZE_LIMIT,
+                        ),
 
                         c.Heading(text='AI Settings', class_name='font-bold'),
                         c.InputField(

@@ -79,7 +79,8 @@ async def list_view(
 
 
 @router.get('/documents/upload', response_model=list, response_model_exclude_none=True)
-def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
+async def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
+    settings_service = SettingsServiceFactory().get_service()
     return view(
         [c.Div(components=[
             c.Div(components=[
@@ -101,7 +102,7 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                             title=_('file', 'File'),
                             required=True,
                             multiple=True,
-                            file_size_limit=settings.FILE_SIZE_LIMIT,
+                            file_size_limit=await settings_service.get_value(SettingKey.FILE_SIZE_LIMIT),
                         ),
                         c.Button(
                             html_type='submit',
