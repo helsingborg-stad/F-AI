@@ -128,7 +128,7 @@ async def upload_and_vectorize_handler(
         view=Depends(get_page_template_for_logged_in_users),
         collection_service: CollectionService = Depends(get_collection_service),
 ) -> list:
-    list_of_urls = [url for url in urls.splitlines() if is_url(url)]
+    list_of_urls = [url for url in (urls or '').splitlines() if is_url(url)]
     upload_path = file_service.save_files(project_user.project_id, files)
     collection_name = upload_path.split('/')[-1]
     chunks = [
@@ -146,6 +146,12 @@ async def upload_and_vectorize_handler(
         ]
         for element in ParserFactory.get_parser(file_or_url).parse(file_or_url) if element
     ]
+
+    if len(chunks) == 0:
+        return view(
+            c.FireEvent(event=e.GoToEvent(url='/documents/upload')),
+            _('submit_a_question', 'Create Question'),
+        )
 
     await vector_service.create_collection(
         collection_name=collection_name,
