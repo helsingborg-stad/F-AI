@@ -29,13 +29,16 @@ class FileUploadService:
     def save_files(self, project_id: str, files: list[UploadFile]) -> str:
         upload_path = self._generate_upload_path(project_id)
 
+        if not files:
+            return upload_path
+
         for file in files:
             file_location = os.path.join(upload_path, file.filename)
             with open(file_location, 'wb+') as file_object:
                 file_object.write(file.file.read())
         return upload_path
 
-    def get_file_infos(self, directory_path, upload_date: datetime) -> list[FileInfo]:
+    def get_file_infos(self, directory_path) -> list[FileInfo]:
         file_infos = []
         for file_name in os.listdir(directory_path):
             file_path = os.path.join(directory_path, file_name)
@@ -49,7 +52,7 @@ class FileUploadService:
                     collection=file_path.split('/')[-2],  # TODO: niceify
                     mime_type=mime_type or 'application/octet-stream',
                     last_modified=datetime.fromtimestamp(stat.st_mtime),
-                    upload_date=upload_date,
+                    upload_date=datetime.fromtimestamp(os.path.getctime(directory_path)),
                     created_date=datetime.fromtimestamp(stat.st_ctime)
                 ))
 
@@ -64,7 +67,7 @@ class FileUploadService:
         full_paths = [os.path.join(self.upload_dir, path) for path in project_directories]
 
         all_files = [file for path in full_paths for file in
-                     self.get_file_infos(path, datetime.fromtimestamp(os.path.getctime(path)))]
+                     self.get_file_infos(path)]
 
         return sorted(all_files, key=lambda x: x.upload_date, reverse=True)
 
@@ -81,8 +84,7 @@ class FileUploadService:
     def parse_files(self, src_directory_path: str) -> list[str]:
         parsed_files = []
 
-        upload_date = datetime.fromtimestamp(os.path.getctime(src_directory_path))
-        files = self.get_file_infos(src_directory_path, upload_date)
+        files = self.get_file_infos(src_directory_path)
 
         for file in files:
             parser = ParserFactory.get_parser(file.path)

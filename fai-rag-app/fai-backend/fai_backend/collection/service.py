@@ -15,6 +15,7 @@ class CollectionService:
             label: str,
             description: str = '',
             embedding_model: str | None = None,
+            urls: list[str] | None = None
 
     ):
         collection_metadata = CollectionMetadataModel(
@@ -22,6 +23,7 @@ class CollectionService:
             label=label,
             description=description,
             embedding_model=embedding_model,
+            urls=urls
         )
 
         return await self.repo.create(collection_metadata)
