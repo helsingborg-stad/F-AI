@@ -73,7 +73,11 @@ class RagScoringPipeline(IAssistantPipelineStrategy):
 
         def rag_postprocess(in_data: Any):
             results: list[str] = in_data[0]['results']
-            concatenated = '\n\n'.join([(s + '\n' + str(m)) for (s, m, _) in results])
+            concatenated = '\n\n'.join([json.dumps({
+                **{'text': s},
+                **m
+            }) for (s, m, _) in results])
+
             context_store.get_mutable().rag_output = concatenated
             return concatenated
 
