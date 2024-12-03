@@ -99,7 +99,7 @@ class ExcelParser(AbstractDocumentParser):
 
 class HTMLParser(AbstractDocumentParser):
     @staticmethod
-    def _parse_html(self, filename: str) -> list[Element]:
+    def _parse_html(filename: str) -> list[Element]:
         if is_url(filename):
             return partition_html(
                 url=filename,
