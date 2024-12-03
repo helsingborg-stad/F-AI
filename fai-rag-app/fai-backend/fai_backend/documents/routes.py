@@ -90,13 +90,6 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                             required=False,
                             html_type='text',
                         ),
-                        c.FileInput(
-                            name='files[]',
-                            label=_('file', 'File'),
-                            required=False,
-                            multiple=True,
-                            file_size_limit=settings.FILE_SIZE_LIMIT,
-                        ),
                         c.Textarea(
                             name='urls',
                             placeholder=_('urls', 'URLs'),
@@ -104,6 +97,13 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                             required=False,
                             class_name='whitespace-nowrap',
                             rows=6
+                        ),
+                        c.FileInput(
+                            name='files[]',
+                            label=_('file', 'File'),
+                            required=False,
+                            multiple=True,
+                            file_size_limit=settings.FILE_SIZE_LIMIT,
                         ),
                         c.Button(
                             html_type='submit',
