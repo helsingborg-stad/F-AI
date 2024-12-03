@@ -35,6 +35,7 @@ class VectorService:
             collection_name=collection_name,
             ids=ids,
             documents=documents,
+            metadatas=documents_metadata,
             embedding_function=await EmbeddingFnFactory.create(embedding_model)
         )
 
