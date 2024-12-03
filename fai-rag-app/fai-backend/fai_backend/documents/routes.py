@@ -1,6 +1,7 @@
 from tempfile import NamedTemporaryFile
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, Security, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Security, UploadFile
 
 from fai_backend.collection.dependencies import get_collection_service
 from fai_backend.collection.service import CollectionService
@@ -11,16 +12,16 @@ from fai_backend.files.file_parser import ParserFactory, is_url
 from fai_backend.files.service import FileUploadService
 from fai_backend.framework import components as c
 from fai_backend.framework import events as e
-from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
 from fai_backend.schema import ProjectUser
 from fai_backend.vector.dependencies import get_vector_service
 from fai_backend.vector.service import VectorService
 
+router_base = APIRouter()
+
 router = APIRouter(
     prefix='/api',
     tags=['Documents'],
-    route_class=LoggingAPIRouter,
 )
 
 
@@ -99,7 +100,7 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
                             rows=6
                         ),
                         c.FileInput(
-                            name='files[]',
+                            name='files',
                             label=_('file', 'File'),
                             required=False,
                             multiple=True,
@@ -119,7 +120,9 @@ def upload_view(view=Depends(get_page_template_for_logged_in_users)) -> list:
 
 @router.post('/documents/upload_and_vectorize', response_model=list, response_model_exclude_none=True)
 async def upload_and_vectorize_handler(
-        files: list[UploadFile] = Form([]),
+        files: Annotated[
+            list[UploadFile], File(description='Multiple files as UploadFile')
+        ],
         collection_label: str = Form(None),
         urls: str = Form(None),
         project_user: ProjectUser = Depends(get_project_user),
@@ -128,9 +131,11 @@ async def upload_and_vectorize_handler(
         view=Depends(get_page_template_for_logged_in_users),
         collection_service: CollectionService = Depends(get_collection_service),
 ) -> list:
+    list_of_files = [file for file in files if len(file.filename) > 0]
     list_of_urls = [url for url in (urls or '').splitlines() if is_url(url)]
-    upload_path = file_service.save_files(project_user.project_id, files)
+    upload_path = file_service.save_files(project_user.project_id, list_of_files)
     collection_name = upload_path.split('/')[-1]
+
     chunks = [
         {
             'document': element.text,
