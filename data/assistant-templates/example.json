@@ -9,6 +9,7 @@
       "Ge mig ett recept på äppelkaka."
     ]
   },
+  "allow_inline_files": true,
   "streams": [
     {
       "provider": "openai",
