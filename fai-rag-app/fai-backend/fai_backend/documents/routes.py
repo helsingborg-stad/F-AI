@@ -128,6 +128,7 @@ async def upload_and_vectorize_handler(
         view=Depends(get_page_template_for_logged_in_users),
         collection_service: CollectionService = Depends(get_collection_service),
 ) -> list:
+    list_of_urls = [url for url in urls.splitlines() if is_url(url)]
     upload_path = file_service.save_files(project_user.project_id, files)
     collection_name = upload_path.split('/')[-1]
     chunks = [
@@ -141,9 +142,9 @@ async def upload_and_vectorize_handler(
         }
         for file_or_url in [
             *[file.path for file in file_service.get_file_infos(upload_path)],
-            *[url for url in urls.splitlines() if is_url(url)]
+            *[url for url in list_of_urls]
         ]
-        for element in ParserFactory.get_parser(file_or_url).parse(file_or_url)
+        for element in ParserFactory.get_parser(file_or_url).parse(file_or_url) if element
     ]
 
     await vector_service.create_collection(
@@ -163,7 +164,7 @@ async def upload_and_vectorize_handler(
         label=collection_label or '',
         description='',
         embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
-        urls=[url for url in urls.splitlines() if is_url(url)]
+        urls=[url for url in list_of_urls]
     )
 
     return view(
