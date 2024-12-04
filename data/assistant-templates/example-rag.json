@@ -5,6 +5,7 @@
     "description": "This is an *example assistant* for demonstration purposes. It is instructed to answer in Swedish 🇸🇪. It has RAG support enabled and will answer questions specifically about the document(s) in it's file collection.\n\n**NOTE: before first use document(s) must be uploaded and the resulting file collection must be selected in the assistant editor.**",
     "sample_questions": []
   },
+  "max_tokens": 120000,
   "streams": [
     {
       "pipeline": "rag_scoring"
