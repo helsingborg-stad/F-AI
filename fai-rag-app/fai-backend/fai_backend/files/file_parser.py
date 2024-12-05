@@ -40,7 +40,7 @@ def is_url(string: str) -> bool:
 @error_handler(default_return='null')
 def get_mime_type(file_path: str) -> str:
     if is_url(file_path):
-        return magic.from_buffer(requests.get(file_path, verify=settings.ENV_MODE != 'development').content, mime=True)
+        return magic.from_buffer(requests.get(file_path, verify=settings.ENV_MODE == 'development').content, mime=True)
     return magic.from_file(file_path, mime=True)
 
 
