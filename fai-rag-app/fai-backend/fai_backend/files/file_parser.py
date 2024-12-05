@@ -57,9 +57,10 @@ class DocxParser(AbstractDocumentParser):
             return partition_docx(
                 url=filename,
                 ssl_verify=settings.ENV_MODE != 'development',
-                chunking_strategy='basic'
+                chunking_strategy='basic',
+                unique_element_ids=True
             )
-        return partition_docx(filename, chunking_strategy='basic')
+        return partition_docx(filename, chunking_strategy='basic', unique_element_ids=True)
 
 
 class PDFParser(AbstractDocumentParser):
@@ -69,9 +70,10 @@ class PDFParser(AbstractDocumentParser):
             return partition_pdf(
                 url=filename,
                 ssl_verify=settings.ENV_MODE != 'development',
-                chunking_strategy='basic'
+                chunking_strategy='basic',
+                unique_element_ids=True
             )
-        return partition_pdf(filename, chunking_strategy='basic')
+        return partition_pdf(filename, chunking_strategy='basic', unique_element_ids=True)
 
 
 class MarkdownParser(AbstractDocumentParser):
@@ -81,9 +83,10 @@ class MarkdownParser(AbstractDocumentParser):
             return partition_md(
                 url=filename,
                 ssl_verify=settings.ENV_MODE != 'development',
-                chunking_strategy='basic'
+                chunking_strategy='basic',
+                unique_element_ids=True
             )
-        return partition_md(filename, chunking_strategy='basic')
+        return partition_md(filename, chunking_strategy='basic', unique_element_ids=True)
 
 
 class ExcelParser(AbstractDocumentParser):
@@ -92,9 +95,10 @@ class ExcelParser(AbstractDocumentParser):
         if is_url(filename):
             return partition_xlsx(
                 url=filename,
-                ssl_verify=settings.ENV_MODE != 'development'
+                ssl_verify=settings.ENV_MODE != 'development',
+                unique_element_ids=True
             )
-        return partition_xlsx(filename)
+        return partition_xlsx(filename, unique_element_ids=True)
 
 
 class HTMLParser(AbstractDocumentParser):
@@ -104,9 +108,10 @@ class HTMLParser(AbstractDocumentParser):
             return partition_html(
                 url=filename,
                 ssl_verify=settings.ENV_MODE != 'development',
-                chunking_strategy='basic'
+                chunking_strategy='basic',
+                unique_element_ids=True
             )
-        return partition_html(filename, chunking_strategy='basic')
+        return partition_html(filename, chunking_strategy='basic', unique_element_ids=True)
 
     @error_handler(default_return=[])
     def parse(self, filename: str) -> list[Element]:
