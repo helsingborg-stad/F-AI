@@ -2,6 +2,7 @@ from tempfile import NamedTemporaryFile
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, Security, UploadFile
+from more_itertools import chunked
 
 from fai_backend.collection.dependencies import get_collection_service
 from fai_backend.collection.service import CollectionService
@@ -131,44 +132,45 @@ async def upload_and_vectorize_handler(
         view=Depends(get_page_template_for_logged_in_users),
         collection_service: CollectionService = Depends(get_collection_service),
 ) -> list:
+    def generate_chunks(file_paths_or_urls: list[str]):
+        for file_or_url in file_paths_or_urls:
+            for element in ParserFactory.get_parser(file_or_url).parse(file_or_url):
+                if len(element.text):
+                    yield {
+                        'document': element.text,
+                        'document_meta': {
+                            key: value
+                            for key, value in element.metadata.to_dict().items()
+                            if key in ['filename', 'url', 'page_number', 'page_name']
+                        },
+                        'document_id': element.id
+                    }
+
     list_of_files = [file for file in files if len(file.filename) > 0]
     list_of_urls = [url for url in (urls or '').splitlines() if is_url(url)]
+
     upload_path = file_service.save_files(project_user.project_id, list_of_files)
     collection_name = upload_path.split('/')[-1]
-
-    chunks = [
-        {
-            'document': element.text,
-            'document_meta': {
-                key: value
-                for key, value in {**element.metadata.to_dict(), }.items()
-                if key in ['filename', 'url', 'page_number', 'page_name']
-            }
-        }
-        for file_or_url in [
-            *[file.path for file in file_service.get_file_infos(upload_path)],
-            *[url for url in list_of_urls]
-        ]
-        for element in ParserFactory.get_parser(file_or_url).parse(file_or_url) if element
-    ]
-
-    if len(chunks) == 0:
-        return view(
-            c.FireEvent(event=e.GoToEvent(url='/documents/upload')),
-            _('submit_a_question', 'Create Question'),
-        )
 
     await vector_service.create_collection(
         collection_name=collection_name,
         embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL
     )
 
-    await vector_service.add_documents_without_id_to_empty_collection(
-        collection_name=collection_name,
-        documents=[chunk['document'] for chunk in chunks],
-        embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
-        documents_metadata=[chunk['document_meta'] for chunk in chunks],
-    )
+    for batch in chunked(
+            generate_chunks([
+                *[file.path for file in file_service.get_file_infos(upload_path)],
+                *list_of_urls
+            ]),
+            100
+    ):
+        await vector_service.add_documents_without_id_to_empty_collection(
+            collection_name=collection_name,
+            documents=[chunk['document'] for chunk in batch],
+            embedding_model=settings.APP_VECTOR_DB_EMBEDDING_MODEL,
+            documents_metadata=[chunk['document_meta'] for chunk in batch],
+            document_ids=[chunk['document_id'] for chunk in batch]
+        )
 
     await collection_service.create_collection_metadata(
         collection_id=collection_name or '',
