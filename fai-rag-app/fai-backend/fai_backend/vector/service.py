@@ -46,13 +46,14 @@ class VectorService:
             embedding_model: str | None = None,
             documents_metadata: Mapping[str, str | int | float | bool] | list[
                 Mapping[str, str | int | float | bool]] | None = None,
+            document_ids: list[str] | None = None
     ) -> None:
         """
         Add documents to a collection without specifying ID's
 
         The collection should be empty before calling this method to avoid ID conflicts.
         """
-        ids = [str(i) for i in range(len(documents))]
+        ids = [str(i) for i in range(len(documents))] if document_ids is None else document_ids
 
         await self.add_to_collection(
             collection_name=collection_name,
