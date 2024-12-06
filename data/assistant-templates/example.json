@@ -2,13 +2,15 @@
   "id": "example",
   "meta": {
     "name": "Example Assistant",
-    "description": "This is an *example assistant* for testing purposes. It has been instructed to answer Swedish questions about Helsingborg.",
+    "description": "This is an *example assistant* for demonstration purposes. It is instructed to answer in Swedish 🇸🇪.",
     "sample_questions": [
-      "Hur kan jag kolla upp tidstabellen för bussar?",
-      "Vilka evenemang händer i sommar?",
-      "Var kan jag parkera?"
+      "Hur kan AI hjälpa mig i vardagen?",
+      "Vilken är Sveriges största stad?",
+      "Ge mig ett recept på äppelkaka."
     ]
   },
+  "max_tokens": 120000,
+  "allow_inline_files": true,
   "streams": [
     {
       "provider": "openai",
@@ -19,7 +21,7 @@
       "messages": [
         {
           "role": "system",
-          "content": "You are a helpful AI assistant that helps people with answering questions related to municipality and Helsingborg City. The questions are going to be asked in Swedish. Your response must always be in Swedish."
+          "content": "You are a helpful AI assistant that helps people with answering questions. The questions are going to be asked in Swedish. Your response must always be in Swedish."
         },
         {
           "insert": "history"
