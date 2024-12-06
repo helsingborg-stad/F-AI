@@ -46,6 +46,7 @@ def AssistantForm(
                             ('gpt-3.5-turbo', _('GPT-3.5 Turbo')),
                             ('gpt-4o', _('GPT-4o')),
                             ('gpt-4', _('GPT-4')),
+                            ('o1-preview', _('o1-preview')),
                         ],
                         value=data.model if data else 'gpt-3.5-turbo',
                         size='sm',

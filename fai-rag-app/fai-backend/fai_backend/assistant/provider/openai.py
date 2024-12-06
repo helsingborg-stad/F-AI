@@ -33,6 +33,14 @@ class OpenAIStream(Stream[str, OpenAIChatDelta]):
                 messages: List[OpenAIChatMessage],
         ) -> AsyncGenerator[StreamOutput[OpenAIChatDelta], None]:
             try:
+                if model.startswith('o1-'):
+                    # o1 (beta) models does not support 'system' role - instead merge with user message
+                    # https://platform.openai.com/docs/guides/reasoning?reasoning-prompt-examples=coding-planning#beta-limitations
+                    first_system = next(m for m in messages if m.role == 'system')
+                    first_user = next(m for m in messages if m.role == 'user')
+                    first_user.content = f"Instructions:\n{first_system.content}\n\n{first_user.content}"
+                    messages = [m for m in messages if m.role != 'system']
+
                 completions = await self._client.chat.completions.create(
                     model=model,
                     messages=[m.to_dict() for m in messages],
