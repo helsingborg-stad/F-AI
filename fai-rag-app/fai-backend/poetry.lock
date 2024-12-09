@@ -1783,7 +1783,6 @@ files = [
 ]
 
 [package.dependencies]
-effdet = {version = "*", optional = true, markers = "extra == \"layoutmodels\""}
 iopath = "*"
 numpy = "*"
 opencv-python = "*"
@@ -1791,11 +1790,8 @@ pandas = "*"
 pdf2image = "*"
 pdfplumber = "*"
 pillow = "*"
-pytesseract = {version = "*", optional = true, markers = "extra == \"tesseract\""}
 pyyaml = ">=5.1"
 scipy = "*"
-torch = {version = "*", optional = true, markers = "extra == \"layoutmodels\""}
-torchvision = {version = "*", optional = true, markers = "extra == \"layoutmodels\""}
 
 [package.extras]
 effdet = ["effdet", "torch", "torchvision"]
@@ -5560,13 +5556,13 @@ files = [
 
 [[package]]
 name = "unstructured"
-version = "0.13.7"
+version = "0.14.3"
 description = "A library that prepares raw documents for downstream ML tasks."
 optional = false
-python-versions = "<3.12,>=3.9.0"
+python-versions = "<3.13,>=3.9.0"
 files = [
-    {file = "unstructured-0.13.7-py3-none-any.whl", hash = "sha256:a3d8f3037cb3063661531c6ecc04aca6df93c293ba06e36d67ffc70857a6f208"},
-    {file = "unstructured-0.13.7.tar.gz", hash = "sha256:5d59161d353b7006d8c6ee6f1a39154a5a11a5aaa258aac3fe90a8d44016aa6c"},
+    {file = "unstructured-0.14.3-py3-none-any.whl", hash = "sha256:9f94607aaae66a543315062bf10bd3a196b5809d2747e15567d1a814764bcf8c"},
+    {file = "unstructured-0.14.3.tar.gz", hash = "sha256:57156e67edf91d1f1a3c13451ca0dd834a8108090eca3cd2e3a99eb045b18612"},
 ]
 
 [package.dependencies]
@@ -5574,6 +5570,7 @@ backoff = "*"
 beautifulsoup4 = "*"
 chardet = "*"
 dataclasses-json = "*"
+effdet = {version = "*", optional = true, markers = "extra == \"pdf\""}
 emoji = "*"
 filetype = "*"
 google-cloud-vision = {version = "*", optional = true, markers = "extra == \"pdf\""}
@@ -5588,6 +5585,7 @@ pdf2image = {version = "*", optional = true, markers = "extra == \"pdf\""}
 pikepdf = {version = "*", optional = true, markers = "extra == \"pdf\""}
 pillow-heif = {version = "*", optional = true, markers = "extra == \"pdf\""}
 pypdf = {version = "*", optional = true, markers = "extra == \"pdf\""}
+pytesseract = {version = "*", optional = true, markers = "extra == \"pdf\""}
 python-docx = {version = "*", optional = true, markers = "extra == \"docx\""}
 python-iso639 = "*"
 python-magic = "*"
@@ -5596,13 +5594,13 @@ requests = "*"
 tabulate = "*"
 typing-extensions = "*"
 unstructured-client = "*"
-unstructured-inference = {version = "0.7.31", optional = true, markers = "extra == \"pdf\""}
+unstructured-inference = {version = "0.7.33", optional = true, markers = "extra == \"pdf\""}
 "unstructured.pytesseract" = {version = ">=0.3.12", optional = true, markers = "extra == \"pdf\""}
 wrapt = "*"
 
 [package.extras]
 airtable = ["pyairtable"]
-all-docs = ["google-cloud-vision", "markdown", "msg-parser", "networkx", "onnx", "openpyxl", "pandas", "pdf2image", "pdfminer.six", "pikepdf", "pillow-heif", "pypandoc", "pypdf", "python-docx", "python-pptx (<=0.6.23)", "unstructured-inference (==0.7.31)", "unstructured.pytesseract (>=0.3.12)", "xlrd"]
+all-docs = ["effdet", "google-cloud-vision", "markdown", "msg-parser", "networkx", "onnx", "openpyxl", "pandas", "pdf2image", "pdfminer.six", "pikepdf", "pillow-heif", "pypandoc", "pypdf", "pytesseract", "python-docx", "python-pptx (<=0.6.23)", "unstructured-inference (==0.7.33)", "unstructured.pytesseract (>=0.3.12)", "xlrd"]
 astra = ["astrapy"]
 azure = ["adlfs", "fsspec"]
 azure-cognitive-search = ["azure-search-documents"]
@@ -5623,6 +5621,7 @@ elasticsearch = ["elasticsearch"]
 embed-huggingface = ["huggingface", "langchain-community", "sentence-transformers"]
 embed-octoai = ["openai", "tiktoken"]
 embed-vertexai = ["langchain", "langchain-community", "langchain-google-vertexai"]
+embed-voyageai = ["langchain", "langchain-voyageai"]
 epub = ["pypandoc"]
 gcs = ["bs4", "fsspec", "gcsfs"]
 github = ["pygithub (>1.58.0)"]
@@ -5630,9 +5629,9 @@ gitlab = ["python-gitlab"]
 google-drive = ["google-api-python-client"]
 hubspot = ["hubspot-api-client", "urllib3"]
 huggingface = ["langdetect", "sacremoses", "sentencepiece", "torch", "transformers"]
-image = ["google-cloud-vision", "onnx", "pdf2image", "pdfminer.six", "pikepdf", "pillow-heif", "pypdf", "unstructured-inference (==0.7.31)", "unstructured.pytesseract (>=0.3.12)"]
+image = ["effdet", "google-cloud-vision", "onnx", "pdf2image", "pdfminer.six", "pikepdf", "pillow-heif", "pypdf", "pytesseract", "unstructured-inference (==0.7.33)", "unstructured.pytesseract (>=0.3.12)"]
 jira = ["atlassian-python-api"]
-local-inference = ["google-cloud-vision", "markdown", "msg-parser", "networkx", "onnx", "openpyxl", "pandas", "pdf2image", "pdfminer.six", "pikepdf", "pillow-heif", "pypandoc", "pypdf", "python-docx", "python-pptx (<=0.6.23)", "unstructured-inference (==0.7.31)", "unstructured.pytesseract (>=0.3.12)", "xlrd"]
+local-inference = ["effdet", "google-cloud-vision", "markdown", "msg-parser", "networkx", "onnx", "openpyxl", "pandas", "pdf2image", "pdfminer.six", "pikepdf", "pillow-heif", "pypandoc", "pypdf", "pytesseract", "python-docx", "python-pptx (<=0.6.23)", "unstructured-inference (==0.7.33)", "unstructured.pytesseract (>=0.3.12)", "xlrd"]
 md = ["markdown"]
 mongodb = ["pymongo"]
 msg = ["msg-parser"]
@@ -5644,8 +5643,8 @@ opensearch = ["opensearch-py"]
 org = ["pypandoc"]
 outlook = ["Office365-REST-Python-Client", "msal"]
 paddleocr = ["unstructured.paddleocr (==2.6.1.3)"]
-pdf = ["google-cloud-vision", "onnx", "pdf2image", "pdfminer.six", "pikepdf", "pillow-heif", "pypdf", "unstructured-inference (==0.7.31)", "unstructured.pytesseract (>=0.3.12)"]
-pinecone = ["pinecone-client (==2.2.4)"]
+pdf = ["effdet", "google-cloud-vision", "onnx", "pdf2image", "pdfminer.six", "pikepdf", "pillow-heif", "pypdf", "pytesseract", "unstructured-inference (==0.7.33)", "unstructured.pytesseract (>=0.3.12)"]
+pinecone = ["pinecone-client (>=3.7.1)"]
 postgres = ["psycopg2-binary"]
 ppt = ["python-pptx (<=0.6.23)"]
 pptx = ["python-pptx (<=0.6.23)"]
@@ -5700,23 +5699,26 @@ dev = ["pylint (==3.1.0)"]
 
 [[package]]
 name = "unstructured-inference"
-version = "0.7.31"
+version = "0.7.33"
 description = "A library for performing inference using trained models."
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "unstructured_inference-0.7.31-py3-none-any.whl", hash = "sha256:0f04ee2875299b3bf3f879b387a968cf157969ba2edf4e0c77fe6f1b2f1d3054"},
-    {file = "unstructured_inference-0.7.31.tar.gz", hash = "sha256:c79187b3621cf726556a5edeca814f6e9195498dbabf89623c19d0d77c811afe"},
+    {file = "unstructured_inference-0.7.33-py3-none-any.whl", hash = "sha256:828013a0775b6bde401bd22914427c3f84f80014dedc3b9b8c08e8066642b20e"},
+    {file = "unstructured_inference-0.7.33.tar.gz", hash = "sha256:d2638c0f41cbe03685565e421332240cedba65073410342c76862e727ad74ee3"},
 ]
 
 [package.dependencies]
 huggingface-hub = "*"
-layoutparser = {version = "*", extras = ["layoutmodels", "tesseract"]}
+layoutparser = "*"
+matplotlib = "*"
 onnx = "*"
 onnxruntime = ">=1.17.0"
 opencv-python = "!=4.7.0.68"
 python-multipart = "*"
 rapidfuzz = "*"
+timm = "*"
+torch = "*"
 transformers = ">=4.25.1"
 
 [[package]]
@@ -6119,4 +6121,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11.9"
-content-hash = "2bb07d412144cc737c20577529e5ad9633e70416bae3eb5b7d0dc7cd2b69f278"
+content-hash = "de44eada39965685a1a0cd3537501e82b9c2fd01443dc91404ed3e7c66405f36"
