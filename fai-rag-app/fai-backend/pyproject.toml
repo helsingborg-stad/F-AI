@@ -34,7 +34,7 @@ cryptography = "^43.0.3"
 more-itertools = "^10.5.0"
 
 [tool.poetry.group.unstructured.dependencies]
-unstructured = { extras = ["md", "pdf", "docx"], version = "0.13.7" }
+unstructured = { extras = ["md", "pdf", "docx"], version = "0.14.3" }
 
 [tool.poetry.group.test.dependencies]
 pytest = "~7.4.4"
