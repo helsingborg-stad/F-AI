@@ -1,7 +1,7 @@
 from typing import Literal
 
 from dotenv import load_dotenv
-from pydantic import Extra, SecretStr
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings
 
 from fai_backend.logger.console import console
@@ -9,7 +9,7 @@ from fai_backend.logger.console import console
 load_dotenv()
 
 
-class Settings(BaseSettings, extra=Extra.ignore):
+class Settings(BaseSettings):
     APP_PROJECT_NAME: str = 'fai-rag-app'
     APP_ADMIN_EMAIL: str
     APP_DB: Literal['memory', 'mongodb'] = 'mongodb'
@@ -53,6 +53,7 @@ class Settings(BaseSettings, extra=Extra.ignore):
 
     class Config:
         env_file = '.env'
+        extra = 'ignore'
 
 
 settings = None
