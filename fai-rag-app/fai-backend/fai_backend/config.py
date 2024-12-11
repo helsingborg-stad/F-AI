@@ -56,7 +56,8 @@ class Settings(BaseSettings):
         extra = 'ignore'
 
 
-settings = None
+
+settings: None | Settings = None
 
 try:
     env_settings = Settings()
