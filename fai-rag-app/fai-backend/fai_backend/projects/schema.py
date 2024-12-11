@@ -21,7 +21,7 @@ class Project(BaseModel):
     creator: EmailStr
     description: str = ''
     timestamp: Timestamp = Timestamp()
-    settings: SettingsDict = {}
+    settings: SettingsDict = Field(default_factory=dict)
     assistants: list[AssistantTemplate] = Field(default_factory=list)
     members: list[ProjectMember] = Field(..., default_factory=list)
     roles: dict[str, ProjectRole] = Field(..., default_factory=dict)
