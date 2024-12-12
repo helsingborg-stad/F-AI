@@ -53,4 +53,6 @@ jobs:
           poetry install
 
       - name: Run tests
+        env:
+          ENV_MODE: "development"
         run: poetry run pytest -s -vv
