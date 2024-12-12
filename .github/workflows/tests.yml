@@ -55,4 +55,5 @@ jobs:
       - name: Run tests
         env:
           ENV_MODE: "development"
+          DEFAULT_LANGUAGE: "sv"
         run: poetry run pytest -s -vv
