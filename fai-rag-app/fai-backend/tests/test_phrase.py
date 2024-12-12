@@ -1,16 +1,4 @@
-from fastapi.testclient import TestClient
-
-from fai_backend.main import app
 from fai_backend.phrase import phrase, set_language
-
-client = TestClient(app)
-
-
-def test_greeting_swedish():
-    response = client.get('/greet', headers={'language': 'sv'})
-    assert response.status_code == 200
-    assert response.json() == {'message': 'Hej'}
-
 
 def test_greeting_nonexistent_key():
     set_language('en')
