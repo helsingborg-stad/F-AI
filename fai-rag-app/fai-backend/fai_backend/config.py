@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     MAIL_SENDER_NAME: str = 'FAI App'
     MAIL_SENDER_EMAIL: str = 'no-reply@localhost.dev'
     LOG_LEVEL: str = 'INFO'
-    DEFAULT_LANGUAGE: str = 'en'
+    DEFAULT_LANGUAGE: str = 'sv'
     FILE_UPLOAD_PATH: str = 'uploads'
     LLM_BACKEND: Literal['parrot', 'openai'] = 'parrot'
     SENTRY_ENABLED: bool = False
