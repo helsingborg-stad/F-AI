@@ -1,3 +1,4 @@
+import os
 from typing import Literal
 
 from dotenv import load_dotenv
@@ -11,14 +12,14 @@ load_dotenv()
 
 class Settings(BaseSettings):
     APP_PROJECT_NAME: str = 'fai-rag-app'
-    APP_ADMIN_EMAIL: str
+    APP_ADMIN_EMAIL: str = ''
     APP_DB: Literal['memory', 'mongodb'] = 'mongodb'
     APP_VECTOR_DB: Literal['memory', 'chromadb'] = 'chromadb'
     APP_VECTOR_DB_PATH: str = 'vector_db'
     APP_VECTOR_DB_EMBEDDING_MODEL: Literal[
         'default', 'text-embedding-3-small', 'text-embedding-3-large'] = 'default'
     APP_MESSAGE_BROKER: Literal['memory', 'redis_queue'] = 'redis_queue'
-    SECRET_KEY: SecretStr
+    SECRET_KEY: SecretStr = ''
     BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
     BREVO_API_KEY: SecretStr = ''
     ALGORITHM: str = 'HS256'
@@ -55,9 +56,14 @@ class Settings(BaseSettings):
         env_file = '.env'
         extra = 'ignore'
 
+    def reload_from_env(self) -> None:
+        console.log('Reloading app settings')
+        for field in self.model_fields:
+            new_value = os.getenv(field.upper(), getattr(self, field))
+            setattr(self, field, new_value)
 
 
-settings: None | Settings = None
+settings: Settings | None = None
 
 try:
     env_settings = Settings()

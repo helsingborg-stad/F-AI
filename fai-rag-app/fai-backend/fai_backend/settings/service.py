@@ -4,7 +4,7 @@ from enum import Enum
 import dotenv
 from pydantic import SecretStr
 
-from fai_backend.config import Settings
+from fai_backend.config import settings as app_settings
 from fai_backend.projects.dependencies import get_project_service
 from fai_backend.settings.models import SettingsDict
 
@@ -27,15 +27,18 @@ class SettingsService:
     async def refresh_environment(self):
         dotenv.load_dotenv()
         project = await self._get_project()
-        for key in project.settings:
-            os.environ[key] = str(project.settings[key])
 
-    async def get_all(self) -> Settings:
+        for key, value in project.settings.items():
+            os.environ[key] = str(value)
+
+        app_settings.reload_from_env()
+
+    async def get_all(self) -> SettingsDict:
         project = await self._get_project()
-        defaults = Settings().model_dump()
+        defaults = app_settings.model_dump()
         overrides = project.settings
         merged = defaults | overrides
-        return Settings(**merged, _env_file=None)
+        return app_settings.model_validate(merged)
 
     async def set_all(self, settings: SettingsDict):
         project = await self._get_project()
@@ -43,8 +46,10 @@ class SettingsService:
         project_service = get_project_service()
         await project_service.update_project(project.id, project)
 
-        for key in settings.keys():
-            os.environ[key] = str(settings[key])
+        for key, value in settings.items():
+            os.environ[key] = str(value)
+
+        app_settings.reload_from_env()
 
     async def get_value(self, key: SettingKey) -> bool | float | int | str:
         project = await self._get_project()
@@ -53,7 +58,7 @@ class SettingsService:
         if str_key in project.settings:
             return project.settings[str_key]
 
-        defaults = Settings().model_dump()
+        defaults = app_settings.model_dump()
         if str_key in defaults:
             value = defaults[str_key]
             if isinstance(value, SecretStr):
