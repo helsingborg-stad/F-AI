@@ -63,7 +63,7 @@ class Settings(BaseSettings):
             setattr(self, field, new_value)
 
 
-settings: Settings | None = None
+settings = None
 
 try:
     env_settings = Settings()
