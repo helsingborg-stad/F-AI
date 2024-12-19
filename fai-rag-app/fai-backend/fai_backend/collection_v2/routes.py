@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import Union
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, HTTPException, UploadFile, Depends
 from more_itertools import chunked
@@ -176,12 +177,20 @@ def generate_chunks(file_paths_or_urls: list[str]):
                 }
 
 
+def is_url(string: str) -> bool:
+    parsed = urlparse(string)
+    return parsed.scheme in {'http', 'https'}
+
+
 @router.put('/collections/{id}/files', summary='Replace collection files')
 async def set_collection_files(
         id: str,
-        files: list[UploadFile],
+        files: list[UploadFile] = None,
+        urls: list[str] = None,
         project_user: ProjectUser = Depends(get_project_user)
 ):
+    files = files or []
+    urls = urls or []
     collection_service = get_collection_service()
     vector_service = await get_vector_service()
 
@@ -202,9 +211,11 @@ async def set_collection_files(
 
     file_service = get_file_upload_service()
     upload_path = file_service.save_files(project_user.project_id, files)
+    list_of_urls = [url for url in urls if is_url(url)]
     for batch in chunked(
             generate_chunks([
-                *[file.path for file in file_service.get_file_infos(upload_path)]
+                *[file.path for file in file_service.get_file_infos(upload_path)],
+                *list_of_urls
             ]),
             100
     ):
@@ -227,4 +238,4 @@ async def set_collection_files(
         for file in files
     ]
 
-    await collection_service.update_collection_metadata(id, {'files': collection_files})
+    await collection_service.update_collection_metadata(id, {'files': collection_files, 'urls': list_of_urls})
