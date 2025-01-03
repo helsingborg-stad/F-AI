@@ -43,7 +43,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+#lib/
 lib64/
 parts/
 sdist/
@@ -190,3 +190,4 @@ cython_debug/
 
 node_modules
 !/fai-frontend/src/lib/
+!/fai-sveltekit-frontend/src/lib/
