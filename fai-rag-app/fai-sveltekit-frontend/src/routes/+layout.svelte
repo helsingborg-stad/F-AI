@@ -8,7 +8,11 @@
 
 <div class="h-screen">
 	<div class="relative flex h-full overflow-hidden z-0">
-		<MenuSidebar menuItems={[{label: 'Chat', path: '/chat'}, {label: 'Questions', path: '/questions'}]} currentUrlPath={$page.url.pathname} />
+		<MenuSidebar menuItems={[
+				{label: 'Chat', path: '/chat'},
+				{label: 'Questions', path: '/questions'},
+				{label: 'Assistant', path: '/assistant'}
+			]} currentUrlPath={$page.url.pathname} />
 		<!-- Main Content -->
         <div class="relative flex h-full w-full flex-1 flex-col overflow-hidden">
             <!-- Header -->
