@@ -6,11 +6,7 @@
 		title: 'Components/Navbar',
 		component: Navbar,
 		tags: ['autodocs'],
-		argTypes: {
-			title: { control: 'text' },
-		},
 	});
 </script>
 
-<!-- Navbar hidden for larger screens. -->
-<Story name="Hidden for `md` view ports" />
+<Story name="Menu button for `md` view ports" />
