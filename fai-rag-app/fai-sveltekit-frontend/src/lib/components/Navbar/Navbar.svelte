@@ -1,11 +1,7 @@
-<script>
-	export let title = '';
-</script>
-
-<div class="navbar bg-base-100 md:hidden">
+<div class="navbar bg-gray-50">
   <div class="navbar-start">
     <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-circle md:hidden">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5"
@@ -20,8 +16,9 @@
         </svg>
       </div>
     </div>
+    <slot name="left"></slot>
   </div>
-  <div class="navbar-center">
-    <p class="text-xl">{title}</p>
+  <div class="navbar-end">
+    <slot name="right"></slot>
   </div>
 </div>
