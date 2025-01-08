@@ -46,7 +46,7 @@
 </script>
 
 <!-- Chat Content -->
-<div class="flex flex-col flex-1 bg-gradient-to-b from-amber-50 to-amber-100">
+<div class="flex flex-col flex-1 bg-gradient-to-b from-orange-50 to-orange-100">
   <!-- Chat Bubbles Area -->
   <div class="flex-1 overflow-y-auto p-4">
     {#each $messages as msg (msg.text)}
