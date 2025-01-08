@@ -1,3 +1,5 @@
+<!--TODO: Remove dropdown from navbar and place it in top `+layout.page`-->
+
 <div class="navbar bg-gray-50">
   <div class="navbar-start">
     <div class="dropdown">
