@@ -4,7 +4,10 @@
 	export let items: MenuItem[] = [];
 	export let currentUrlPath: string;
 
-	const isActive = (path: string) => currentUrlPath === path;
+	const isActive = (path: string) => {
+		const urlFirstDirectory = '/' + currentUrlPath.split('/').filter(Boolean)[0];
+		return urlFirstDirectory === path;
+	}
 </script>
 
 <div class="h-full">
