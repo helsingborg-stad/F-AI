@@ -23,6 +23,7 @@ from fai_backend.schema import ProjectUser
 from fai_backend.settings.routes import router as config_router
 from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_parser, setup_settings
 from fai_backend.collection_v2.routes import router as collection_router
+from fai_backend.collection_v2.view_routes import router as collection_view_router
 
 
 @asynccontextmanager
@@ -55,6 +56,7 @@ app.include_router(documents_router)
 app.include_router(assistant_router)
 app.include_router(config_router)
 app.include_router(collection_router)
+app.include_router(collection_view_router)
 
 app.middleware('http')(add_git_revision_to_request_header)
 app.middleware('http')(remove_trailing_slash)

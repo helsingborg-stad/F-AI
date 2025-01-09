@@ -67,7 +67,7 @@ class CollectionService:
             files: list[UploadFile] = None,
             urls: list[str] = None,
     ):
-        files = files or []
+        files = [f for f in (files or []) if f.size > 0]
         urls = urls or []
 
         collection = await self.get_collection(collection_id)
