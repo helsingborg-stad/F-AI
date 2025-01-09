@@ -4,6 +4,6 @@
 
 <Navbar>
 	<div slot="left">
-		<a class="link link-neutral link-hover">Zoo</a>
+		<a class="link link-neutral link-hover">Asistant Zoo</a>
 	</div>
 </Navbar>
