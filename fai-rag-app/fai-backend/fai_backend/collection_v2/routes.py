@@ -32,7 +32,7 @@ class CreateCollectionResponse(BaseModel):
     status_code=201,
     response_model=CreateCollectionResponse
 )
-async def create_collection(data: CreateCollectionRequest):
+async def create_collection(data: CreateCollectionRequest, _: ProjectUser = Depends(get_project_user)):
     service = await get_collection_service()
     new_collection = await service.create_collection(
         label=data.label,
@@ -62,7 +62,7 @@ class ListCollectionsResponse(BaseModel):
     summary='Get all collections',
     response_model=ListCollectionsResponse
 )
-async def list_collections():
+async def list_collections(_: ProjectUser = Depends(get_project_user)):
     service = await get_collection_service()
     all_collections = await service.get_collections()
     return ListCollectionsResponse(
@@ -84,7 +84,7 @@ class GetCollectionResponse(BaseModel):
 
 
 @router.get('/collections/{id}', summary='Get a single collection')
-async def get_collection(id: str):
+async def get_collection(id: str, _: ProjectUser = Depends(get_project_user)):
     service = await get_collection_service()
     collection = await service.get_collection(id)
 
@@ -119,7 +119,7 @@ class UpdateCollectionResponse(BaseModel):
     summary='Update a collection',
     response_model=UpdateCollectionResponse,
 )
-async def update_collection(id: str, data: UpdateCollectionRequest):
+async def update_collection(id: str, data: UpdateCollectionRequest, _: ProjectUser = Depends(get_project_user)):
     service = await get_collection_service()
     result = await service.update_collection(id, data.dict(exclude_none=True))
 
@@ -140,7 +140,7 @@ async def update_collection(id: str, data: UpdateCollectionRequest):
     summary='Delete a collection',
     status_code=204,
 )
-async def delete_collection(id: str):
+async def delete_collection(id: str, _: ProjectUser = Depends(get_project_user)):
     service = await get_collection_service()
     await service.delete_collection(id)
 
