@@ -145,8 +145,8 @@ async def delete_collection(id: str, _: ProjectUser = Depends(get_project_user))
     await service.delete_collection(id)
 
 
-@router.put('/collections/{id}/files', summary='Replace collection files')
-async def set_collection_files(
+@router.put('/collections/{id}/content', summary='Replace collection content')
+async def set_collection_content(
         id: str,
         files: list[UploadFile] = None,
         urls: list[str] = None,

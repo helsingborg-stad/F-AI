@@ -6,7 +6,7 @@ from pydantic import ByteSize
 from fai_backend.collection.models import CollectionMetadataModel, CollectionFile
 from fai_backend.collection_v2.dependencies import get_collection_service
 from fai_backend.collection_v2.routes import UpdateCollectionRequest, update_collection, delete_collection, \
-    set_collection_files, CreateCollectionRequest, create_collection
+    set_collection_content, CreateCollectionRequest, create_collection
 from fai_backend.config import settings
 from fai_backend.dependencies import get_page_template_for_logged_in_users, get_project_user
 from fai_backend.framework.display import DisplayAs
@@ -136,8 +136,8 @@ def get_collection_metadata_form(collection: CollectionMetadataModel | None, sub
                     *([c.Div(
                         components=[
                             c.Link(
-                                text=_('Edit Documents/URLs'),
-                                url=f'/view/collections/{collection.collection_id}/files',
+                                text=_('Edit Collection Content'),
+                                url=f'/view/collections/{collection.collection_id}/content',
                                 state='primary'
                             )
                         ]
@@ -153,8 +153,8 @@ class CollectionFileViewItem(CollectionFile):
     friendly_timestamp: str
 
 
-@router.get('/collections/{collection_id}/files', response_model=list, response_model_exclude_none=True)
-async def get_collection_files_view(collection_id, view=Depends(get_page_template_for_logged_in_users)):
+@router.get('/collections/{collection_id}/content', response_model=list, response_model_exclude_none=True)
+async def get_collection_content_view(collection_id, view=Depends(get_page_template_for_logged_in_users)):
     service = await get_collection_service()
     collection = await service.get_collection(collection_id)
     if not collection:
@@ -181,7 +181,7 @@ async def get_collection_files_view(collection_id, view=Depends(get_page_templat
                     c.Heading(text='Replace existing content', level=1, class_name='my-5 font-bold'),
                     c.Form(
                         submit_as='form',
-                        submit_url=f'/api/view/collections/{collection_id}/files',
+                        submit_url=f'/api/view/collections/{collection_id}/content',
                         components=[
                             c.Textarea(
                                 name='urls',
@@ -283,26 +283,26 @@ async def update_collection_from_view(
 
 
 @router.post(
-    '/collections/{collection_id}/files',
-    summary='Replace collection files/URLs (called from views)',
+    '/collections/{collection_id}/content',
+    summary='Replace collection content (Files/URLs) (called from views)',
     response_model=list,
     response_model_exclude_none=True
 )
-async def replace_collection_files_from_view(
+async def replace_collection_content_from_view(
         collection_id: str,
         files: list[UploadFile] = None,
         urls: list[str] = None,
         view=Depends(get_page_template_for_logged_in_users),
         project_user: ProjectUser = Depends(get_project_user)
 ):
-    await set_collection_files(
+    await set_collection_content(
         collection_id,
         files,
         urls,
         project_user
     )
     return view(
-        [c.FireEvent(event=e.GoToEvent(url=f'/view/collections/{collection_id}/files'))],
+        [c.FireEvent(event=e.GoToEvent(url=f'/view/collections/{collection_id}/content'))],
         _('')
     )
 
