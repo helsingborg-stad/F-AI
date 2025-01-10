@@ -4,18 +4,20 @@
 	export let items: MenuItem[] = [];
 	export let currentUrlPath: string;
 
-	const isActive = (path: string) => {
-		const urlFirstDirectory = '/' + currentUrlPath.split('/').filter(Boolean)[0];
-		return urlFirstDirectory === path;
-	}
+	$: urlFirstDirectory = (() => {
+		const segments = currentUrlPath.split('/').filter(Boolean);
+		return segments.length > 0 ? '/' + segments[0] : '/';
+	})();
+
+	const isActive = (path: string) => path === urlFirstDirectory;
 </script>
 
 <div class="h-full">
 	<ul class="menu">
 		{#each items as item}
-					<li>
-						<a href="{item.path}" class:active={isActive(item.path)}>{item.label}</a>
-					</li>
-			{/each}
+			<li>
+				<a href="{item.path}" class:active={isActive(item.path)}>{item.label}</a>
+			</li>
+		{/each}
 	</ul>
 </div>
