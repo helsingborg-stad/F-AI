@@ -2,13 +2,15 @@ from fastapi import APIRouter, Security, Depends
 from pydantic import BaseModel, SecretStr
 
 from fai_backend.auth.security import check_permissions
-from fai_backend.dependencies import get_authenticated_user, get_project_user_permissions, \
-    get_page_template_for_logged_in_users
+from fai_backend.dependencies import (get_authenticated_user, get_project_user_permissions,
+                                      get_page_template_for_logged_in_users)
 from fai_backend.framework import components as c
 from fai_backend.logger.route_class import APIRouter as LoggingAPIRouter
 from fai_backend.phrase import phrase as _
+from fai_backend.projects.dependencies import get_project_service
 from fai_backend.settings.models import SettingsDict
 from fai_backend.settings.service import SettingsServiceFactory
+from fai_backend.config import settings as app_settings
 
 router = APIRouter(
     prefix='/api',
@@ -22,17 +24,20 @@ class GetSettingsResponseModel(BaseModel):
     settings: SettingsDict
 
 
+class SetSettingsRequestModel(BaseModel):
+    settings: SettingsDict
+
+
 @router.get(
     '/settings',
     response_model=GetSettingsResponseModel,
-    dependencies=[Security(get_authenticated_user)]
-)
+    dependencies=[Security(get_authenticated_user)])
 async def get_settings(
-        permissions=Depends(get_project_user_permissions)
-):
+        permissions=Depends(get_project_user_permissions),
+        project_service=Depends(get_project_service)):
     check_permissions(['can_edit_settings'], permissions)
-    service = SettingsServiceFactory().get_service()
-    settings = (await service.get_all()).model_dump()
+    service = SettingsServiceFactory().get_service(project_service)
+    settings = (await service.get_all(app_settings)).model_dump()
     for key in settings.keys():
         if isinstance(settings[key], SecretStr):
             secret: SecretStr = settings[key]
@@ -40,32 +45,25 @@ async def get_settings(
     return GetSettingsResponseModel(settings=settings)
 
 
-class SetSettingsRequestModel(BaseModel):
-    settings: SettingsDict
-
-
 @router.post(
     '/settings',
-    dependencies=[Security(get_authenticated_user)]
-)
+    dependencies=[Security(get_authenticated_user)])
 async def set_settings(
         body: SetSettingsRequestModel,
-        permissions=Depends(get_project_user_permissions)
-):
+        permissions=Depends(get_project_user_permissions),
+        project_service=Depends(get_project_service)):
     check_permissions(['can_edit_settings'], permissions)
-    service = SettingsServiceFactory.get_service()
-    await service.set_all(body.settings)
+    service = SettingsServiceFactory.get_service(project_service)
+    await service.set_all(body.settings, app_settings)
 
 
 @router.post(
     '/settings/form',
     response_model=list,
-    response_model_exclude_none=True
-)
+    response_model_exclude_none=True)
 async def set_settings_from_form(
         _=Depends(set_settings),
-        view=Depends(get_page_template_for_logged_in_users)
-):
+        view=Depends(get_page_template_for_logged_in_users)):
     return view(
         [c.Div(components=[
             c.Div(components=[
@@ -80,14 +78,13 @@ async def set_settings_from_form(
     '/view/settings',
     dependencies=[Security(get_authenticated_user)],
     response_model=list,
-    response_model_exclude_none=True
-)
+    response_model_exclude_none=True)
 async def edit_settings(
         permissions=Depends(get_project_user_permissions),
         view=Depends(get_page_template_for_logged_in_users),
-):
+        project_service=Depends(get_project_service)):
     check_permissions(['can_edit_settings'], permissions)
-    settings = await SettingsServiceFactory.get_service().get_all()
+    settings = await SettingsServiceFactory.get_service(project_service).get_all(app_settings)
 
     return view(
         [c.Div(components=[
@@ -105,7 +102,7 @@ async def edit_settings(
                             required=False,
                             html_type='text',
                             size='sm',
-                            value=settings.FIXED_PIN,
+                            value=settings['FIXED_PIN'] or None,
                         ),
 
                         c.Heading(text='AI Settings', class_name='font-bold'),
@@ -116,7 +113,7 @@ async def edit_settings(
                             required=False,
                             html_type='text',
                             size='sm',
-                            value=settings.OPENAI_API_KEY.get_secret_value(),
+                            value=settings['OPENAI_API_KEY'] or None,
                         ),
 
                         c.Heading(text='E-mail (Brevo)', class_name='font-bold'),
@@ -127,7 +124,7 @@ async def edit_settings(
                             required=False,
                             html_type='text',
                             size='sm',
-                            value=settings.BREVO_API_URL,
+                            value=settings['BREVO_API_URL'] or None,
                         ),
                         c.InputField(
                             name='settings.BREVO_API_KEY',
@@ -136,7 +133,7 @@ async def edit_settings(
                             required=False,
                             html_type='text',
                             size='sm',
-                            value=settings.BREVO_API_KEY.get_secret_value(),
+                            value=settings['BREVO_API_KEY'] or None,
                         )
                     ]
                 )

@@ -10,6 +10,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from fai_backend.assistant.models import AssistantChatHistoryModel, StoredQuestionModel, AssistantTemplate
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.config import settings
+from fai_backend.projects.dependencies import get_project_service
 from fai_backend.projects.schema import ProjectMember, ProjectRole
 from fai_backend.repositories import ConversationDocument, PinCodeModel, ProjectModel, projects_repo
 from fai_backend.sentry.watcher import Watcher
@@ -128,5 +129,6 @@ async def setup_file_parser():
 
 
 async def setup_settings():
-    service = SettingsServiceFactory().get_service()
-    await service.refresh_environment()
+    service = SettingsServiceFactory().get_service(get_project_service())
+    await service.reload_envs_from_settings_repo()
+    settings.reload_from_env()
