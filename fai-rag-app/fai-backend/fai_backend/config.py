@@ -2,7 +2,6 @@ import os
 from typing import Literal
 
 from dotenv import load_dotenv
-from pydantic import SecretStr
 from pydantic_settings import BaseSettings
 
 from fai_backend.logger.console import console
@@ -19,9 +18,9 @@ class Settings(BaseSettings):
     APP_VECTOR_DB_EMBEDDING_MODEL: Literal[
         'default', 'text-embedding-3-small', 'text-embedding-3-large'] = 'default'
     APP_MESSAGE_BROKER: Literal['memory', 'redis_queue'] = 'redis_queue'
-    SECRET_KEY: SecretStr = ''
+    SECRET_KEY: str = ''
     BREVO_API_URL: str = 'https://api.brevo.com/v3/smtp/email'
-    BREVO_API_KEY: SecretStr = ''
+    BREVO_API_KEY: str = ''
     ALGORITHM: str = 'HS256'
     JWT_DECODE_ALGORITHM: str = 'RS256'
     HTTP_AUTHENTICATION_TYPE: Literal['http_bearer', 'none'] = 'http_bearer'
@@ -38,18 +37,18 @@ class Settings(BaseSettings):
     FILE_UPLOAD_PATH: str = 'uploads'
     LLM_BACKEND: Literal['parrot', 'openai'] = 'parrot'
     SENTRY_ENABLED: bool = False
-    SENTRY_DSN: SecretStr = ''
+    SENTRY_DSN: str = ''
     SENTRY_LOGGING_LEVEL: str = 'ERROR'
     SENTRY_EVENT_LEVEL: str = 'ERROR'
     SENTRY_TRACE_SAMPLE_RATE: float = 0.1
     SENTRY_ENVIRONMENT: str = 'development'
     VLLM_CONFIG: str = ''
     FILE_SIZE_LIMIT: int = 10  # MB
-    FEEDBACK_GITHUB_API_TOKEN: SecretStr = ''
+    FEEDBACK_GITHUB_API_TOKEN: str = ''
     FEEDBACK_GITHUB_REPO_OWNER: str = ''
     FEEDBACK_GITHUB_REPO_NAME: str = ''
     CHAT_MAX_INPUT_LENGTH: int | None = 2500
-    OPENAI_API_KEY: SecretStr = ''
+    OPENAI_API_KEY: str = ''
     ASSISTANT_RAG_SCORING_TEMPLATE_ID: str = '_rag_scoring'
 
     class Config:

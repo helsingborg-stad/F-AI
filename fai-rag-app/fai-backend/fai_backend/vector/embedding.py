@@ -15,7 +15,7 @@ class EmbeddingFnFactory:
         embedding_model_map = {
             'default': embedding_functions.DefaultEmbeddingFunction(),
             'text-embedding-3-small': embedding_functions.OpenAIEmbeddingFunction(
-                api_key=settings.OPENAI_API_KEY.get_secret_value(),
+                api_key=settings.OPENAI_API_KEY,
                 model_name='text-embedding-3-small'
             )
         }

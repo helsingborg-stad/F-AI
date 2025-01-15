@@ -113,7 +113,7 @@ async def setup_sentry():
         return
 
     sentry_logger = Watcher(
-        dsn=settings.SENTRY_DSN.get_secret_value(),
+        dsn=settings.SENTRY_DSN,
         environment=settings.SENTRY_ENVIRONMENT,
         level=settings.SENTRY_LOGGING_LEVEL,
         event_level=settings.SENTRY_EVENT_LEVEL,
