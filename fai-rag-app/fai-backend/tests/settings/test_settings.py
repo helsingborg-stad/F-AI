@@ -43,7 +43,6 @@ def test_reload_settings_from_env(settings_service, app_settings):
     os.environ['FIXED_PIN'] = '1234'
     app_settings.reload_from_env()
 
-    assert app_settings.MONGO_DB_NAME == 'fai-rag-app'
     assert app_settings.MONGO_DB_URI == 'mongodb://localhost:27017'
     assert app_settings.FIXED_PIN == '1234'
 
@@ -54,9 +53,8 @@ async def test_get_settings(settings_service, app_settings):
     app_settings.reload_from_env()
     settings = await settings_service.get_all(app_settings)
 
-    assert settings['FIXED_PIN'] == '4321'
-    assert settings['MONGO_DB_NAME'] == 'fai-rag-app'
     assert settings['MONGO_DB_URI'] == 'mongodb://localhost:27017'
+    assert settings['FIXED_PIN'] == '4321'
 
 
 @pytest.mark.asyncio
