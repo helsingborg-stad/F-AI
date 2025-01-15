@@ -41,20 +41,27 @@ def app_settings():
 
 def test_reload_settings_from_env(settings_service, app_settings):
     os.environ['FIXED_PIN'] = '1234'
+    os.environ['MONGO_DB_URI'] = 'mongodb://localhost:27017'
+
     app_settings.reload_from_env()
 
-    assert app_settings.MONGO_DB_URI == 'mongodb://localhost:27017'
     assert app_settings.FIXED_PIN == '1234'
+    assert app_settings.MONGO_DB_URI == 'mongodb://localhost:27017'
+
 
 
 @pytest.mark.asyncio
 async def test_get_settings(settings_service, app_settings):
     os.environ['FIXED_PIN'] = '4321'
+    os.environ['MONGO_DB_URI'] = 'mongodb://localhost:27017'
+
     app_settings.reload_from_env()
+
     settings = await settings_service.get_all(app_settings)
 
-    assert settings['MONGO_DB_URI'] == 'mongodb://localhost:27017'
     assert settings['FIXED_PIN'] == '4321'
+    assert settings['MONGO_DB_URI'] == 'mongodb://localhost:27017'
+
 
 
 @pytest.mark.asyncio
