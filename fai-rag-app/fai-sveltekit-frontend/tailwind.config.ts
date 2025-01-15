@@ -12,7 +12,7 @@ export default {
 	],
 
 	daisyui: {
-		theme: ['light']
+		themes: ['light']
 	},
 
 	plugins: [typography, forms, daisyui]
