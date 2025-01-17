@@ -38,10 +38,6 @@ async def get_settings(
     check_permissions(['can_edit_settings'], permissions)
     service = SettingsServiceFactory().get_service(project_service)
     settings = (await service.get_all(app_settings)).model_dump()
-    for key in settings.keys():
-        if isinstance(settings[key], SecretStr):
-            secret: SecretStr = settings[key]
-            settings[key] = secret.get_secret_value()
     return GetSettingsResponseModel(settings=settings)
 
 
