@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Security, Depends
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel
 
 from fai_backend.auth.security import check_permissions
 from fai_backend.dependencies import (get_authenticated_user, get_project_user_permissions,
