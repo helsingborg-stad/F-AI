@@ -24,6 +24,7 @@ from fai_backend.settings.routes import router as settings_router
 from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_parser, setup_settings
 from fai_backend.collection_v2.routes import router as collection_router
 from fai_backend.collection_v2.view_routes import router as collection_view_router
+from fai_backend.auth_v2.test_routes import router as auth_test_router
 
 
 @asynccontextmanager
@@ -57,6 +58,7 @@ app.include_router(assistant_router)
 app.include_router(settings_router)
 app.include_router(collection_router)
 app.include_router(collection_view_router)
+app.include_router(auth_test_router)
 
 app.middleware('http')(add_git_revision_to_request_header)
 app.middleware('http')(remove_trailing_slash)
