@@ -1,6 +1,9 @@
+import inspect
 import json
+from functools import partial
+from typing import Callable, Any
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, APIRouter, Security
 from fastapi.security import SecurityScopes
 from fastapi_jwt import JwtAuthorizationCredentials
 from pydantic import BaseModel
@@ -65,7 +68,7 @@ auth_responses = {
 }
 
 
-async def auth(
+async def auth_dependency(
         security_scopes: SecurityScopes,
         api_key: str | None = Depends(api_key_source),
         bearer_token: JwtAuthorizationCredentials | None = Depends(bearer_token_source),
@@ -135,4 +138,150 @@ def get_auth_responses(additional_400_description: str | None = None) -> dict[in
 
 
 def make_auth_path_description(path_description: str, scopes: list[str]) -> str:
-    return f'{path_description}\n\n*(Auth) required scopes: {", ".join(scopes)}*'
+    if len(scopes) == 0:
+        return f'{path_description}\n\n*__(Auth) no scopes required__*'
+    return f'{path_description}\n\n*__(Auth) required scope(s): {", ".join(scopes)}__*'
+
+
+class AuthRouterDecorator:
+    def __init__(self, api_router: APIRouter):
+        self.api_router = api_router
+
+    @staticmethod
+    def route(
+            router_method: Callable,
+            path: str,
+            required_scopes: list[str] = None,
+            summary: str | None = None,
+            description: str | None = None,
+            response_model: Any | None = None,
+            response_description: str | None = None,
+            response_400_description: str | None = None,
+    ):
+        if required_scopes is None:
+            required_scopes = []
+
+        def inner_decorator(func):
+            security_dependency = Security(auth_dependency, scopes=required_scopes)
+            parameters = inspect.signature(func).parameters
+            function_has_identity_parameter = 'auth_identity' in parameters
+            fn = partial(func,
+                         auth_identity=security_dependency) if function_has_identity_parameter else func
+            deps = [] if function_has_identity_parameter else [security_dependency]
+
+            router_method(
+                path,
+                summary=summary,
+                description=make_auth_path_description(description, scopes=required_scopes),
+                response_model=response_model,
+                response_description=response_description,
+                responses=get_auth_responses(response_400_description),
+                dependencies=deps,
+            )(fn)
+
+        return inner_decorator
+
+    def get(
+            self,
+            path: str,
+            required_scopes: list[str] = None,
+            summary: str | None = None,
+            description: str | None = None,
+            response_model: Any | None = None,
+            response_description: str | None = None,
+            response_400_description: str | None = None,
+    ):
+        return AuthRouterDecorator.route(
+            router_method=self.api_router.get,
+            path=path,
+            required_scopes=required_scopes,
+            summary=summary,
+            description=description,
+            response_model=response_model,
+            response_description=response_description,
+            response_400_description=response_400_description,
+        )
+
+    def post(
+            self,
+            path: str,
+            required_scopes: list[str] = None,
+            summary: str | None = None,
+            description: str | None = None,
+            response_model: Any | None = None,
+            response_description: str | None = None,
+            response_400_description: str | None = None,
+    ):
+        return AuthRouterDecorator.route(
+            router_method=self.api_router.post,
+            path=path,
+            required_scopes=required_scopes,
+            summary=summary,
+            description=description,
+            response_model=response_model,
+            response_description=response_description,
+            response_400_description=response_400_description,
+        )
+
+    def put(
+            self,
+            path: str,
+            required_scopes: list[str] = None,
+            summary: str | None = None,
+            description: str | None = None,
+            response_model: Any | None = None,
+            response_description: str | None = None,
+            response_400_description: str | None = None,
+    ):
+        return AuthRouterDecorator.route(
+            router_method=self.api_router.put,
+            path=path,
+            required_scopes=required_scopes,
+            summary=summary,
+            description=description,
+            response_model=response_model,
+            response_description=response_description,
+            response_400_description=response_400_description,
+        )
+
+    def patch(
+            self,
+            path: str,
+            required_scopes: list[str] = None,
+            summary: str | None = None,
+            description: str | None = None,
+            response_model: Any | None = None,
+            response_description: str | None = None,
+            response_400_description: str | None = None,
+    ):
+        return AuthRouterDecorator.route(
+            router_method=self.api_router.patch,
+            path=path,
+            required_scopes=required_scopes,
+            summary=summary,
+            description=description,
+            response_model=response_model,
+            response_description=response_description,
+            response_400_description=response_400_description,
+        )
+
+    def delete(
+            self,
+            path: str,
+            required_scopes: list[str] = None,
+            summary: str | None = None,
+            description: str | None = None,
+            response_model: Any | None = None,
+            response_description: str | None = None,
+            response_400_description: str | None = None,
+    ):
+        return AuthRouterDecorator.route(
+            router_method=self.api_router.delete,
+            path=path,
+            required_scopes=required_scopes,
+            summary=summary,
+            description=description,
+            response_model=response_model,
+            response_description=response_description,
+            response_400_description=response_400_description,
+        )
