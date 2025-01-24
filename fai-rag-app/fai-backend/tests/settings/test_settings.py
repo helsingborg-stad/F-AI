@@ -34,12 +34,13 @@ async def settings_service(project_service):
 
 
 @pytest.fixture
-def app_settings():
-    os.environ.clear()
+def app_settings(monkeypatch):
+    monkeypatch.delenv('FIXED_PIN', raising=False)
+    monkeypatch.delenv('MONGO_DB_URI', raising=False)
     return Settings()
 
 
-def test_reload_settings_from_env(settings_service, app_settings):
+def test_reload_settings_from_env(app_settings):
     os.environ['FIXED_PIN'] = '1234'
     os.environ['MONGO_DB_URI'] = 'mongodb://localhost:27017'
 
