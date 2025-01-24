@@ -9,7 +9,6 @@
 	<div class="relative flex h-full overflow-hidden z-0">
 		<MenuSidebar menuItems={[
 				{label: 'Chat', path: '/chat'},
-				{label: 'Questions', path: '/questions'},
 				{label: 'Assistant', path: '/assistant'}
 			]} currentUrlPath={$page.url.pathname} />
 		<!-- Main Content -->
