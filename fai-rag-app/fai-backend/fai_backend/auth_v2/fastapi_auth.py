@@ -157,6 +157,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            status_code: int | None = None,
     ):
         if required_scopes is None:
             required_scopes = []
@@ -177,6 +178,7 @@ class AuthRouterDecorator:
                 response_description=response_description,
                 responses=get_auth_responses(response_400_description),
                 dependencies=deps,
+                status_code=status_code,
             )(fn)
 
         return inner_decorator
@@ -190,6 +192,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.get,
@@ -200,6 +203,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            status_code=status_code,
         )
 
     def post(
@@ -211,6 +215,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.post,
@@ -221,6 +226,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            status_code=status_code,
         )
 
     def put(
@@ -232,6 +238,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.put,
@@ -242,6 +249,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            status_code=status_code,
         )
 
     def patch(
@@ -253,6 +261,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.patch,
@@ -263,6 +272,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            status_code=status_code,
         )
 
     def delete(
@@ -274,6 +284,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.delete,
@@ -284,4 +295,5 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            status_code=status_code,
         )
