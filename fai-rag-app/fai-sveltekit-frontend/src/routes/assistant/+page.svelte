@@ -1,8 +1,8 @@
 <script>
 	let nrOfAssistants = $state(0)
 </script>
-<div>
-		<div class="p-5 flex flex-col">
+<div class="p-4">
+		<div class="py-4 flex flex-col">
 		<div class="flex w-screen">
 			Assistants
 			<div class="divider divider-horizontal"></div>
