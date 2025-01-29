@@ -1,8 +1,10 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
 from pydantic import BaseModel
 
 from fai_backend.auth_v2.api_key.dependencies import get_api_key_service
 from fai_backend.auth_v2.api_key.models import ReadOnlyApiKeyModel
+from fai_backend.auth_v2.authentication.models import AuthenticatedIdentity
+from fai_backend.auth_v2.authorization.factory import AuthorizationFactory
 from fai_backend.auth_v2.fastapi_auth import AuthRouterDecorator
 
 router = APIRouter(
@@ -25,14 +27,32 @@ class CreateApiKeyResponse(BaseModel):
     '/apikey',
     ['can_manage_api_keys'],
     response_model=CreateApiKeyResponse,
+    summary='Create API Key',
     description='''
     Create a new API key with the given scopes.
     ''',
     status_code=status.HTTP_201_CREATED,
+    response_400_description='No scopes provided.'
 )
-async def create_api_key(body: CreateApiKeyRequest):
+async def create_api_key(body: CreateApiKeyRequest, auth_identity: AuthenticatedIdentity):
+    desired_scopes = [scope for scope in body.scopes if len(scope) > 0]
+
+    if len(desired_scopes) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='No scopes provided.'
+        )
+
     service = await get_api_key_service()
-    revoke_id, key = await service.create(scopes=body.scopes)
+
+    authorization_provider = await AuthorizationFactory.get()
+    if not await authorization_provider.has_scopes(auth_identity, desired_scopes):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Can not assign scope(s) outside of creator's scopes to an API key."
+        )
+
+    revoke_id, key = await service.create(scopes=desired_scopes)
     return CreateApiKeyResponse(key=key, revoke_id=str(revoke_id))
 
 
