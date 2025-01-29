@@ -7,7 +7,6 @@ from pydantic import Field
 from fai_backend.config import settings
 from fai_backend.logger.console import console
 from fai_backend.mail.schemas import EmailPayload
-from fai_backend.settings.service import SettingsServiceFactory, SettingKey
 
 
 class MailClient(ABC):
@@ -32,10 +31,8 @@ class BrevoPayload(EmailPayload):
 class BrevoMailClient(MailClient):
 
     async def send_mail(self, payload: EmailPayload) -> bool:
-        payload = BrevoPayload.model_validate(payload.model_dump())
-        settings_service = SettingsServiceFactory().get_service()
-        url = await settings_service.get_value(SettingKey.BREVO_API_URL)
-        key = await settings_service.get_value(SettingKey.BREVO_API_KEY)
+        url = settings.BREVO_API_URL
+        key = settings.BREVO_API_KEY
         headers = {
             'accept': 'application/json',
             'api-key': key,
@@ -52,10 +49,6 @@ class BrevoMailClient(MailClient):
 
 
 async def create_mail_client() -> MailClient:
-    settings_service = SettingsServiceFactory().get_service()
-    key = await settings_service.get_value(SettingKey.BREVO_API_KEY)
-    if len(key) > 0:
-        print("using BrevoMailClient")
+    if len(settings.BREVO_API_KEY):
         return BrevoMailClient()
-    print("using ConsoleMailClient")
     return ConsoleMailClient()

@@ -16,7 +16,7 @@ class FeedbackService:
 
 
 def create_feedback_provider(feedback_settings: Settings) -> IFeedbackProvider:
-    api_token = feedback_settings.FEEDBACK_GITHUB_API_TOKEN.get_secret_value()
+    api_token = feedback_settings.FEEDBACK_GITHUB_API_TOKEN
     if api_token == '':
         return DummyProvider()
 

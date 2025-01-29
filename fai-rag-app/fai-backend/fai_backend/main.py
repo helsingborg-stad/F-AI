@@ -20,7 +20,7 @@ from fai_backend.phrase import phrase as _
 from fai_backend.phrase import set_language
 from fai_backend.qaf.routes import router as qaf_router
 from fai_backend.schema import ProjectUser
-from fai_backend.settings.routes import router as config_router
+from fai_backend.settings.routes import router as settings_router
 from fai_backend.setup import setup_db, setup_project, setup_sentry, setup_file_parser, setup_settings
 from fai_backend.collection_v2.routes import router as collection_router
 from fai_backend.collection_v2.view_routes import router as collection_view_router
@@ -54,7 +54,7 @@ app.include_router(qaf_router)
 app.include_router(new_chat_router)
 app.include_router(documents_router)
 app.include_router(assistant_router)
-app.include_router(config_router)
+app.include_router(settings_router)
 app.include_router(collection_router)
 app.include_router(collection_view_router)
 

@@ -1,7 +1,6 @@
 import logging
 import random
 import re
-from collections.abc import Callable
 from datetime import timedelta
 from typing import Annotated
 
@@ -18,13 +17,13 @@ from fai_backend.config import settings
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 access_security = JwtAccessBearerCookie(
-    secret_key=settings.SECRET_KEY.get_secret_value(),
+    secret_key=settings.SECRET_KEY,
     auto_error=False,
     access_expires_delta=timedelta(hours=12),
 )
 
 refresh_security = JwtRefreshBearerCookie(
-    secret_key=settings.SECRET_KEY.get_secret_value(),
+    secret_key=settings.SECRET_KEY,
     auto_error=True,
     refresh_expires_delta=timedelta(days=2),
 )
@@ -48,9 +47,7 @@ def create_refresh_token(subject: dict):
 
 async def generate_pin():
     try:
-        from fai_backend.settings.service import SettingsServiceFactory, SettingKey
-        settings_service = SettingsServiceFactory().get_service()
-        fixed = await settings_service.get_value(SettingKey.FIXED_PIN)
+        fixed = settings.FIXED_PIN
         if len(fixed) > 0:
             return fixed
     except KeyError:
