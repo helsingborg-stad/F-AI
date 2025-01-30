@@ -8,6 +8,7 @@ from fastapi.routing import APIRoute
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from fai_backend.assistant.models import AssistantChatHistoryModel, StoredQuestionModel, AssistantTemplate
+from fai_backend.auth_v2.api_key.models import ApiKeyDocumentModel
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.config import settings
 from fai_backend.projects.dependencies import get_project_service
@@ -103,7 +104,8 @@ async def setup_db():
             ConversationDocument,
             AssistantChatHistoryModel,
             CollectionMetadataModel,
-            StoredQuestionModel
+            StoredQuestionModel,
+            ApiKeyDocumentModel,
         ]
     )
 

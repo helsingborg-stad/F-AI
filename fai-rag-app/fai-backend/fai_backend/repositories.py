@@ -1,11 +1,12 @@
-import time
 from typing import Protocol
 
+import time
 from beanie import Document, Indexed
 from pydantic import EmailStr, Field
 
 from fai_backend.assistant.models import AssistantChatHistoryModel, StoredQuestionModel
 from fai_backend.auth.security import is_mail_pattern, try_match_email
+from fai_backend.auth_v2.api_key.models import ApiKeyDocumentModel
 from fai_backend.collection.models import CollectionMetadataModel
 from fai_backend.conversations.models import Conversation
 from fai_backend.projects.schema import Project, ProjectMember
@@ -59,7 +60,11 @@ class UserRepoImp(UserRepository, CompositeRepo[ProjectModel]):
                 return exact_match_projects
 
             for proj in project_list:
-                pattern = next(pattern for pattern in extract_member_emails(proj.members) if is_mail_pattern(pattern))
+                pattern = next((pattern for pattern in extract_member_emails(proj.members) if is_mail_pattern(pattern)),
+                               None)
+
+                if pattern is None:
+                    return []
 
                 if try_match_email(email, pattern):
                     new_project = proj.model_copy(deep=True)
@@ -126,6 +131,10 @@ class StoredQuestionsRepository(IAsyncRepo[StoredQuestionModel]):
     pass
 
 
+class ApiKeyRepository(IAsyncRepo[ApiKeyDocumentModel]):
+    pass
+
+
 repo_factory.register_builder(
     {
         ProjectRepository: lambda: create_repo_from_env(ProjectModel, ProjectModel),
@@ -135,6 +144,7 @@ repo_factory.register_builder(
         ChatHistoryRepository: lambda: create_repo_from_env(AssistantChatHistoryModel, AssistantChatHistoryModel),
         CollectionMetadataRepository: lambda: create_repo_from_env(CollectionMetadataModel, CollectionMetadataModel),
         StoredQuestionsRepository: lambda: create_repo_from_env(StoredQuestionModel, StoredQuestionModel),
+        ApiKeyRepository: lambda: create_repo_from_env(ApiKeyDocumentModel, ApiKeyDocumentModel),
     }
 )
 
@@ -145,3 +155,4 @@ conversation_repo = repo_factory.create(ConversationRepository)
 chat_history_repo = repo_factory.create(ChatHistoryRepository)
 collection_metadata_repo = repo_factory.create(CollectionMetadataRepository)
 stored_questions_repo = repo_factory.create(StoredQuestionsRepository)
+api_key_repo = repo_factory.create(ApiKeyRepository)
