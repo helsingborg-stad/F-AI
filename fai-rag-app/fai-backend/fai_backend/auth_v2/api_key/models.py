@@ -3,13 +3,14 @@ from pydantic import BaseModel
 
 
 class ApiKeyModel(BaseModel):
-    key: str
+    key_hash: str
+    key_hint: str
     scopes: list[str]
 
 
 class ReadOnlyApiKeyModel(BaseModel):
     revoke_id: str
-    redacted_key: str
+    key_hint: str
     scopes: list[str]
 
 

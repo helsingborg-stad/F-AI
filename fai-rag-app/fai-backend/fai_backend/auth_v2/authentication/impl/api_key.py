@@ -11,6 +11,5 @@ class ApiKeyProvider(IAuthenticationProvider):
             return None
 
         return AuthenticatedIdentity(
-            type=AuthenticationType.API_KEY,
             uid=key.revoke_id
         )

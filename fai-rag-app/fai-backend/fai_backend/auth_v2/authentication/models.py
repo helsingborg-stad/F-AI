@@ -10,7 +10,6 @@ class AuthenticationType:
 
 
 class AuthenticatedIdentity(BaseModel):
-    type: str
     uid: str
 
 

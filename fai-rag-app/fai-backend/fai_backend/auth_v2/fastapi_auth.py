@@ -74,7 +74,7 @@ async def auth_dependency(
         bearer_token: JwtAuthorizationCredentials | None = Depends(bearer_token_source),
 ) -> AuthenticatedIdentity:
     if settings.HTTP_AUTHENTICATION_TYPE == 'none':
-        return AuthenticatedIdentity(type=AuthenticationType.NONE, uid='')
+        return AuthenticatedIdentity(uid='')
 
     credential_types = [
         (AuthenticationType.API_KEY, api_key),
