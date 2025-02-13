@@ -55,9 +55,6 @@
     </ul>
   </div>
   <div class="flex-none">
-    {#if avatarName}
-      <div class="px-4">{avatarName}</div>
-    {/if}
     {#if avatarUrl}
       <div class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
