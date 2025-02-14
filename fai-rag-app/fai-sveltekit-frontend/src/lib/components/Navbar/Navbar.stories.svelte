@@ -67,12 +67,3 @@
 	 	navbarTitle: 'My Navbar Title',
 	}}
 />
-
-<Story
-  name="Avatar Name only"
-  args={{
-		menuItems: sampleLinks,
-		currentUrlPath: '/some_link_2',
-	 	avatarName: 'John Doe',
-	}}
-/>
