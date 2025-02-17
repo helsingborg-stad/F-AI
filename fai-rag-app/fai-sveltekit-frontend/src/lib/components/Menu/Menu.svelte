@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { MenuItem } from '$lib/types.js';
+	import MenuHeader from '$lib/components/Menu/MenuHeader.svelte';
 
 	export let items: MenuItem[] = [];
 	export let currentUrlPath: string;
@@ -13,6 +14,7 @@
 </script>
 
 <div class="h-full">
+	<MenuHeader iconName="banana" title="Banana menu" />
 	<ul class="menu">
 		{#each items as item}
 			<li>
