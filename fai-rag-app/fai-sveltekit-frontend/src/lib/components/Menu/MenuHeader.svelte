@@ -3,12 +3,17 @@
 	import { icons } from '$lib/components/Icon/icons.js';
 
 	export let title: string = '';
-	export let iconName: keyof typeof Icon;
+	export let iconName: keyof typeof icons;
+	export let href: string = '#';
 </script>
 
-<button class="btn">
-	{#if iconName && icons[iconName]}
-		<Icon icon={ icons[iconName] } />
-	{/if}
-	{title}
-</button>
+<ul class="menu">
+	<li>
+    <a href={href}>
+			{#if iconName && icons[iconName]}
+				<Icon icon={ icons[iconName] } />
+			{/if}
+			{title}
+    </a>
+  </li>
+</ul>
