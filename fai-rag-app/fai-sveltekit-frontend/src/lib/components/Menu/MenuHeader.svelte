@@ -13,7 +13,7 @@
 			{#if iconName && icons[iconName]}
 				<Icon icon={ icons[iconName] } />
 			{/if}
-			{title}
+			<p class="uppercase">{title}</p>
     </a>
   </li>
 </ul>
