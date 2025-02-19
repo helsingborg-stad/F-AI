@@ -22,16 +22,40 @@
 	];
 </script>
 
-<div class="h-screen flex flex-col">
-	<nav class="w-full bg-blue-100 flex md:px-4">
+<div class="root-layout">
+	<header class="root-layout-header">
 		<Navbar navbarTitle={NAVBAR_TITLE} {navBarItems} currentUrlPath={page.url.pathname} />
-	</nav>
-	<div class="flex flex-grow">
-		<aside class="w-48 h-full p-4">
+	</header>
+	<div class="root-content">
+		<aside class="root-content-aside">
 			<MenuSidebar {menuSidebarItems} currentUrlPath={page.url.pathname} />
 		</aside>
-		<main class="bg-amber-100 flex-grow h-auto p-4">
+		<main class="root-content-main">
 			{@render children()}
 		</main>
 	</div>
 </div>
+
+<style lang="postcss">
+	@reference '../app.css';
+
+	.root-layout {
+		@apply h-screen flex flex-col;
+	}
+
+	.root-layout-header {
+		@apply w-full bg-blue-100 flex md:px-4;
+	}
+
+	.root-content {
+		@apply flex flex-grow;
+	}
+
+	.root-content-aside {
+		@apply flex-shrink-0 overflow-hidden bg-blue-100 max-md:!w-0 w-60;
+	}
+
+	.root-content-main {
+		@apply bg-amber-100 flex-grow;
+	}
+</style>
