@@ -1,9 +1,15 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from src.modules.llm.factory import LLMFactory
+
+from src.common.services.fastapi_get_services import get_services
+from src.common.services.models.Services import Services
+from src.modules.auth.auth_router_decorator import AuthRouterDecorator
 from src.modules.llm.models.Message import Message
 
-router = APIRouter(prefix='/llm', tags=['LLM'])
+llm_router = APIRouter(prefix='/llm', tags=['LLM'])
+auth = AuthRouterDecorator(llm_router)
 
 
 class RunRequestMessage(BaseModel):
@@ -21,10 +27,9 @@ class RunResponse(BaseModel):
     content: str
 
 
-@router.post('/run', response_model=RunResponse)
-async def run(request: RunRequest):
-    service = await LLMFactory().get()
-    message = await service.run(model=request.model, messages=[
+@auth.post('/run', required_scopes=['can_ask_questions'])
+async def run(request: RunRequest, services: Annotated[Services, Depends(get_services)]):
+    message = await services.llm_service.run(model=request.model, messages=[
         Message(
             role=message.role,
             content=message.content

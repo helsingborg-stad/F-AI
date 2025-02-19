@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from src.modules.llm.models import ToolCall
+from src.modules.llm.models.ToolCall import ToolCall
 
 
 class Message(BaseModel):
