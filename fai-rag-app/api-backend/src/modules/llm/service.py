@@ -1,10 +1,10 @@
 from collections.abc import AsyncGenerator
 
-from .models.Delta import Delta
-from .models.Message import Message
-from .models.ToolCall import ToolCall
-from .protocols.ILLMService import ILLMService
-from .runner import OpenAIRunner
+from src.modules.llm.models.Message import Message
+from src.modules.llm.models.Delta import Delta
+from src.modules.llm.models.ToolCall import ToolCall
+from src.modules.llm.protocols.ILLMService import ILLMService
+from src.modules.llm.runner import OpenAIRunner
 
 
 class LLMService(ILLMService):

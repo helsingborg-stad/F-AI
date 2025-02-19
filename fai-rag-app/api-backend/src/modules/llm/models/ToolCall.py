@@ -1,8 +1,7 @@
 from typing import Literal
 
 from pydantic import BaseModel
-
-from src.modules.llm.models import ToolCallFunction
+from src.modules.llm.models.ToolCallFunction import ToolCallFunction
 
 
 class ToolCall(BaseModel):

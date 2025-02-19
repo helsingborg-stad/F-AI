@@ -1,7 +1,8 @@
 from collections.abc import AsyncGenerator
 from typing import Protocol
 
-from src.modules.llm.models import Message, Delta
+from src.modules.llm.models.Message import Message
+from src.modules.llm.models.Delta import Delta
 
 
 class ILLMService(Protocol):
