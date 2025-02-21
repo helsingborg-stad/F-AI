@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@storybook/addon-console": "^3.0.0"
+  }
+}
