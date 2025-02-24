@@ -1,9 +1,14 @@
 <script>
-	import AssistantNavbar from '$lib/components/Menu/AssistantNavbar.svelte';
+	import MenuSidebar from '$lib/components/Menu/MenuSidebar.svelte';
+
+	let { children } = $props();
+
+	let menuSidebarItems = [{
+		label: 'Asistant Zoo',
+		path: ''
+	}]
 </script>
 
-<div class="sticky top-0 z-10 w-full ">
-	<AssistantNavbar />
-</div>
+<MenuSidebar {menuSidebarItems} />
 
-<slot />
+{@render children()}
