@@ -9,7 +9,7 @@
     argTypes: {
       avatarUrl: { control: 'text' },
       avatarName: { control: 'text' },
-      menuItems: { control: 'array' },
+      navBarItems: { control: 'array' },
       currentUrlPath: { control: 'text' }
     }
   });
@@ -33,7 +33,7 @@
 <Story
   name="Default"
   args={{
-		menuItems: sampleLinks,
+		navBarItems: sampleLinks,
 		currentUrlPath: '/settings',
 	}}
 />
@@ -41,7 +41,7 @@
 <Story
   name="Avatar"
   args={{
-		menuItems: sampleLinks,
+		navBarItems: sampleLinks,
 		currentUrlPath: '/settings',
 	 	avatarUrl: 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
 	 	avatarName: 'John Doe',
@@ -51,7 +51,7 @@
 <Story
   name="Title"
   args={{
-		menuItems: sampleLinks,
+		navBarItems: sampleLinks,
 		currentUrlPath: '/some_link_1',
 	 	navbarTitle: 'My Navbar Title',
 	}}
@@ -60,7 +60,7 @@
 <Story
   name="Title and Avatar"
   args={{
-		menuItems: sampleLinks,
+		navBarItems: sampleLinks,
 		currentUrlPath: '/some_link_2',
 	 	avatarUrl: 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
 	 	avatarName: 'John Doe',

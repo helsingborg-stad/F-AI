@@ -12,12 +12,10 @@
 	const isActive = (path: string) => path === urlFirstDirectory;
 </script>
 
-<div class="h-full">
-	<ul class="menu">
-		{#each items as item}
-			<li>
-				<a href="{item.path}" class:active={isActive(item.path)}>{item.label}</a>
-			</li>
-		{/each}
-	</ul>
-</div>
+<ul class="menu">
+	{#each items as { path, label }}
+		<li class="py-1">
+			<a href="{path}" class:active={isActive(path)}>{label}</a>
+		</li>
+	{/each}
+</ul>
