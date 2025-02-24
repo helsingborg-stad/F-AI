@@ -7,7 +7,7 @@
     component: MenuSidebar,
     tags: ['autodocs'],
     argTypes: {
-      menuItems: { control: 'object' },
+      menuSidebarItems: { control: 'object' },
       currentUrlPath: { control: 'text' },
     },
   });
@@ -20,7 +20,7 @@
 </script>
 
 <!-- Sidebar will be hidden for smaller screens. -->
-<Story name="Default" args={{ menuItems: sampleMenuItems, currentUrlPath: '/' }} />
+<Story name="Default" args={{ menuSidebarItems: sampleMenuItems, currentUrlPath: '/' }} />
 
 <!-- Story with 'About' page active. -->
-<Story name="About Page Active" args={{ menuItems: sampleMenuItems, currentUrlPath: '/about' }} />
+<Story name="About Page Active" args={{ menuSidebarItems: sampleMenuItems, currentUrlPath: '/about' }} />
