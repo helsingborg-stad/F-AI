@@ -9,8 +9,7 @@
 		tags: ['autodocs'],
 		argTypes: {
 			iconName: {
-				control: 'select',
-				options: ['trash']
+				control: 'text',
 			},
 			title: { control: 'text' },
 			onClick: { action: 'clicked' }
