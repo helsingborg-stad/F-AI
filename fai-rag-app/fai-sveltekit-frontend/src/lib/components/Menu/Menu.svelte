@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { MenuItem } from '$lib/types.js';
+	import MenuHeader from '$lib/components/Menu/MenuHeader.svelte';
 
 	export let items: MenuItem[] = [];
 	export let currentUrlPath: string;
@@ -12,10 +13,13 @@
 	const isActive = (path: string) => path === urlFirstDirectory;
 </script>
 
-<ul class="menu">
-	{#each items as { path, label }}
-		<li class="py-1">
-			<a href="{path}" class:active={isActive(path)}>{label}</a>
-		</li>
-	{/each}
-</ul>
+<div class="h-full">
+	<MenuHeader iconName="banana" title="Banana menu" />
+	<ul class="menu">
+		{#each items as item}
+			<li>
+				<a href="{item.path}" class:active={isActive(item.path)}>{item.label}</a>
+			</li>
+		{/each}
+	</ul>
+</div>
