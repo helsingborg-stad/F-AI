@@ -35,7 +35,7 @@
 						d="M4 6h16M4 12h16M4 18h7" />
 				</svg>
 			</div>
-			<ul class="menu dropdown-content bg-blue-200 z-10 mt-3 w-52 p-2 shadow gap-3">
+			<ul class="menu dropdown-content bg-base-200 z-10 mt-3 w-52 p-2 shadow gap-3">
 				{#each navBarItems as { label, path }}
 					<li><a href="{path}" class:active={isActive(path)}>{label}</a></li>
 				{/each}

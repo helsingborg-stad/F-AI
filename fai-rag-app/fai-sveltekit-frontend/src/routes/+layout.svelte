@@ -44,7 +44,7 @@
 	}
 
 	.root-layout-header {
-		@apply w-full bg-blue-100 flex md:px-4;
+		@apply w-full bg-base-200 flex md:px-4;
 	}
 
 	.root-content {
@@ -52,7 +52,7 @@
 	}
 
 	.root-content-aside {
-		@apply flex-shrink-0 overflow-hidden bg-blue-100 max-md:!w-0 w-60;
+		@apply flex-shrink-0 overflow-hidden bg-base-100 max-md:!w-0 w-60;
 	}
 
 	.root-content-main {
