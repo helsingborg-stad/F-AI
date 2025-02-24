@@ -56,6 +56,6 @@
 	}
 
 	.root-content-main {
-		@apply bg-amber-100 flex-grow;
+		@apply bg-stone-50 flex-grow;
 	}
 </style>
