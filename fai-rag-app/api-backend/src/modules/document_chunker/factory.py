@@ -3,6 +3,7 @@ from src.modules.document_chunker.ExcelDocumentChunker import ExcelDocumentChunk
 from src.modules.document_chunker.HTMLDocumentChunker import HTMLDocumentChunker
 from src.modules.document_chunker.MarkdownDocumentChunker import MarkdownDocumentChunker
 from src.modules.document_chunker.PDFDocumentChunker import PDFDocumentChunker
+from src.modules.document_chunker.PlainTextDocumentChunker import PlainTextDocumentChunker
 from src.modules.document_chunker.helpers.get_mime_type import get_mime_type
 from src.modules.document_chunker.protocols.IDocumentChunker import IDocumentChunker
 
@@ -14,7 +15,8 @@ class DocumentChunkerFactory:
     def get(self, path_or_url: str) -> IDocumentChunker:
         mime_map: dict[str, type[IDocumentChunker]] = {
             'application/pdf': PDFDocumentChunker,
-            'text/plain': MarkdownDocumentChunker,
+            'text/plain': PlainTextDocumentChunker,
+            'text/markdown': MarkdownDocumentChunker,
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document': DocxDocumentChunker,
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ExcelDocumentChunker,
             'text/html': HTMLDocumentChunker,
