@@ -1,10 +1,7 @@
-from typing import Annotated
-
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, HTTPException
 from pydantic import BaseModel
 
-from src.common.services.fastapi_get_services import get_services
-from src.common.services.models.Services import Services
+from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.api_key.models.RedactedApiKey import RedactedApiKey
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
 from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
@@ -38,7 +35,7 @@ class CreateApiKeyResponse(BaseModel):
     response_400_description='No scopes provided.'
 )
 async def create_api_key(body: CreateApiKeyRequest, auth_identity: AuthenticatedIdentity,
-                         services: Annotated[Services, Depends(get_services)]):
+                         services: ServicesDependency):
     desired_scopes = [scope for scope in body.scopes if len(scope) > 0]
 
     if len(desired_scopes) == 0:
@@ -71,7 +68,7 @@ List information about all API keys.
 Keys themselves are redacted for security purposes.
     ''',
 )
-async def list_api_keys(services: Annotated[Services, Depends(get_services)]):
+async def list_api_keys(services: ServicesDependency):
     keys = await services.api_key_service.get_all()
     return ListApiKeyResponse(api_keys=keys)
 
@@ -86,5 +83,5 @@ The `revoke_id` can be found through the `create` and `list` operations.
     ''',
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def revoke_api_key(revoke_id: str, services: Annotated[Services, Depends(get_services)]):
+async def revoke_api_key(revoke_id: str, services: ServicesDependency):
     await services.api_key_service.revoke(revoke_id)

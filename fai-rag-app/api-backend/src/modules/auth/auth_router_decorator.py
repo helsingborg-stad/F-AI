@@ -29,6 +29,8 @@ class AuthRouterDecorator:
         if required_scopes is None:
             required_scopes = []
 
+        responses = get_auth_responses(response_400_description)
+
         def inner_decorator(func):
             security_dependency = Security(auth_route_dependency, scopes=required_scopes)
             parameters = inspect.signature(func).parameters
@@ -40,10 +42,10 @@ class AuthRouterDecorator:
             router_method(
                 path,
                 summary=summary,
-                description=make_auth_path_description(description, scopes=required_scopes),
+                description=make_auth_path_description(description or '', scopes=required_scopes),
                 response_model=response_model,
                 response_description=response_description,
-                responses=get_auth_responses(response_400_description),
+                responses=responses,
                 dependencies=deps,
                 status_code=status_code,
             )(fn)
