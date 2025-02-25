@@ -1,10 +1,7 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
 
-from src.common.services.fastapi_get_services import get_services
-from src.common.services.models.Services import Services
+from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
 from src.modules.llm.models.Message import Message
 
@@ -28,7 +25,7 @@ class RunResponse(BaseModel):
 
 
 @auth.post('/run', required_scopes=['can_ask_questions'])
-async def run(request: RunRequest, services: Annotated[Services, Depends(get_services)]):
+async def run(request: RunRequest, services: ServicesDependency):
     message = await services.llm_service.run(model=request.model, messages=[
         Message(
             role=message.role,

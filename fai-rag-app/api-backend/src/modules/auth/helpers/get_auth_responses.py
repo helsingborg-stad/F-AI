@@ -1,3 +1,5 @@
+import copy
+
 from pydantic import BaseModel
 
 
@@ -7,7 +9,7 @@ class CommonHTTPErrorResponse(BaseModel):
 
 _auth_responses = {
     400: {
-        "description": "(Auth) too many credentials provided; only one type should be used.",
+        "description": "* (Auth) too many credentials provided; only one type should be used.",
         "model": CommonHTTPErrorResponse,
         "content": {
             "application/json": {
@@ -45,9 +47,9 @@ _auth_responses = {
 
 
 def get_auth_responses(additional_400_description: str | None = None) -> dict[int, dict]:
-    result = dict(_auth_responses)
+    result = copy.deepcopy(_auth_responses)
 
     if additional_400_description:
-        result[400]["description"] = f"{additional_400_description}\n\n{_auth_responses[400]['description']}"
+        result[400]["description"] = f"One of:\n\n* {additional_400_description}\n{_auth_responses[400]['description']}"
 
     return result
