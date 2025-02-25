@@ -23,8 +23,6 @@ class CreateCollectionRequest(BaseModel):
 @auth.post(
     '',
     required_scopes=['can_manage_collections'],
-    summary='Create a collection',
-    description='Create a collection',
 )
 async def create_collection(body: CreateCollectionRequest, services: ServicesDependency):
     await services.collection_service.create(
@@ -48,8 +46,7 @@ class GetCollectionsResponse(BaseModel):
 @auth.get(
     '',
     required_scopes=['can_manage_collections'],
-    summary='Get collections',
-    description='Get collections',
+    response_model=GetCollectionsResponse
 )
 async def get_collections(services: ServicesDependency):
     collections = await services.collection_service.list_collections()
@@ -67,7 +64,6 @@ async def get_collections(services: ServicesDependency):
 @auth.delete(
     '/{collection_id}',
     required_scopes=['can_manage_collections'],
-    summary='Delete a collection',
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_collection(collection_id: str, services: ServicesDependency):
@@ -81,16 +77,21 @@ class UpdateCollectionRequest(BaseModel):
 @auth.patch(
     '/{collection_id}',
     required_scopes=['can_manage_collections'],
-    summary='Update collection metadata',
 )
 async def update_collection_metadata(body: UpdateCollectionRequest, collection_id: str, services: ServicesDependency):
-    await services.collection_service.set_collection_meta(collection_id, body.label)
+    await services.collection_service.set_meta(collection_id, body.label)
 
 
 @auth.put(
     '/{collection_id}/content',
     required_scopes=['can_manage_collections'],
     summary='Replace content (files/urls) of a collection',
+    description='''
+Replaces the content of the collection with the files/URLs provided.
+
+Note: depending on the size and complexity of the content this may take several minutes
+to complete.
+    '''
 )
 async def set_collection_content(
         collection_id: str,
@@ -112,11 +113,12 @@ async def set_collection_content(
 
         paths_and_urls = [p for p in file_paths + (urls or []) if len(p) > 0]
 
-        await services.collection_service.set_collection_documents(collection_id, paths_and_urls)
+        await services.collection_service.set_documents(collection_id, paths_and_urls)
 
 
 class QueryCollectionRequest(BaseModel):
     query: str
+    max_results: int = 10
 
 
 class QueryCollectionResponseResult(BaseModel):
@@ -132,9 +134,17 @@ class QueryCollectionResponse(BaseModel):
 @auth.post(
     '/{collection_id}/query',
     required_scopes=['can_manage_collections'],
+    summary='Query a collection',
+    description='''
+Query (search) a collection by an input query and returns up to `max_results` (defaults to 10)
+chunks of content based on the document(s) in the given collection.
+
+Returned chunks are ordered from most relevant to least relevant content relative to the query.
+    ''',
+    response_model=QueryCollectionResponse
 )
 async def query_collection(body: QueryCollectionRequest, collection_id: str, services: ServicesDependency):
-    results = await services.collection_service.query(collection_id, body.query, max_results=10)
+    results = await services.collection_service.query(collection_id, body.query, max_results=body.max_results)
     return QueryCollectionResponse(
         results=[
             QueryCollectionResponseResult(

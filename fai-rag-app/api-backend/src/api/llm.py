@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
@@ -15,16 +15,25 @@ class RunRequestMessage(BaseModel):
 
 
 class RunRequest(BaseModel):
-    model: str
-    messages: list[RunRequestMessage]
+    model: str = Field(examples=['o3-mini'])
+    messages: list[RunRequestMessage] = Field(examples=[[
+        {"role": "system", "content": "Answer like a pirate"},
+        {"role": "user", "content": "Who is the king of Sweden?"}],
+    ])
 
 
 class RunResponse(BaseModel):
-    role: str
-    content: str
+    role: str = Field(examples=['assistant'])
+    content: str = Field(examples=["""Ahoy, matey! The king o' Sweden be King Carl XVI Gustaf, 
+    at the helm o' his royal ship for many a year now! Arr!"""])
 
 
-@auth.post('/run', required_scopes=['can_ask_questions'])
+@auth.post(
+    '/run',
+    required_scopes=['can_ask_questions'],
+    summary='Run LLM inference',
+    response_model=RunResponse,
+)
 async def run(request: RunRequest, services: ServicesDependency):
     message = await services.llm_service.run(model=request.model, messages=[
         Message(
