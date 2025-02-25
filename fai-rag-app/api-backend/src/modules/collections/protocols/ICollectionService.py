@@ -11,16 +11,16 @@ class ICollectionService(Protocol):
     async def delete(self, collection_id: str):
         ...
 
-    async def get_collection(self, collection_id: str) -> CollectionMetadata | None:
+    async def get(self, collection_id: str) -> CollectionMetadata | None:
         ...
 
     async def list_collections(self) -> list[CollectionMetadata]:
         ...
 
-    async def set_collection_meta(self, collection_id: str, label: str):
+    async def set_meta(self, collection_id: str, label: str):
         ...
 
-    async def set_collection_documents(self, collection_id: str, paths_and_urls: list[str]):
+    async def set_documents(self, collection_id: str, paths_and_urls: list[str]):
         ...
 
     async def query(self, collection_id: str, query: str, max_results: int) -> list[CollectionQueryResult]:

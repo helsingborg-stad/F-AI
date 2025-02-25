@@ -26,12 +26,12 @@ class CreateApiKeyResponse(BaseModel):
 @auth.post(
     '',
     ['can_manage_api_keys'],
-    response_model=CreateApiKeyResponse,
     summary='Create API Key',
     description='''
     Create a new API key with the given scopes.
     ''',
     status_code=status.HTTP_201_CREATED,
+    response_model=CreateApiKeyResponse,
     response_400_description='No scopes provided.'
 )
 async def create_api_key(body: CreateApiKeyRequest, auth_identity: AuthenticatedIdentity,
@@ -61,12 +61,12 @@ class ListApiKeyResponse(BaseModel):
 @auth.get(
     '',
     ['can_manage_api_keys'],
-    response_model=ListApiKeyResponse,
     description='''
 List information about all API keys.
 
-Keys themselves are redacted for security purposes.
+Keys themselves are redacted for security reasons.
     ''',
+    response_model=ListApiKeyResponse,
 )
 async def list_api_keys(services: ServicesDependency):
     keys = await services.api_key_service.get_all()

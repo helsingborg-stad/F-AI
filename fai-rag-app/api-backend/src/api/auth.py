@@ -21,7 +21,8 @@ class AuthTestResponseModel(BaseModel):
     '/test',
     ['can_ask_questions'],
     summary='Test authentication/authorization endpoint',
-    description='''This endpoint does nothing except showcase how authenticated/authorized endpoints work. 
+    description='''
+This endpoint does nothing except showcase how authenticated/authorized endpoints work. 
 
 It also serves as a code example of how to implement an endpoint with auth (see source code).''',
     response_model=AuthTestResponseModel,

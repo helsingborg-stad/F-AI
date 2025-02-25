@@ -33,7 +33,7 @@ class MongoCollectionService(ICollectionService):
         await self._vector_service.delete(collection_id)
         await self._database['collections'].delete_one({'_id': ObjectId(collection_id)})
 
-    async def get_collection(self, collection_id: str) -> CollectionMetadata | None:
+    async def get(self, collection_id: str) -> CollectionMetadata | None:
         result = await self._database['collections'].find_one({'_id': ObjectId(collection_id)},
                                                               projection=['_id', 'label', 'embedding_model', 'files',
                                                                           'urls'])
@@ -59,17 +59,17 @@ class MongoCollectionService(ICollectionService):
             async for doc in cursor
         ]
 
-    async def set_collection_meta(self, collection_id: str, label: str):
+    async def set_meta(self, collection_id: str, label: str):
         await self._database['collections'].update_one(
             {'_id': ObjectId(collection_id)},
             {
                 '$set': {'label': label}
             })
 
-    async def set_collection_documents(self, collection_id: str, paths_and_urls: list[str]):
+    async def set_documents(self, collection_id: str, paths_and_urls: list[str]):
         await self._vector_service.delete(collection_id)
 
-        collection_meta = await self.get_collection(collection_id)
+        collection_meta = await self.get(collection_id)
         await self._vector_service.create(collection_id, collection_meta.embedding_model)
 
         urls = []
@@ -112,7 +112,7 @@ class MongoCollectionService(ICollectionService):
         })
 
     async def query(self, collection_id: str, query: str, max_results: int) -> list[CollectionQueryResult]:
-        collection_meta = await self.get_collection(collection_id)
+        collection_meta = await self.get(collection_id)
         results = await self._vector_service.query(
             space=collection_id,
             embedding_model=collection_meta.embedding_model,
