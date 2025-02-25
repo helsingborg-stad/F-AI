@@ -4,7 +4,7 @@
 
 
 	const { Story } = defineMeta({
-		title: 'Components/Menu/Chat/Options',
+		title: 'Components/Menu/Chat/History/Options',
 		component: HistoryItemOptions,
 		tags: ['autodocs'],
 		argTypes: {

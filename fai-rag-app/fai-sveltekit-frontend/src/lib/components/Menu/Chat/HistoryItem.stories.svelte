@@ -4,7 +4,7 @@
 	import HistoryItem from '$lib/components/Menu/Chat/HistoryItem.svelte';
 
 	const { Story } = defineMeta({
-		title: 'Components/Menu/Chat',
+		title: 'Components/Menu/Chat/History',
 		component: HistoryItem,
 		tags: ['autodocs'],
 		argTypes: {
