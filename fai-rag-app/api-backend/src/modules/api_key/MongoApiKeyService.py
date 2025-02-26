@@ -1,6 +1,3 @@
-import hashlib
-import hmac
-import os
 import uuid
 from collections.abc import Mapping
 from typing import Any
@@ -9,6 +6,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from pymongo.asynchronous.database import AsyncDatabase
 
+from src.common.hashing import hash_secret
 from src.modules.api_key.models.NewlyCreatedApiKey import NewlyCreatedApiKey
 from src.modules.api_key.models.RedactedApiKey import RedactedApiKey
 from src.modules.api_key.models.StoredApiKey import StoredApiKey
@@ -20,15 +18,19 @@ class MongoApiKeyService(IApiKeyService):
         self._database = database
 
     async def create(self, scopes: list[str]) -> NewlyCreatedApiKey:
-        key = f'fai-{uuid.uuid4().hex}'
-        key_hash = self._hash_api_key(key)
+        new_id = ObjectId()
+        key = f'fai-{uuid.uuid4().hex}.{str(new_id)}'
+        key_hash = hash_secret(key)
         key_hint = self._create_key_hint(key)
         api_key = StoredApiKey(
             key_hash=key_hash,
             key_hint=key_hint,
             scopes=scopes)
 
-        result = await self._database['api_key'].insert_one(api_key.model_dump())
+        result = await self._database['api_key'].insert_one({
+            **api_key.model_dump(),
+            '_id': new_id
+        })
 
         return NewlyCreatedApiKey(
             revoke_id=str(result.inserted_id),
@@ -46,8 +48,11 @@ class MongoApiKeyService(IApiKeyService):
         return [self._to_read_only_api_key(doc) async for doc in cursor]
 
     async def find_by_key(self, key: str) -> RedactedApiKey | None:
-        key_hash = self._hash_api_key(key)
-        result = await self._database['api_key'].find_one({'key_hash': key_hash})
+        (api_key, lookup_id) = key.split('.')
+        if not self._is_valid_id(lookup_id):
+            return None
+
+        result = await self._database['api_key'].find_one({'_id': ObjectId(lookup_id)})
         return self._to_read_only_api_key(result) if result else None
 
     async def find_by_revoke_id(self, revoke_id: str) -> RedactedApiKey | None:
@@ -64,10 +69,6 @@ class MongoApiKeyService(IApiKeyService):
             return True
         except InvalidId:
             return False
-
-    @staticmethod
-    def _hash_api_key(key: str) -> str:
-        return hmac.new(os.environ['API_HASH_KEY'].encode(), key.encode(), hashlib.sha256).hexdigest()
 
     @staticmethod
     def _to_read_only_api_key(db_doc: Mapping[str, Any]) -> RedactedApiKey:
