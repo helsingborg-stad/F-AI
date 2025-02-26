@@ -1,3 +1,5 @@
+import os
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import SecurityScopes
 
@@ -22,6 +24,9 @@ async def _get_auth_credentials(api_key: str | None) -> (AuthenticationType, str
 
     # Check for missing credentials
     if len(valid_credentials_provided) == 0:
+        if os.environ['DISABLE_AUTH'] == '1':
+            return AuthenticationType.GUEST, ''
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not Authenticated",

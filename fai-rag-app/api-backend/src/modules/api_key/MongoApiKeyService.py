@@ -48,6 +48,9 @@ class MongoApiKeyService(IApiKeyService):
         return [self._to_read_only_api_key(doc) async for doc in cursor]
 
     async def find_by_key(self, key: str) -> RedactedApiKey | None:
+        if '.' not in key:
+            return None
+
         (api_key, lookup_id) = key.split('.')
         if not self._is_valid_id(lookup_id):
             return None
