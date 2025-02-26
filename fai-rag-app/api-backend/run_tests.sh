@@ -1,1 +1,1 @@
-PYTHONPATH=./ poetry run pytest -v
+PYTHONPATH=./ poetry run pytest --cov=src/ -v
