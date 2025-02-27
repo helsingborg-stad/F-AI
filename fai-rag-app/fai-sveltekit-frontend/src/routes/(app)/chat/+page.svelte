@@ -15,9 +15,9 @@
       const response = await fetch('/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ message: message }),
+        body: JSON.stringify({ message: message })
       });
 
       const data = await response.json();
@@ -29,14 +29,14 @@
         console.error('Error:', data.error);
         messages.update((msgs) => [
           ...msgs,
-          { sender: 'bot', text: 'An error occurred. Please try again.' },
+          { sender: 'bot', text: 'An error occurred. Please try again.' }
         ]);
       }
     } catch (error) {
       console.error('Error:', error);
       messages.update((msgs) => [
         ...msgs,
-        { sender: 'bot', text: 'An error occurred. Please try again.' },
+        { sender: 'bot', text: 'An error occurred. Please try again.' }
       ]);
     }
 

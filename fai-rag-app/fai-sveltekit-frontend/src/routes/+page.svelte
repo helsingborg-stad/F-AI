@@ -1,1 +1,0 @@
-<p>Root page</p>
