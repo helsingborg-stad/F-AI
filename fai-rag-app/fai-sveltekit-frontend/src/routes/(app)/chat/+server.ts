@@ -10,9 +10,9 @@ export const POST: RequestHandler = async ({ request }) => {
     const response = await fetch(`${SECRET_API_URL}/chat/stream/`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message })
     });
 
     if (!response.ok) {

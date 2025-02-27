@@ -8,16 +8,14 @@ export const actions = {
 			const data = Object.fromEntries(formData.entries());
 
 			const response = await fetch(`${SECRET_API_URL}/api/rest/assistant/create`, {
-
-				method: 'POST',
+				method: 'POSTXX',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(data),
+				body: JSON.stringify(data)
 			});
 		} catch (e) {
 			console.log(`CREATE ERROR: ${e.message}`);
 		}
 
-
-		redirect(303, "/assistant");
-	},
+		redirect(303, '/assistant');
+	}
 };
