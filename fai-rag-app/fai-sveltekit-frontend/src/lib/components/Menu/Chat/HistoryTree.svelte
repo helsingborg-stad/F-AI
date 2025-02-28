@@ -20,39 +20,41 @@
    * Function to categorize history items into time periods
    */
   function categorizeHistoryItems(items: HistoryItemType[]): HistoryCategorized {
-    const result: HistoryCategorized = {
-      todaysHistory: [],
-      yesterdaysHistory: [],
-      previousSevenDays: [],
-      previousThirtyDays: [],
-      olderItems: [],
-    }
+    return items.reduce<HistoryCategorized>(
+      (categories, item) => {
+        const createdDate = item.created
 
-    items.forEach((item) => {
-      const createdDate = item.created
+        // Determine which category this item belongs to
+        if (isDateInRange(createdDate, dateRanges.today)) {
+          categories.todaysHistory.push(item)
+        } else if (isDateInRange(createdDate, dateRanges.yesterday, dateRanges.today)) {
+          categories.yesterdaysHistory.push(item)
+        } else if (
+          isDateInRange(createdDate, dateRanges.previousSevenDays, dateRanges.yesterday)
+        ) {
+          categories.previousSevenDays.push(item)
+        } else if (
+          isDateInRange(
+            createdDate,
+            dateRanges.previousThirtyDays,
+            dateRanges.previousSevenDays,
+          )
+        ) {
+          categories.previousThirtyDays.push(item)
+        } else {
+          categories.olderItems.push(item)
+        }
 
-      if (isDateInRange(createdDate, dateRanges.today)) {
-        result.todaysHistory.push(item)
-      } else if (isDateInRange(createdDate, dateRanges.yesterday, dateRanges.today)) {
-        result.yesterdaysHistory.push(item)
-      } else if (
-        isDateInRange(createdDate, dateRanges.previousSevenDays, dateRanges.yesterday)
-      ) {
-        result.previousSevenDays.push(item)
-      } else if (
-        isDateInRange(
-          createdDate,
-          dateRanges.previousThirtyDays,
-          dateRanges.previousSevenDays,
-        )
-      ) {
-        result.previousThirtyDays.push(item)
-      } else {
-        result.olderItems.push(item)
-      }
-    })
-
-    return result
+        return categories
+      },
+      {
+        todaysHistory: [],
+        yesterdaysHistory: [],
+        previousSevenDays: [],
+        previousThirtyDays: [],
+        olderItems: [],
+      },
+    )
   }
 
   const {
