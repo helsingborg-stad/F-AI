@@ -2,7 +2,10 @@
   import HistoryItem from '$lib/components/Menu/Chat/HistoryItem.svelte'
   import type { HistoryItemType } from '$lib/types.js'
   import type { DateRangeConfig } from '$lib/utils/dates.js'
-  import { categorizeHistoryItems, getCategoryTitles } from '$lib/utils/historyUtils.js'
+  import {
+    categorizeHistoryItems,
+    getCategoryTitles,
+  } from '$lib/components/Menu/Chat/HistoryTree/historyUtils.js'
 
   export let historyItems: HistoryItemType[] = []
   export let dateRangeConfig: DateRangeConfig = {

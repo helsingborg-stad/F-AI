@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { getCategoryTitles, categorizeHistoryItems } from '$lib/utils/historyUtils.js'
+import {
+  getCategoryTitles,
+  categorizeHistoryItems,
+} from '$lib/components/Menu/Chat/HistoryTree/historyUtils.js'
 import type { HistoryItemType } from '$lib/types.js'
 import type { DateRangeConfig } from '$lib/utils/dates.js'
 

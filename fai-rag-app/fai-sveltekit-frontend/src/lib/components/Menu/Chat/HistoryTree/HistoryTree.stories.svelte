@@ -1,6 +1,6 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import HistoryTree from '$lib/components/Menu/Chat/HistoryTree.svelte'
+  import HistoryTree from '$lib/components/Menu/Chat/HistoryTree/HistoryTree.svelte'
 
   const { Story } = defineMeta({
     title: 'Components/Menu/Chat/History',
