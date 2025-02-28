@@ -30,8 +30,8 @@ export function isDateInRange(date: Date, startDate: Date, endDate?: Date): bool
  * Get standard date boundaries from current date
  * Returns an object with today, yesterday, 7 days ago and 30 days ago
  */
-export function getDateBoundaries() {
-  const now = new Date()
+export function getDateBoundaries(referenceDate?: Date) {
+  const now = referenceDate || new Date()
   return {
     today: getStartOfDay(now),
     yesterday: getDaysAgo(now, 1),
