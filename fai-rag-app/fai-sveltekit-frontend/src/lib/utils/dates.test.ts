@@ -161,15 +161,15 @@ describe('Date utility functions', () => {
     })
 
     describe('getDateBoundaries', () => {
-      it('should return correct date boundaries based on reference date', () => {
+      it('should return correct date boundaries based on reference date with default config', () => {
         // Use a specific reference date for testing
         const referenceDate = new Date(2023, 4, 15, 12, 0, 0) // May 15, 2023, 12:00:00
 
-        const boundaries = getDateBoundaries(referenceDate)
+        const boundaries = getDateBoundaries(undefined, referenceDate)
 
         // Today should be 2023-05-15 00:00:00
         expect(boundaries.today.getFullYear()).toBe(2023)
-        expect(boundaries.today.getMonth()).toBe(4) // May (0-indexed)
+        expect(boundaries.today.getMonth()).toBe(4)
         expect(boundaries.today.getDate()).toBe(15)
         expect(boundaries.today.getHours()).toBe(0)
 
@@ -179,14 +179,14 @@ describe('Date utility functions', () => {
         expect(boundaries.yesterday.getDate()).toBe(14)
 
         // Previous 7 days should be 2023-05-08 00:00:00
-        expect(boundaries.previousSevenDays.getFullYear()).toBe(2023)
-        expect(boundaries.previousSevenDays.getMonth()).toBe(4)
-        expect(boundaries.previousSevenDays.getDate()).toBe(8)
+        expect(boundaries.previous7Days.getFullYear()).toBe(2023)
+        expect(boundaries.previous7Days.getMonth()).toBe(4)
+        expect(boundaries.previous7Days.getDate()).toBe(8)
 
         // Previous 30 days should be 2023-04-15 00:00:00
-        expect(boundaries.previousThirtyDays.getFullYear()).toBe(2023)
-        expect(boundaries.previousThirtyDays.getMonth()).toBe(3) // April
-        expect(boundaries.previousThirtyDays.getDate()).toBe(15)
+        expect(boundaries.previous30Days.getFullYear()).toBe(2023)
+        expect(boundaries.previous30Days.getMonth()).toBe(3)
+        expect(boundaries.previous30Days.getDate()).toBe(15)
       })
 
       it('should use current date when no reference date is provided', () => {
@@ -202,6 +202,41 @@ describe('Date utility functions', () => {
         expect(boundaries.today.getHours()).toBe(0)
         expect(boundaries.today.getMinutes()).toBe(0)
         expect(boundaries.today.getSeconds()).toBe(0)
+      })
+
+      it('should honor custom configuration', () => {
+        // Use a specific reference date for testing
+        const referenceDate = new Date(2023, 4, 15, 12, 0, 0) // May 15, 2023, 12:00:00
+
+        const customConfig = {
+          today: true,
+          yesterday: false, // Skip yesterday
+          previousDays: [3, 14], // Use 3 and 14 days instead of 7 and 30
+          customRanges: [{ name: 'quarterAgo', daysAgo: 90 }],
+        }
+
+        const boundaries = getDateBoundaries(customConfig, referenceDate)
+
+        // Today should be present
+        expect(boundaries.today).toBeDefined()
+        expect(boundaries.today.getDate()).toBe(15)
+
+        // Yesterday should NOT be present
+        expect(boundaries.yesterday).toBeUndefined()
+
+        // Custom previous days should be present
+        expect(boundaries.previous3Days.getFullYear()).toBe(2023)
+        expect(boundaries.previous3Days.getMonth()).toBe(4)
+        expect(boundaries.previous3Days.getDate()).toBe(12)
+
+        expect(boundaries.previous14Days.getFullYear()).toBe(2023)
+        expect(boundaries.previous14Days.getMonth()).toBe(5 - 1) // May
+        expect(boundaries.previous14Days.getDate()).toBe(1)
+
+        // Custom range should be present
+        expect(boundaries.quarterAgo.getFullYear()).toBe(2023)
+        expect(boundaries.quarterAgo.getMonth()).toBe(2 - 1) // February
+        expect(boundaries.quarterAgo.getDate()).toBe(14)
       })
     })
   })

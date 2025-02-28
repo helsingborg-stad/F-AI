@@ -1,6 +1,28 @@
 /**
- * Date utility functions
+ * dates.ts - Date utility functions for time-based categorization
  */
+
+/**
+ * Interface for date range configuration
+ */
+export interface DateRangeConfig {
+  today: boolean
+  yesterday: boolean
+  previousDays: number[]
+  customRanges?: Array<{
+    name: string
+    daysAgo: number
+  }>
+}
+
+/**
+ * Default date range configuration
+ */
+export const DEFAULT_DATE_RANGE_CONFIG: DateRangeConfig = {
+  today: true,
+  yesterday: true,
+  previousDays: [7, 30],
+}
 
 /**
  * Get date with time set to midnight (start of day)
@@ -27,15 +49,41 @@ export function isDateInRange(date: Date, startDate: Date, endDate?: Date): bool
 }
 
 /**
- * Get standard date boundaries from current date
- * Returns an object with today, yesterday, 7 days ago and 30 days ago
+ * Get date boundaries based on configuration
+ *
+ * @param config Optional configuration for date ranges
+ * @param referenceDate Optional reference date (defaults to current date)
+ * @returns Object with configured date boundaries
  */
-export function getDateBoundaries(referenceDate?: Date) {
+export function getDateBoundaries(
+  config: DateRangeConfig = DEFAULT_DATE_RANGE_CONFIG,
+  referenceDate?: Date,
+) {
   const now = referenceDate || new Date()
-  return {
-    today: getStartOfDay(now),
-    yesterday: getDaysAgo(now, 1),
-    previousSevenDays: getDaysAgo(now, 7),
-    previousThirtyDays: getDaysAgo(now, 30),
+  const boundaries: Record<string, Date> = {}
+
+  // Add standard ranges if configured
+  if (config.today) {
+    boundaries.today = getStartOfDay(now)
   }
+
+  if (config.yesterday) {
+    boundaries.yesterday = getDaysAgo(now, 1)
+  }
+
+  // Add previous days ranges
+  if (config.previousDays && config.previousDays.length > 0) {
+    config.previousDays.forEach((days) => {
+      boundaries[`previous${days}Days`] = getDaysAgo(now, days)
+    })
+  }
+
+  // Add any custom ranges
+  if (config.customRanges && config.customRanges.length > 0) {
+    config.customRanges.forEach((range) => {
+      boundaries[range.name] = getDaysAgo(now, range.daysAgo)
+    })
+  }
+
+  return boundaries
 }
