@@ -1,67 +1,67 @@
 <script lang="ts">
   import HistoryItem from '$lib/components/Menu/Chat/HistoryItem.svelte'
   import type { HistoryItemType } from '$lib/types.js'
+  import { getDateBoundaries, isDateInRange } from '$lib/utils/dates.js'
 
   export let historyItems: HistoryItemType[] = []
 
-  const isDateWithinRange = (date: Date, startDate: Date, endDate: Date): boolean => {
-    return date.getTime() > startDate.getTime() && date.getTime() < endDate.getTime()
+  // Get date boundaries for categorization
+  const dateRanges = getDateBoundaries()
+
+  type HistoryCategorized = {
+    todaysHistory: HistoryItemType[]
+    yesterdaysHistory: HistoryItemType[]
+    previousSevenDays: HistoryItemType[]
+    previousThirtyDays: HistoryItemType[]
+    olderItems: HistoryItemType[]
   }
 
-  let todaysHistory: HistoryItemType[] = []
-  let yesterdaysHistory: HistoryItemType[] = []
-  let previousSevenDays: HistoryItemType[] = []
-  let previousThirtyDays: HistoryItemType[] = []
-  let olderItems: HistoryItemType[] = []
-
-  const today = new Date()
-
-  // Today's range
-  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)
-
-  // Yesterday's range
-  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
-  const yesterdayStart = new Date(
-    yesterday.getFullYear(),
-    yesterday.getMonth(),
-    yesterday.getDate(),
-  )
-  const yesterdayEnd = new Date(yesterdayStart.getTime() + 24 * 60 * 60 * 1000)
-
-  // Previous 7 days range
-  const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
-  const sevenDaysStart = new Date(
-    sevenDaysAgo.getFullYear(),
-    sevenDaysAgo.getMonth(),
-    sevenDaysAgo.getDate(),
-  )
-  const sevenDaysEnd = todayStart
-
-  // Previous 30 days range
-  const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
-  const thirtyDaysStart = new Date(
-    thirtyDaysAgo.getFullYear(),
-    thirtyDaysAgo.getMonth(),
-    thirtyDaysAgo.getDate(),
-  )
-  const thirtyDaysEnd = sevenDaysStart
-
-  historyItems.forEach((item) => {
-    const itemDate = item.created
-
-    if (isDateWithinRange(itemDate, todayStart, todayEnd)) {
-      todaysHistory.push(item)
-    } else if (isDateWithinRange(itemDate, yesterdayStart, yesterdayEnd)) {
-      yesterdaysHistory.push(item)
-    } else if (isDateWithinRange(itemDate, sevenDaysStart, sevenDaysEnd)) {
-      previousSevenDays.push(item)
-    } else if (isDateWithinRange(itemDate, thirtyDaysStart, thirtyDaysEnd)) {
-      previousThirtyDays.push(item)
-    } else {
-      olderItems.push(item)
+  /**
+   * Function to categorize history items into time periods
+   */
+  function categorizeHistoryItems(items: HistoryItemType[]): HistoryCategorized {
+    const result: HistoryCategorized = {
+      todaysHistory: [],
+      yesterdaysHistory: [],
+      previousSevenDays: [],
+      previousThirtyDays: [],
+      olderItems: [],
     }
-  })
+
+    items.forEach((item) => {
+      const createdDate = item.created
+
+      if (isDateInRange(createdDate, dateRanges.today)) {
+        result.todaysHistory.push(item)
+      } else if (isDateInRange(createdDate, dateRanges.yesterday, dateRanges.today)) {
+        result.yesterdaysHistory.push(item)
+      } else if (
+        isDateInRange(createdDate, dateRanges.previousSevenDays, dateRanges.yesterday)
+      ) {
+        result.previousSevenDays.push(item)
+      } else if (
+        isDateInRange(
+          createdDate,
+          dateRanges.previousThirtyDays,
+          dateRanges.previousSevenDays,
+        )
+      ) {
+        result.previousThirtyDays.push(item)
+      } else {
+        result.olderItems.push(item)
+      }
+    })
+
+    return result
+  }
+
+  const {
+    todaysHistory,
+    yesterdaysHistory,
+    previousSevenDays,
+    previousThirtyDays,
+    olderItems,
+  } = categorizeHistoryItems(historyItems)
 </script>
 
 <div class="rounded-box">
