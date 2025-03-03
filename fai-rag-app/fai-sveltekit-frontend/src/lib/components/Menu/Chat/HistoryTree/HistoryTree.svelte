@@ -1,14 +1,14 @@
 <script lang="ts">
   import HistoryItem from '$lib/components/Menu/Chat/HistoryItem.svelte'
   import type { HistoryItemType } from '$lib/types.js'
-  import type { DateRangeConfig } from '$lib/utils/dates.js'
+  import type { IDateRangeConfig } from '$lib/utils/dates.js'
   import {
     categorizeHistoryItems,
     getCategoryTitles,
   } from '$lib/components/Menu/Chat/HistoryTree/historyUtils.js'
 
   export let historyItems: HistoryItemType[] = []
-  export let dateRangeConfig: DateRangeConfig = {
+  export let dateRangeConfig: IDateRangeConfig = {
     today: true,
     yesterday: true,
     previousDays: [7, 30],

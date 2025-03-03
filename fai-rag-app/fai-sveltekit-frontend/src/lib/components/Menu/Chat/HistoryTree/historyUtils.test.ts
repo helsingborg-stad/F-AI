@@ -4,16 +4,11 @@ import {
   categorizeHistoryItems,
 } from '$lib/components/Menu/Chat/HistoryTree/historyUtils.js'
 import type { HistoryItemType } from '$lib/types.js'
-import type { DateRangeConfig } from '$lib/utils/dates.js'
-
-// Create a test-specific interface that extends DateRangeConfig
-interface TestDateRangeConfig extends DateRangeConfig {
-  _testDate?: Date
-}
+import type { IDateRangeConfig } from '$lib/utils/dates.js'
 
 describe('getCategoryTitles', () => {
   it('should return default category titles', () => {
-    const config: DateRangeConfig = {
+    const config: IDateRangeConfig = {
       today: true,
       yesterday: true,
       previousDays: [7, 30],
@@ -29,7 +24,7 @@ describe('getCategoryTitles', () => {
   })
 
   it('should include custom category titles', () => {
-    const config: DateRangeConfig = {
+    const config: IDateRangeConfig = {
       today: true,
       yesterday: true,
       previousDays: [7],
@@ -54,11 +49,10 @@ describe('categorizeHistoryItems', () => {
 
   let items: HistoryItemType[]
 
-  const standardConfig: TestDateRangeConfig = {
+  const standardConfig: IDateRangeConfig = {
     today: true,
     yesterday: true,
     previousDays: [7, 30],
-    _testDate: testDate,
   }
 
   beforeEach(() => {
@@ -102,7 +96,7 @@ describe('categorizeHistoryItems', () => {
 
   it('should categorize items correctly based on their creation date', () => {
     // Create a version of the test that uses our test date as the reference date
-    const categorized = categorizeHistoryItems(items, standardConfig)
+    const categorized = categorizeHistoryItems(items, standardConfig, testDate)
 
     // Verify categorization using title instead of id
     expect(categorized.today.length).toBe(1)
@@ -122,7 +116,7 @@ describe('categorizeHistoryItems', () => {
   })
 
   it('should handle empty history items array', () => {
-    const categorized = categorizeHistoryItems([], standardConfig)
+    const categorized = categorizeHistoryItems([], standardConfig, testDate)
 
     expect(categorized.today).toEqual([])
     expect(categorized.yesterday).toEqual([])
@@ -132,12 +126,11 @@ describe('categorizeHistoryItems', () => {
   })
 
   it('should work with custom date ranges', () => {
-    const customConfig: TestDateRangeConfig = {
+    const customConfig: IDateRangeConfig = {
       today: true,
       yesterday: false,
       previousDays: [14],
       customRanges: [{ name: 'quarterAgo', daysAgo: 90 }],
-      _testDate: testDate,
     }
 
     // Create specific items for this test
@@ -171,7 +164,7 @@ describe('categorizeHistoryItems', () => {
       },
     ]
 
-    const categorized = categorizeHistoryItems(customItems, customConfig)
+    const categorized = categorizeHistoryItems(customItems, customConfig, testDate)
 
     // Test custom configuration results using title instead of id
     expect(categorized.today.length).toBe(1)
