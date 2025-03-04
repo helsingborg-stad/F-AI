@@ -31,11 +31,15 @@ async def create_collection(body: CreateCollectionRequest, services: ServicesDep
     )
 
 
+class GetCollectionResponseCollectionFile(BaseModel):
+    name: str
+
+
 class GetCollectionResponseCollection(BaseModel):
     id: str
     label: str
     embedding_model: str
-    files: list[str]
+    files: list[GetCollectionResponseCollectionFile]
     urls: list[str]
 
 
@@ -55,7 +59,9 @@ async def get_collections(services: ServicesDependency):
             id=collection.id,
             label=collection.label,
             embedding_model=collection.embedding_model,
-            files=collection.files,
+            files=[GetCollectionResponseCollectionFile(
+                name=file.name,
+            ) for file in collection.files],
             urls=collection.urls
         ) for collection in collections
     ])
