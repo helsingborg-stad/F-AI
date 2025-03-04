@@ -1,31 +1,40 @@
 import os
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import SecurityScopes
 
-from src.common.services.fastapi_get_services import get_services
-from src.common.services.models.Services import Services
-from src.modules.auth.authentication.api_key.api_key_source_header import api_key_source_header
+from src.common.services.fastapi_get_services import ServicesDependency
+from src.modules.auth.authentication.api_key.api_key_source import ApiKeySource
+from src.modules.auth.authentication.bearer_token.bearer_token_source import BearerTokenSource
+from src.modules.auth.authentication.cookie_token.cookie_token_source import CookieTokenSource
 from src.modules.auth.authentication.factory import AuthenticationServiceFactory
 from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
+from src.modules.auth.authentication.models.AuthenticationSourceCredentials import AuthenticationSourceCredentials
 from src.modules.auth.authentication.models.AuthenticationType import AuthenticationType
-from src.modules.auth.helpers.authentication_challenge_adapter import AuthenticationChallengeAdapter
 from src.modules.auth.authorization.protocols.IAuthorizationService import IAuthorizationService
+from src.modules.auth.helpers.authentication_challenge_adapter import AuthenticationChallengeAdapter
 
 
-async def _get_auth_credentials(api_key: str | None) -> (AuthenticationType, str):
-    credential_types = [
-        (AuthenticationType.API_KEY, api_key),
-        # (AuthenticationType.BEARER_TOKEN, json.dumps(bearer_token.subject) if bearer_token else None),
-    ]
-    valid_credentials_provided = [(c, v) for c, v in credential_types if v is not None]
+async def _get_auth_credentials(
+        api_key: ApiKeySource,
+        bearer_token: BearerTokenSource,
+        cookie_token: CookieTokenSource
+) -> AuthenticationSourceCredentials:
+    credentials_priority = [api_key, bearer_token, cookie_token]
+
+    valid_credentials_provided = [c for c in credentials_priority if
+                                  c.credentials is not None and len(c.credentials) > 0]
     available_challenges = ', '.join([
-        AuthenticationChallengeAdapter.to_challenge(a) for a, _ in credential_types])
+        AuthenticationChallengeAdapter.to_challenge(c.auth_type) for c in credentials_priority])
 
     # Check for missing credentials
     if len(valid_credentials_provided) == 0:
         if os.environ['DISABLE_AUTH'] == '1':
-            return AuthenticationType.GUEST, ''
+            return AuthenticationSourceCredentials(
+                auth_type=AuthenticationType.GUEST,
+                credentials=''
+            )
 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -33,14 +42,6 @@ async def _get_auth_credentials(api_key: str | None) -> (AuthenticationType, str
             headers={"WWW-Authenticate": available_challenges}
         )
 
-    # Check for superfluous credentials
-    if len(valid_credentials_provided) > 1:
-        provided_credential_types = [str(c) for c, _ in valid_credentials_provided]
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Too many authentication credentials provided ({'+'.join(provided_credential_types)})",
-            headers={"WWW-Authenticate": available_challenges}
-        )
     return valid_credentials_provided[0]
 
 
@@ -73,13 +74,15 @@ async def _ensure_authorized(
 
 
 async def auth_route_dependency(
+        credentials: Annotated[AuthenticationSourceCredentials, Depends(_get_auth_credentials)],
         security_scopes: SecurityScopes,
-        api_key: str | None = Depends(api_key_source_header),
-        # bearer_token: JwtAuthorizationCredentials | None = Depends(bearer_token_source),
-        services: Services = Depends(get_services)
+        services: ServicesDependency
 ) -> AuthenticatedIdentity:
-    auth_type, auth_payload = await _get_auth_credentials(api_key)
-    authenticated_identity = await _authenticate(services.authentication_factory, auth_type, auth_payload)
+    authenticated_identity = await _authenticate(
+        services.authentication_factory,
+        credentials.auth_type,
+        credentials.credentials
+    )
     await _ensure_authorized(authenticated_identity, security_scopes.scopes, services.authorization_service)
 
     return authenticated_identity

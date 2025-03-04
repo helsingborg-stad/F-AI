@@ -5,3 +5,6 @@ from src.modules.auth.authorization.protocols.IAuthorizationService import IAuth
 class AlwaysAuthorizedAuthorizationService(IAuthorizationService):
     async def has_scopes(self, identity: AuthenticatedIdentity, scopes: list[str]) -> bool:
         return True
+
+    async def get_scopes(self, identity: AuthenticatedIdentity) -> list[str]:
+        return []

@@ -9,6 +9,7 @@ from src.api.api_key import api_key_router
 from src.api.document_chunker import document_chunker_router
 from src.api.llm import llm_router
 from src.api.collection import collection_router
+from src.api.login import login_router
 from src.common.services.create_services import create_services
 
 
@@ -31,6 +32,7 @@ def create_app():
     api_router.include_router(collection_router)
     api_router.include_router(document_chunker_router)
     api_router.include_router(llm_router)
+    api_router.include_router(login_router)
 
     new_app.include_router(api_router)
     return new_app
