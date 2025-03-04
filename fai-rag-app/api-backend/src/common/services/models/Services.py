@@ -6,6 +6,8 @@ from src.modules.auth.authorization.protocols.IAuthorizationService import IAuth
 from src.modules.collections.protocols.ICollectionService import ICollectionService
 from src.modules.document_chunker.factory import DocumentChunkerFactory
 from src.modules.llm.protocols.ILLMService import ILLMService
+from src.modules.login.protocols.ILoginService import ILoginService
+from src.modules.notification.protocols.INotificationService import INotificationService
 from src.modules.vector.protocols.IVectorService import IVectorService
 
 
@@ -18,3 +20,5 @@ class Services:
     document_chunker_factory: DocumentChunkerFactory
     vector_service: IVectorService
     collection_service: ICollectionService
+    notification_service: INotificationService
+    login_service: ILoginService

@@ -11,11 +11,31 @@ class MongoAuthorizationService(IAuthorizationService):
         self._api_key_service = api_key_service
 
     async def has_scopes(self, identity: AuthenticatedIdentity, scopes: list[str]) -> bool:
-        # TODO: check user bearer token
 
-        api_key = await self._api_key_service.find_by_revoke_id(identity.uid)
+        match identity.principal_type:
+            case 'application':
+                api_key = await self._api_key_service.find_by_revoke_id(identity.uid)
 
-        if api_key is not None:
-            return all(scope in api_key.scopes for scope in scopes)
+                if api_key is not None:
+                    return all(scope in api_key.scopes for scope in scopes)
+
+            case 'user':
+                # TODO: check user (non api-key)
+                ...
 
         return False
+
+    async def get_scopes(self, identity: AuthenticatedIdentity) -> list[str]:
+
+        match identity.principal_type:
+            case 'application':
+                api_key = await self._api_key_service.find_by_revoke_id(identity.uid)
+
+                if api_key is not None:
+                    return api_key.scopes
+
+            case 'user':
+                # TODO
+                ...
+
+        return []

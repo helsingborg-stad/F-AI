@@ -5,3 +5,4 @@ class AuthenticationType(Enum):
     GUEST = 'guest'
     API_KEY = 'api_key'
     BEARER_TOKEN = 'bearer_token'
+    COOKIE_TOKEN = 'cookie_token'

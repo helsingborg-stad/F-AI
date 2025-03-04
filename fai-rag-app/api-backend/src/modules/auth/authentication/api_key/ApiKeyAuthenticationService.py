@@ -14,5 +14,6 @@ class ApiKeyAuthenticationService(IAuthenticationService):
             return None
 
         return AuthenticatedIdentity(
+            principal_type='application',
             uid=key.revoke_id,
         )

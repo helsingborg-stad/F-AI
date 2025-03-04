@@ -6,3 +6,6 @@ from src.modules.auth.authentication.models.AuthenticatedIdentity import Authent
 class IAuthorizationService(Protocol):
     async def has_scopes(self, identity: AuthenticatedIdentity, scopes: list[str]) -> bool:
         ...
+
+    async def get_scopes(self, identity: AuthenticatedIdentity) -> list[str]:
+        ...
