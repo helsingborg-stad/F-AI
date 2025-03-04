@@ -1,14 +1,5 @@
 <script>
-	import MenuSidebar from '$lib/components/Menu/MenuSidebar.svelte';
-
-	let { children } = $props();
-
-	let menuSidebarItems = [{
-		label: 'Asistant Zoo',
-		path: ''
-	}]
+  let { children } = $props()
 </script>
-
-<MenuSidebar {menuSidebarItems} />
 
 {@render children()}
