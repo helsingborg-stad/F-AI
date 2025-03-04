@@ -3,7 +3,6 @@
   import type { ItemOptionsType } from '$lib/types.js'
 
   export let title: string
-  // export let itemOptions: { iconName: keyof typeof icons, title: string, onClick: () => void }[] = [];
   export let itemOptions: ItemOptionsType[] = []
 </script>
 
