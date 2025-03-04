@@ -25,11 +25,11 @@
   <header class="flex w-full bg-base-200 md:px-4">
     <Navbar navbarTitle={NAVBAR_TITLE} {navBarItems} currentUrlPath={page.url.pathname} />
   </header>
-  <div class="flex flex-grow">
+  <div class="flex flex-grow bg-base-200">
     <aside class="w-60 flex-shrink-0 overflow-hidden bg-base-200 max-md:!w-0">
       <MenuSidebar {menuSidebarItems} currentUrlPath={page.url.pathname} />
     </aside>
-    <main class="flex-grow bg-stone-50">
+    <main class="m-2 flex-grow rounded-lg border bg-stone-50">
       {@render children()}
     </main>
   </div>

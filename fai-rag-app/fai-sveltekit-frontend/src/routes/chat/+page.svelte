@@ -46,7 +46,7 @@
 </script>
 
 <!-- Chat Content -->
-<div class="flex h-full flex-1 flex-col bg-gradient-to-b from-orange-50 to-orange-100">
+<div class="flex h-full flex-1 flex-col">
   <!-- Chat Bubbles Area -->
   <div class="flex-1 overflow-y-auto p-4">
     {#each $messages as msg (msg.text)}
@@ -56,7 +56,7 @@
 
   <!-- Chat Input -->
   <div class="p-2">
-    <div class="m-3.5 rounded-2xl bg-white p-2">
+    <div class="m-3.5 rounded-2xl border bg-white p-2">
       <ChatInput send={sendMessage} placeholder="Fråga Folkets AI" />
     </div>
   </div>
