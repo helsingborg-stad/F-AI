@@ -2,6 +2,7 @@ from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
 
 from src.common.is_url import is_url
+from src.common.mongo import is_valid_mongo_id
 from src.modules.collections.models.CollectionFile import CollectionFile
 from src.modules.collections.models.CollectionMetadata import CollectionMetadata
 from src.modules.collections.models.CollectionQueryResult import CollectionQueryResult
@@ -31,14 +32,20 @@ class MongoCollectionService(ICollectionService):
 
     async def delete(self, collection_id: str):
         await self._vector_service.delete(collection_id)
-        await self._database['collections'].delete_one({'_id': ObjectId(collection_id)})
+
+        if is_valid_mongo_id(collection_id):
+            await self._database['collections'].delete_one({'_id': ObjectId(collection_id)})
 
     async def get(self, collection_id: str) -> CollectionMetadata | None:
+        if not is_valid_mongo_id(collection_id):
+            return None
+
         result = await self._database['collections'].find_one({'_id': ObjectId(collection_id)},
                                                               projection=['_id', 'label', 'embedding_model', 'files',
                                                                           'urls'])
         if result is None:
             return None
+
         return CollectionMetadata(
             id=str(result['_id']),
             label=result['label'],
@@ -60,6 +67,9 @@ class MongoCollectionService(ICollectionService):
         ]
 
     async def set_meta(self, collection_id: str, label: str):
+        if not is_valid_mongo_id(collection_id):
+            return
+
         await self._database['collections'].update_one(
             {'_id': ObjectId(collection_id)},
             {
@@ -70,6 +80,10 @@ class MongoCollectionService(ICollectionService):
         await self._vector_service.delete(collection_id)
 
         collection_meta = await self.get(collection_id)
+
+        if collection_meta is None:
+            return
+
         await self._vector_service.create(collection_id, collection_meta.embedding_model)
 
         urls = []
@@ -113,6 +127,10 @@ class MongoCollectionService(ICollectionService):
 
     async def query(self, collection_id: str, query: str, max_results: int) -> list[CollectionQueryResult]:
         collection_meta = await self.get(collection_id)
+
+        if collection_meta is None:
+            return []
+
         results = await self._vector_service.query(
             space=collection_id,
             embedding_model=collection_meta.embedding_model,
