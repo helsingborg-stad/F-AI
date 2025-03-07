@@ -39,7 +39,6 @@ class ConfirmLoginRequest(BaseModel):
 
 class ConfirmLoginResponse(BaseModel):
     user_id: str = Field(example="john.smith@example.com")
-    scopes: list[str] = Field(examples=[['can_manage_api_keys', 'can_ask_questions']])
 
 
 @login_router.post(
@@ -65,8 +64,7 @@ async def confirm_login(response: Response, body: ConfirmLoginRequest, services:
     )
 
     return ConfirmLoginResponse(
-        user_id=login.user_id,
-        scopes=login.scopes
+        user_id=login.user_id
     )
 
 

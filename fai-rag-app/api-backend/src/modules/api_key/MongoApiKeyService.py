@@ -3,10 +3,10 @@ from collections.abc import Mapping
 from typing import Any
 
 from bson import ObjectId
-from bson.errors import InvalidId
 from pymongo.asynchronous.database import AsyncDatabase
 
 from src.common.hashing import hash_secret
+from src.common.mongo import is_valid_mongo_id
 from src.modules.api_key.models.NewlyCreatedApiKey import NewlyCreatedApiKey
 from src.modules.api_key.models.RedactedApiKey import RedactedApiKey
 from src.modules.api_key.models.StoredApiKey import StoredApiKey
@@ -38,7 +38,7 @@ class MongoApiKeyService(IApiKeyService):
         )
 
     async def revoke(self, revoke_id: str):
-        if not self._is_valid_id(revoke_id):
+        if not is_valid_mongo_id(revoke_id):
             return
 
         await self._database['api_key'].delete_one({'_id': ObjectId(revoke_id)})
@@ -52,26 +52,18 @@ class MongoApiKeyService(IApiKeyService):
             return None
 
         (api_key, lookup_id) = key.split('.')
-        if not self._is_valid_id(lookup_id):
+        if not is_valid_mongo_id(lookup_id):
             return None
 
         result = await self._database['api_key'].find_one({'_id': ObjectId(lookup_id)})
         return self._to_read_only_api_key(result) if result else None
 
     async def find_by_revoke_id(self, revoke_id: str) -> RedactedApiKey | None:
-        if not self._is_valid_id(revoke_id):
+        if not is_valid_mongo_id(revoke_id):
             return None
 
         result = await self._database['api_key'].find_one({'_id': ObjectId(revoke_id)})
         return self._to_read_only_api_key(result) if result else None
-
-    @staticmethod
-    def _is_valid_id(any_id: str) -> bool:
-        try:
-            ObjectId(any_id)
-            return True
-        except InvalidId:
-            return False
 
     @staticmethod
     def _to_read_only_api_key(db_doc: Mapping[str, Any]) -> RedactedApiKey:

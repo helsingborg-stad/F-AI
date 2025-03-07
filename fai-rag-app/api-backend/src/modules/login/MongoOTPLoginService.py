@@ -47,10 +47,8 @@ class MongoOTPLoginService(ILoginService):
             raise ValueError('Invalid confirmation code')
 
         await self._database['login_otp'].delete_one({'_id': ObjectId(request_id)})
-        scopes = await self._authorization_service.get_scopes(
-            identity=AuthenticatedIdentity(uid=result['user_id'], principal_type='user'))
-        jwt = create_user_jwt(result['user_id'], {'scopes': scopes})
-        return ConfirmedLogin(user_id=result['user_id'], scopes=scopes, access_token=jwt)
+        jwt = create_user_jwt(result['user_id'], {})
+        return ConfirmedLogin(user_id=result['user_id'], access_token=jwt)
 
     @staticmethod
     def _generate_otp() -> str:
