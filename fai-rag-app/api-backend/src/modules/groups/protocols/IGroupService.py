@@ -10,7 +10,7 @@ class IGroupService(Protocol):
     async def get_group_by_id(self, group_id: str) -> Group | None:
         ...
 
-    async def add(self, owner: str, label: str, members: list[str], scopes: list[str]):
+    async def add(self, new_id: str, owner: str, label: str, members: list[str], scopes: list[str]):
         ...
 
     async def delete(self, group_id: str):

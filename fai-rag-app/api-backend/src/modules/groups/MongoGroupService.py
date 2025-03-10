@@ -38,8 +38,11 @@ class MongoGroupService(IGroupService):
         doc = await self._database['groups'].find_one({'_id': ObjectId(group_id)})
         return self._doc_to_group(doc) if doc else None
 
-    async def add(self, owner: str, label: str, members: list[str], scopes: list[str]):
+    async def add(self, new_id: str, owner: str, label: str, members: list[str], scopes: list[str]):
+        if await self._database['groups'].find_one({'_id': ObjectId(new_id)}):
+            return
         await self._database['groups'].insert_one({
+            '_id': ObjectId(new_id),
             'owner': owner,
             'label': label,
             'members': members,

@@ -1,3 +1,4 @@
+from bson import ObjectId
 from fastapi import APIRouter, status, HTTPException
 from pydantic import BaseModel
 
@@ -29,6 +30,7 @@ async def create_group(
         services: ServicesDependency
 ):
     await services.group_service.add(
+        new_id=str(ObjectId()),
         owner=auth_identity.uid,
         label=body.label,
         members=[],
