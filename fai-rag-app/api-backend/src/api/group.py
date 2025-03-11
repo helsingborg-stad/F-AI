@@ -20,7 +20,7 @@ class CreateGroupRequest(BaseModel):
 
 @auth.post(
     '',
-    ['can_manage_groups'],
+    ['group.write'],
     summary='Create new group',
     description=''
 )
@@ -44,7 +44,7 @@ class DeleteGroupRequest(BaseModel):
 
 @auth.delete(
     '',
-    ['can_manage_groups'],
+    ['group.write'],
     summary='Delete group',
     description=''
 )
@@ -65,7 +65,7 @@ class ListGroupsResponse(BaseModel):
 
 @auth.get(
     '',
-    ['can_manage_groups'],
+    ['group.read'],
     summary='List groups',
     description='',
     response_model=ListGroupsResponse
@@ -90,7 +90,7 @@ class GetGroupResponse(BaseModel):
 
 @auth.get(
     '{group_id}',
-    ['can_manage_groups'],
+    ['group.read'],
     summary='Get group',
     description='',
     response_model=GetGroupResponse
@@ -110,7 +110,7 @@ class SetGroupMembersRequest(BaseModel):
 
 @auth.patch(
     '{group_id}/members',
-    ['can_manage_groups'],
+    ['group.write'],
     summary='Set group members',
     description=''
 )
@@ -124,7 +124,7 @@ class SetGroupScopesRequest(BaseModel):
 
 @auth.patch(
     '{group_id}/scopes',
-    ['can_manage_groups'],
+    ['group.write'],
     summary='Set group scopes',
     description=''
 )

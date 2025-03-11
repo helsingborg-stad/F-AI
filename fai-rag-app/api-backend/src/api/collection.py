@@ -22,7 +22,7 @@ class CreateCollectionRequest(BaseModel):
 
 @auth.post(
     '',
-    required_scopes=['can_manage_collections'],
+    required_scopes=['collection.write'],
 )
 async def create_collection(body: CreateCollectionRequest, services: ServicesDependency):
     await services.collection_service.create(
@@ -49,7 +49,7 @@ class GetCollectionsResponse(BaseModel):
 
 @auth.get(
     '',
-    required_scopes=['can_manage_collections'],
+    required_scopes=['collection.read'],
     response_model=GetCollectionsResponse
 )
 async def get_collections(services: ServicesDependency):
@@ -69,7 +69,7 @@ async def get_collections(services: ServicesDependency):
 
 @auth.delete(
     '/{collection_id}',
-    required_scopes=['can_manage_collections'],
+    required_scopes=['collection.write'],
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_collection(collection_id: str, services: ServicesDependency):
@@ -82,7 +82,7 @@ class UpdateCollectionRequest(BaseModel):
 
 @auth.patch(
     '/{collection_id}',
-    required_scopes=['can_manage_collections'],
+    required_scopes=['collection.write'],
 )
 async def update_collection_metadata(body: UpdateCollectionRequest, collection_id: str, services: ServicesDependency):
     await services.collection_service.set_meta(collection_id, body.label)
@@ -90,7 +90,7 @@ async def update_collection_metadata(body: UpdateCollectionRequest, collection_i
 
 @auth.put(
     '/{collection_id}/content',
-    required_scopes=['can_manage_collections'],
+    required_scopes=['collection.write'],
     summary='Replace content (files/urls) of a collection',
     description='''
 Replaces the content of the collection with the files/URLs provided.
@@ -139,7 +139,7 @@ class QueryCollectionResponse(BaseModel):
 
 @auth.post(
     '/{collection_id}/query',
-    required_scopes=['can_manage_collections'],
+    required_scopes=['collection.read'],
     summary='Query a collection',
     description='''
 Query (search) a collection by an input query and returns up to `max_results` (defaults to 10)

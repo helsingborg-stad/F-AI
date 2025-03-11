@@ -20,7 +20,7 @@ class AuthTestResponseModel(BaseModel):
 
 @auth.get(
     '/test',
-    ['can_ask_questions'],
+    ['test'],
     summary='Test authentication/authorization endpoint',
     description='''
 This endpoint does nothing except showcase how authenticated/authorized endpoints work. 

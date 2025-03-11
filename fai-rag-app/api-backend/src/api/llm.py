@@ -30,7 +30,7 @@ class RunResponse(BaseModel):
 
 @auth.post(
     '/run',
-    required_scopes=['can_ask_questions'],
+    required_scopes=['llm.run'],
     summary='Run LLM inference',
     response_model=RunResponse,
 )
