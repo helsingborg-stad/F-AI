@@ -5,12 +5,12 @@ from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
 
 from src.common.hashing import hash_secret, verify_hash
-from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
 from src.modules.auth.authorization.protocols.IAuthorizationService import IAuthorizationService
 from src.modules.auth.helpers.user_jwt import create_user_jwt
 from src.modules.login.models.ConfirmedLogin import ConfirmedLogin
 from src.modules.login.models.StoredOTP import StoredOTP
 from src.modules.login.protocols.ILoginService import ILoginService
+from src.modules.notification.models.NotificationPayload import NotificationPayload
 from src.modules.notification.protocols.INotificationService import INotificationService
 
 
@@ -55,7 +55,10 @@ class MongoOTPLoginService(ILoginService):
         return os.environ.get('FIXED_OTP') or ''.join([str(random.randint(0, 9)) for _ in range(4)])
 
     @staticmethod
-    def _get_notification_payload(otp: str) -> str:
-        return f"""
+    def _get_notification_payload(otp: str) -> NotificationPayload:
+        return NotificationPayload(
+            subject="Your Login PIN",
+            body=f"""
 <html><head></head><body><p>Hello,</p><p>Login with this pin: {otp}</p></body></html>
 """
+        )
