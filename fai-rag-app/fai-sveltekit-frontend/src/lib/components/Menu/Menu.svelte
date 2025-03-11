@@ -15,7 +15,7 @@
 </script>
 
 <div class="h-full">
-  <MenuHeader iconName="banana" {title} />
+  <MenuHeader iconName="panelLeft" {title} />
   <ul class="menu">
     {#each items as item}
       <li>
