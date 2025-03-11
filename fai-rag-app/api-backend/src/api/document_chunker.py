@@ -28,7 +28,7 @@ class ChunkDocumentResponse(BaseModel):
 
 @auth.post(
     '/file',
-    required_scopes=['can_manage_documents'],
+    required_scopes=['document.chunk'],
     summary='Chunk a file',
     description='''
 Parse and split a file into string parts (chunks) based on file-type specific semantics.
@@ -65,7 +65,7 @@ async def chunk_file(file: UploadFile, services: ServicesDependency):
 
 @auth.post(
     '/url',
-    required_scopes=['can_manage_documents'],
+    required_scopes=['document.chunk'],
     summary='Chunk a file/document from an URL',
     description='''
 Chunk a file/web-page from an URL.

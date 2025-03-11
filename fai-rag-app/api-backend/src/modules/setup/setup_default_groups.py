@@ -9,7 +9,7 @@ async def setup_default_groups(group_service: IGroupService):
         owner=os.environ['SETUP_ADMIN'],
         label='default',
         members=['*@*'],
-        scopes=['']
+        scopes=[]
     )
 
     await group_service.add(
@@ -17,5 +17,15 @@ async def setup_default_groups(group_service: IGroupService):
         owner='',
         label='admins',
         members=[os.environ['SETUP_ADMIN']],
-        scopes=['']
+        scopes=[
+            'apiKey.read',
+            'apiKey.write',
+            'collection.read',
+            'collection.write',
+            'document.chunk',
+            'group.read',
+            'group.write',
+            'llm.run',
+            'test'
+        ]
     )

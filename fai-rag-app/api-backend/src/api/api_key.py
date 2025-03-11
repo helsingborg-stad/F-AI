@@ -25,7 +25,7 @@ class CreateApiKeyResponse(BaseModel):
 
 @auth.post(
     '',
-    ['can_manage_api_keys'],
+    ['apiKey.write'],
     summary='Create API Key',
     description='''
     Create a new API key with the given scopes.
@@ -60,7 +60,7 @@ class ListApiKeyResponse(BaseModel):
 
 @auth.get(
     '',
-    ['can_manage_api_keys'],
+    ['apiKey.read'],
     description='''
 List information about all API keys.
 
@@ -75,7 +75,7 @@ async def list_api_keys(services: ServicesDependency):
 
 @auth.delete(
     '/apikey/{revoke_id}',
-    ['can_manage_api_keys'],
+    ['apiKey.write'],
     description='''
 Revoke a specific API key (permanently delete it).
 
