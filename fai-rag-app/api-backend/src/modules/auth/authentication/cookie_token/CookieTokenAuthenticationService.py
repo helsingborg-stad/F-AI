@@ -15,4 +15,4 @@ class CookieTokenAuthenticationService(IAuthenticationService):
         if jwt is None:
             return None
 
-        return AuthenticatedIdentity(uid=jwt['sub'], principal_type='user')
+        return AuthenticatedIdentity(uid=jwt['sub'])

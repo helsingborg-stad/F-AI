@@ -14,10 +14,6 @@ api_key_router = APIRouter(
 auth = AuthRouterDecorator(api_key_router)
 
 
-class CreateApiKeyRequest(BaseModel):
-    scopes: list[str]
-
-
 class CreateApiKeyResponse(BaseModel):
     key: str
     revokeId: str
@@ -28,29 +24,13 @@ class CreateApiKeyResponse(BaseModel):
     ['apiKey.write'],
     summary='Create API Key',
     description='''
-    Create a new API key with the given scopes.
+    Create a new API key.
     ''',
     status_code=status.HTTP_201_CREATED,
-    response_model=CreateApiKeyResponse,
-    response_400_description='No scopes provided.'
+    response_model=CreateApiKeyResponse
 )
-async def create_api_key(body: CreateApiKeyRequest, auth_identity: AuthenticatedIdentity,
-                         services: ServicesDependency):
-    desired_scopes = [scope for scope in body.scopes if len(scope) > 0]
-
-    if len(desired_scopes) == 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='No scopes provided.'
-        )
-
-    if not await services.authorization_service.has_scopes(auth_identity, desired_scopes):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Can not assign scope(s) outside of creator's scopes to an API key."
-        )
-
-    new_key = await services.api_key_service.create(scopes=desired_scopes)
+async def create_api_key(services: ServicesDependency):
+    new_key = await services.api_key_service.create()
     return CreateApiKeyResponse(key=new_key.api_key, revokeId=new_key.revoke_id)
 
 

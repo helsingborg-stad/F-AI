@@ -20,20 +20,9 @@ class MongoAuthorizationService(IAuthorizationService):
 
     async def get_scopes(self, identity: AuthenticatedIdentity) -> GrantedScopes:
         # TODO: include resources
-
-        match identity.principal_type:
-            case 'application':
-                api_key = await self._api_key_service.find_by_revoke_id(identity.uid)
-
-                if api_key is not None:
-                    return GrantedScopes(global_scopes=api_key.scopes)
-
-            case 'user':
-                groups = await self._group_service.get_groups_by_member(identity.uid)
-                flattened = flatten_permissions([Permissions(
-                    scopes=group.scopes,
-                    resources=[]
-                ) for group in groups])
-                return GrantedScopes(global_scopes=flattened.scopes)
-
-        return GrantedScopes(global_scopes=[])
+        groups = await self._group_service.get_groups_by_member(identity.uid)
+        flattened = flatten_permissions([Permissions(
+            scopes=group.scopes,
+            resources=[]
+        ) for group in groups])
+        return GrantedScopes(global_scopes=flattened.scopes)

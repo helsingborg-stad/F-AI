@@ -5,7 +5,7 @@ from src.modules.api_key.models.RedactedApiKey import RedactedApiKey
 
 
 class IApiKeyService(Protocol):
-    async def create(self, scopes: list[str]) -> NewlyCreatedApiKey:
+    async def create(self) -> NewlyCreatedApiKey:
         ...
 
     async def revoke(self, revoke_id: str):

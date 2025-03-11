@@ -17,15 +17,15 @@ class MongoApiKeyService(IApiKeyService):
     def __init__(self, database: AsyncDatabase):
         self._database = database
 
-    async def create(self, scopes: list[str]) -> NewlyCreatedApiKey:
+    async def create(self) -> NewlyCreatedApiKey:
         new_id = ObjectId()
         key = f'fai-{uuid.uuid4().hex}.{str(new_id)}'
         key_hash = hash_secret(key)
         key_hint = self._create_key_hint(key)
         api_key = StoredApiKey(
             key_hash=key_hash,
-            key_hint=key_hint,
-            scopes=scopes)
+            key_hint=key_hint
+        )
 
         result = await self._database['api_key'].insert_one({
             **api_key.model_dump(),
@@ -44,7 +44,7 @@ class MongoApiKeyService(IApiKeyService):
         await self._database['api_key'].delete_one({'_id': ObjectId(revoke_id)})
 
     async def get_all(self) -> list[RedactedApiKey]:
-        cursor = self._database['api_key'].find(projection=['_id', 'key_hint', 'scopes'])
+        cursor = self._database['api_key'].find(projection=['_id', 'key_hint'])
         return [self._to_read_only_api_key(doc) async for doc in cursor]
 
     async def find_by_key(self, key: str) -> RedactedApiKey | None:
@@ -69,8 +69,7 @@ class MongoApiKeyService(IApiKeyService):
     def _to_read_only_api_key(db_doc: Mapping[str, Any]) -> RedactedApiKey:
         return RedactedApiKey(
             revoke_id=str(db_doc['_id']),
-            key_hint=db_doc['key_hint'],
-            scopes=db_doc['scopes'],
+            key_hint=db_doc['key_hint']
         )
 
     @staticmethod
