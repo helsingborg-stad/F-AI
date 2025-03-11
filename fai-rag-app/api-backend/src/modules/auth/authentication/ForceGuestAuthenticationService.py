@@ -6,7 +6,4 @@ from src.modules.auth.authentication.protocols.IAuthenticationService import IAu
 
 class ForceGuestAuthenticationService(IAuthenticationService):
     async def authenticate(self, payload: str) -> AuthenticatedIdentity | None:
-        return AuthenticatedIdentity(
-            principal_type='user',
-            uid=f'guest_{uuid.uuid4().hex}'
-        )
+        return AuthenticatedIdentity(uid=f'guest_{uuid.uuid4().hex}')

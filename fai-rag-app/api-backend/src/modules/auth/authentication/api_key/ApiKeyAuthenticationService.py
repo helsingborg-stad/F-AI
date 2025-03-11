@@ -13,7 +13,4 @@ class ApiKeyAuthenticationService(IAuthenticationService):
         if key is None:
             return None
 
-        return AuthenticatedIdentity(
-            principal_type='application',
-            uid=key.revoke_id,
-        )
+        return AuthenticatedIdentity(uid=key.revoke_id)
