@@ -2,4 +2,8 @@
   let { children } = $props()
 </script>
 
-{@render children()}
+<div class="flex flex-grow bg-base-200">
+  <main class="m-2 flex-grow rounded-lg border bg-stone-50">
+    {@render children()}
+  </main>
+</div>

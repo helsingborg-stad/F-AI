@@ -10,6 +10,7 @@
 
   const navBarItems = [
     { label: 'Chat', path: '/chat' },
+    { label: 'Assistants', path: '/assistant' },
     { label: 'Settings', path: '/settings' },
   ]
 </script>
