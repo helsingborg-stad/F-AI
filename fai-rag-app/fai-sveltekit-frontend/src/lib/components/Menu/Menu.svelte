@@ -2,6 +2,7 @@
   import type { IMenuItem } from '$lib/types.js'
   import MenuHeader from '$lib/components/Menu/MenuHeader.svelte'
 
+  export let title: string = 'Some title'
   export let items: IMenuItem[] = []
   export let currentUrlPath: string
 
@@ -14,7 +15,7 @@
 </script>
 
 <div class="h-full">
-  <MenuHeader iconName="banana" title="Banana menu" />
+  <MenuHeader iconName="panelLeft" {title} />
   <ul class="menu">
     {#each items as item}
       <li>
