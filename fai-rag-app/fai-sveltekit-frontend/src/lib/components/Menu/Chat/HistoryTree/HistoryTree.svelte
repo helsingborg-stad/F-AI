@@ -7,18 +7,25 @@
     getCategoryTitles,
   } from '$lib/components/Menu/Chat/HistoryTree/historyUtils.js'
 
-  export let historyItems: HistoryItemType[] = []
-  export let dateRangeConfig: IDateRangeConfig = {
-    today: true,
-    yesterday: true,
-    previousDays: [7, 30],
+  interface Props {
+    historyItems: HistoryItemType[],
+    dateRangeConfig: IDateRangeConfig
   }
 
+  let {
+    historyItems = [],
+    dateRangeConfig = {
+      today: true,
+      yesterday: true,
+      previousDays: [7, 30]
+    }
+  }: Props = $props()
+
   // Get category titles based on configuration
-  const categoryTitles = getCategoryTitles(dateRangeConfig)
+  let categoryTitles = $derived(getCategoryTitles(dateRangeConfig))
 
   // Categorize history items
-  const categorizedItems = categorizeHistoryItems(historyItems, dateRangeConfig)
+  let categorizedItems = $derived(categorizeHistoryItems(historyItems, dateRangeConfig))
 </script>
 
 <div class="rounded-box">

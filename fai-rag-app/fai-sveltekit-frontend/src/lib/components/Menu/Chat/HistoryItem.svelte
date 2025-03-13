@@ -2,8 +2,15 @@
   import HistoryItemOptions from '$lib/components/Menu/Chat/HistoryItemOptions.svelte'
   import type { ItemOptionsType } from '$lib/types.js'
 
-  export let title: string
-  export let itemOptions: ItemOptionsType[] = []
+  interface Props {
+    title: string,
+    itemOptions: ItemOptionsType[]
+  }
+
+  let {
+    title,
+    itemOptions = []
+  }: Props = $props()
 </script>
 
 <div
