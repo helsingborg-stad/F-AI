@@ -18,7 +18,8 @@ export type ItemOptionsType = {
 
 export type HistoryItemType = {
   title: string
-  itemOptions: ItemOptionsType
+  itemOptions: ItemOptionsType[]
+  created: Date
 }
 
 // Dummy export to prevent empty module at runtime.
