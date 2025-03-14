@@ -12,6 +12,7 @@ from src.modules.login.models.StoredOTP import StoredOTP
 from src.modules.login.protocols.ILoginService import ILoginService
 from src.modules.notification.models.NotificationPayload import NotificationPayload
 from src.modules.notification.protocols.INotificationService import INotificationService
+from src.modules.settings.protocols.ISettingsService import ISettingsService
 
 
 class MongoOTPLoginService(ILoginService):
@@ -20,10 +21,12 @@ class MongoOTPLoginService(ILoginService):
             notification_service: INotificationService,
             database: AsyncDatabase,
             authorization_service: IAuthorizationService,
+            settings_service: ISettingsService
     ):
         self._notification_service = notification_service
         self._database = database
         self._authorization_service = authorization_service
+        self._settings_service = settings_service
 
     async def initiate(self, user_id: str) -> str:
         otp = self._generate_otp()
@@ -47,7 +50,7 @@ class MongoOTPLoginService(ILoginService):
             raise ValueError('Invalid confirmation code')
 
         await self._database['login_otp'].delete_one({'_id': ObjectId(request_id)})
-        jwt = create_user_jwt(result['user_id'], {})
+        jwt = create_user_jwt(result['user_id'], {}, await self._settings_service.get_setting('jwt.user_secret'))
         return ConfirmedLogin(user_id=result['user_id'], access_token=jwt)
 
     @staticmethod

@@ -29,6 +29,7 @@ async def create_services() -> Services:
         api_key_service=api_key_service,
         group_service=group_service,
     ).get()
+    settings_service = SettingsServiceFactory(mongo_database=mongo_database).get()
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
@@ -39,6 +40,7 @@ async def create_services() -> Services:
                 AuthenticationType.COOKIE_TOKEN
             ],
             api_key_service=api_key_service,
+            settings_service=settings_service,
         ),
         authorization_service=authorization_service,
         api_key_service=api_key_service,
@@ -53,8 +55,9 @@ async def create_services() -> Services:
         login_service=LoginServiceFactory(
             mongo_database=mongo_database,
             authorization_service=authorization_service,
-            notification_service=notification_service
+            notification_service=notification_service,
+            settings_service=settings_service,
         ).get(),
         group_service=group_service,
-        settings_service=SettingsServiceFactory(mongo_database=mongo_database).get(),
+        settings_service=settings_service,
     )
