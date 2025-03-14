@@ -1,12 +1,5 @@
 # Getting started
 
-## Try it on Elastx
-
-1. Sign up on Elastx <https://elastx.se/se/signup>
-2. Click button below 👇 to install demo
-
-[![Install demo](https://raw.githubusercontent.com/helsingborg-stad/F-AI/5e0c8dcac95f2468b4509927ccc2f410c08b0508/.deploy/elastx/elastx_install_demo.png)](https://app.jelastic.elastx.net/?manifest=https://raw.githubusercontent.com/helsingborg-stad/F-AI/refs/heads/master/.deploy/elastx/mainfest.yml)
-
 ## Development (macOS)
 
 ```bash
@@ -28,14 +21,12 @@ git clone https://github.com/helsingborg-stad/F-AI.git
 ### Backend 🤖
 
 ```bash
-cd F-AI/fai-rag-app/fai-backend
+cd F-AI/backend
 ```
 
 ```bash
 poetry shell && poetry install --with dev,test,unstructured
 ```
-
-Setup mongodb as needed.
 
 ```bash
 cp .env.example .env
@@ -49,32 +40,6 @@ python -m fai_backend.main
 
 ### Frontend 🎸
 
-```bash
-cd F-AI/fai-rag-app/fai-frontend
-```
+The front-end is currently under development and not complete as we refactor the project. 
 
-```bash
-npm i
-```
-
-```bash
-npm run dev
-```
-
-#### View in browser 🚀
-
-```bash
-open http://localhost:8000
-```
-
-##### API Docs
-
-```bash
-open http://localhost:8000/docs
-```
-
-##### API Root Endpoint 🤩
-
-```bash
-open http://localhost:8000/api
-```
+For a working version with both front-end and back-end functionality, switch to Git tag "0.0.34", for the last stable release.
