@@ -9,6 +9,7 @@ from src.modules.groups.protocols.IGroupService import IGroupService
 from src.modules.llm.protocols.ILLMService import ILLMService
 from src.modules.login.protocols.ILoginService import ILoginService
 from src.modules.notification.protocols.INotificationService import INotificationService
+from src.modules.settings.protocols.ISettingsService import ISettingsService
 from src.modules.vector.protocols.IVectorService import IVectorService
 
 
@@ -24,3 +25,4 @@ class Services:
     notification_service: INotificationService
     login_service: ILoginService
     group_service: IGroupService
+    settings_service: ISettingsService

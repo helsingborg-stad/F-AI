@@ -11,6 +11,7 @@ from src.api.group import group_router
 from src.api.llm import llm_router
 from src.api.collection import collection_router
 from src.api.login import login_router
+from src.api.settings import settings_router
 from src.common.services.create_services import create_services
 from src.modules.setup.setup_default_groups import setup_default_groups
 
@@ -37,6 +38,7 @@ def create_app():
     api_router.include_router(llm_router)
     api_router.include_router(login_router)
     api_router.include_router(group_router)
+    api_router.include_router(settings_router)
 
     new_app.include_router(api_router)
     return new_app

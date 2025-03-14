@@ -26,6 +26,8 @@ async def setup_default_groups(group_service: IGroupService):
             'group.read',
             'group.write',
             'llm.run',
+            'settings.read',
+            'settings.write',
             'test'
         ]
     )
