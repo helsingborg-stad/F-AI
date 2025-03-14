@@ -74,6 +74,9 @@ instance/
 # Scrapy stuff:
 .scrapy
 
+# Storybook stuff:
+storybook-static/
+
 # Sphinx documentation
 docs/_build/
 
