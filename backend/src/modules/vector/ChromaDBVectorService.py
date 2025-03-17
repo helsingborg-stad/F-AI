@@ -6,13 +6,15 @@ from chromadb.errors import InvalidCollectionException
 from chromadb.utils.embedding_functions.openai_embedding_function import OpenAIEmbeddingFunction
 from chromadb.utils import embedding_functions
 
+from src.modules.settings.protocols.ISettingsService import ISettingsService
 from src.modules.vector.models.VectorDocument import VectorDocument
 from src.modules.vector.models.VectorSpace import VectorSpace
 from src.modules.vector.protocols.IVectorService import IVectorService
 
 
 class ChromaDBVectorService(IVectorService):
-    def __init__(self, db_path='./__chromadb'):
+    def __init__(self, settings_service: ISettingsService, db_path='./__chromadb'):
+        self._settings_service = settings_service
         self._chroma_client = chromadb.PersistentClient(
             path=db_path,
             settings=chromadb.Settings(
@@ -22,7 +24,7 @@ class ChromaDBVectorService(IVectorService):
         )
 
     async def create(self, space: str, embedding_model: str):
-        embedding_function = self._get_embedding_function(embedding_model)
+        embedding_function = await self._get_embedding_function(embedding_model)
         try:
             self._chroma_client.get_collection(space, embedding_function)
         except InvalidCollectionException:
@@ -37,7 +39,7 @@ class ChromaDBVectorService(IVectorService):
 
         collection = self._chroma_client.get_collection(
             space,
-            embedding_function=self._get_embedding_function(embedding_model)
+            embedding_function=await self._get_embedding_function(embedding_model)
         )
 
         collection.add(
@@ -57,8 +59,9 @@ class ChromaDBVectorService(IVectorService):
 
     async def query(self, space: str, embedding_model: str, query: str, max_results: int) -> list[VectorDocument]:
         try:
-            collection = self._chroma_client.get_collection(space, embedding_function=self._get_embedding_function(
-                embedding_model))
+            collection = self._chroma_client.get_collection(space,
+                                                            embedding_function=await self._get_embedding_function(
+                                                                embedding_model))
         except InvalidCollectionException:
             return []
 
@@ -78,12 +81,12 @@ class ChromaDBVectorService(IVectorService):
         ) for i in range(len(ids))
         ]
 
-    @staticmethod
-    def _get_embedding_function(embedding_model_name: str) -> EmbeddingFunction:
+    async def _get_embedding_function(self, embedding_model_name: str) -> EmbeddingFunction:
+        openai_api_key = await self._settings_service.get_setting('openai_api_key')
         embedding_model_map = {
             'default': lambda: embedding_functions.DefaultEmbeddingFunction(),
             'text-embedding-3-small': lambda: OpenAIEmbeddingFunction(
-                api_key=os.environ['OPENAI_API_KEY'],
+                api_key=openai_api_key,
                 model_name='text-embedding-3-small'
             )
         }

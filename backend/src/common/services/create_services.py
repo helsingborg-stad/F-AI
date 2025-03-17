@@ -21,7 +21,6 @@ async def create_services() -> Services:
     mongo_database = AsyncMongoClient(os.environ['MONGO_URI'])[os.environ['MONGO_DB']]
     api_key_service = ApiKeyServiceFactory(mongo_database).get()
     document_chunker_factory = DocumentChunkerFactory()
-    vector_service = VectorServiceFactory().get()
     group_service = GroupServiceFactory(mongo_database=mongo_database).get()
     authorization_service = AuthorizationServiceFactory(
         mongo_database=mongo_database,
@@ -30,6 +29,7 @@ async def create_services() -> Services:
     ).get()
     settings_service = SettingsServiceFactory(mongo_database=mongo_database).get()
     notification_service = NotificationServiceFactory(settings_service=settings_service).get()
+    vector_service = VectorServiceFactory(settings_service=settings_service).get()
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
@@ -44,7 +44,7 @@ async def create_services() -> Services:
         ),
         authorization_service=authorization_service,
         api_key_service=api_key_service,
-        llm_service=LLMServiceFactory().get(),
+        llm_service=LLMServiceFactory(settings_service=settings_service).get(),
         document_chunker_factory=document_chunker_factory,
         vector_service=vector_service,
         collection_service=CollectionServiceFactory(
