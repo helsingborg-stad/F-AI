@@ -22,7 +22,6 @@ async def create_services() -> Services:
     api_key_service = ApiKeyServiceFactory(mongo_database).get()
     document_chunker_factory = DocumentChunkerFactory()
     vector_service = VectorServiceFactory().get()
-    notification_service = NotificationServiceFactory().get()
     group_service = GroupServiceFactory(mongo_database=mongo_database).get()
     authorization_service = AuthorizationServiceFactory(
         mongo_database=mongo_database,
@@ -30,6 +29,7 @@ async def create_services() -> Services:
         group_service=group_service,
     ).get()
     settings_service = SettingsServiceFactory(mongo_database=mongo_database).get()
+    notification_service = NotificationServiceFactory(settings_service=settings_service).get()
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(

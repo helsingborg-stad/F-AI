@@ -29,7 +29,7 @@ class MongoOTPLoginService(ILoginService):
         self._settings_service = settings_service
 
     async def initiate(self, user_id: str) -> str:
-        otp = self._generate_otp()
+        otp = self._generate_otp(await self._settings_service.get_setting('login.fixed_otp'))
         hashed_otp = hash_secret(otp)
         stored_otp = StoredOTP(user_id=user_id, hashed_otp=hashed_otp)
 
@@ -54,8 +54,9 @@ class MongoOTPLoginService(ILoginService):
         return ConfirmedLogin(user_id=result['user_id'], access_token=jwt)
 
     @staticmethod
-    def _generate_otp() -> str:
-        return os.environ.get('FIXED_OTP') or ''.join([str(random.randint(0, 9)) for _ in range(4)])
+    def _generate_otp(fixed_otp: str | None) -> str:
+        return fixed_otp if fixed_otp and len(fixed_otp) > 0 \
+            else ''.join([str(random.randint(0, 9)) for _ in range(4)])
 
     @staticmethod
     def _get_notification_payload(otp: str) -> NotificationPayload:
