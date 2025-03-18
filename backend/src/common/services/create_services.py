@@ -4,6 +4,7 @@ from pymongo import AsyncMongoClient
 
 from src.common.services.models.Services import Services
 from src.modules.api_key.factory import ApiKeyServiceFactory
+from src.modules.assistants.factory import AssistantServiceFactory
 from src.modules.auth.authentication.factory import AuthenticationServiceFactory
 from src.modules.auth.authentication.models.AuthenticationType import AuthenticationType
 from src.modules.auth.authorization.factory import AuthorizationServiceFactory
@@ -60,4 +61,5 @@ async def create_services() -> Services:
         ).get(),
         group_service=group_service,
         settings_service=settings_service,
+        assistant_service=AssistantServiceFactory(mongo_database=mongo_database).get(),
     )

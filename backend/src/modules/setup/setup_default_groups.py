@@ -20,6 +20,8 @@ async def setup_default_groups(group_service: IGroupService):
         scopes=[
             'apiKey.read',
             'apiKey.write',
+            'assistant.read',
+            'assistant.write',
             'collection.read',
             'collection.write',
             'document.chunk',

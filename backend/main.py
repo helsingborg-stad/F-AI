@@ -4,6 +4,7 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, APIRouter
 
+from src.api.assistant import assistant_router
 from src.api.auth import auth_router
 from src.api.api_key import api_key_router
 from src.api.document_chunker import document_chunker_router
@@ -34,12 +35,13 @@ def create_app():
     # Add routes here
     # TODO: move somewhere cooler
     api_router.include_router(api_key_router)
+    api_router.include_router(assistant_router)
     api_router.include_router(auth_router)
     api_router.include_router(collection_router)
     api_router.include_router(document_chunker_router)
+    api_router.include_router(group_router)
     api_router.include_router(llm_router)
     api_router.include_router(login_router)
-    api_router.include_router(group_router)
     api_router.include_router(settings_router)
 
     new_app.include_router(api_router)

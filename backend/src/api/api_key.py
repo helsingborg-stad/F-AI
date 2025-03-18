@@ -1,10 +1,9 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status
 from pydantic import BaseModel
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.api_key.models.RedactedApiKey import RedactedApiKey
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
-from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
 
 api_key_router = APIRouter(
     prefix='/apikey',
