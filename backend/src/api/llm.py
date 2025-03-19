@@ -35,7 +35,7 @@ class RunResponse(BaseModel):
     response_model=RunResponse,
 )
 async def run(request: RunRequest, services: ServicesDependency):
-    message = await services.llm_service.run(model=request.model, messages=[
+    message = await services.llm_service.run_llm(model=request.model, messages=[
         Message(
             role=message.role,
             content=message.content

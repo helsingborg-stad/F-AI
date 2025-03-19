@@ -25,7 +25,7 @@ class CreateCollectionRequest(BaseModel):
     required_scopes=['collection.write'],
 )
 async def create_collection(body: CreateCollectionRequest, services: ServicesDependency):
-    await services.collection_service.create(
+    await services.collection_service.create_collection(
         label=body.label,
         embedding_model=body.embedding_model,
     )
@@ -53,7 +53,7 @@ class GetCollectionsResponse(BaseModel):
     response_model=GetCollectionsResponse
 )
 async def get_collections(services: ServicesDependency):
-    collections = await services.collection_service.list_collections()
+    collections = await services.collection_service.get_collections()
     return GetCollectionsResponse(collections=[
         GetCollectionResponseCollection(
             id=collection.id,
@@ -73,7 +73,7 @@ async def get_collections(services: ServicesDependency):
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_collection(collection_id: str, services: ServicesDependency):
-    await services.collection_service.delete(collection_id)
+    await services.collection_service.delete_collection(collection_id)
 
 
 class UpdateCollectionRequest(BaseModel):
@@ -85,7 +85,7 @@ class UpdateCollectionRequest(BaseModel):
     required_scopes=['collection.write'],
 )
 async def update_collection_metadata(body: UpdateCollectionRequest, collection_id: str, services: ServicesDependency):
-    await services.collection_service.set_meta(collection_id, body.label)
+    await services.collection_service.set_collection_label(collection_id, body.label)
 
 
 @auth.put(
@@ -119,7 +119,7 @@ async def set_collection_content(
 
         paths_and_urls = [p for p in file_paths + (urls or []) if len(p) > 0]
 
-        await services.collection_service.set_documents(collection_id, paths_and_urls)
+        await services.collection_service.set_collection_documents(collection_id, paths_and_urls)
 
 
 class QueryCollectionRequest(BaseModel):
@@ -150,7 +150,7 @@ Returned chunks are ordered from most relevant to least relevant content relativ
     response_model=QueryCollectionResponse
 )
 async def query_collection(body: QueryCollectionRequest, collection_id: str, services: ServicesDependency):
-    results = await services.collection_service.query(collection_id, body.query, max_results=body.max_results)
+    results = await services.collection_service.query_collection(collection_id, body.query, max_results=body.max_results)
     return QueryCollectionResponse(
         results=[
             QueryCollectionResponseResult(

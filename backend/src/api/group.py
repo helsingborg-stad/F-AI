@@ -29,7 +29,7 @@ async def create_group(
         auth_identity: AuthenticatedIdentity,
         services: ServicesDependency
 ):
-    await services.group_service.add(
+    await services.group_service.create_group(
         new_id=str(ObjectId()),
         owner=auth_identity.uid,
         label=body.label,
@@ -49,7 +49,7 @@ class DeleteGroupRequest(BaseModel):
     description=''
 )
 async def delete_group(body: DeleteGroupRequest, services: ServicesDependency):
-    await services.group_service.delete(group_id=body.group_id)
+    await services.group_service.delete_group(group_id=body.group_id)
 
 
 class ListGroupsResponseGroup(BaseModel):
@@ -71,7 +71,7 @@ class ListGroupsResponse(BaseModel):
     response_model=ListGroupsResponse
 )
 async def list_groups(services: ServicesDependency):
-    groups = await services.group_service.list_all()
+    groups = await services.group_service.get_groups()
     return ListGroupsResponse(groups=[
         ListGroupsResponseGroup(
             id=group.id,
@@ -115,7 +115,7 @@ class SetGroupMembersRequest(BaseModel):
     description=''
 )
 async def set_group_members(group_id: str, body: SetGroupMembersRequest, services: ServicesDependency):
-    await services.group_service.set_members(group_id=group_id, members=body.members)
+    await services.group_service.set_group_members(group_id=group_id, members=body.members)
 
 
 class SetGroupScopesRequest(BaseModel):
@@ -133,4 +133,4 @@ async def set_group_scopes(group_id: str, body: SetGroupScopesRequest, services:
     if not await services.authorization_service.has_scopes(auth_identity, body.scopes):
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Attempting to set scope(s) outside of caller's scopes")
 
-    await services.group_service.set_scopes(group_id=group_id, scopes=body.scopes)
+    await services.group_service.set_group_scopes(group_id=group_id, scopes=body.scopes)

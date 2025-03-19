@@ -8,7 +8,7 @@ class ApiKeyAuthenticationService(IAuthenticationService):
         self._api_key_service = api_key_service
 
     async def authenticate(self, payload: str) -> AuthenticatedIdentity | None:
-        key = await self._api_key_service.find_by_key(payload)
+        key = await self._api_key_service.find_api_key(payload)
 
         if key is None:
             return None

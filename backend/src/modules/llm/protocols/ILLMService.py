@@ -6,8 +6,8 @@ from src.modules.llm.models.Delta import Delta
 
 
 class ILLMService(Protocol):
-    async def stream(self, model: str, messages: list[Message]) -> AsyncGenerator[Delta, None]:
+    async def stream_llm(self, model: str, messages: list[Message]) -> AsyncGenerator[Delta, None]:
         ...
 
-    async def run(self, model: str, messages: list[Message]) -> Message:
+    async def run_llm(self, model: str, messages: list[Message]) -> Message:
         ...

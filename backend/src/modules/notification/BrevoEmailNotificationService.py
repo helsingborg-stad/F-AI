@@ -11,7 +11,7 @@ class BrevoEmailNotificationService(INotificationService):
     def __init__(self, settings_service: ISettingsService):
         self._settings_service = settings_service
 
-    async def send(self, recipient: str, payload: NotificationPayload):
+    async def send_notification(self, recipient: str, payload: NotificationPayload):
         url = await self._settings_service.get_setting('brevo.url')
         key = await self._settings_service.get_setting('brevo.key')
 

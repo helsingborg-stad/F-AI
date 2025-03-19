@@ -28,7 +28,7 @@ the login process via the `POST /login/confirm` endpoint.
     response_model=InitiateLoginResponse,
 )
 async def initiate_login(body: InitiateLoginRequest, services: ServicesDependency):
-    request_id = await services.login_service.initiate(user_id=body.user_id)
+    request_id = await services.login_service.initiate_login(user_id=body.user_id)
     return InitiateLoginResponse(request_id=request_id)
 
 
@@ -52,8 +52,8 @@ If successful a cookie is set with a JWT for the authenticated user.
 )
 async def confirm_login(response: Response, body: ConfirmLoginRequest, services: ServicesDependency):
     try:
-        login = await services.login_service.confirm(request_id=body.request_id,
-                                                     confirmation_code=body.confirmation_code)
+        login = await services.login_service.confirm_login(request_id=body.request_id,
+                                                           confirmation_code=body.confirmation_code)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 

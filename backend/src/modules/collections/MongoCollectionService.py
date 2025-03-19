@@ -19,9 +19,9 @@ class MongoCollectionService(ICollectionService):
         self._vector_service = vector_service
         self._chunker_factory = chunker_factory
 
-    async def create(self, label: str, embedding_model: str):
+    async def create_collection(self, label: str, embedding_model: str):
         new_id = ObjectId()
-        await self._vector_service.create(str(new_id), embedding_model)
+        await self._vector_service.create_vector_space(str(new_id), embedding_model)
         await self._database['collections'].insert_one({
             '_id': new_id,
             'label': label,
@@ -30,13 +30,13 @@ class MongoCollectionService(ICollectionService):
             'urls': []
         })
 
-    async def delete(self, collection_id: str):
-        await self._vector_service.delete(collection_id)
+    async def delete_collection(self, collection_id: str):
+        await self._vector_service.delete_vector_space(collection_id)
 
         if is_valid_mongo_id(collection_id):
             await self._database['collections'].delete_one({'_id': ObjectId(collection_id)})
 
-    async def get(self, collection_id: str) -> CollectionMetadata | None:
+    async def get_collection(self, collection_id: str) -> CollectionMetadata | None:
         if not is_valid_mongo_id(collection_id):
             return None
 
@@ -54,7 +54,7 @@ class MongoCollectionService(ICollectionService):
             urls=result['urls']
         )
 
-    async def list_collections(self) -> list[CollectionMetadata]:
+    async def get_collections(self) -> list[CollectionMetadata]:
         cursor = self._database['collections'].find(projection=['_id', 'label', 'embedding_model', 'files', 'urls'])
         return [CollectionMetadata(
             id=str(doc['_id']),
@@ -66,7 +66,7 @@ class MongoCollectionService(ICollectionService):
             async for doc in cursor
         ]
 
-    async def set_meta(self, collection_id: str, label: str):
+    async def set_collection_label(self, collection_id: str, label: str):
         if not is_valid_mongo_id(collection_id):
             return
 
@@ -76,15 +76,15 @@ class MongoCollectionService(ICollectionService):
                 '$set': {'label': label}
             })
 
-    async def set_documents(self, collection_id: str, paths_and_urls: list[str]):
-        await self._vector_service.delete(collection_id)
+    async def set_collection_documents(self, collection_id: str, paths_and_urls: list[str]):
+        await self._vector_service.delete_vector_space(collection_id)
 
-        collection_meta = await self.get(collection_id)
+        collection_meta = await self.get_collection(collection_id)
 
         if collection_meta is None:
             return
 
-        await self._vector_service.create(collection_id, collection_meta.embedding_model)
+        await self._vector_service.create_vector_space(collection_id, collection_meta.embedding_model)
 
         urls = []
         files = []
@@ -110,7 +110,7 @@ class MongoCollectionService(ICollectionService):
                 }
             ) for chunk in chunks]
 
-            await self._vector_service.add_to(
+            await self._vector_service.add_documents_to_vector_space(
                 space=collection_id,
                 embedding_model=collection_meta.embedding_model,
                 documents=documents
@@ -125,13 +125,13 @@ class MongoCollectionService(ICollectionService):
             }
         })
 
-    async def query(self, collection_id: str, query: str, max_results: int) -> list[CollectionQueryResult]:
-        collection_meta = await self.get(collection_id)
+    async def query_collection(self, collection_id: str, query: str, max_results: int) -> list[CollectionQueryResult]:
+        collection_meta = await self.get_collection(collection_id)
 
         if collection_meta is None:
             return []
 
-        results = await self._vector_service.query(
+        results = await self._vector_service.query_vector_space(
             space=collection_id,
             embedding_model=collection_meta.embedding_model,
             query=query,

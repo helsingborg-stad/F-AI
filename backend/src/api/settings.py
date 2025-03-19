@@ -22,7 +22,7 @@ class GetSettingsResponse(BaseModel):
     ['settings.read']
 )
 async def get_settings(services: ServicesDependency):
-    settings = await services.settings_service.get_all()
+    settings = await services.settings_service.get_settings()
     return GetSettingsResponse(settings=settings)
 
 

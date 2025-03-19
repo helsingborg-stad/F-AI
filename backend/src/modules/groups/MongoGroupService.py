@@ -38,7 +38,7 @@ class MongoGroupService(IGroupService):
         doc = await self._database['groups'].find_one({'_id': ObjectId(group_id)})
         return self._doc_to_group(doc) if doc else None
 
-    async def add(self, new_id: str, owner: str, label: str, members: list[str], scopes: list[str]):
+    async def create_group(self, new_id: str, owner: str, label: str, members: list[str], scopes: list[str]):
         if await self._database['groups'].find_one({'_id': ObjectId(new_id)}):
             return
         await self._database['groups'].insert_one({
@@ -50,13 +50,13 @@ class MongoGroupService(IGroupService):
             'resources': [],
         })
 
-    async def delete(self, group_id: str):
+    async def delete_group(self, group_id: str):
         if not is_valid_mongo_id(group_id):
             return
 
         await self._database['groups'].delete_one({'_id': ObjectId(group_id)})
 
-    async def list_all(self) -> list[Group]:
+    async def get_groups(self) -> list[Group]:
         cursor = self._database['groups'].find()
         return [Group(
             id=str(doc['_id']),
@@ -66,13 +66,13 @@ class MongoGroupService(IGroupService):
             scopes=doc['scopes']
         )async for doc in cursor]
 
-    async def set_members(self, group_id: str, members: list[str]):
+    async def set_group_members(self, group_id: str, members: list[str]):
         if not is_valid_mongo_id(group_id):
             return
 
         await self._database['groups'].update_one({'_id': ObjectId(group_id)}, {'$set': {'members': members}})
 
-    async def set_scopes(self, group_id: str, scopes: list[str]):
+    async def set_group_scopes(self, group_id: str, scopes: list[str]):
         if not is_valid_mongo_id(group_id):
             return
 

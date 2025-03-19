@@ -4,5 +4,5 @@ from src.modules.notification.models.NotificationPayload import NotificationPayl
 
 
 class INotificationService(Protocol):
-    async def send(self, recipient: str, payload: NotificationPayload):
+    async def send_notification(self, recipient: str, payload: NotificationPayload):
         ...

@@ -23,7 +23,7 @@ class ChromaDBVectorService(IVectorService):
             ),
         )
 
-    async def create(self, space: str, embedding_model: str):
+    async def create_vector_space(self, space: str, embedding_model: str):
         embedding_function = await self._get_embedding_function(embedding_model)
         try:
             self._chroma_client.get_collection(space, embedding_function)
@@ -33,7 +33,7 @@ class ChromaDBVectorService(IVectorService):
                 embedding_function=embedding_function,
             )
 
-    async def add_to(self, space: str, embedding_model: str, documents: list[VectorDocument]):
+    async def add_documents_to_vector_space(self, space: str, embedding_model: str, documents: list[VectorDocument]):
         if len(documents) == 0:
             return
 
@@ -48,16 +48,22 @@ class ChromaDBVectorService(IVectorService):
             metadatas=[doc.metadata for doc in documents]
         )
 
-    async def delete(self, space: str):
+    async def delete_vector_space(self, space: str):
         try:
             self._chroma_client.delete_collection(space)
         except ValueError:
             return
 
-    async def list_spaces(self) -> list[VectorSpace]:
+    async def get_vector_spaces(self) -> list[VectorSpace]:
         return [VectorSpace(name=collection) for collection in self._chroma_client.list_collections()]
 
-    async def query(self, space: str, embedding_model: str, query: str, max_results: int) -> list[VectorDocument]:
+    async def query_vector_space(
+            self,
+            space: str,
+            embedding_model: str,
+            query: str,
+            max_results: int
+    ) -> list[VectorDocument]:
         try:
             collection = self._chroma_client.get_collection(space,
                                                             embedding_function=await self._get_embedding_function(

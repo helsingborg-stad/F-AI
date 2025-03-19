@@ -3,5 +3,5 @@ from src.modules.notification.protocols.INotificationService import INotificatio
 
 
 class ConsoleNotificationService(INotificationService):
-    async def send(self, recipient: str, payload: NotificationPayload):
+    async def send_notification(self, recipient: str, payload: NotificationPayload):
         print(f'(ConsoleNotificationService) {recipient=}, {payload=}')

@@ -4,7 +4,7 @@ from src.modules.groups.protocols.IGroupService import IGroupService
 
 
 async def setup_default_groups(group_service: IGroupService):
-    await group_service.add(
+    await group_service.create_group(
         new_id='ff0000000000000000000000',
         owner=os.environ['SETUP_ADMIN'],
         label='default',
@@ -12,7 +12,7 @@ async def setup_default_groups(group_service: IGroupService):
         scopes=[]
     )
 
-    await group_service.add(
+    await group_service.create_group(
         new_id='ff0000000000000000000001',
         owner='',
         label='admins',

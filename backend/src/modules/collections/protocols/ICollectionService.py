@@ -5,23 +5,23 @@ from src.modules.collections.models.CollectionQueryResult import CollectionQuery
 
 
 class ICollectionService(Protocol):
-    async def create(self, label: str, embedding_model: str):
+    async def create_collection(self, label: str, embedding_model: str):
         ...
 
-    async def delete(self, collection_id: str):
+    async def delete_collection(self, collection_id: str):
         ...
 
-    async def get(self, collection_id: str) -> CollectionMetadata | None:
+    async def get_collection(self, collection_id: str) -> CollectionMetadata | None:
         ...
 
-    async def list_collections(self) -> list[CollectionMetadata]:
+    async def get_collections(self) -> list[CollectionMetadata]:
         ...
 
-    async def set_meta(self, collection_id: str, label: str):
+    async def set_collection_label(self, collection_id: str, label: str):
         ...
 
-    async def set_documents(self, collection_id: str, paths_and_urls: list[str]):
+    async def set_collection_documents(self, collection_id: str, paths_and_urls: list[str]):
         ...
 
-    async def query(self, collection_id: str, query: str, max_results: int) -> list[CollectionQueryResult]:
+    async def query_collection(self, collection_id: str, query: str, max_results: int) -> list[CollectionQueryResult]:
         ...

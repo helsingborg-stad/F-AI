@@ -28,16 +28,16 @@ class MongoOTPLoginService(ILoginService):
         self._authorization_service = authorization_service
         self._settings_service = settings_service
 
-    async def initiate(self, user_id: str) -> str:
+    async def initiate_login(self, user_id: str) -> str:
         otp = self._generate_otp(await self._settings_service.get_setting('login.fixed_otp'))
         hashed_otp = hash_secret(otp)
         stored_otp = StoredOTP(user_id=user_id, hashed_otp=hashed_otp)
 
         result = await self._database['login_otp'].insert_one(stored_otp.model_dump())
-        await self._notification_service.send(recipient=user_id, payload=self._get_notification_payload(otp))
+        await self._notification_service.send_notification(recipient=user_id, payload=self._get_notification_payload(otp))
         return str(result.inserted_id)
 
-    async def confirm(self, request_id: str, confirmation_code: str) -> ConfirmedLogin:
+    async def confirm_login(self, request_id: str, confirmation_code: str) -> ConfirmedLogin:
         result = await self._database['login_otp'].find_one({'_id': ObjectId(request_id)},
                                                             projection=['user_id', 'hashed_otp'])
 

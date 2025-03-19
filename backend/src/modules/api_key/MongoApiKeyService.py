@@ -17,7 +17,7 @@ class MongoApiKeyService(IApiKeyService):
     def __init__(self, database: AsyncDatabase):
         self._database = database
 
-    async def create(self) -> NewlyCreatedApiKey:
+    async def create_api_key(self) -> NewlyCreatedApiKey:
         new_id = ObjectId()
         key = f'fai-{uuid.uuid4().hex}.{str(new_id)}'
         key_hash = hash_secret(key)
@@ -37,17 +37,17 @@ class MongoApiKeyService(IApiKeyService):
             api_key=key
         )
 
-    async def revoke(self, revoke_id: str):
+    async def revoke_api_key(self, revoke_id: str):
         if not is_valid_mongo_id(revoke_id):
             return
 
         await self._database['api_key'].delete_one({'_id': ObjectId(revoke_id)})
 
-    async def get_all(self) -> list[RedactedApiKey]:
+    async def get_api_keys(self) -> list[RedactedApiKey]:
         cursor = self._database['api_key'].find(projection=['_id', 'key_hint'])
         return [self._to_read_only_api_key(doc) async for doc in cursor]
 
-    async def find_by_key(self, key: str) -> RedactedApiKey | None:
+    async def find_api_key(self, key: str) -> RedactedApiKey | None:
         if '.' not in key:
             return None
 
@@ -58,7 +58,7 @@ class MongoApiKeyService(IApiKeyService):
         result = await self._database['api_key'].find_one({'_id': ObjectId(lookup_id)})
         return self._to_read_only_api_key(result) if result else None
 
-    async def find_by_revoke_id(self, revoke_id: str) -> RedactedApiKey | None:
+    async def find_api_key_by_revoke_id(self, revoke_id: str) -> RedactedApiKey | None:
         if not is_valid_mongo_id(revoke_id):
             return None
 

@@ -40,7 +40,7 @@ class MongoSettingsService(ISettingsService):
             return fallback_value
         return bool(result['value'])
 
-    async def get_all(self) -> dict[str, SettingValue]:
+    async def get_settings(self) -> dict[str, SettingValue]:
         cursor = self._database['settings'].find(projection=['key', 'value'])
         out_dict: dict[str, SettingValue] = {}
         async for doc in cursor:

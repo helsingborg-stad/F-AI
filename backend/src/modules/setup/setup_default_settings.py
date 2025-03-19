@@ -9,7 +9,7 @@ async def _set_if_not_set(existing: dict[str, Any], settings_service: ISettingsS
 
 
 async def setup_default_settings(settings_service: ISettingsService):
-    all_settings = await settings_service.get_all()
+    all_settings = await settings_service.get_settings()
 
     await _set_if_not_set(all_settings, settings_service, 'login.fixed_otp', '1234')
     await _set_if_not_set(all_settings, settings_service, 'jwt.user_secret', 'CHANGE THIS')
