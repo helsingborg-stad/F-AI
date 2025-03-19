@@ -34,7 +34,8 @@ class MongoOTPLoginService(ILoginService):
         stored_otp = StoredOTP(user_id=user_id, hashed_otp=hashed_otp)
 
         result = await self._database['login_otp'].insert_one(stored_otp.model_dump())
-        await self._notification_service.send_notification(recipient=user_id, payload=self._get_notification_payload(otp))
+        await self._notification_service.send_notification(recipient=user_id,
+                                                           payload=self._get_notification_payload(otp))
         return str(result.inserted_id)
 
     async def confirm_login(self, request_id: str, confirmation_code: str) -> ConfirmedLogin:

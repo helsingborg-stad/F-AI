@@ -20,7 +20,7 @@ class MongoGroupService(IGroupService):
             projection=['_id', 'owner', 'label', 'members', 'scopes', 'resources'])
         groups = [self._doc_to_group(doc) async for doc in cursor]
         direct_groups = [group for group in groups if member in group.members]
-        indirect_groups = [group for group in groups if not group in direct_groups]
+        indirect_groups = [group for group in groups if group not in direct_groups]
         matching_indirect_groups = [
             group for group in indirect_groups
             if any([

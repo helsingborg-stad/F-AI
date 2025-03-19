@@ -15,7 +15,7 @@ from src.modules.hello_world.services.SwedishHelloWorldService import SwedishHel
 
 
 class HelloWorldFactory:
-    def __init__(self, lang: Literal['en', 'sv']):
+    def __init__(self, lang: str):
         self.lang = lang
 
     async def get(self) -> IHelloWorldService:

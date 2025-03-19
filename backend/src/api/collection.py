@@ -150,7 +150,8 @@ Returned chunks are ordered from most relevant to least relevant content relativ
     response_model=QueryCollectionResponse
 )
 async def query_collection(body: QueryCollectionRequest, collection_id: str, services: ServicesDependency):
-    results = await services.collection_service.query_collection(collection_id, body.query, max_results=body.max_results)
+    results = await services.collection_service.query_collection(collection_id, body.query,
+                                                                 max_results=body.max_results)
     return QueryCollectionResponse(
         results=[
             QueryCollectionResponseResult(
