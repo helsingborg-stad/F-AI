@@ -24,6 +24,8 @@ async def setup_default_groups(group_service: IGroupService):
             'assistant.write',
             'collection.read',
             'collection.write',
+            'conversation.read',
+            'conversation.write',
             'document.chunk',
             'group.read',
             'group.write',

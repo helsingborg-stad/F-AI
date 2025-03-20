@@ -9,6 +9,7 @@ from src.modules.auth.authentication.factory import AuthenticationServiceFactory
 from src.modules.auth.authentication.models.AuthenticationType import AuthenticationType
 from src.modules.auth.authorization.factory import AuthorizationServiceFactory
 from src.modules.collections.factory import CollectionServiceFactory
+from src.modules.conversations.factory import ConversationServiceFactory
 from src.modules.document_chunker.factory import DocumentChunkerFactory
 from src.modules.groups.factory import GroupServiceFactory
 from src.modules.llm.factory import LLMServiceFactory
@@ -62,4 +63,5 @@ async def create_services() -> Services:
         group_service=group_service,
         settings_service=settings_service,
         assistant_service=AssistantServiceFactory(mongo_database=mongo_database).get(),
+        conversation_service=ConversationServiceFactory(mongo_database=mongo_database).get(),
     )

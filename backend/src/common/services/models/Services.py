@@ -5,6 +5,7 @@ from src.modules.assistants.protocols.IAssistantService import IAssistantService
 from src.modules.auth.authentication.factory import AuthenticationServiceFactory
 from src.modules.auth.authorization.protocols.IAuthorizationService import IAuthorizationService
 from src.modules.collections.protocols.ICollectionService import ICollectionService
+from src.modules.conversations.protocols.IConversationService import IConversationService
 from src.modules.document_chunker.factory import DocumentChunkerFactory
 from src.modules.groups.protocols.IGroupService import IGroupService
 from src.modules.llm.protocols.ILLMService import ILLMService
@@ -28,3 +29,4 @@ class Services:
     group_service: IGroupService
     settings_service: ISettingsService
     assistant_service: IAssistantService
+    conversation_service: IConversationService
