@@ -1,6 +1,7 @@
 from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
 
+from src.common.mongo import is_valid_mongo_id
 from src.modules.conversations.models.Conversation import Conversation
 from src.modules.conversations.models.Message import Message
 from src.modules.conversations.protocols.IConversationService import IConversationService
@@ -23,6 +24,9 @@ class MongoConversationService(IConversationService):
         return str(result.inserted_id)
 
     async def get_conversation(self, conversation_id: str) -> Conversation | None:
+        if not is_valid_mongo_id(conversation_id):
+            return None
+
         result = await self._database['conversations'].find_one(
             {'_id': ObjectId(conversation_id)},
             projection=['_id', 'assistant_id', 'title', 'messages']
@@ -35,7 +39,7 @@ class MongoConversationService(IConversationService):
         cursor = self._database['conversations'].find(projection=['_id', 'assistant_id', 'title', 'messages'])
         return [self._doc_to_conversation(doc) async for doc in cursor]
 
-    async def add_message_to_conversation(self, conversation_id: str, timestamp: str, role: str, message: str):
+    async def add_message_to_conversation(self, conversation_id: str, timestamp: str, role: str, message: str) -> bool:
         conversation = await self.get_conversation(conversation_id)
         if conversation:
             conversation.messages.append(Message(
@@ -45,9 +49,15 @@ class MongoConversationService(IConversationService):
             ))
             await self._database['conversations'].update_one({'_id': ObjectId(conversation_id)},
                                                              {'$set': {**conversation.model_dump()}})
+            return True
+        return False
 
-    async def set_conversation_title(self, conversation_id: str, title: str):
-        await self._database['conversations'].update_one({'_id': ObjectId(conversation_id)}, {'$set': {'title': title}})
+    async def set_conversation_title(self, conversation_id: str, title: str) -> bool:
+        if not is_valid_mongo_id(conversation_id):
+            return False
+        result = await self._database['conversations'].update_one({'_id': ObjectId(conversation_id)},
+                                                                  {'$set': {'title': title}})
+        return result.modified_count == 1
 
     async def delete_conversation(self, conversation_id: str):
         await self._database['conversations'].delete_one({'_id': ObjectId(conversation_id)})

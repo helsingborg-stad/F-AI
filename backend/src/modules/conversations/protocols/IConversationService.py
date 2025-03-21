@@ -13,10 +13,10 @@ class IConversationService(Protocol):
     async def get_conversations(self) -> list[Conversation]:
         ...
 
-    async def add_message_to_conversation(self, conversation_id: str, timestamp: str, role: str, message: str):
+    async def add_message_to_conversation(self, conversation_id: str, timestamp: str, role: str, message: str) -> bool:
         ...
 
-    async def set_conversation_title(self, conversation_id: str, title: str):
+    async def set_conversation_title(self, conversation_id: str, title: str) -> bool:
         ...
 
     async def delete_conversation(self, conversation_id: str):
