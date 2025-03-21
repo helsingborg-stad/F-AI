@@ -13,6 +13,9 @@
     { label: 'Assistants', path: '/assistant' },
     { label: 'Settings', path: '/settings' },
   ]
+
+  let showNavbar = $derived(!page.url.pathname.startsWith('/login'))
+
 </script>
 
 <!--
@@ -21,9 +24,11 @@ This layout file is responsible for setting the Navbar for the application
 and providing the main content area for child components.
 -->
 <div class="flex h-screen flex-col">
-  <header class="flex w-full bg-base-200 md:px-4">
-    <Navbar navbarTitle={NAVBAR_TITLE} {navBarItems} currentUrlPath={page.url.pathname} />
-  </header>
+  {#if showNavbar}
+    <header class="flex w-full bg-base-200 md:px-4">
+      <Navbar navbarTitle={NAVBAR_TITLE} {navBarItems} currentUrlPath={page.url.pathname} />
+    </header>
+  {/if}
   <div class="flex flex-grow">
     <main class="flex h-full flex-grow flex-col">
       {@render children()}
