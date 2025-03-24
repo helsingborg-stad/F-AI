@@ -37,12 +37,6 @@ class MongoApiKeyService(IApiKeyService):
             api_key=key
         )
 
-    async def revoke_api_key(self, revoke_id: str):
-        if not is_valid_mongo_id(revoke_id):
-            return
-
-        await self._database['api_key'].delete_one({'_id': ObjectId(revoke_id)})
-
     async def get_api_keys(self) -> list[RedactedApiKey]:
         cursor = self._database['api_key'].find(projection=['_id', 'key_hint'])
         return [self._to_read_only_api_key(doc) async for doc in cursor]
@@ -64,6 +58,12 @@ class MongoApiKeyService(IApiKeyService):
 
         result = await self._database['api_key'].find_one({'_id': ObjectId(revoke_id)})
         return self._to_read_only_api_key(result) if result else None
+
+    async def revoke_api_key(self, revoke_id: str):
+        if not is_valid_mongo_id(revoke_id):
+            return
+
+        await self._database['api_key'].delete_one({'_id': ObjectId(revoke_id)})
 
     @staticmethod
     def _to_read_only_api_key(db_doc: Mapping[str, Any]) -> RedactedApiKey:

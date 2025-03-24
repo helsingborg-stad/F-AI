@@ -19,7 +19,7 @@ class MongoCollectionService(ICollectionService):
         self._vector_service = vector_service
         self._chunker_factory = chunker_factory
 
-    async def create_collection(self, label: str, embedding_model: str):
+    async def create_collection(self, label: str, embedding_model: str) -> str:
         new_id = ObjectId()
         await self._vector_service.create_vector_space(str(new_id), embedding_model)
         await self._database['collections'].insert_one({
@@ -29,12 +29,7 @@ class MongoCollectionService(ICollectionService):
             'files': [],
             'urls': []
         })
-
-    async def delete_collection(self, collection_id: str):
-        await self._vector_service.delete_vector_space(collection_id)
-
-        if is_valid_mongo_id(collection_id):
-            await self._database['collections'].delete_one({'_id': ObjectId(collection_id)})
+        return str(new_id)
 
     async def get_collection(self, collection_id: str) -> CollectionMetadata | None:
         if not is_valid_mongo_id(collection_id):
@@ -66,23 +61,24 @@ class MongoCollectionService(ICollectionService):
             async for doc in cursor
         ]
 
-    async def set_collection_label(self, collection_id: str, label: str):
+    async def set_collection_label(self, collection_id: str, label: str) -> bool:
         if not is_valid_mongo_id(collection_id):
-            return
+            return False
 
-        await self._database['collections'].update_one(
+        result = await self._database['collections'].update_one(
             {'_id': ObjectId(collection_id)},
             {
                 '$set': {'label': label}
             })
+        return result.modified_count == 1
 
-    async def set_collection_documents(self, collection_id: str, paths_and_urls: list[str]):
+    async def set_collection_documents(self, collection_id: str, paths_and_urls: list[str]) -> bool:
         await self._vector_service.delete_vector_space(collection_id)
 
         collection_meta = await self.get_collection(collection_id)
 
         if collection_meta is None:
-            return
+            return False
 
         await self._vector_service.create_vector_space(collection_id, collection_meta.embedding_model)
 
@@ -116,7 +112,7 @@ class MongoCollectionService(ICollectionService):
                 documents=documents
             )
 
-        await self._database['collections'].update_one({
+        result = await self._database['collections'].update_one({
             '_id': ObjectId(collection_id)
         }, {
             '$set': {
@@ -125,10 +121,12 @@ class MongoCollectionService(ICollectionService):
             }
         })
 
+        return result.modified_count == 1
+
     async def query_collection(self, collection_id: str, query: str, max_results: int) -> list[CollectionQueryResult]:
         collection_meta = await self.get_collection(collection_id)
 
-        if collection_meta is None:
+        if collection_meta is None or max_results <= 0:
             return []
 
         results = await self._vector_service.query_vector_space(
@@ -144,3 +142,9 @@ class MongoCollectionService(ICollectionService):
                 page_number=None if result.metadata['page_number'] == -1 else result.metadata['page_number']
             ) for result in results
         ]
+
+    async def delete_collection(self, collection_id: str):
+        await self._vector_service.delete_vector_space(collection_id)
+
+        if is_valid_mongo_id(collection_id):
+            await self._database['collections'].delete_one({'_id': ObjectId(collection_id)})

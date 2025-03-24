@@ -7,6 +7,7 @@ from src.modules.conversations.protocols.IConversationService import IConversati
 class BaseConversationTestClass:
     @staticmethod
     @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_conversation_service_create_get(service: IConversationService):
         conversation_id = await service.create_conversation('my_assistant_id')
         conversation = await service.get_conversation(conversation_id)
@@ -20,12 +21,14 @@ class BaseConversationTestClass:
 
     @staticmethod
     @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_conversation_service_get_none(service: IConversationService):
         result = await service.get_conversation('does not exist')
         assert result is None
 
     @staticmethod
     @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_conversation_service_list(service: IConversationService):
         await service.create_conversation('a')
         await service.create_conversation('b')
@@ -38,6 +41,7 @@ class BaseConversationTestClass:
 
     @staticmethod
     @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_conversation_service_add_message(service: IConversationService):
         conversation_id = await service.create_conversation('my_assistant_id')
         timestamp = get_timestamp()
@@ -62,12 +66,14 @@ class BaseConversationTestClass:
 
     @staticmethod
     @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_conversation_service_add_message_missing(service: IConversationService):
         result = await service.add_message_to_conversation('does not exist', '', '', '')
         assert result is False
 
     @staticmethod
     @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_conversation_service_set_title(service: IConversationService):
         conversation_id = await service.create_conversation('my_assistant_id')
 
@@ -79,12 +85,14 @@ class BaseConversationTestClass:
 
     @staticmethod
     @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_conversation_service_set_title_missing(service: IConversationService):
         result = await service.set_conversation_title('', '')
         assert result is False
 
     @staticmethod
     @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_conversation_service_delete(service: IConversationService):
         conversation_id = await service.create_conversation('my_assistant_id')
         await service.delete_conversation(conversation_id)

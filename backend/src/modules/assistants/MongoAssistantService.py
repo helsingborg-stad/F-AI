@@ -3,6 +3,7 @@ from typing import Mapping, Any
 from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
 
+from src.common.mongo import is_valid_mongo_id
 from src.modules.assistants.models.Assistant import Assistant
 from src.modules.assistants.models.AssistantMeta import AssistantMeta
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
@@ -31,6 +32,9 @@ class MongoAssistantService(IAssistantService):
         return str(result.inserted_id)
 
     async def get_assistant(self, assistant_id: str) -> Assistant | None:
+        if not is_valid_mongo_id(assistant_id):
+            return None
+
         doc = await self._database['assistants'].find_one(
             {'_id': ObjectId(assistant_id)},
             projection=[
@@ -79,8 +83,11 @@ class MongoAssistantService(IAssistantService):
             max_tokens: int,
             allow_files: bool,
             collection_id: str,
-    ) -> None:
-        await self._database['assistants'].update_one(
+    ) -> bool:
+        if not is_valid_mongo_id(assistant_id):
+            return False
+
+        result = await self._database['assistants'].update_one(
             {'_id': ObjectId(assistant_id)},
             {
                 '$set': {
@@ -100,7 +107,11 @@ class MongoAssistantService(IAssistantService):
             }
         )
 
+        return result.modified_count == 1
+
     async def delete_assistant(self, assistant_id: str) -> None:
+        if not is_valid_mongo_id(assistant_id):
+            return None
         await self._database['assistants'].delete_one({'_id': ObjectId(assistant_id)})
 
     @staticmethod

@@ -1,22 +1,7 @@
-import shutil
-import uuid
-
 import pytest
 
-from src.common.mock_services import MockSettingsService
-from src.modules.vector.ChromaDBVectorService import ChromaDBVectorService
 from src.modules.vector.models.VectorDocument import VectorDocument
 from src.modules.vector.protocols.IVectorService import IVectorService
-
-TEST_DB_PATH = './__test_chromadb'
-
-
-@pytest.fixture
-def vector_service():
-    path = TEST_DB_PATH + uuid.uuid4().hex
-    shutil.rmtree(path, ignore_errors=True)
-    yield ChromaDBVectorService(settings_service=MockSettingsService(), db_path=path)
-    shutil.rmtree(path, ignore_errors=True)
 
 
 @pytest.mark.asyncio

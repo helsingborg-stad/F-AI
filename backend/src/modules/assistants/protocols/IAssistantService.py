@@ -26,7 +26,7 @@ class IAssistantService(Protocol):
             max_tokens: int,
             allow_files: bool,
             collection_id: str,
-    ) -> None:
+    ) -> bool:
         ...
 
     async def delete_assistant(self, assistant_id: str) -> None:
