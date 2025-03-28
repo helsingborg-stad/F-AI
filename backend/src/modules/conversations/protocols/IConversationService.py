@@ -16,6 +16,15 @@ class IConversationService(Protocol):
     async def add_message_to_conversation(self, conversation_id: str, timestamp: str, role: str, message: str) -> bool:
         ...
 
+    async def add_to_conversation_last_message(
+            self,
+            conversation_id: str,
+            timestamp: str,
+            role: str,
+            additional_message: str
+    ) -> bool:
+        ...
+
     async def set_conversation_title(self, conversation_id: str, title: str) -> bool:
         ...
 

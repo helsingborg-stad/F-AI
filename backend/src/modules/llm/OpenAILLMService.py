@@ -1,33 +1,44 @@
 from collections.abc import AsyncGenerator
 
-from src.modules.llm.models.Message import Message
 from src.modules.llm.models.Delta import Delta
+from src.modules.llm.models.Message import Message
 from src.modules.llm.models.ToolCall import ToolCall
 from src.modules.llm.protocols.ILLMService import ILLMService
 from src.modules.llm.runner import OpenAIRunner
-from src.modules.settings.protocols.ISettingsService import ISettingsService
 
 
 class OpenAILLMService(ILLMService):
-    def __init__(self, settings_service: ISettingsService):
-        self._settings_service = settings_service
-
-    async def stream_llm(self, model: str, messages: list[Message]) -> AsyncGenerator[Delta, None]:
+    async def stream_llm(
+            self,
+            model: str,
+            messages: list[Message],
+            max_tokens: int = 0,
+            temperature: float = 0.0,
+            api_key: str = '',
+    ) -> AsyncGenerator[Delta, None]:
         runner = OpenAIRunner(
             model=model,
             messages=messages,
-            temperature=1,
-            api_key=await self._settings_service.get_setting('openai_api_key'),
+            temperature=temperature,
+            max_tokens=max_tokens,
+            api_key=api_key,
         )
         async for output in runner.run():
             yield output
 
-    async def run_llm(self, model: str, messages: list[Message]) -> Message:
+    async def run_llm(
+            self,
+            model: str,
+            messages: list[Message],
+            max_tokens: int = 0,
+            temperature: float = 0.0,
+            api_key: str = ''
+    ) -> Message:
         role: str | None = None
         content: str | None = None
         tool_calls: list[ToolCall] | None = None
 
-        async for output in self.stream_llm(model, messages):
+        async for output in self.stream_llm(model, messages, max_tokens, temperature, api_key):
             role = output.role if output.role else role
             content = (content or '') + output.content if output.content else content
             tool_calls = output.tool_calls if output.tool_calls else tool_calls

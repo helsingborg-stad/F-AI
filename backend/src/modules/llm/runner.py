@@ -2,6 +2,7 @@ import collections
 from typing import Iterable, Any
 
 import openai
+from openai import BadRequestError
 from openai.types.chat import ChatCompletionToolParam
 
 from .models.Message import Message
@@ -14,16 +15,18 @@ class OpenAIRunner:
     def __init__(
             self,
             model: str,
-            temperature: float,
             messages: list[Message],
+            max_tokens: int,
+            temperature: float,
             url: str | None = None,
             api_key: str | None = None,
             tools: Iterable[ChatCompletionToolParam] = None,
             response_format: Any = None
     ):
         self.model = model
-        self.temperature = temperature
         self.messages = messages
+        self.temperature = temperature
+        self.max_tokens = max_tokens
         self.url = url
         self.api_key = api_key
         self.tools = tools
@@ -37,14 +40,22 @@ class OpenAIRunner:
 
         full_messages = self.messages + [message] if message is not None else self.messages
 
-        stream = await client.chat.completions.create(
-            stream=True,
-            model=self.model,
-            messages=[m.model_dump(exclude_none=True) for m in full_messages],
-            temperature=self.temperature,
-            tools=self.tools,
-            response_format=self.response_format
-        )
+        try:
+            stream = await client.chat.completions.create(
+                stream=True,
+                model=self.model,
+                messages=[m.model_dump(exclude_none=True) for m in full_messages],
+                temperature=self.temperature,
+                max_completion_tokens=self.max_tokens,
+                tools=self.tools,
+                response_format=self.response_format
+            )
+        except BadRequestError as e:
+            yield Delta(
+                role='error',
+                content=e.body['message'] if isinstance(e.body, dict) and 'message' in e.body else e.message
+            )
+            return
 
         pending_fn_name: str | None = None
         pending_fn_args: str | None = None
@@ -54,6 +65,8 @@ class OpenAIRunner:
         async for output in stream:
             if len(output.choices) == 0:
                 continue
+
+            # TODO: propagate output.choices[0].finish_reason == 'length' to report max_token limit
 
             delta = output.choices[0].delta
             if not delta:

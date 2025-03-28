@@ -22,6 +22,7 @@ async def setup_default_groups(group_service: IGroupService):
             'apiKey.write',
             'assistant.read',
             'assistant.write',
+            'chat',
             'collection.read',
             'collection.write',
             'conversation.read',

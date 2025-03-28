@@ -20,11 +20,13 @@ class RunRequest(BaseModel):
         {"role": "system", "content": "Answer like a pirate"},
         {"role": "user", "content": "Who is the king of Sweden?"}],
     ])
+    maxTokens: int = Field(examples=[16000]),
+    temperature: float = Field(examples=[1.0])
 
 
 class RunResponse(BaseModel):
     role: str = Field(examples=['assistant'])
-    content: str = Field(examples=["""Ahoy, matey! The king o' Sweden be King Carl XVI Gustaf, 
+    content: str | None = Field(examples=["""Ahoy, matey! The king o' Sweden be King Carl XVI Gustaf, 
     at the helm o' his royal ship for many a year now! Arr!"""])
 
 
@@ -35,11 +37,16 @@ class RunResponse(BaseModel):
     response_model=RunResponse,
 )
 async def run(request: RunRequest, services: ServicesDependency):
-    message = await services.llm_service.run_llm(model=request.model, messages=[
-        Message(
-            role=message.role,
-            content=message.content
-        )
-        for message in request.messages
-    ])
+    message = await services.llm_service.run_llm(
+        model=request.model,
+        max_tokens=request.maxTokens,
+        temperature=request.temperature,
+        messages=[
+            Message(
+                role=message.role,
+                content=message.content
+            )
+            for message in request.messages
+        ]
+    )
     return RunResponse(role=message.role, content=message.content)

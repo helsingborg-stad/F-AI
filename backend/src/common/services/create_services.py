@@ -8,6 +8,7 @@ from src.modules.assistants.factory import AssistantServiceFactory
 from src.modules.auth.authentication.factory import AuthenticationServiceFactory
 from src.modules.auth.authentication.models.AuthenticationType import AuthenticationType
 from src.modules.auth.authorization.factory import AuthorizationServiceFactory
+from src.modules.chat.factory import ChatServiceFactory, MessageStoreServiceFactory
 from src.modules.collections.factory import CollectionServiceFactory
 from src.modules.conversations.factory import ConversationServiceFactory
 from src.modules.document_chunker.factory import DocumentChunkerFactory
@@ -32,6 +33,9 @@ async def create_services() -> Services:
     settings_service = SettingsServiceFactory(mongo_database=mongo_database).get()
     notification_service = NotificationServiceFactory(settings_service=settings_service).get()
     vector_service = VectorServiceFactory(settings_service=settings_service).get()
+    llm_service = LLMServiceFactory().get()
+    assistant_service = AssistantServiceFactory(mongo_database=mongo_database).get()
+    conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
@@ -46,7 +50,7 @@ async def create_services() -> Services:
         ),
         authorization_service=authorization_service,
         api_key_service=api_key_service,
-        llm_service=LLMServiceFactory(settings_service=settings_service).get(),
+        llm_service=llm_service,
         document_chunker_factory=document_chunker_factory,
         vector_service=vector_service,
         collection_service=CollectionServiceFactory(
@@ -62,6 +66,12 @@ async def create_services() -> Services:
         ).get(),
         group_service=group_service,
         settings_service=settings_service,
-        assistant_service=AssistantServiceFactory(mongo_database=mongo_database).get(),
-        conversation_service=ConversationServiceFactory(mongo_database=mongo_database).get(),
+        assistant_service=assistant_service,
+        conversation_service=conversation_service,
+        chat_service=ChatServiceFactory(
+            llm_service=llm_service,
+            assistant_service=assistant_service,
+            conversation_service=conversation_service,
+        ).get(),
+        message_store_service=await MessageStoreServiceFactory(mongo_database=mongo_database).get(),
     )

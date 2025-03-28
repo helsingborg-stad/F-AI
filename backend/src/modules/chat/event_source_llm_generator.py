@@ -1,0 +1,56 @@
+import asyncio
+import datetime
+
+from src.modules.chat.protocols.IChatService import IChatService
+from sse_starlette import ServerSentEvent, EventSourceResponse
+
+
+async def event_source_llm_generator(
+        assistant_or_conversation_id: str,
+        start_new_conversation: bool,
+        user_message: str,
+        chat_service: IChatService
+):
+    async def sse_generator():
+        try:
+            if start_new_conversation:
+                chat_generator = chat_service.start_new_chat(
+                    assistant_id=assistant_or_conversation_id,
+                    message=user_message
+                )
+            else:
+                chat_generator = chat_service.continue_chat(
+                    conversation_id=assistant_or_conversation_id,
+                    message=user_message
+                )
+
+            has_sent_conversation_id = False
+            async for message in chat_generator:
+                if message.conversation_id and not has_sent_conversation_id:
+                    yield ServerSentEvent(
+                        event='chat.conversation_id',
+                        data=message.conversation_id
+                    )
+                    has_sent_conversation_id = True
+
+                yield ServerSentEvent(
+                    event='chat.message',
+                    data={
+                        'timestamp': datetime.datetime.utcnow().isoformat(),
+                        'source': message.source,
+                        'message': message.message
+                    }
+                )
+        except asyncio.CancelledError as e:
+            # likely user cancelled generating
+            raise e
+
+        finally:
+            yield ServerSentEvent(
+                event='chat.message_end',
+                data={
+                    'timestamp': datetime.datetime.utcnow().isoformat()
+                }
+            )
+
+    return EventSourceResponse(sse_generator())

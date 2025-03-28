@@ -48,9 +48,35 @@ class MongoConversationService(IConversationService):
                 content=message
             ))
             await self._database['conversations'].update_one({'_id': ObjectId(conversation_id)},
-                                                             {'$set': {**conversation.model_dump()}})
+                                                             {'$set': {**conversation.model_dump(exclude={'id'})}})
             return True
         return False
+
+    async def add_to_conversation_last_message(
+            self,
+            conversation_id: str,
+            timestamp: str,
+            role: str,
+            additional_message: str
+    ) -> bool:
+        conversation = await self.get_conversation(conversation_id)
+
+        if not conversation:
+            return False
+
+        if len(conversation.messages) == 0:
+            await self.add_message_to_conversation(conversation_id, timestamp, role, additional_message)
+            return True
+
+        conversation.messages[-1].timestamp = timestamp
+        conversation.messages[-1].role = role
+        conversation.messages[-1].content = conversation.messages[-1].content + additional_message
+        result = await self._database['conversations'].update_one({'_id': ObjectId(conversation_id)}, {
+            "$set": {
+                'messages': conversation.model_dump(include={'messages'})['messages']
+            }
+        })
+        return result.modified_count == 1
 
     async def set_conversation_title(self, conversation_id: str, title: str) -> bool:
         if not is_valid_mongo_id(conversation_id):

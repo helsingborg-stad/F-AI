@@ -1,0 +1,86 @@
+from typing import AsyncGenerator
+
+from src.common.get_timestamp import get_timestamp
+from src.modules.assistants.protocols.IAssistantService import IAssistantService
+from src.modules.chat.models.MessageDelta import MessageDelta
+from src.modules.chat.protocols.IChatService import IChatService
+from src.modules.conversations.protocols.IConversationService import IConversationService
+from src.modules.llm.models.Message import Message
+from src.modules.llm.protocols.ILLMService import ILLMService
+
+
+class LLMChatService(IChatService):
+    def __init__(
+            self,
+            llm_service: ILLMService,
+            assistant_service: IAssistantService,
+            conversation_service: IConversationService
+    ):
+        self._llm_service = llm_service
+        self._assistant_service = assistant_service
+        self._conversation_service = conversation_service
+
+    async def start_new_chat(self, assistant_id: str, message: str) -> AsyncGenerator[MessageDelta, None]:
+        assistant = await self._assistant_service.get_assistant(assistant_id)
+
+        if not assistant:
+            yield MessageDelta(conversation_id='', source='error', message='invalid assistant')
+            return
+
+        conversation_id = await self._conversation_service.create_conversation(assistant_id=assistant_id)
+
+        await self._conversation_service.add_message_to_conversation(
+            conversation_id=conversation_id,
+            timestamp=get_timestamp(),
+            role='system',
+            message=assistant.instructions
+        )
+
+        async for m in self.continue_chat(conversation_id, message):
+            yield m
+
+    async def continue_chat(self, conversation_id: str, message: str) -> AsyncGenerator[MessageDelta, None]:
+        conversation = await self._conversation_service.get_conversation(conversation_id)
+
+        if not conversation:
+            yield MessageDelta(conversation_id='', source='error', message='invalid conversation')
+            return
+
+        assistant = await self._assistant_service.get_assistant(conversation.assistant_id)
+
+        if not assistant:
+            yield MessageDelta(conversation_id='', source='error', message='invalid assistant')
+            return
+
+        await self._conversation_service.add_message_to_conversation(
+            conversation_id=conversation_id,
+            timestamp=get_timestamp(),
+            role='user',
+            message=message
+        )
+
+        await self._conversation_service.add_message_to_conversation(
+            conversation_id=conversation_id,
+            timestamp=get_timestamp(),
+            role='',
+            message=''
+        )
+
+        async for delta in self._llm_service.stream_llm(
+                model=assistant.model,
+                messages=[
+                    *[Message(role=m.role, content=m.content) for m in conversation.messages],
+                    Message(role='user', content=message)
+                ],
+                max_tokens=assistant.max_tokens,
+                temperature=assistant.temperature,
+                api_key=assistant.llm_api_key,
+        ):
+            if delta.role != 'error':
+                await self._conversation_service.add_to_conversation_last_message(
+                    conversation_id=conversation_id,
+                    timestamp=get_timestamp(),
+                    role=delta.role,
+                    additional_message=delta.content
+                )
+            yield MessageDelta(conversation_id=conversation_id, source=delta.role, message=delta.content)
