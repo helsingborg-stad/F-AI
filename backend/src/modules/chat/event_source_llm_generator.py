@@ -24,23 +24,32 @@ async def event_source_llm_generator(
                     message=user_message
                 )
 
-            has_sent_conversation_id = False
-            async for message in chat_generator:
-                if message.conversation_id and not has_sent_conversation_id:
-                    yield ServerSentEvent(
-                        event='chat.conversation_id',
-                        data=message.conversation_id
-                    )
-                    has_sent_conversation_id = True
-
-                yield ServerSentEvent(
-                    event='chat.message',
-                    data={
-                        'timestamp': datetime.datetime.utcnow().isoformat(),
-                        'source': message.source,
-                        'message': message.message
-                    }
-                )
+            async for chat_event in chat_generator:
+                match chat_event.event:
+                    case 'conversation_id':
+                        yield ServerSentEvent(
+                            event='chat.conversation_id',
+                            data=chat_event.conversation_id
+                        )
+                    case 'message':
+                        yield ServerSentEvent(
+                            event='chat.message',
+                            data={
+                                'timestamp': datetime.datetime.utcnow().isoformat(),
+                                'source': chat_event.source,
+                                'message': chat_event.message
+                            }
+                        )
+                    case _:
+                        print(f'unhandled chat event {chat_event.event}')
+                        yield ServerSentEvent(
+                            event=f'chat.{chat_event.event}',
+                            data={
+                                'timestamp': datetime.datetime.utcnow().isoformat(),
+                                'source': chat_event.source,
+                                'message': chat_event.message
+                            }
+                        )
         except asyncio.CancelledError as e:
             # likely user cancelled generating
             raise e

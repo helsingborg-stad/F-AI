@@ -37,9 +37,11 @@ async def buffered_chat(body: BufferedChatRequest, services: ServicesDependency)
     final_message = ''
 
     async for delta in services.chat_service.start_new_chat(body.assistant_id, body.message):
-        conversation_id = delta.conversation_id
-        final_source = delta.source
-        final_message += delta.message
+        if delta.event == 'conversation_id':
+            conversation_id = delta.conversation_id
+        if delta.event == 'message':
+            final_source = delta.source
+            final_message += delta.message
 
     return BufferedChatResponse(
         conversation_id=conversation_id,
@@ -72,8 +74,9 @@ async def buffered_chat_continue(body: BufferedChatContinueRequest, conversation
     final_message = ''
 
     async for delta in services.chat_service.continue_chat(conversation_id, body.message):
-        final_source = delta.source
-        final_message += delta.message
+        if delta.event == 'message':
+            final_source = delta.source
+            final_message += delta.message
 
     return BufferedChatContinueResponse(
         source=final_source,
