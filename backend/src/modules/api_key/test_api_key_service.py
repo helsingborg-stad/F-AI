@@ -43,7 +43,7 @@ class BaseApiKeyTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_find_api_key_missing(service: IApiKeyService):
+    async def test_find_api_key_invalid(service: IApiKeyService):
         result = await service.find_api_key('does not exist')
         assert result is None
 
@@ -61,7 +61,7 @@ class BaseApiKeyTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_find_api_key_by_revoke_id_missing(service: IApiKeyService):
+    async def test_find_api_key_by_revoke_id_invalid(service: IApiKeyService):
         result = await service.find_api_key_by_revoke_id('does not exist')
         assert result is None
 
@@ -78,6 +78,6 @@ class BaseApiKeyTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_revoke_api_key_missing(service: IApiKeyService):
+    async def test_revoke_api_key_invalid(service: IApiKeyService):
         await service.revoke_api_key('does not exist')
         assert True

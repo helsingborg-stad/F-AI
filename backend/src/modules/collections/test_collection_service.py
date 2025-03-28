@@ -30,7 +30,7 @@ class BaseCollectionServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_get_collection_missing(service: ICollectionService):
+    async def test_get_collection_invalid(service: ICollectionService):
         result = await service.get_collection('does not exist')
 
         assert result is None
@@ -51,7 +51,7 @@ class BaseCollectionServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_set_collection_label_missing(service: ICollectionService):
+    async def test_set_collection_label_invalid(service: ICollectionService):
         result = await service.set_collection_label('does not exist', 'my new label')
 
         assert result is False
@@ -75,7 +75,7 @@ class BaseCollectionServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_set_collection_documents_missing(service: ICollectionService):
+    async def test_set_collection_documents_invalid(service: ICollectionService):
         result = await service.set_collection_documents(
             'does not exist',
             [os.path.join(os.path.dirname(__file__), 'test_file.md')]
@@ -116,7 +116,7 @@ class BaseCollectionServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_query_collection_missing(service: ICollectionService):
+    async def test_query_collection_invalid(service: ICollectionService):
         result = await service.query_collection('does not exist', query='test', max_results=1)
 
         assert len(result) == 0
@@ -136,7 +136,7 @@ class BaseCollectionServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_delete_collection_missing(service: ICollectionService):
+    async def test_delete_collection_invalid(service: ICollectionService):
         await service.delete_collection('does not exist')
 
         result = await service.get_collection('does not exist')
