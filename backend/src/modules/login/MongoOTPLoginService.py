@@ -1,10 +1,11 @@
-import os
 import random
+from datetime import datetime
 
 from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
 
 from src.common.hashing import hash_secret, verify_hash
+from src.common.mongo import ensure_expiry_index
 from src.modules.auth.authorization.protocols.IAuthorizationService import IAuthorizationService
 from src.modules.auth.helpers.user_jwt import create_user_jwt
 from src.modules.login.models.ConfirmedLogin import ConfirmedLogin
@@ -27,22 +28,31 @@ class MongoOTPLoginService(ILoginService):
         self._database = database
         self._authorization_service = authorization_service
         self._settings_service = settings_service
+        self._otp_expiry_seconds = 60
+
+    async def init(self, otp_expiry_seconds: int):
+        self._otp_expiry_seconds = otp_expiry_seconds
+        await ensure_expiry_index(self._database['login_otp'], self._otp_expiry_seconds)
 
     async def initiate_login(self, user_id: str) -> str:
         otp = self._generate_otp(await self._settings_service.get_setting('login.fixed_otp'))
         hashed_otp = hash_secret(otp)
         stored_otp = StoredOTP(user_id=user_id, hashed_otp=hashed_otp)
 
-        result = await self._database['login_otp'].insert_one(stored_otp.model_dump())
+        result = await self._database['login_otp'].insert_one(
+            {
+                **stored_otp.model_dump(),
+                'createdAt': datetime.utcnow()
+            })
         await self._notification_service.send_notification(recipient=user_id,
                                                            payload=self._get_notification_payload(otp))
         return str(result.inserted_id)
 
     async def confirm_login(self, request_id: str, confirmation_code: str) -> ConfirmedLogin:
         result = await self._database['login_otp'].find_one({'_id': ObjectId(request_id)},
-                                                            projection=['user_id', 'hashed_otp'])
+                                                            projection=['createdAt', 'user_id', 'hashed_otp'])
 
-        if not result:
+        if not result or (datetime.utcnow() - result['createdAt']).total_seconds() >= self._otp_expiry_seconds:
             raise ValueError('Invalid request ID')
 
         valid_code = verify_hash(confirmation_code, result['hashed_otp'])

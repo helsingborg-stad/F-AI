@@ -20,10 +20,12 @@ class LoginServiceFactory:
         self._notification_service = notification_service
         self._settings_service = settings_service
 
-    def get(self) -> ILoginService:
-        return MongoOTPLoginService(
+    async def get(self) -> ILoginService:
+        service = MongoOTPLoginService(
             notification_service=self._notification_service,
             database=self._mongo_database,
             authorization_service=self._authorization_service,
             settings_service=self._settings_service
         )
+        await service.init(otp_expiry_seconds=60)
+        return service

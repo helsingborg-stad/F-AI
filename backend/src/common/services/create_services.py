@@ -58,7 +58,7 @@ async def create_services() -> Services:
             vector_service=vector_service,
             chunker_factory=document_chunker_factory).get(),
         notification_service=notification_service,
-        login_service=LoginServiceFactory(
+        login_service=await LoginServiceFactory(
             mongo_database=mongo_database,
             authorization_service=authorization_service,
             notification_service=notification_service,

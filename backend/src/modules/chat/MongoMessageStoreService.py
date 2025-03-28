@@ -3,7 +3,7 @@ import datetime
 from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
 
-from src.common.mongo import is_valid_mongo_id
+from src.common.mongo import is_valid_mongo_id, ensure_expiry_index
 from src.modules.chat.protocols.IMessageStoreService import IMessageStoreService
 
 
@@ -14,7 +14,7 @@ class MongoMessageStoreService(IMessageStoreService):
 
     async def init(self, expiry_seconds: int):
         self._expiry_seconds = expiry_seconds
-        await self._database['stored_messages'].create_index('createdAt', expireAfterSeconds=expiry_seconds)
+        await ensure_expiry_index(self._database['stored_messages'], self._expiry_seconds)
 
     async def store_message(self, message: str) -> str:
         result = await self._database['stored_messages'].insert_one(
