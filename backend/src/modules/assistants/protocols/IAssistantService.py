@@ -18,13 +18,13 @@ class IAssistantService(Protocol):
             assistant_id: str,
             name: str,
             description: str,
+            allow_files: bool,
             sample_questions: list[str],
             model: str,
             llm_api_key: str | None,
             instructions: str,
             temperature: float,
             max_tokens: int,
-            allow_files: bool,
             collection_id: str,
     ) -> bool:
         ...

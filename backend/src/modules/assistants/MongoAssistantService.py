@@ -16,13 +16,12 @@ class MongoAssistantService(IAssistantService):
     async def create_assistant(self) -> str:
         assistant = Assistant(
             id=str(ObjectId()),
-            meta=AssistantMeta(name='', description='', sample_questions=[]),
+            meta=AssistantMeta(name='', description='', sample_questions=[], allow_files=False),
             model='',
             llm_api_key=None,
             instructions='',
             temperature=1,
             max_tokens=16000,
-            allow_files=False,
             collection_id=None
         )
         result = await self._database['assistants'].insert_one({
@@ -75,13 +74,13 @@ class MongoAssistantService(IAssistantService):
             assistant_id: str,
             name: str,
             description: str,
+            allow_files: bool,
             sample_questions: list[str],
             model: str,
             llm_api_key: str | None,
             instructions: str,
             temperature: float,
             max_tokens: int,
-            allow_files: bool,
             collection_id: str,
     ) -> bool:
         if not is_valid_mongo_id(assistant_id):
@@ -94,6 +93,7 @@ class MongoAssistantService(IAssistantService):
                     'meta': {
                         'name': name,
                         'description': description,
+                        'allow_files': allow_files,
                         'sample_questions': sample_questions,
                     },
                     'model': model,
@@ -101,7 +101,6 @@ class MongoAssistantService(IAssistantService):
                     'instructions': instructions,
                     'temperature': temperature,
                     'max_tokens': max_tokens,
-                    'allow_files': allow_files,
                     'collection_id': collection_id,
                 }
             }
@@ -121,13 +120,13 @@ class MongoAssistantService(IAssistantService):
             meta=AssistantMeta(
                 name=doc['meta']['name'],
                 description=doc['meta']['description'],
-                sample_questions=doc['meta']['sample_questions']
+                allow_files=doc['meta']['allow_files'],
+                sample_questions=doc['meta']['sample_questions'],
             ),
             model=doc['model'],
             llm_api_key=doc['llm_api_key'],
             instructions=doc['instructions'],
             temperature=doc['temperature'],
             max_tokens=doc['max_tokens'],
-            allow_files=doc['allow_files'],
             collection_id=doc['collection_id']
         )

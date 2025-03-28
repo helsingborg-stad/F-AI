@@ -11,5 +11,4 @@ class Assistant(BaseModel):
     instructions: str
     temperature: float
     max_tokens: int
-    allow_files: bool
     collection_id: str | None

@@ -30,12 +30,12 @@ class GetAssistantResponseAssistant(BaseModel):
     name: str
     description: str
     sample_questions: list[str]
+    allow_files: bool
     model: str
     llm_api_key: str | None
     instructions: str
     temperature: float
     max_tokens: int
-    allow_files: bool
     collection_id: str | None
 
 
@@ -58,13 +58,13 @@ async def get_assistant(assistant_id: str, services: ServicesDependency):
         assistant=GetAssistantResponseAssistant(
             name=result.meta.name,
             description=result.meta.description,
+            allow_files=result.meta.allow_files,
             sample_questions=result.meta.sample_questions,
             model=result.model,
             llm_api_key=result.llm_api_key,
             instructions=result.instructions,
             temperature=result.temperature,
             max_tokens=result.max_tokens,
-            allow_files=result.allow_files,
             collection_id=result.collection_id
         )
     )
@@ -99,13 +99,13 @@ async def get_assistants(services: ServicesDependency):
 class UpdateAssistantRequest(BaseModel):
     name: str
     description: str
+    allow_files: bool
     sample_questions: list[str]
     model: str
     llm_api_key: str | None
     instructions: str
     temperature: float
     max_tokens: int
-    allow_files: bool
     collection_id: str
 
 
@@ -118,13 +118,13 @@ async def update_assistant(assistant_id: str, body: UpdateAssistantRequest, serv
         assistant_id,
         name=body.name,
         description=body.description,
+        allow_files=body.allow_files,
         sample_questions=body.sample_questions,
         model=body.model,
         llm_api_key=body.llm_api_key,
         instructions=body.instructions,
         temperature=body.temperature,
         max_tokens=body.max_tokens,
-        allow_files=body.allow_files,
         collection_id=body.collection_id,
     )
 
