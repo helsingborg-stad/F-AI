@@ -72,37 +72,37 @@ class MongoAssistantService(IAssistantService):
     async def update_assistant(
             self,
             assistant_id: str,
-            name: str,
-            description: str,
-            allow_files: bool,
-            sample_questions: list[str],
-            model: str,
-            llm_api_key: str | None,
-            instructions: str,
-            temperature: float,
-            max_tokens: int,
-            collection_id: str,
+            name: str | None = None,
+            description: str | None = None,
+            allow_files: bool | None = None,
+            sample_questions: list[str] | None = None,
+            model: str | None = None,
+            llm_api_key: str | None = None,
+            instructions: str | None = None,
+            temperature: float | None = None,
+            max_tokens: int | None = None,
+            collection_id: str | None = None,
     ) -> bool:
         if not is_valid_mongo_id(assistant_id):
             return False
 
+        update_dict: dict[str, Any] = {}
+
+        self._add_to_dict_unless_none(update_dict, 'meta.name', name)
+        self._add_to_dict_unless_none(update_dict, 'meta.description', description)
+        self._add_to_dict_unless_none(update_dict, 'meta.allow_files', allow_files)
+        self._add_to_dict_unless_none(update_dict, 'meta.sample_questions', sample_questions)
+        self._add_to_dict_unless_none(update_dict, 'model', model)
+        self._add_to_dict_unless_none(update_dict, 'llm_api_key', llm_api_key)
+        self._add_to_dict_unless_none(update_dict, 'instructions', instructions)
+        self._add_to_dict_unless_none(update_dict, 'temperature', temperature)
+        self._add_to_dict_unless_none(update_dict, 'max_tokens', max_tokens)
+        self._add_to_dict_unless_none(update_dict, 'collection_id', collection_id)
+
         result = await self._database['assistants'].update_one(
             {'_id': ObjectId(assistant_id)},
             {
-                '$set': {
-                    'meta': {
-                        'name': name,
-                        'description': description,
-                        'allow_files': allow_files,
-                        'sample_questions': sample_questions,
-                    },
-                    'model': model,
-                    'llm_api_key': llm_api_key,
-                    'instructions': instructions,
-                    'temperature': temperature,
-                    'max_tokens': max_tokens,
-                    'collection_id': collection_id,
-                }
+                '$set': {**update_dict}
             }
         )
 
@@ -124,9 +124,18 @@ class MongoAssistantService(IAssistantService):
                 sample_questions=doc['meta']['sample_questions'],
             ),
             model=doc['model'],
-            llm_api_key=doc['llm_api_key'],
+            llm_api_key=MongoAssistantService._redact_key(doc['llm_api_key']),
             instructions=doc['instructions'],
             temperature=doc['temperature'],
             max_tokens=doc['max_tokens'],
             collection_id=doc['collection_id']
         )
+
+    @staticmethod
+    def _add_to_dict_unless_none(in_dict: dict[str, Any], key: str, value: Any | None):
+        if value is not None:
+            in_dict[key] = value
+
+    @staticmethod
+    def _redact_key(key: str) -> str | None:
+        return key[:2] + "..." + key[-2:] if key else None

@@ -72,11 +72,38 @@ class BaseAssistantServiceTestClass:
         assert assistant.meta.allow_files is True
         assert assistant.meta.sample_questions == ['a', 'b']
         assert assistant.model == 'model_name'
-        assert assistant.llm_api_key == 'api_key'
+        assert assistant.llm_api_key == 'ap...ey'
         assert assistant.instructions == 'instructions here'
         assert assistant.temperature == 0.31415
         assert assistant.max_tokens == 16000
         assert assistant.collection_id == 'my_collection_id'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_update_assistant_partial(service: IAssistantService):
+        assistant_id = await service.create_assistant()
+        await service.update_assistant(
+            assistant_id=assistant_id,
+            name='my assistant',
+            description='my description',
+        )
+
+        assistant1 = await service.get_assistant(assistant_id)
+
+        await service.update_assistant(
+            assistant_id=assistant_id,
+            model='my_cool_model',
+        )
+
+        assistant2 = await service.get_assistant(assistant_id)
+
+        assert assistant1.meta.name == 'my assistant'
+        assert assistant1.meta.description == 'my description'
+        assert assistant1.model != 'my_cool_model'
+        assert assistant2.meta.name == 'my assistant'
+        assert assistant2.meta.description == 'my description'
+        assert assistant2.model == 'my_cool_model'
 
     @staticmethod
     @pytest.mark.asyncio
@@ -116,3 +143,19 @@ class BaseAssistantServiceTestClass:
         assistant = await service.get_assistant('does not exist')
 
         assert assistant is None
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_redact_key(service: IAssistantService):
+        assistant_id = await service.create_assistant()
+        await service.update_assistant(
+            assistant_id=assistant_id,
+            llm_api_key='my_secret_key'
+        )
+
+        result1 = await service.get_assistant(assistant_id)
+        result2 = await service.get_assistants()
+
+        assert 'my_secret_key' not in result1.llm_api_key
+        assert 'my_secret_key' not in result2[0].llm_api_key

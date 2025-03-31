@@ -16,16 +16,16 @@ class IAssistantService(Protocol):
     async def update_assistant(
             self,
             assistant_id: str,
-            name: str,
-            description: str,
-            allow_files: bool,
-            sample_questions: list[str],
-            model: str,
-            llm_api_key: str | None,
-            instructions: str,
-            temperature: float,
-            max_tokens: int,
-            collection_id: str,
+            name: str | None = None,
+            description: str | None = None,
+            allow_files: bool | None = None,
+            sample_questions: list[str] | None = None,
+            model: str | None = None,
+            llm_api_key: str | None = None,
+            instructions: str | None = None,
+            temperature: float | None = None,
+            max_tokens: int | None = None,
+            collection_id: str | None = None,
     ) -> bool:
         ...
 
