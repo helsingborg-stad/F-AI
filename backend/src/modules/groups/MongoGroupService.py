@@ -14,6 +14,21 @@ class MongoGroupService(IGroupService):
     def __init__(self, database: AsyncDatabase):
         self._database = database
 
+    async def create_group(self, owner: str, label: str, members: list[str], scopes: list[str],
+                           force_id: str | None = None) -> str:
+        if force_id and await self._database['groups'].find_one({'_id': ObjectId(force_id)}) is not None:
+            return force_id
+        result = await self._database['groups'].insert_one({
+            '_id': ObjectId(force_id) if force_id else ObjectId(),
+            'owner': owner,
+            'label': label,
+            'members': members,
+            'scopes': scopes,
+            'resources': [],
+        })
+
+        return str(result.inserted_id)
+
     async def get_groups_by_member(self, member: str) -> list[Group]:
         cursor = self._database['groups'].find(
             {'members': {'$in': [member, wildcard_member_pattern_regex]}},
@@ -38,24 +53,6 @@ class MongoGroupService(IGroupService):
         doc = await self._database['groups'].find_one({'_id': ObjectId(group_id)})
         return self._doc_to_group(doc) if doc else None
 
-    async def create_group(self, new_id: str, owner: str, label: str, members: list[str], scopes: list[str]):
-        if await self._database['groups'].find_one({'_id': ObjectId(new_id)}):
-            return
-        await self._database['groups'].insert_one({
-            '_id': ObjectId(new_id),
-            'owner': owner,
-            'label': label,
-            'members': members,
-            'scopes': scopes,
-            'resources': [],
-        })
-
-    async def delete_group(self, group_id: str):
-        if not is_valid_mongo_id(group_id):
-            return
-
-        await self._database['groups'].delete_one({'_id': ObjectId(group_id)})
-
     async def get_groups(self) -> list[Group]:
         cursor = self._database['groups'].find()
         return [Group(
@@ -77,6 +74,12 @@ class MongoGroupService(IGroupService):
             return
 
         await self._database['groups'].update_one({'_id': ObjectId(group_id)}, {'$set': {'scopes': scopes}})
+
+    async def delete_group(self, group_id: str):
+        if not is_valid_mongo_id(group_id):
+            return
+
+        await self._database['groups'].delete_one({'_id': ObjectId(group_id)})
 
     @staticmethod
     def _doc_to_group(doc: Mapping[str, Any]) -> Group:

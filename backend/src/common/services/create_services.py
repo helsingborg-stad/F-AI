@@ -21,7 +21,8 @@ from src.modules.vector.factory import VectorServiceFactory
 
 
 async def create_services() -> Services:
-    mongo_database = AsyncMongoClient(os.environ['MONGO_URI'])[os.environ['MONGO_DB']]
+    mongo_client = AsyncMongoClient(os.environ['MONGO_URI'])
+    mongo_database = mongo_client[os.environ['MONGO_DB']]
     api_key_service = ApiKeyServiceFactory(mongo_database).get()
     document_chunker_factory = DocumentChunkerFactory()
     group_service = GroupServiceFactory(mongo_database=mongo_database).get()
