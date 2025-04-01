@@ -6,18 +6,6 @@ class MockSettingsService(ISettingsService):
     async def get_setting(self, key: str, fallback_value: SettingValue | None = None) -> SettingValue | None:
         return None
 
-    async def get_str_setting(self, key: str, fallback_value: str | None = None) -> str | None:
-        return None
-
-    async def get_int_setting(self, key: str, fallback_value: int | None = None) -> int | None:
-        return None
-
-    async def get_float_setting(self, key: str, fallback_value: float | None = None) -> float | None:
-        return None
-
-    async def get_bool_setting(self, key: str, fallback_value: bool | None = None) -> bool | None:
-        return None
-
     async def get_settings(self) -> dict[str, SettingValue]:
         return {}
 

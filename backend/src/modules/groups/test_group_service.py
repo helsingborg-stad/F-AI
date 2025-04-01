@@ -38,6 +38,7 @@ class BaseGroupServiceTestClass:
             'test group',
             ['john@example.com', 'jane@example.com'],
             ['test.write', 'test.read'],
+            # TODO: this currently relies on the ID being Mongo-compatible (ObjectId) - ideally it should not have to
             force_id='ff00000000000000000000ff'
         )
 

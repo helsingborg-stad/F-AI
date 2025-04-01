@@ -16,30 +16,6 @@ class MongoSettingsService(ISettingsService):
             return fallback_value
         return self._to_valid_value(result['value'])
 
-    async def get_str_setting(self, key: str, fallback_value: str | None = None) -> str | None:
-        result = await self._database['settings'].find_one({'key': key}, projection=['key', 'value'])
-        if result is None:
-            return fallback_value
-        return str(result['value'])
-
-    async def get_int_setting(self, key: str, fallback_value: int | None = None) -> int | None:
-        result = await self._database['settings'].find_one({'key': key}, projection=['key', 'value'])
-        if result is None:
-            return fallback_value
-        return int(result['value'])
-
-    async def get_float_setting(self, key: str, fallback_value: float | None = None) -> float | None:
-        result = await self._database['settings'].find_one({'key': key}, projection=['key', 'value'])
-        if result is None:
-            return fallback_value
-        return float(result['value'])
-
-    async def get_bool_setting(self, key: str, fallback_value: bool = None) -> bool | None:
-        result = await self._database['settings'].find_one({'key': key}, projection=['key', 'value'])
-        if result is None:
-            return fallback_value
-        return bool(result['value'])
-
     async def get_settings(self) -> dict[str, SettingValue]:
         cursor = self._database['settings'].find(projection=['key', 'value'])
         out_dict: dict[str, SettingValue] = {}
