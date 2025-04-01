@@ -5,12 +5,12 @@ from datetime import datetime, timedelta
 from jose import jwt
 
 
-def create_user_jwt(user_id: str, data: dict, secret: str) -> str:
+def create_user_jwt(user_id: str, data: dict, exp: datetime, secret: str) -> str:
     return jwt.encode({
         'iss': 'fai',
         'sub': user_id,
         'aud': 'fai',
-        'exp': datetime.utcnow() + timedelta(minutes=60),
+        'exp': exp,
         'iat': datetime.utcnow(),
         'jti': str(uuid.uuid4()),
         'data': data,

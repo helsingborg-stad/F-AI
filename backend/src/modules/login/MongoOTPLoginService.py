@@ -1,5 +1,5 @@
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
@@ -61,7 +61,11 @@ class MongoOTPLoginService(ILoginService):
             raise ValueError('Invalid confirmation code')
 
         await self._database['login_otp'].delete_one({'_id': ObjectId(request_id)})
-        jwt = create_user_jwt(result['user_id'], {}, await self._settings_service.get_setting('jwt.user_secret'))
+        jwt = create_user_jwt(
+            result['user_id'],
+            {},
+            datetime.utcnow() + timedelta(minutes=await self._settings_service.get_setting('jwt.expire_minutes', 600)),
+            await self._settings_service.get_setting('jwt.user_secret'))
         return ConfirmedLogin(user_id=result['user_id'], access_token=jwt)
 
     @staticmethod
