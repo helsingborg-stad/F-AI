@@ -2,17 +2,17 @@
   let { form } = $props()
 
   let id = $state(form?.email || '')
-  let isIDSubmitted = $state(form?.isIDSubmitted || false)
+  let isIdSubmitted = $state(form?.isIDSubmitted || false)
   let otp = $state('')
   let processingForm = $state(false)
 
-  let isIDValidEmail = $derived.by(() => {
+  let isIdValidEmail = $derived.by(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
     return emailRegex.test(id)
   })
 
-  let isOTPCodeValid = $derived.by(() => {
+  let isOtpCodeValid = $derived.by(() => {
     return otp.length > 0
   })
 
@@ -31,7 +31,7 @@
 
 <div class="card w-96 bg-base-100 shadow-sm">
   <div class="card-body">
-    {#if !isIDSubmitted}
+    {#if !isIdSubmitted}
       <form method="POST" action="?/initiateOTP" onsubmit={handleForm}>
         <h2 class="text-3xl font-bold">Login to your account</h2>
         <p class="mt-4 mb-2 text-sm text-gray-500">Enter your email address</p>
@@ -53,7 +53,7 @@
           </div>
           <button
             class="btn btn-primary btn-block"
-            disabled={!isIDValidEmail || processingForm}
+            disabled={!isIdValidEmail || processingForm}
           >
             Continue with email
             {#if processingForm}
@@ -86,7 +86,7 @@
           </div>
           <button
             class="btn btn-primary btn-block"
-            disabled={!isOTPCodeValid || processingForm}
+            disabled={!isOtpCodeValid || processingForm}
           >
             Verify email address
             {#if processingForm}
