@@ -4,7 +4,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   const path = event.url.pathname
   const publicPaths = ['/login']
 
-  const isPublicPath = publicPaths.some(publicPath => publicPath === path)
+  const isPublicPath = publicPaths.some((publicPath) => publicPath === path)
 
   if (!isPublicPath && !event.cookies.get('access_token')) {
     return redirect(303, '/login')
