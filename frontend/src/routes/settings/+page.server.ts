@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types.js';
 import { error } from '@sveltejs/kit'
-import { api } from '$lib/api-fetch-factory.js'
+import { api } from '$lib/api-fetch-factory.ts'
 
 export const load: PageServerLoad = async (event) => {
   const response = await api.get('/api/settings/settings', { event })
