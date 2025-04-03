@@ -46,7 +46,7 @@
           />
         </label>
         <div class="mt-6">
-          <div class="mb-4 text-center">
+          <div class="mb-4">
             {#if form?.error}
               <p>{form.error}</p>
             {/if}
@@ -65,7 +65,7 @@
     {:else}
       <form method="POST" action="?/confirmOTP" onsubmit={handleForm}>
         <input type="hidden" name="request_id" value={form?.request_id}>
-        <input type="hidden" name="email" value={id}> <!-- Added to preserve email for error state -->
+        <input type="hidden" name="email" value={id}>
         <h2 class="text-3xl font-bold">Enter verification code</h2>
         <p class="mt-4 mb-2 text-sm text-gray-500">Enter the code sent to your email {id}</p>
         <label class="form-control w-full max-w-xs">
@@ -79,7 +79,7 @@
           />
         </label>
         <div class="mt-6">
-          <div class="mb-4 text-center">
+          <div class="mb-4">
             {#if form?.error}
               <p>{form.error}</p>
             {/if}

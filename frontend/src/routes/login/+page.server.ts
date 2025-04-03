@@ -64,7 +64,7 @@ export const actions = {
         email,
         request_id: requestId,
         isIDSubmitted: true,
-        error: `Error: ${response.status} ${response.statusText}`,
+        error: 'There was an error verifying your code. If the problem persists contact support for assistance.',
       }
     }
   },
