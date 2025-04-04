@@ -13,6 +13,8 @@
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"baseUrl": ".",
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
 		"paths": {
 			"$lib": ["src/lib"],
 			"$lib/*": ["src/lib/*"],
