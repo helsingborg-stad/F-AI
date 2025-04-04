@@ -5,6 +5,8 @@
   "semi": false,
   "trailingComma": "all",
   "singleQuote": true,
+  "endOfLine": "lf",
+  "insertFinalNewline": true,
   "plugins": [
     "prettier-plugin-svelte",
     "prettier-plugin-tailwindcss"
