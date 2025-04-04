@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit'
-import { api } from '$lib/api-fetch-factory.js'
+import { api } from '$lib/api-fetch-factory.ts'
 
 export const actions = {
   initiateOTP: async (event) => {
@@ -18,12 +18,12 @@ export const actions = {
       return {
         email,
         request_id: responseData.request_id,
-        isIDSubmitted: true,
+        isIdSubmitted: true,
       }
     } else {
       return {
         email,
-        isIDSubmitted: false,
+        isIdSubmitted: false,
         error: `Error: ${response.status} ${response.statusText}`,
       }
     }
@@ -63,7 +63,7 @@ export const actions = {
       return {
         email,
         request_id: requestId,
-        isIDSubmitted: true,
+        isIdSubmitted: true,
         error:
           'There was an error verifying your code. If the problem persists contact support for assistance.',
       }

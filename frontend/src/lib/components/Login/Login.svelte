@@ -1,8 +1,20 @@
 <script lang="ts">
-  let { form } = $props()
+  interface Props {
+    initialId: string
+    initialIsIdSubmitted: boolean
+    errorMessage: string
+    requestId: string
+  }
 
-  let id = $state(form?.email || '')
-  let isIdSubmitted = $state(form?.isIDSubmitted || false)
+  let {
+    initialId,
+    initialIsIdSubmitted,
+    errorMessage,
+    requestId,
+  }: Props = $props()
+
+  let id = $state(initialId)
+  let isIdSubmitted = $state(initialIsIdSubmitted)
   let otp = $state('')
   let processingForm = $state(false)
 
@@ -47,9 +59,7 @@
         </label>
         <div class="mt-6">
           <div class="mb-4">
-            {#if form?.error}
-              <p>{form.error}</p>
-            {/if}
+            <p>{errorMessage}</p>
           </div>
           <button
             class="btn btn-primary btn-block"
@@ -64,7 +74,7 @@
       </form>
     {:else}
       <form method="POST" action="?/confirmOTP" onsubmit={handleForm}>
-        <input type="hidden" name="request_id" value={form?.request_id}>
+        <input type="hidden" name="request_id" value={requestId}>
         <input type="hidden" name="email" value={id}>
         <h2 class="text-3xl font-bold">Enter verification code</h2>
         <p class="mt-4 mb-2 text-sm text-gray-500">Enter the code sent to your email {id}</p>
@@ -80,9 +90,7 @@
         </label>
         <div class="mt-6">
           <div class="mb-4">
-            {#if form?.error}
-              <p>{form.error}</p>
-            {/if}
+            <p>{errorMessage}</p>
           </div>
           <button
             class="btn btn-primary btn-block"
