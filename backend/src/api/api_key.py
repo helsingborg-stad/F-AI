@@ -15,7 +15,7 @@ auth = AuthRouterDecorator(api_key_router)
 
 class CreateApiKeyResponse(BaseModel):
     key: str
-    revokeId: str
+    revoke_id: str
 
 
 @auth.post(
@@ -30,7 +30,7 @@ class CreateApiKeyResponse(BaseModel):
 )
 async def create_api_key(services: ServicesDependency):
     new_key = await services.api_key_service.create_api_key()
-    return CreateApiKeyResponse(key=new_key.api_key, revokeId=new_key.revoke_id)
+    return CreateApiKeyResponse(key=new_key.api_key, revoke_id=new_key.revoke_id)
 
 
 class ListApiKeyResponse(BaseModel):

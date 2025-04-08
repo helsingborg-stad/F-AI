@@ -24,12 +24,13 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         if required_scopes is None:
             required_scopes = []
 
-        responses = get_auth_responses(response_400_description)
+        responses = get_auth_responses(response_400_description, response_404_description)
 
         def inner_decorator(func):
             security_dependency = Security(auth_route_dependency, scopes=required_scopes)
@@ -61,6 +62,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -72,6 +74,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )
 
@@ -84,6 +87,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -95,6 +99,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )
 
@@ -107,6 +112,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -118,6 +124,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )
 
@@ -130,6 +137,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -141,6 +149,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )
 
@@ -153,6 +162,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -164,5 +174,6 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )

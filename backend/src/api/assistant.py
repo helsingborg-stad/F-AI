@@ -20,6 +20,7 @@ class CreateAssistantResponse(BaseModel):
     '',
     ['assistant.write'],
     response_model=CreateAssistantResponse,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_assistant(services: ServicesDependency):
     new_id = await services.assistant_service.create_assistant()
@@ -47,6 +48,7 @@ class GetAssistantResponse(BaseModel):
     '/{assistant_id}',
     ['assistant.read'],
     response_model=GetAssistantResponse,
+    response_404_description='Assistant not found',
 )
 async def get_assistant(assistant_id: str, services: ServicesDependency):
     result = await services.assistant_service.get_assistant(assistant_id)
@@ -112,9 +114,10 @@ class UpdateAssistantRequest(BaseModel):
 @auth.put(
     '/{assistant_id}',
     ['assistant.write'],
+    response_404_description='Assistant not found',
 )
 async def update_assistant(assistant_id: str, body: UpdateAssistantRequest, services: ServicesDependency):
-    await services.assistant_service.update_assistant(
+    success = await services.assistant_service.update_assistant(
         assistant_id,
         name=body.name,
         description=body.description,
@@ -128,6 +131,9 @@ async def update_assistant(assistant_id: str, body: UpdateAssistantRequest, serv
         collection_id=body.collection_id,
     )
 
+    if not success:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
 
 class DeleteAssistantRequest(BaseModel):
     assistant_id: str
@@ -136,6 +142,7 @@ class DeleteAssistantRequest(BaseModel):
 @auth.delete(
     '/{assistant_id}',
     ['assistant.write'],
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_assistant(assistant_id: str, services: ServicesDependency):
     await services.assistant_service.delete_assistant(assistant_id)

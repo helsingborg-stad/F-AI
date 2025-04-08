@@ -46,10 +46,20 @@ _auth_responses = {
 }
 
 
-def get_auth_responses(additional_400_description: str | None = None) -> dict[int, dict]:
+def get_auth_responses(
+        additional_400_description: str | None = None,
+        optional_404_description: str | None = None
+) -> dict[int, dict]:
     result = copy.deepcopy(_auth_responses)
 
     if additional_400_description:
         result[400]["description"] = f"One of:\n\n* {additional_400_description}\n{_auth_responses[400]['description']}"
+
+    if optional_404_description:
+        result[404] = {
+            "description": optional_404_description,
+            "model": CommonHTTPErrorResponse,
+            "content": {"application/json": {"example": CommonHTTPErrorResponse(detail="Not Found")}}
+        }
 
     return result

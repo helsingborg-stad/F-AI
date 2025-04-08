@@ -12,61 +12,6 @@ conversation_router = APIRouter(
 auth = AuthRouterDecorator(conversation_router)
 
 
-class CreateConversationRequest(BaseModel):
-    assistant_id: str
-
-
-class CreateConversationResponse(BaseModel):
-    conversation_id: str
-
-
-@auth.post(
-    '',
-    ['conversation.write'],
-    response_model=CreateConversationResponse,
-)
-async def create_conversation(body: CreateConversationRequest,
-                              services: ServicesDependency):
-    result = await services.conversation_service.create_conversation(body.assistant_id)
-    return CreateConversationResponse(conversation_id=result)
-
-
-class GetConversationResponseConversationMessage(BaseModel):
-    timestamp: str
-    role: str
-    content: str
-
-
-class GetConversationResponseConversation(BaseModel):
-    assistant_id: str
-    messages: list[GetConversationResponseConversationMessage]
-
-
-class GetConversationResponse(BaseModel):
-    conversation: GetConversationResponseConversation
-
-
-@auth.get(
-    '/{conversation_id}',
-    ['conversation.read'],
-    response_model=GetConversationResponse,
-)
-async def get_conversation(conversation_id: str, services: ServicesDependency):
-    result = await services.conversation_service.get_conversation(conversation_id)
-
-    if not result:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-    return GetConversationResponse(conversation=GetConversationResponseConversation(
-        assistant_id=result.assistant_id,
-        messages=[GetConversationResponseConversationMessage(
-            timestamp=message.timestamp,
-            role=message.role,
-            content=message.content
-        ) for message in result.messages]
-    ))
-
-
 class GetConversationsResponseConversation(BaseModel):
     id: str
     timestamp: str
@@ -94,6 +39,45 @@ async def get_conversations(services: ServicesDependency):
     ])
 
 
+class GetConversationResponseConversationMessage(BaseModel):
+    timestamp: str
+    role: str
+    content: str
+
+
+class GetConversationResponseConversation(BaseModel):
+    title: str
+    assistant_id: str
+    messages: list[GetConversationResponseConversationMessage]
+
+
+class GetConversationResponse(BaseModel):
+    conversation: GetConversationResponseConversation
+
+
+@auth.get(
+    '/{conversation_id}',
+    ['conversation.read'],
+    response_model=GetConversationResponse,
+    response_404_description='Conversation not found'
+)
+async def get_conversation(conversation_id: str, services: ServicesDependency):
+    result = await services.conversation_service.get_conversation(conversation_id)
+
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return GetConversationResponse(conversation=GetConversationResponseConversation(
+        title=result.title,
+        assistant_id=result.assistant_id,
+        messages=[GetConversationResponseConversationMessage(
+            timestamp=message.timestamp,
+            role=message.role,
+            content=message.content
+        ) for message in result.messages]
+    ))
+
+
 class SetConversationTitleRequest(BaseModel):
     title: str
 
@@ -101,9 +85,13 @@ class SetConversationTitleRequest(BaseModel):
 @auth.patch(
     '/{conversation_id}/title',
     ['conversation.write'],
+    response_404_description='Conversation not found'
 )
 async def set_conversation_title(conversation_id: str, body: SetConversationTitleRequest, services: ServicesDependency):
-    await services.conversation_service.set_conversation_title(conversation_id, body.title)
+    success = await services.conversation_service.set_conversation_title(conversation_id, body.title)
+
+    if not success:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @auth.delete(

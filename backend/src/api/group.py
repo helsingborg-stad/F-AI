@@ -45,26 +45,12 @@ async def create_group(
     return CreateGroupResponse(group_id=group_id)
 
 
-class DeleteGroupRequest(BaseModel):
-    group_id: str
-
-
-@auth.delete(
-    '',
-    ['group.write'],
-    summary='Delete group',
-    description='',
-    status_code=status.HTTP_204_NO_CONTENT
-)
-async def delete_group(body: DeleteGroupRequest, auth_identity: AuthenticatedIdentity, services: ServicesDependency):
-    await services.group_service.delete_group(as_uid=auth_identity.uid, group_id=body.group_id)
-
-
 class ListGroupsResponseGroup(BaseModel):
     id: str
     label: str
     members: list[str]
     scopes: list[str]
+    resources: list[str]
 
 
 class ListGroupsResponse(BaseModel):
@@ -85,7 +71,8 @@ async def list_groups(auth_identity: AuthenticatedIdentity, services: ServicesDe
             id=group.id,
             label=group.label,
             members=group.members,
-            scopes=group.scopes
+            scopes=group.scopes,
+            resources=group.resources
         ) for group in groups
     ])
 
@@ -94,22 +81,29 @@ class GetGroupResponse(BaseModel):
     label: str
     members: list[str]
     scopes: list[str]
+    resources: list[str]
 
 
 @auth.get(
-    '{group_id}',
+    '/{group_id}',
     ['group.read'],
     summary='Get group',
     description='',
-    response_model=GetGroupResponse
+    response_model=GetGroupResponse,
+    response_404_description='Group not found'
 )
 async def get_group(group_id: str, auth_identity: AuthenticatedIdentity, services: ServicesDependency):
     group = await services.group_service.get_group_by_id(as_uid=auth_identity.uid, group_id=group_id)
 
     if group is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Group not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    return GetGroupResponse(label=group.label, members=group.members, scopes=group.scopes)
+    return GetGroupResponse(
+        label=group.label,
+        members=group.members,
+        scopes=group.scopes,
+        resources=group.resources
+    )
 
 
 class SetGroupMembersRequest(BaseModel):
@@ -117,14 +111,19 @@ class SetGroupMembersRequest(BaseModel):
 
 
 @auth.patch(
-    '{group_id}/members',
+    '/{group_id}/members',
     ['group.write'],
     summary='Set group members',
-    description=''
+    description='',
+    response_404_description='Group not found'
 )
 async def set_group_members(group_id: str, body: SetGroupMembersRequest, auth_identity: AuthenticatedIdentity,
                             services: ServicesDependency):
-    await services.group_service.set_group_members(as_uid=auth_identity.uid, group_id=group_id, members=body.members)
+    success = await services.group_service.set_group_members(as_uid=auth_identity.uid, group_id=group_id,
+                                                             members=body.members)
+
+    if not success:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 class SetGroupScopesRequest(BaseModel):
@@ -132,32 +131,41 @@ class SetGroupScopesRequest(BaseModel):
 
 
 @auth.patch(
-    '{group_id}/scopes',
+    '/{group_id}/scopes',
     ['group.write'],
     summary='Set group scopes',
-    description=''
+    description='',
+    response_404_description='Group not found'
 )
 async def set_group_scopes(group_id: str, body: SetGroupScopesRequest, auth_identity: AuthenticatedIdentity,
                            services: ServicesDependency):
     if not await services.authorization_service.has_scopes(auth_identity, body.scopes):
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Attempting to set scope(s) outside of caller's scopes")
 
-    await services.group_service.set_group_scopes(as_uid=auth_identity.uid, group_id=group_id, scopes=body.scopes)
+    success = await services.group_service.set_group_scopes(as_uid=auth_identity.uid, group_id=group_id,
+                                                            scopes=body.scopes)
+
+    if not success:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @auth.put(
-    '{group_id}/resources/{resource_id}',
+    '/{group_id}/resources/{resource_id}',
     ['group.write'],
     summary='Add resource to group',
+    response_404_description='Group not found'
 )
 async def add_group_resource(group_id: str, resource_id: str, auth_identity: AuthenticatedIdentity,
                              services: ServicesDependency):
-    await services.group_service.add_group_resource(as_uid=auth_identity.uid, group_id=group_id,
-                                                    resource_id=resource_id)
+    success = await services.group_service.add_group_resource(as_uid=auth_identity.uid, group_id=group_id,
+                                                              resource=resource_id)
+
+    if not success:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @auth.delete(
-    '{group_id}/resources/{resource_id}',
+    '/{group_id}/resources/{resource_id}',
     ['group.write'],
     summary='Delete resource from group',
     status_code=status.HTTP_204_NO_CONTENT
@@ -165,4 +173,15 @@ async def add_group_resource(group_id: str, resource_id: str, auth_identity: Aut
 async def delete_group_resource(group_id: str, resource_id: str, auth_identity: AuthenticatedIdentity,
                                 services: ServicesDependency):
     await services.group_service.remove_group_resource(as_uid=auth_identity.uid, group_id=group_id,
-                                                       resource_id=resource_id)
+                                                       resource=resource_id)
+
+
+@auth.delete(
+    '/{group_id}',
+    ['group.write'],
+    summary='Delete group',
+    description='',
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_group(group_id: str, auth_identity: AuthenticatedIdentity, services: ServicesDependency):
+    await services.group_service.delete_group(as_uid=auth_identity.uid, group_id=group_id)

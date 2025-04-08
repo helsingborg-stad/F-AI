@@ -24,16 +24,16 @@ class IGroupService(Protocol):
     async def get_groups_by_member(self, member: str) -> list[Group]:
         ...
 
-    async def set_group_members(self, as_uid: str, group_id: str, members: list[str]):
+    async def set_group_members(self, as_uid: str, group_id: str, members: list[str]) -> bool:
         ...
 
-    async def set_group_scopes(self, as_uid: str, group_id: str, scopes: list[str]):
+    async def set_group_scopes(self, as_uid: str, group_id: str, scopes: list[str]) -> bool:
         ...
 
-    async def add_group_resource(self, as_uid: str, group_id: str, resource: str):
+    async def add_group_resource(self, as_uid: str, group_id: str, resource: str) -> bool:
         ...
 
-    async def remove_group_resource(self, as_uid: str, group_id: str, resource: str):
+    async def remove_group_resource(self, as_uid: str, group_id: str, resource: str) -> bool:
         ...
 
     async def delete_group(self, as_uid: str, group_id: str):

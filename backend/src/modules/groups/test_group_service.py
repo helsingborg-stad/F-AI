@@ -167,9 +167,10 @@ class BaseGroupServiceTestClass:
     async def test_set_group_members(service: IGroupService):
         group_id = await service.create_group('john', '1', [], ['x'], ['a'])
 
-        await service.set_group_members(as_uid='john', group_id=group_id, members=['john'])
+        success = await service.set_group_members(as_uid='john', group_id=group_id, members=['john'])
         result = await service.get_group_by_id(as_uid='john', group_id=group_id)
 
+        assert success is True
         assert result.id == group_id
         assert result.members == ['john']
 
@@ -179,10 +180,12 @@ class BaseGroupServiceTestClass:
     async def test_set_group_members_twice(service: IGroupService):
         group_id = await service.create_group('john', '1', [], ['x'], ['a'])
 
-        await service.set_group_members(as_uid='john', group_id=group_id, members=['john'])
-        await service.set_group_members(as_uid='john', group_id=group_id, members=['jane', 'pete'])
+        success1 = await service.set_group_members(as_uid='john', group_id=group_id, members=['john'])
+        success2 = await service.set_group_members(as_uid='john', group_id=group_id, members=['jane', 'pete'])
         result = await service.get_group_by_id(as_uid='john', group_id=group_id)
 
+        assert success1 is True
+        assert success2 is True
         assert result.members == ['jane', 'pete']
 
     @staticmethod
@@ -191,9 +194,10 @@ class BaseGroupServiceTestClass:
     async def test_set_group_members_invalid_uid(service: IGroupService):
         group_id = await service.create_group('john', '1', ['jane'], ['x'], ['a'])
 
-        await service.set_group_members(as_uid='pete', group_id=group_id, members=['emma'])
+        success = await service.set_group_members(as_uid='pete', group_id=group_id, members=['emma'])
         result = await service.get_group_by_id(as_uid='john', group_id=group_id)
 
+        assert success is False
         assert result.id == group_id
         assert result.members == ['jane']
 
@@ -201,9 +205,10 @@ class BaseGroupServiceTestClass:
     @pytest.mark.asyncio
     @pytest.mark.mongo
     async def test_set_group_members_invalid_id(service: IGroupService):
-        await service.set_group_members(as_uid='john', group_id='does not exist', members=['john'])
+        success = await service.set_group_members(as_uid='john', group_id='does not exist', members=['john'])
         result = await service.get_group_by_id(as_uid='john', group_id='does not exist')
 
+        assert success is False
         assert result is None
 
     @staticmethod
@@ -212,9 +217,10 @@ class BaseGroupServiceTestClass:
     async def test_set_group_scopes(service: IGroupService):
         group_id = await service.create_group('john', '1', [], ['x'], [])
 
-        await service.set_group_scopes(as_uid='john', group_id=group_id, scopes=['y', 'z'])
+        success = await service.set_group_scopes(as_uid='john', group_id=group_id, scopes=['y', 'z'])
         result = await service.get_group_by_id(as_uid='john', group_id=group_id)
 
+        assert success is True
         assert result.scopes == ['y', 'z']
 
     @staticmethod
@@ -223,19 +229,21 @@ class BaseGroupServiceTestClass:
     async def test_set_group_scopes_invalid_uid(service: IGroupService):
         group_id = await service.create_group('john', '1', [], ['x'], [])
 
-        await service.set_group_scopes(as_uid='jane', group_id=group_id, scopes=['y', 'z'])
+        success = await service.set_group_scopes(as_uid='jane', group_id=group_id, scopes=['y', 'z'])
         result = await service.get_group_by_id(as_uid='john', group_id=group_id)
 
+        assert success is False
         assert result.scopes == ['x']
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
     async def test_set_group_scopes_invalid_id(service: IGroupService):
-        await service.set_group_scopes(as_uid='john', group_id='does not exist', scopes=['y', 'z'])
+        success = await service.set_group_scopes(as_uid='john', group_id='does not exist', scopes=['y', 'z'])
 
         result = await service.get_group_by_id(as_uid='john', group_id='does not exist')
 
+        assert success is False
         assert result is None
 
     @staticmethod
@@ -244,10 +252,12 @@ class BaseGroupServiceTestClass:
     async def test_add_group_resource(service: IGroupService):
         group_id = await service.create_group('john', '1', [], [], ['a'])
 
-        await service.add_group_resource(as_uid='john', group_id=group_id, resource='a')
-        await service.add_group_resource(as_uid='john', group_id=group_id, resource='b')
+        success1 = await service.add_group_resource(as_uid='john', group_id=group_id, resource='a')
+        success2 = await service.add_group_resource(as_uid='john', group_id=group_id, resource='b')
         result = await service.get_group_by_id(as_uid='john', group_id=group_id)
 
+        assert success1 is True
+        assert success2 is True
         assert result.resources == ['a', 'b']
 
     @staticmethod
@@ -256,19 +266,21 @@ class BaseGroupServiceTestClass:
     async def test_add_group_resource_invalid_uid(service: IGroupService):
         group_id = await service.create_group('john', '1', [], [], ['a'])
 
-        await service.add_group_resource(as_uid='jane', group_id=group_id, resource='b')
+        success = await service.add_group_resource(as_uid='jane', group_id=group_id, resource='b')
         result = await service.get_group_by_id(as_uid='john', group_id=group_id)
 
+        assert success is False
         assert result.resources == ['a']
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
     async def test_add_group_resource_invalid_id(service: IGroupService):
-        await service.add_group_resource(as_uid='john', group_id='does not exist', resource='a')
+        success = await service.add_group_resource(as_uid='john', group_id='does not exist', resource='a')
 
         result = await service.get_group_by_id(as_uid='john', group_id='does not exist')
 
+        assert success is False
         assert result is None
 
     @staticmethod
@@ -277,10 +289,12 @@ class BaseGroupServiceTestClass:
     async def test_remove_group_resource(service: IGroupService):
         group_id = await service.create_group('john', '1', [], ['x'], ['a', 'b'])
 
-        await service.remove_group_resource(as_uid='john', group_id=group_id, resource='a')
-        await service.remove_group_resource(as_uid='john', group_id=group_id, resource='c')
+        success1 = await service.remove_group_resource(as_uid='john', group_id=group_id, resource='a')
+        success2 = await service.remove_group_resource(as_uid='john', group_id=group_id, resource='c')
         result = await service.get_group_by_id(as_uid='john', group_id=group_id)
 
+        assert success1 is True
+        assert success2 is True
         assert result.resources == ['b']
 
     @staticmethod
@@ -289,19 +303,21 @@ class BaseGroupServiceTestClass:
     async def test_remove_group_resource_invalid_uid(service: IGroupService):
         group_id = await service.create_group('john', '1', [], ['x'], ['a', 'b'])
 
-        await service.remove_group_resource(as_uid='jane', group_id=group_id, resource='a')
+        success = await service.remove_group_resource(as_uid='jane', group_id=group_id, resource='a')
         result = await service.get_group_by_id(as_uid='john', group_id=group_id)
 
+        assert success is False
         assert result.resources == ['a', 'b']
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
     async def test_remove_group_resource_invalid_id(service: IGroupService):
-        await service.remove_group_resource(as_uid='john', group_id='does not exist', resource='a')
+        success = await service.remove_group_resource(as_uid='john', group_id='does not exist', resource='a')
 
         result = await service.get_group_by_id(as_uid='john', group_id='does not exist')
 
+        assert success is False
         assert result is None
 
     @staticmethod

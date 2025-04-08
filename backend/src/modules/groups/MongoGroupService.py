@@ -71,41 +71,49 @@ class MongoGroupService(IGroupService):
 
         return direct_groups + matching_indirect_groups
 
-    async def set_group_members(self, as_uid: str, group_id: str, members: list[str]):
+    async def set_group_members(self, as_uid: str, group_id: str, members: list[str]) -> bool:
         if not is_valid_mongo_id(group_id):
-            return
+            return False
 
-        await self._database['groups'].update_one(
+        result = await self._database['groups'].update_one(
             {'_id': ObjectId(group_id), 'owner': as_uid},
             {'$set': {'members': members}}
         )
 
-    async def set_group_scopes(self, as_uid: str, group_id: str, scopes: list[str]):
-        if not is_valid_mongo_id(group_id):
-            return
+        return result.modified_count == 1
 
-        await self._database['groups'].update_one(
+    async def set_group_scopes(self, as_uid: str, group_id: str, scopes: list[str]) -> bool:
+        if not is_valid_mongo_id(group_id):
+            return False
+
+        result = await self._database['groups'].update_one(
             {'_id': ObjectId(group_id), 'owner': as_uid},
             {'$set': {'scopes': scopes}}
         )
 
-    async def add_group_resource(self, as_uid: str, group_id: str, resource: str):
-        if not is_valid_mongo_id(group_id):
-            return
+        return result.modified_count == 1
 
-        await self._database['groups'].update_one(
+    async def add_group_resource(self, as_uid: str, group_id: str, resource: str) -> bool:
+        if not is_valid_mongo_id(group_id):
+            return False
+
+        result = await self._database['groups'].update_one(
             {'_id': ObjectId(group_id), 'owner': as_uid},
             {'$addToSet': {'resources': resource}}
         )
 
-    async def remove_group_resource(self, as_uid: str, group_id: str, resource: str):
-        if not is_valid_mongo_id(group_id):
-            return
+        return result.matched_count == 1
 
-        await self._database['groups'].update_one(
+    async def remove_group_resource(self, as_uid: str, group_id: str, resource: str) -> bool:
+        if not is_valid_mongo_id(group_id):
+            return False
+
+        result = await self._database['groups'].update_one(
             {'_id': ObjectId(group_id), 'owner': as_uid},
             {'$pull': {'resources': resource}}
         )
+
+        return result.matched_count == 1
 
     async def delete_group(self, as_uid: str, group_id: str):
         if not is_valid_mongo_id(group_id):
