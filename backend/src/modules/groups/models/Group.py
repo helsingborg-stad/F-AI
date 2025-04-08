@@ -7,3 +7,4 @@ class Group(BaseModel):
     label: str
     members: list[str]
     scopes: list[str]
+    resources: list[str]

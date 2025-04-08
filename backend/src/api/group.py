@@ -1,4 +1,3 @@
-from bson import ObjectId
 from fastapi import APIRouter, status, HTTPException
 from pydantic import BaseModel
 
@@ -18,23 +17,32 @@ class CreateGroupRequest(BaseModel):
     label: str
 
 
+class CreateGroupResponse(BaseModel):
+    group_id: str
+
+
 @auth.post(
     '',
     ['group.write'],
     summary='Create new group',
-    description=''
+    description='',
+    response_model=CreateGroupResponse,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_group(
         body: CreateGroupRequest,
         auth_identity: AuthenticatedIdentity,
         services: ServicesDependency
 ):
-    await services.group_service.create_group(
-        owner=auth_identity.uid,
+    group_id = await services.group_service.create_group(
+        as_uid=auth_identity.uid,
         label=body.label,
         members=[],
-        scopes=[]
+        scopes=[],
+        resources=[]
     )
+
+    return CreateGroupResponse(group_id=group_id)
 
 
 class DeleteGroupRequest(BaseModel):
@@ -45,10 +53,11 @@ class DeleteGroupRequest(BaseModel):
     '',
     ['group.write'],
     summary='Delete group',
-    description=''
+    description='',
+    status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_group(body: DeleteGroupRequest, services: ServicesDependency):
-    await services.group_service.delete_group(group_id=body.group_id)
+async def delete_group(body: DeleteGroupRequest, auth_identity: AuthenticatedIdentity, services: ServicesDependency):
+    await services.group_service.delete_group(as_uid=auth_identity.uid, group_id=body.group_id)
 
 
 class ListGroupsResponseGroup(BaseModel):
@@ -69,8 +78,8 @@ class ListGroupsResponse(BaseModel):
     description='',
     response_model=ListGroupsResponse
 )
-async def list_groups(services: ServicesDependency):
-    groups = await services.group_service.get_groups()
+async def list_groups(auth_identity: AuthenticatedIdentity, services: ServicesDependency):
+    groups = await services.group_service.get_owned_groups(as_uid=auth_identity.uid)
     return ListGroupsResponse(groups=[
         ListGroupsResponseGroup(
             id=group.id,
@@ -94,8 +103,8 @@ class GetGroupResponse(BaseModel):
     description='',
     response_model=GetGroupResponse
 )
-async def get_group(group_id: str, services: ServicesDependency):
-    group = await services.group_service.get_group_by_id(group_id=group_id)
+async def get_group(group_id: str, auth_identity: AuthenticatedIdentity, services: ServicesDependency):
+    group = await services.group_service.get_group_by_id(as_uid=auth_identity.uid, group_id=group_id)
 
     if group is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Group not found')
@@ -113,8 +122,9 @@ class SetGroupMembersRequest(BaseModel):
     summary='Set group members',
     description=''
 )
-async def set_group_members(group_id: str, body: SetGroupMembersRequest, services: ServicesDependency):
-    await services.group_service.set_group_members(group_id=group_id, members=body.members)
+async def set_group_members(group_id: str, body: SetGroupMembersRequest, auth_identity: AuthenticatedIdentity,
+                            services: ServicesDependency):
+    await services.group_service.set_group_members(as_uid=auth_identity.uid, group_id=group_id, members=body.members)
 
 
 class SetGroupScopesRequest(BaseModel):
@@ -127,9 +137,32 @@ class SetGroupScopesRequest(BaseModel):
     summary='Set group scopes',
     description=''
 )
-async def set_group_scopes(group_id: str, body: SetGroupScopesRequest, services: ServicesDependency,
-                           auth_identity: AuthenticatedIdentity):
+async def set_group_scopes(group_id: str, body: SetGroupScopesRequest, auth_identity: AuthenticatedIdentity,
+                           services: ServicesDependency):
     if not await services.authorization_service.has_scopes(auth_identity, body.scopes):
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Attempting to set scope(s) outside of caller's scopes")
 
-    await services.group_service.set_group_scopes(group_id=group_id, scopes=body.scopes)
+    await services.group_service.set_group_scopes(as_uid=auth_identity.uid, group_id=group_id, scopes=body.scopes)
+
+
+@auth.put(
+    '{group_id}/resources/{resource_id}',
+    ['group.write'],
+    summary='Add resource to group',
+)
+async def add_group_resource(group_id: str, resource_id: str, auth_identity: AuthenticatedIdentity,
+                             services: ServicesDependency):
+    await services.group_service.add_group_resource(as_uid=auth_identity.uid, group_id=group_id,
+                                                    resource_id=resource_id)
+
+
+@auth.delete(
+    '{group_id}/resources/{resource_id}',
+    ['group.write'],
+    summary='Delete resource from group',
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_group_resource(group_id: str, resource_id: str, auth_identity: AuthenticatedIdentity,
+                                services: ServicesDependency):
+    await services.group_service.remove_group_resource(as_uid=auth_identity.uid, group_id=group_id,
+                                                       resource_id=resource_id)
