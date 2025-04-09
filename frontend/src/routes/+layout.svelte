@@ -3,19 +3,24 @@
   import { page } from '$app/state'
 
   import Navbar from '$lib/components/Navbar/Navbar.svelte'
+  import { hasScope, setUser } from '$lib/state/user.svelte.js'
 
-  let { children } = $props()
+  let { children, data } = $props()
+
+  setUser(data.user)
 
   const NAVBAR_TITLE = 'Folkets AI'
 
   const navBarItems = [
     { label: 'Chat', path: '/chat' },
     { label: 'Assistants', path: '/assistant' },
-    { label: 'Settings', path: '/settings' },
   ]
 
-  let showNavbar = $derived(!page.url.pathname.startsWith('/login'))
+  if (hasScope('settings.read')) {
+    navBarItems.push({ label: 'Settings', path: '/settings' })
+  }
 
+  let showNavbar = $derived(!page.url.pathname.startsWith('/login'))
 </script>
 
 <!--
