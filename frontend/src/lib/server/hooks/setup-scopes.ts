@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { api } from '$lib/api-fetch-factory.js'
-import type { ScopesResponse } from '$lib/types.js'
+import type { IScopesResponse } from '$lib/types.js'
 
 export async function setupScopes(
   event: RequestEvent<Partial<Record<string, string>>, string | null>,
@@ -23,7 +23,7 @@ export async function setupScopes(
       const scopesResponse = await api.get('/api/auth/scopes', { withAuth: true, event })
 
       if (scopesResponse.ok) {
-        const scopesData: ScopesResponse = await scopesResponse.json()
+        const scopesData: IScopesResponse = await scopesResponse.json()
 
         event.locals.user = {
           authenticated: true,

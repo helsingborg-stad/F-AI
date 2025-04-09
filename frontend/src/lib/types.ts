@@ -22,7 +22,7 @@ export type HistoryItemType = {
   created: Date
 }
 
-export type UserScope =
+export type UserScopeType =
   | 'collection.read'
   | 'collection.write'
   | 'settings.read'
@@ -36,14 +36,14 @@ export type UserScope =
   | 'llm.run'
   | string // Allow for future scopes
 
-export interface UserInfo {
+export interface IUserInfo {
   authenticated: boolean
   email: string
-  scopes: UserScope[]
+  scopes: UserScopeType[]
 }
 
-export interface ScopesResponse {
-  scopes: UserScope[]
+export interface IScopesResponse {
+  scopes: UserScopeType[]
 }
 
 // Dummy export to prevent empty module at runtime.
