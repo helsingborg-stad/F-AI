@@ -6,8 +6,13 @@ export const userState = $state<IUserInfo>({
 })
 
 export function setUser(userData: IUserInfo) {
-  userState.email = userData.email
-  userState.scopes = userData.scopes
+  if ('email' in userData) {
+    userState.email = userData.email
+  }
+
+  if ('scopes' in userData) {
+    userState.scopes = userData.scopes
+  }
 }
 
 export function clearUser() {
@@ -16,13 +21,17 @@ export function clearUser() {
 }
 
 export function hasScope(scope: UserScopeType): boolean {
-  return userState.scopes.includes(scope)
+  return userState.scopes ? userState.scopes.includes(scope) : false
 }
 
 export function hasAllScopes(requiredScopes: UserScopeType[]): boolean {
-  return requiredScopes.every((scope) => userState.scopes.includes(scope))
+  return requiredScopes.every((scope) =>
+    userState.scopes ? userState.scopes.includes(scope) : false,
+  )
 }
 
 export function hasAnyScope(possibleScopes: UserScopeType[]): boolean {
-  return possibleScopes.some((scope) => userState.scopes.includes(scope))
+  return possibleScopes.some((scope) =>
+    userState.scopes ? userState.scopes.includes(scope) : false,
+  )
 }

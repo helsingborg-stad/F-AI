@@ -13,8 +13,8 @@ export async function setupScopes(
 
   // Set default values
   event.locals.user = {
+    ...event.locals.user,
     scopes: [],
-    email: '',
   }
 
   if (accessToken && !isPublicPath) {
@@ -26,7 +26,6 @@ export async function setupScopes(
 
         event.locals.user = {
           scopes: scopesData.scopes || [],
-          email: '',
         }
       }
     } catch (e) {
