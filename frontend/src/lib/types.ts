@@ -37,7 +37,6 @@ export type UserScopeType =
   | string // Allow for future scopes
 
 export interface IUserInfo {
-  authenticated: boolean
   email: string
   scopes: UserScopeType[]
 }

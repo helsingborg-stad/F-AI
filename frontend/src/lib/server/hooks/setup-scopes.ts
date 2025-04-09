@@ -13,7 +13,6 @@ export async function setupScopes(
 
   // Set default values
   event.locals.user = {
-    authenticated: false,
     scopes: [],
     email: '',
   }
@@ -26,7 +25,6 @@ export async function setupScopes(
         const scopesData: IScopesResponse = await scopesResponse.json()
 
         event.locals.user = {
-          authenticated: true,
           scopes: scopesData.scopes || [],
           email: '',
         }

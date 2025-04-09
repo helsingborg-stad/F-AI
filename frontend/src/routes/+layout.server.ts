@@ -1,5 +1,5 @@
 export function load({ locals }) {
   return {
-    user: locals.user || { authenticated: false, scopes: [], email: '' },
+    user: locals.user || { scopes: [], email: '' },
   }
 }
