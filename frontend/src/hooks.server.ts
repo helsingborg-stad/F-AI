@@ -1,14 +1,13 @@
 import { type Handle, redirect } from '@sveltejs/kit'
+import { handleAccess } from '$lib/server/hooks/handle-access.js'
+import { setupScopes } from '$lib/server/hooks/setup-scopes.js'
+import { compose } from '$lib/server/hooks/compose.js'
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const path = event.url.pathname
-  const publicPaths = ['/login']
-
-  const isPublicPath = publicPaths.some((publicPath) => publicPath === path)
-
-  if (!isPublicPath && !event.cookies.get('access_token')) {
-    return redirect(303, '/login')
-  }
+  event = await compose(
+    handleAccess,
+    setupScopes
+  )(event)
 
   const response = await resolve(event)
 
