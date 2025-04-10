@@ -36,10 +36,12 @@ class BaseAssistantServiceTestClass:
         await service.update_assistant(as_uid='john', assistant_id=aid, llm_api_key='my_secret_key')
 
         result1 = await service.get_assistant(as_uid='john', assistant_id=aid)
-        result2 = await service.get_owned_assistants(as_uid='john')
+        result2 = await service.get_assistant(as_uid='john', assistant_id=aid, redact_key=False)
+        result3 = await service.get_owned_assistants(as_uid='john')
 
         assert 'my_secret_key' not in result1.llm_api_key
-        assert 'my_secret_key' not in result2[0].llm_api_key
+        assert 'my_secret_key' in result2.llm_api_key
+        assert 'my_secret_key' not in result3[0].llm_api_key
 
     @staticmethod
     @pytest.mark.asyncio

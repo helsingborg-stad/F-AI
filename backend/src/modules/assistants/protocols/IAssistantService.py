@@ -7,7 +7,7 @@ class IAssistantService(Protocol):
     async def create_assistant(self, as_uid: str) -> str:
         ...
 
-    async def get_assistant(self, as_uid: str, assistant_id: str) -> Assistant | None:
+    async def get_assistant(self, as_uid: str, assistant_id: str, redact_key: bool = True) -> Assistant | None:
         ...
 
     async def get_owned_assistants(self, as_uid: str) -> list[Assistant]:

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
+from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
 from src.modules.chat.event_source_llm_generator import event_source_llm_generator
 
 chat_router = APIRouter(
@@ -31,17 +32,30 @@ class BufferedChatResponse(BaseModel):
     description='Chat against an assistant. The response is buffered and returned in full once completed.',
     response_model=BufferedChatResponse
 )
-async def buffered_chat(body: BufferedChatRequest, services: ServicesDependency):
+async def buffered_chat(body: BufferedChatRequest, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
     conversation_id = ''
     final_source = ''
     final_message = ''
 
-    async for delta in services.chat_service.start_new_chat(body.assistant_id, body.message):
-        if delta.event == 'conversation_id':
-            conversation_id = delta.conversation_id
-        if delta.event == 'message':
-            final_source = delta.source
-            final_message += delta.message
+    async for delta in services.chat_service.start_new_chat(
+            as_uid=auth_identity.uid,
+            assistant_id=body.assistant_id,
+            message=body.message
+    ):
+        match delta.event:
+            case 'conversation_id':
+                conversation_id = delta.conversation_id
+            case 'message':
+                final_source = delta.source
+                final_message += delta.message
+            case 'error':
+                return BufferedChatResponse(
+                    conversation_id="",
+                    source="error",
+                    message=delta.message
+                )
+            case _:
+                print(f'unhandled chat event {delta.event}')
 
     return BufferedChatResponse(
         conversation_id=conversation_id,
@@ -69,14 +83,32 @@ The response is buffered and returned in full once completed.
 ''',
     response_model=BufferedChatContinueResponse
 )
-async def buffered_chat_continue(body: BufferedChatContinueRequest, conversation_id: str, services: ServicesDependency):
+async def buffered_chat_continue(
+        body: BufferedChatContinueRequest,
+        conversation_id: str,
+        services: ServicesDependency,
+        auth_identity: AuthenticatedIdentity
+):
     final_source = ''
     final_message = ''
 
-    async for delta in services.chat_service.continue_chat(conversation_id, body.message):
-        if delta.event == 'message':
-            final_source = delta.source
-            final_message += delta.message
+    async for delta in services.chat_service.continue_chat(
+            as_uid=auth_identity.uid,
+            conversation_id=conversation_id,
+            message=body.message
+    ):
+        match delta.event:
+            case 'message':
+                final_source = delta.source
+                final_message += delta.message
+            case 'error':
+                return BufferedChatResponse(
+                    conversation_id="",
+                    source="error",
+                    message=delta.message
+                )
+            case _:
+                print(f'unhandled chat event {delta.event}')
 
     return BufferedChatContinueResponse(
         source=final_source,
@@ -121,13 +153,19 @@ Chat against an assistant.
 The response is streamed using Server-Side Events.
     '''
 )
-async def stream_chat(assistant_id: str, stored_message_id: str, services: ServicesDependency):
+async def stream_chat(
+        assistant_id: str,
+        stored_message_id: str,
+        services: ServicesDependency,
+        auth_identity: AuthenticatedIdentity
+):
     message = await services.message_store_service.consume_message(stored_message_id=stored_message_id)
 
     if message is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, 'Invalid stored message')
 
     return await event_source_llm_generator(
+        calling_uid=auth_identity.uid,
         assistant_or_conversation_id=assistant_id,
         start_new_conversation=True,
         user_message=message,
@@ -144,13 +182,19 @@ Chat against an assistant by continuing an existing conversation.
 The response is streamed using Server-Side Events.
     '''
 )
-async def stream_chat_continue(conversation_id: str, stored_message_id: str, services: ServicesDependency):
+async def stream_chat_continue(
+        conversation_id: str,
+        stored_message_id: str,
+        services: ServicesDependency,
+        auth_identity: AuthenticatedIdentity
+):
     message = await services.message_store_service.consume_message(stored_message_id=stored_message_id)
 
     if message is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, 'Invalid stored message')
 
     return await event_source_llm_generator(
+        calling_uid=auth_identity.uid,
         assistant_or_conversation_id=conversation_id,
         start_new_conversation=False,
         user_message=message,

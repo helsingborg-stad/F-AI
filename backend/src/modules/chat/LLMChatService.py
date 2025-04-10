@@ -20,8 +20,12 @@ class LLMChatService(IChatService):
         self._assistant_service = assistant_service
         self._conversation_service = conversation_service
 
-    async def start_new_chat(self, assistant_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
-        assistant = await self._assistant_service.get_assistant(assistant_id)
+    async def start_new_chat(self, as_uid: str, assistant_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
+        assistant = await self._assistant_service.get_assistant(
+            as_uid=as_uid,
+            assistant_id=assistant_id,
+            redact_key=False
+        )
 
         if not assistant:
             yield ChatEvent(event='error', message='invalid assistant')
@@ -38,17 +42,21 @@ class LLMChatService(IChatService):
             message=assistant.instructions
         )
 
-        async for m in self.continue_chat(conversation_id, message):
+        async for m in self.continue_chat(as_uid=as_uid, conversation_id=conversation_id, message=message):
             yield m
 
-    async def continue_chat(self, conversation_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
+    async def continue_chat(self, as_uid: str, conversation_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
         conversation = await self._conversation_service.get_conversation(conversation_id)
 
         if not conversation:
             yield ChatEvent(event='error', message='invalid conversation')
             return
 
-        assistant = await self._assistant_service.get_assistant(conversation.assistant_id)
+        assistant = await self._assistant_service.get_assistant(
+            as_uid=as_uid,
+            assistant_id=conversation.assistant_id,
+            redact_key=False
+        )
 
         if not assistant:
             yield ChatEvent(event='error', message='invalid assistant')

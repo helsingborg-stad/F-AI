@@ -33,7 +33,7 @@ class MongoAssistantService(IAssistantService):
         })
         return str(result.inserted_id)
 
-    async def get_assistant(self, as_uid: str, assistant_id: str) -> Assistant | None:
+    async def get_assistant(self, as_uid: str, assistant_id: str, redact_key: bool = True) -> Assistant | None:
         if not is_valid_mongo_id(assistant_id):
             return None
 
@@ -62,7 +62,7 @@ class MongoAssistantService(IAssistantService):
         if doc is None:
             return None
 
-        return self._doc_to_assistant(doc)
+        return self._doc_to_assistant(doc, redact_key=redact_key)
 
     async def get_owned_assistants(self, as_uid: str) -> list[Assistant]:
         cursor = self._database['assistants'].find(
@@ -80,7 +80,7 @@ class MongoAssistantService(IAssistantService):
                 'collection_id',
             ]
         )
-        return [self._doc_to_assistant(doc) async for doc in cursor]
+        return [self._doc_to_assistant(doc, True) async for doc in cursor]
 
     async def get_available_assistants(self, as_uid: str) -> list[Assistant]:
         resources = await self._resource_service.get_resources(as_uid=as_uid)
@@ -90,7 +90,7 @@ class MongoAssistantService(IAssistantService):
                 {'_id': {"$in": [ObjectId(resource) for resource in resources]}},
             ]}
         )
-        return [self._doc_to_assistant(doc) async for doc in cursor]
+        return [self._doc_to_assistant(doc, True) async for doc in cursor]
 
     async def update_assistant(
             self,
@@ -130,7 +130,7 @@ class MongoAssistantService(IAssistantService):
             }
         )
 
-        return result.modified_count == 1
+        return result.matched_count == 1
 
     async def delete_assistant(self, as_uid: str, assistant_id: str) -> None:
         if not is_valid_mongo_id(assistant_id):
@@ -138,7 +138,7 @@ class MongoAssistantService(IAssistantService):
         await self._database['assistants'].delete_one({'_id': ObjectId(assistant_id), 'owner': as_uid})
 
     @staticmethod
-    def _doc_to_assistant(doc: Mapping[str, Any]) -> Assistant:
+    def _doc_to_assistant(doc: Mapping[str, Any], redact_key: bool) -> Assistant:
         return Assistant(
             id=str(doc['_id']),
             owner=doc['owner'],
@@ -149,7 +149,7 @@ class MongoAssistantService(IAssistantService):
                 sample_questions=doc['meta']['sample_questions'],
             ),
             model=doc['model'],
-            llm_api_key=MongoAssistantService._redact_key(doc['llm_api_key']),
+            llm_api_key=MongoAssistantService._redact_key(doc['llm_api_key']) if redact_key else doc['llm_api_key'],
             instructions=doc['instructions'],
             temperature=doc['temperature'],
             max_tokens=doc['max_tokens'],

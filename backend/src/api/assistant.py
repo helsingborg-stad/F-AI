@@ -20,6 +20,7 @@ class CreateAssistantResponse(BaseModel):
 @auth.post(
     '',
     ['assistant.write'],
+    summary='Create Assistant',
     response_model=CreateAssistantResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -48,6 +49,7 @@ class GetAssistantResponse(BaseModel):
 @auth.get(
     '/{assistant_id}',
     ['assistant.read'],
+    summary='Get Assistant',
     response_model=GetAssistantResponse,
     response_404_description='Assistant not found',
 )
@@ -87,6 +89,7 @@ class GetAvailableAssistantsResponse(BaseModel):
 @auth.get(
     '',
     ['assistant.read'],
+    summary='Get Available Assistants',
     response_model=GetAvailableAssistantsResponse,
 )
 async def get_available_assistants(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
@@ -117,6 +120,7 @@ class UpdateAssistantRequest(BaseModel):
 @auth.put(
     '/{assistant_id}',
     ['assistant.write'],
+    summary='Update Assistant',
     response_404_description='Assistant not found',
 )
 async def update_assistant(
@@ -151,6 +155,7 @@ class DeleteAssistantRequest(BaseModel):
 @auth.delete(
     '/{assistant_id}',
     ['assistant.write'],
+    summary='Delete Assistant',
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_assistant(assistant_id: str, services: ServicesDependency, auth_identity: AuthenticatedIdentity):

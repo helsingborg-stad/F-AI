@@ -2,7 +2,7 @@ import os
 from tempfile import TemporaryDirectory
 
 from fastapi import APIRouter, status, UploadFile, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
@@ -16,8 +16,8 @@ auth = AuthRouterDecorator(collection_router)
 
 
 class CreateCollectionRequest(BaseModel):
-    label: str
-    embedding_model: str
+    label: str = Field(..., example='My collection')
+    embedding_model: str = Field(..., example='default')
 
 
 class CreateCollectionResponse(BaseModel):
