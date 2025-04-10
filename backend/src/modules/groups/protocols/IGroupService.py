@@ -24,6 +24,9 @@ class IGroupService(Protocol):
     async def get_groups_by_member(self, member: str) -> list[Group]:
         ...
 
+    async def set_group_label(self, as_uid: str, group_id: str, label: str) -> bool:
+        ...
+
     async def set_group_members(self, as_uid: str, group_id: str, members: list[str]) -> bool:
         ...
 

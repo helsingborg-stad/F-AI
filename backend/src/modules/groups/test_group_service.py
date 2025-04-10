@@ -164,6 +164,51 @@ class BaseGroupServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
+    async def test_set_group_label(service: IGroupService):
+        group = await service.create_group('john', '', [], [], [])
+
+        success = await service.set_group_label('john', group, 'my label')
+        result = await service.get_group_by_id(as_uid='john', group_id=group)
+
+        assert success is True
+        assert result.label == 'my label'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_set_group_twice(service: IGroupService):
+        group = await service.create_group('john', '', [], [], [])
+
+        success1 = await service.set_group_label('john', group, 'my label')
+        success2 = await service.set_group_label('john', group, 'my label')
+        result = await service.get_group_by_id(as_uid='john', group_id=group)
+
+        assert success1 is True
+        assert success2 is True
+        assert result.label == 'my label'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_set_group_invalid_uid(service: IGroupService):
+        group = await service.create_group('john', 'initial', [], [], [])
+
+        success = await service.set_group_label('jane', group, 'my label')
+        result = await service.get_group_by_id(as_uid='john', group_id=group)
+
+        assert success is False
+        assert result.label == 'initial'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_set_group_invalid_id(service: IGroupService):
+        success = await service.set_group_label('jane', 'invalid group', 'my label')
+        assert success is False
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_set_group_members(service: IGroupService):
         group_id = await service.create_group('john', '1', [], ['x'], ['a'])
 

@@ -106,6 +106,25 @@ async def get_group(group_id: str, auth_identity: AuthenticatedIdentity, service
     )
 
 
+class SetGroupLabelRequest(BaseModel):
+    label: str
+
+
+@auth.patch(
+    '/{group_id}/label',
+    ['group.write'],
+    summary='Set group label',
+    description='',
+    response_404_description='Group not found'
+)
+async def set_group_label(group_id: str, body: SetGroupLabelRequest, auth_identity: AuthenticatedIdentity,
+                          services: ServicesDependency):
+    success = await services.group_service.set_group_label(as_uid=auth_identity.uid, group_id=group_id, label=body.label)
+
+    if not success:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
 class SetGroupMembersRequest(BaseModel):
     members: list[str]
 

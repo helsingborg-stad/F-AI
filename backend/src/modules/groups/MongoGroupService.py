@@ -71,6 +71,17 @@ class MongoGroupService(IGroupService):
 
         return direct_groups + matching_indirect_groups
 
+    async def set_group_label(self, as_uid: str, group_id: str, label: str) -> bool:
+        if not is_valid_mongo_id(group_id):
+            return False
+
+        result = await self._database['groups'].update_one(
+            {'_id': ObjectId(group_id), 'owner': as_uid},
+            {'$set': {'label': label}}
+        )
+
+        return result.matched_count == 1
+
     async def set_group_members(self, as_uid: str, group_id: str, members: list[str]) -> bool:
         if not is_valid_mongo_id(group_id):
             return False
@@ -80,7 +91,7 @@ class MongoGroupService(IGroupService):
             {'$set': {'members': members}}
         )
 
-        return result.modified_count == 1
+        return result.matched_count == 1
 
     async def set_group_scopes(self, as_uid: str, group_id: str, scopes: list[str]) -> bool:
         if not is_valid_mongo_id(group_id):
@@ -91,7 +102,7 @@ class MongoGroupService(IGroupService):
             {'$set': {'scopes': scopes}}
         )
 
-        return result.modified_count == 1
+        return result.matched_count == 1
 
     async def add_group_resource(self, as_uid: str, group_id: str, resource: str) -> bool:
         if not is_valid_mongo_id(group_id):
