@@ -6,12 +6,6 @@
     title: 'Components/Navbar',
     component: Navbar,
     tags: ['autodocs'],
-    argTypes: {
-      avatarUrl: { control: 'text' },
-      avatarName: { control: 'text' },
-      navBarItems: { control: 'array' },
-      currentUrlPath: { control: 'text' }
-    }
   });
 
   const sampleLinks = [
@@ -39,31 +33,33 @@
 />
 
 <Story
+  name="Navbar title"
+  args={{
+		navBarItems: sampleLinks,
+		currentUrlPath: '/settings',
+	 	navbarTitle: 'My Navbar Title',
+	}}
+/>
+
+<Story
   name="Avatar"
   args={{
 		navBarItems: sampleLinks,
 		currentUrlPath: '/settings',
 	 	avatarUrl: 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
 	 	avatarName: 'John Doe',
-	}}
-/>
-
-<Story
-  name="Title"
-  args={{
-		navBarItems: sampleLinks,
-		currentUrlPath: '/some_link_1',
 	 	navbarTitle: 'My Navbar Title',
 	}}
 />
 
 <Story
-  name="Title and Avatar"
+  name="Avatar placeholder"
   args={{
 		navBarItems: sampleLinks,
-		currentUrlPath: '/some_link_2',
-	 	avatarUrl: 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp',
-	 	avatarName: 'John Doe',
+		currentUrlPath: '/settings',
+	 	avatarUrl: '',
+	 	avatarPlaceholder: 'John Doe',
 	 	navbarTitle: 'My Navbar Title',
 	}}
 />
+
