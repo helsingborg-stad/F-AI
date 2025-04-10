@@ -73,13 +73,13 @@
       </div>
     {:else if avatarPlaceholder}
       <div class="avatar placeholder btn btn-circle btn-ghost">
-        <div class="bg-neutral text-neutral-content w-10 rounded-full">
+        <div class="bg-neutral-300 text-base w-10 rounded-full">
           <span>{getAvatarInitial()}</span>
         </div>
       </div>
     {:else }
       <div class="avatar placeholder btn btn-circle btn-ghost">
-        <div class="bg-neutral text-neutral-content w-10 rounded-full">
+        <div class="bg-neutral-300 w-10 rounded-full">
           <Icon icon={icons["circleUser"]} />
         </div>
       </div>
