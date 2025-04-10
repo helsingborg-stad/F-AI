@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
+from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
 
 assistant_router = APIRouter(
     prefix='/assistant',
@@ -22,8 +23,8 @@ class CreateAssistantResponse(BaseModel):
     response_model=CreateAssistantResponse,
     status_code=status.HTTP_201_CREATED,
 )
-async def create_assistant(services: ServicesDependency):
-    new_id = await services.assistant_service.create_assistant()
+async def create_assistant(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    new_id = await services.assistant_service.create_assistant(as_uid=auth_identity.uid)
     return CreateAssistantResponse(assistant_id=new_id)
 
 
@@ -50,8 +51,8 @@ class GetAssistantResponse(BaseModel):
     response_model=GetAssistantResponse,
     response_404_description='Assistant not found',
 )
-async def get_assistant(assistant_id: str, services: ServicesDependency):
-    result = await services.assistant_service.get_assistant(assistant_id)
+async def get_assistant(assistant_id: str, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    result = await services.assistant_service.get_assistant(as_uid=auth_identity.uid, assistant_id=assistant_id)
 
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -72,26 +73,28 @@ async def get_assistant(assistant_id: str, services: ServicesDependency):
     )
 
 
-class GetAssistantsResponseAssistant(BaseModel):
+class GetAvailableAssistantsResponseAssistant(BaseModel):
     id: str
+    owner: str
     name: str
     description: str
 
 
-class GetAssistantsResponse(BaseModel):
-    assistants: list[GetAssistantsResponseAssistant]
+class GetAvailableAssistantsResponse(BaseModel):
+    assistants: list[GetAvailableAssistantsResponseAssistant]
 
 
 @auth.get(
     '',
     ['assistant.read'],
-    response_model=GetAssistantsResponse,
+    response_model=GetAvailableAssistantsResponse,
 )
-async def get_assistants(services: ServicesDependency):
-    result = await services.assistant_service.get_assistants()
-    return GetAssistantsResponse(assistants=[
-        GetAssistantsResponseAssistant(
+async def get_available_assistants(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    result = await services.assistant_service.get_available_assistants(as_uid=auth_identity.uid)
+    return GetAvailableAssistantsResponse(assistants=[
+        GetAvailableAssistantsResponseAssistant(
             id=assistant.id,
+            owner=assistant.owner,
             name=assistant.meta.name,
             description=assistant.meta.description,
         ) for assistant in result
@@ -116,9 +119,15 @@ class UpdateAssistantRequest(BaseModel):
     ['assistant.write'],
     response_404_description='Assistant not found',
 )
-async def update_assistant(assistant_id: str, body: UpdateAssistantRequest, services: ServicesDependency):
+async def update_assistant(
+        assistant_id: str,
+        body: UpdateAssistantRequest,
+        services: ServicesDependency,
+        auth_identity: AuthenticatedIdentity
+):
     success = await services.assistant_service.update_assistant(
-        assistant_id,
+        as_uid=auth_identity.uid,
+        assistant_id=assistant_id,
         name=body.name,
         description=body.description,
         allow_files=body.allow_files,
@@ -144,5 +153,5 @@ class DeleteAssistantRequest(BaseModel):
     ['assistant.write'],
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete_assistant(assistant_id: str, services: ServicesDependency):
-    await services.assistant_service.delete_assistant(assistant_id)
+async def delete_assistant(assistant_id: str, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    await services.assistant_service.delete_assistant(as_uid=auth_identity.uid, assistant_id=assistant_id)

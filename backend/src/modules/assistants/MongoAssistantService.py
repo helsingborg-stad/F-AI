@@ -7,15 +7,18 @@ from src.common.mongo import is_valid_mongo_id
 from src.modules.assistants.models.Assistant import Assistant
 from src.modules.assistants.models.AssistantMeta import AssistantMeta
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
+from src.modules.resources.protocols.IResourceService import IResourceService
 
 
 class MongoAssistantService(IAssistantService):
-    def __init__(self, database: AsyncDatabase):
+    def __init__(self, database: AsyncDatabase, resource_service: IResourceService):
         self._database = database
+        self._resource_service = resource_service
 
-    async def create_assistant(self) -> str:
+    async def create_assistant(self, as_uid: str) -> str:
         assistant = Assistant(
             id=str(ObjectId()),
+            owner=as_uid,
             meta=AssistantMeta(name='', description='', sample_questions=[], allow_files=False),
             model='',
             llm_api_key=None,
@@ -26,18 +29,26 @@ class MongoAssistantService(IAssistantService):
         )
         result = await self._database['assistants'].insert_one({
             **assistant.model_dump(exclude={'id'}),
-            '_id': ObjectId(assistant.id),
+            '_id': ObjectId(assistant.id)
         })
         return str(result.inserted_id)
 
-    async def get_assistant(self, assistant_id: str) -> Assistant | None:
+    async def get_assistant(self, as_uid: str, assistant_id: str) -> Assistant | None:
         if not is_valid_mongo_id(assistant_id):
             return None
 
+        can_access = await self._resource_service.can_access(as_uid=as_uid, resource=assistant_id)
+
         doc = await self._database['assistants'].find_one(
-            {'_id': ObjectId(assistant_id)},
+            {
+                "$and": [
+                    {'_id': ObjectId(assistant_id)},
+                    {"$or": [{'owner': as_uid}] if not can_access else [{"_id": {"$exists": True}}]}
+                ]
+            },
             projection=[
                 '_id',
+                'owner',
                 'meta',
                 'model',
                 'llm_api_key',
@@ -53,10 +64,12 @@ class MongoAssistantService(IAssistantService):
 
         return self._doc_to_assistant(doc)
 
-    async def get_assistants(self) -> list[Assistant]:
+    async def get_owned_assistants(self, as_uid: str) -> list[Assistant]:
         cursor = self._database['assistants'].find(
+            {'owner': as_uid},
             projection=[
                 '_id',
+                'owner',
                 'meta',
                 'model',
                 'llm_api_key',
@@ -69,8 +82,19 @@ class MongoAssistantService(IAssistantService):
         )
         return [self._doc_to_assistant(doc) async for doc in cursor]
 
+    async def get_available_assistants(self, as_uid: str) -> list[Assistant]:
+        resources = await self._resource_service.get_resources(as_uid=as_uid)
+        cursor = self._database['assistants'].find(
+            {"$or": [
+                {'owner': as_uid},
+                {'_id': {"$in": [ObjectId(resource) for resource in resources]}},
+            ]}
+        )
+        return [self._doc_to_assistant(doc) async for doc in cursor]
+
     async def update_assistant(
             self,
+            as_uid: str,
             assistant_id: str,
             name: str | None = None,
             description: str | None = None,
@@ -100,7 +124,7 @@ class MongoAssistantService(IAssistantService):
         self._add_to_dict_unless_none(update_dict, 'collection_id', collection_id)
 
         result = await self._database['assistants'].update_one(
-            {'_id': ObjectId(assistant_id)},
+            {'_id': ObjectId(assistant_id), 'owner': as_uid},
             {
                 '$set': {**update_dict}
             }
@@ -108,15 +132,16 @@ class MongoAssistantService(IAssistantService):
 
         return result.modified_count == 1
 
-    async def delete_assistant(self, assistant_id: str) -> None:
+    async def delete_assistant(self, as_uid: str, assistant_id: str) -> None:
         if not is_valid_mongo_id(assistant_id):
             return None
-        await self._database['assistants'].delete_one({'_id': ObjectId(assistant_id)})
+        await self._database['assistants'].delete_one({'_id': ObjectId(assistant_id), 'owner': as_uid})
 
     @staticmethod
     def _doc_to_assistant(doc: Mapping[str, Any]) -> Assistant:
         return Assistant(
             id=str(doc['_id']),
+            owner=doc['owner'],
             meta=AssistantMeta(
                 name=doc['meta']['name'],
                 description=doc['meta']['description'],

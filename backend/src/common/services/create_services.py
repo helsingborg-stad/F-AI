@@ -16,6 +16,7 @@ from src.modules.groups.factory import GroupServiceFactory
 from src.modules.llm.factory import LLMServiceFactory
 from src.modules.login.factory import LoginServiceFactory
 from src.modules.notification.factory import NotificationServiceFactory
+from src.modules.resources.factory import ResourceServiceFactory
 from src.modules.settings.factory import SettingsServiceFactory
 from src.modules.vector.factory import VectorServiceFactory
 
@@ -35,7 +36,8 @@ async def create_services() -> Services:
     notification_service = NotificationServiceFactory(settings_service=settings_service).get()
     vector_service = VectorServiceFactory(settings_service=settings_service).get()
     llm_service = LLMServiceFactory().get()
-    assistant_service = AssistantServiceFactory(mongo_database=mongo_database).get()
+    resource_service = ResourceServiceFactory(group_service=group_service).get()
+    assistant_service = AssistantServiceFactory(mongo_database=mongo_database, resource_service=resource_service).get()
     conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
 
     return Services(

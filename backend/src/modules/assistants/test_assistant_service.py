@@ -1,161 +1,229 @@
 import pytest
 
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
+from src.modules.groups.protocols.IGroupService import IGroupService
+
+
+async def _create_mock_group(group_service: IGroupService, resource: str):
+    await group_service.create_group(
+        as_uid='john',
+        label='MOCK',
+        members=['john', 'jane'],
+        scopes=[],
+        resources=[resource]
+    )
 
 
 class BaseAssistantServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_create_assistant(service: IAssistantService):
-        result = await service.create_assistant()
+    async def test_create_get_assistant(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
 
-        assert result
-        assert len(result) > 0
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
-    @staticmethod
-    @pytest.mark.asyncio
-    @pytest.mark.mongo
-    async def test_get_assistant(service: IAssistantService):
-        assistant_id = await service.create_assistant()
-
-        result = await service.get_assistant(assistant_id)
-
-        assert result
-        assert result.id == assistant_id
+        assert len(aid) > 0
+        assert result is not None
+        assert result.id == aid
+        assert result.owner == 'john'
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_get_assistant_invalid(service: IAssistantService):
-        result = await service.get_assistant('does not exist')
+    async def test_get_assistant_key_redacted(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+        await service.update_assistant(as_uid='john', assistant_id=aid, llm_api_key='my_secret_key')
+
+        result1 = await service.get_assistant(as_uid='john', assistant_id=aid)
+        result2 = await service.get_owned_assistants(as_uid='john')
+
+        assert 'my_secret_key' not in result1.llm_api_key
+        assert 'my_secret_key' not in result2[0].llm_api_key
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_get_assistant_invalid_uid(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='emma')
+
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
         assert result is None
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_get_assistants(service: IAssistantService):
-        assistant1 = await service.create_assistant()
-        assistant2 = await service.create_assistant()
+    async def test_get_assistant_invalid_assistant_id(service: IAssistantService):
+        result = await service.get_assistant(as_uid='john', assistant_id='does not exist')
 
-        result = await service.get_assistants()
+        assert result is None
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_get_assistant_group(service: IAssistantService, group_service: IGroupService):
+        aid = await service.create_assistant(as_uid='john')
+        await _create_mock_group(group_service, aid)
+
+        result_same_group = await service.get_assistant(as_uid='jane', assistant_id=aid)
+        result_not_same_group = await service.get_assistant(as_uid='pete', assistant_id=aid)
+
+        assert result_same_group is not None
+        assert result_same_group.id == aid
+        assert result_not_same_group is None
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_get_owned_assistants(service: IAssistantService):
+        aid1 = await service.create_assistant(as_uid='john')
+        aid2 = await service.create_assistant(as_uid='john')
+        aid3 = await service.create_assistant(as_uid='jane')
+
+        result = await service.get_owned_assistants(as_uid='john')
 
         assert len(result) == 2
-        assert next(a for a in result if a.id == assistant1)
-        assert next(a for a in result if a.id == assistant2)
+        assert aid1 in [a.id for a in result]
+        assert next(a for a in result if a.id == aid1).owner == 'john'
+        assert aid2 in [a.id for a in result]
+        assert next(a for a in result if a.id == aid2).owner == 'john'
+        assert aid3 not in [a.id for a in result]
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_update_assistant(service: IAssistantService):
-        assistant_id = await service.create_assistant()
-        result = await service.update_assistant(
-            assistant_id,
-            name='my assistant',
-            description='my description',
+    async def test_get_available_assistants(service: IAssistantService, group_service: IGroupService):
+        john_private_aid = await service.create_assistant(as_uid='john')
+        shared_aid = await service.create_assistant(as_uid='john')
+        jane_private_aid = await service.create_assistant(as_uid='jane')
+        await _create_mock_group(group_service, shared_aid)
+
+        result = await service.get_available_assistants(as_uid='jane')
+
+        assert len(result) == 2
+        assert jane_private_aid in [a.id for a in result]
+        assert next(a for a in result if a.id == jane_private_aid).owner == 'jane'
+        assert shared_aid in [a.id for a in result]
+        assert next(a for a in result if a.id == shared_aid).owner == 'john'
+        assert john_private_aid not in [a.id for a in result]
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_update_assistant_basic(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+
+        success = await service.update_assistant(as_uid='john', assistant_id=aid, name='test assistant',
+                                                 description='test description')
+
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
+
+        assert success is True
+        assert result.meta.name == 'test assistant'
+        assert result.meta.description == 'test description'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_update_assistant_consecutive(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+
+        success1 = await service.update_assistant(as_uid='john', assistant_id=aid, name='test assistant')
+        success2 = await service.update_assistant(as_uid='john', assistant_id=aid, sample_questions=['hello', 'world'])
+        success3 = await service.update_assistant(as_uid='john', assistant_id=aid, name='my cool assistant')
+
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
+
+        assert success1 is True
+        assert success2 is True
+        assert success3 is True
+        assert result.meta.name == 'my cool assistant'
+        assert result.meta.sample_questions == ['hello', 'world']
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_update_assistant_full(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+
+        success = await service.update_assistant(
+            as_uid='john',
+            assistant_id=aid,
+            name='a',
+            description='b',
             allow_files=True,
-            sample_questions=['a', 'b'],
-            model='model_name',
-            llm_api_key='api_key',
-            instructions='instructions here',
-            temperature=0.31415,
-            max_tokens=16000,
-            collection_id='my_collection_id',
+            sample_questions=['c', 'd', 'e'],
+            model='f',
+            llm_api_key='g',
+            instructions='h',
+            temperature=3.1415,
+            max_tokens=1337,
+            collection_id='i',
         )
 
-        assistant = await service.get_assistant(assistant_id)
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
-        assert result
-        assert assistant.meta.name == 'my assistant'
-        assert assistant.meta.description == 'my description'
-        assert assistant.meta.allow_files is True
-        assert assistant.meta.sample_questions == ['a', 'b']
-        assert assistant.model == 'model_name'
-        assert assistant.llm_api_key == 'ap...ey'
-        assert assistant.instructions == 'instructions here'
-        assert assistant.temperature == 0.31415
-        assert assistant.max_tokens == 16000
-        assert assistant.collection_id == 'my_collection_id'
+        assert success is True
+        assert result.id == aid
+        assert result.owner == 'john'
+        assert result.meta.name == 'a'
+        assert result.meta.description == 'b'
+        assert result.meta.allow_files is True
+        assert result.meta.sample_questions == ['c', 'd', 'e']
+        assert result.model == 'f'
+        assert result.instructions == 'h'
+        assert result.temperature == 3.1415
+        assert result.max_tokens == 1337
+        assert result.collection_id == 'i'
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_update_assistant_partial(service: IAssistantService):
-        assistant_id = await service.create_assistant()
-        await service.update_assistant(
-            assistant_id=assistant_id,
-            name='my assistant',
-            description='my description',
-        )
+    async def test_update_assistant_invalid_uid(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
 
-        assistant1 = await service.get_assistant(assistant_id)
+        success = await service.update_assistant(as_uid='jane', assistant_id=aid, name='evil override')
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
-        await service.update_assistant(
-            assistant_id=assistant_id,
-            model='my_cool_model',
-        )
-
-        assistant2 = await service.get_assistant(assistant_id)
-
-        assert assistant1.meta.name == 'my assistant'
-        assert assistant1.meta.description == 'my description'
-        assert assistant1.model != 'my_cool_model'
-        assert assistant2.meta.name == 'my assistant'
-        assert assistant2.meta.description == 'my description'
-        assert assistant2.model == 'my_cool_model'
+        assert success is False
+        assert result.meta.name != 'evil override'
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_update_assistant_invalid(service: IAssistantService):
-        result = await service.update_assistant(
-            'does not exist',
-            name='my assistant',
-            description='my description',
-            allow_files=True,
-            sample_questions=['a', 'b'],
-            model='model_name',
-            llm_api_key='api_key',
-            instructions='instructions here',
-            temperature=0.31415,
-            max_tokens=16000,
-            collection_id='my_collection_id',
-        )
-        assert result is False
+    async def test_update_assistant_invalid_assistant_id(service: IAssistantService):
+        success = await service.update_assistant(as_uid='john', assistant_id='invalid', name='hello')
+        result = await service.get_assistant(as_uid='john', assistant_id='invalid')
+
+        assert success is False
+        assert result is None
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
     async def test_delete_assistant(service: IAssistantService):
-        assistant_id = await service.create_assistant()
+        aid = await service.create_assistant(as_uid='john')
 
-        await service.delete_assistant(assistant_id)
-        assistant = await service.get_assistant(assistant_id)
+        await service.delete_assistant(as_uid='john', assistant_id=aid)
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
-        assert assistant is None
-
-    @staticmethod
-    @pytest.mark.asyncio
-    @pytest.mark.mongo
-    async def test_delete_assistant_invalid(service: IAssistantService):
-        await service.delete_assistant('does not exist')
-        assistant = await service.get_assistant('does not exist')
-
-        assert assistant is None
+        assert result is None
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_redact_key(service: IAssistantService):
-        assistant_id = await service.create_assistant()
-        await service.update_assistant(
-            assistant_id=assistant_id,
-            llm_api_key='my_secret_key'
-        )
+    async def test_delete_assistant_invalid_uid(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
 
-        result1 = await service.get_assistant(assistant_id)
-        result2 = await service.get_assistants()
+        await service.delete_assistant(as_uid='jane', assistant_id=aid)
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
-        assert 'my_secret_key' not in result1.llm_api_key
-        assert 'my_secret_key' not in result2[0].llm_api_key
+        assert result is not None
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_delete_assistant_invalid_assistant_id(service: IAssistantService):
+        await service.delete_assistant(as_uid='john', assistant_id='invalid')
+        assert True
