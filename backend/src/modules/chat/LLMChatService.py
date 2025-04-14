@@ -31,11 +31,12 @@ class LLMChatService(IChatService):
             yield ChatEvent(event='error', message='invalid assistant')
             return
 
-        conversation_id = await self._conversation_service.create_conversation(assistant_id=assistant_id)
+        conversation_id = await self._conversation_service.create_conversation(as_uid=as_uid, assistant_id=assistant_id)
 
         yield ChatEvent(event='conversation_id', conversation_id=conversation_id)
 
         await self._conversation_service.add_message_to_conversation(
+            as_uid=as_uid,
             conversation_id=conversation_id,
             timestamp=get_timestamp(),
             role='system',
@@ -46,7 +47,7 @@ class LLMChatService(IChatService):
             yield m
 
     async def continue_chat(self, as_uid: str, conversation_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
-        conversation = await self._conversation_service.get_conversation(conversation_id)
+        conversation = await self._conversation_service.get_conversation(as_uid=as_uid, conversation_id=conversation_id)
 
         if not conversation:
             yield ChatEvent(event='error', message='invalid conversation')
@@ -63,6 +64,7 @@ class LLMChatService(IChatService):
             return
 
         await self._conversation_service.add_message_to_conversation(
+            as_uid=as_uid,
             conversation_id=conversation_id,
             timestamp=get_timestamp(),
             role='user',
@@ -70,6 +72,7 @@ class LLMChatService(IChatService):
         )
 
         await self._conversation_service.add_message_to_conversation(
+            as_uid=as_uid,
             conversation_id=conversation_id,
             timestamp=get_timestamp(),
             role='',
@@ -88,6 +91,7 @@ class LLMChatService(IChatService):
         ):
             if delta.role != 'error':
                 await self._conversation_service.add_to_conversation_last_message(
+                    as_uid=as_uid,
                     conversation_id=conversation_id,
                     timestamp=get_timestamp(),
                     role=delta.role,

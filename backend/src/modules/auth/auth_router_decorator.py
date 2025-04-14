@@ -38,6 +38,7 @@ class AuthRouterDecorator:
             function_has_identity_parameter = 'auth_identity' in parameters
             fn = partial(func,
                          auth_identity=security_dependency) if function_has_identity_parameter else func
+            fn.__name__ = func.__name__
             deps = [] if function_has_identity_parameter else [security_dependency]
 
             router_method(

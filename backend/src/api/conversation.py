@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
+from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
 
 conversation_router = APIRouter(
     prefix='/conversation',
@@ -27,8 +28,8 @@ class GetConversationsResponse(BaseModel):
     ['conversation.read'],
     response_model=GetConversationsResponse,
 )
-async def get_conversations(services: ServicesDependency):
-    result = await services.conversation_service.get_conversations()
+async def get_conversations(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    result = await services.conversation_service.get_conversations(as_uid=auth_identity.uid)
 
     return GetConversationsResponse(conversations=[
         GetConversationsResponseConversation(
@@ -61,8 +62,9 @@ class GetConversationResponse(BaseModel):
     response_model=GetConversationResponse,
     response_404_description='Conversation not found'
 )
-async def get_conversation(conversation_id: str, services: ServicesDependency):
-    result = await services.conversation_service.get_conversation(conversation_id)
+async def get_conversation(conversation_id: str, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    result = await services.conversation_service.get_conversation(as_uid=auth_identity.uid,
+                                                                  conversation_id=conversation_id)
 
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -87,8 +89,13 @@ class SetConversationTitleRequest(BaseModel):
     ['conversation.write'],
     response_404_description='Conversation not found'
 )
-async def set_conversation_title(conversation_id: str, body: SetConversationTitleRequest, services: ServicesDependency):
-    success = await services.conversation_service.set_conversation_title(conversation_id, body.title)
+async def set_conversation_title(conversation_id: str, body: SetConversationTitleRequest, services: ServicesDependency,
+                                 auth_identity: AuthenticatedIdentity):
+    success = await services.conversation_service.set_conversation_title(
+        as_uid=auth_identity.uid,
+        conversation_id=conversation_id,
+        title=body.title
+    )
 
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -97,6 +104,7 @@ async def set_conversation_title(conversation_id: str, body: SetConversationTitl
 @auth.delete(
     '/{conversation_id}',
     ['conversation.write'],
+    status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_conversation(conversation_id: str, services: ServicesDependency):
-    await services.conversation_service.delete_conversation(conversation_id)
+async def delete_conversation(conversation_id: str, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    await services.conversation_service.delete_conversation(as_uid=auth_identity.uid, conversation_id=conversation_id)
