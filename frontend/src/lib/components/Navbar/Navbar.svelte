@@ -1,8 +1,6 @@
-<!--TODO: Remove dropdown from navbar and place it in top `+layout.page`-->
 <script lang="ts">
   import type { IMenuItem } from '$lib/types.js'
-  import Icon from '$lib/components/Icon/Icon.svelte'
-  import { icons } from '$lib/components/Icon/icons.js'
+  import Avatar from '$lib/components/Navbar/Avatar.svelte'
 
   interface Props {
     navbarTitle: string
@@ -10,9 +8,13 @@
     navBarItems: IMenuItem[]
     currentUrlPath: string
     avatarPlaceholder: string
+    avatarMenu: [{
+      title: string,
+      action: string
+    }]
   }
 
-  let { navbarTitle, avatarUrl, navBarItems, currentUrlPath, avatarPlaceholder }: Props = $props()
+  let { navbarTitle, avatarUrl, navBarItems, currentUrlPath, avatarPlaceholder, avatarMenu }: Props = $props()
 
   let urlFirstDirectory = $derived.by(() => {
     const segments = currentUrlPath.split('/').filter(Boolean)
@@ -20,10 +22,6 @@
   })
 
   const isActive = (path: string) => path === urlFirstDirectory
-
-  const getAvatarInitial = () => {
-    return avatarPlaceholder.charAt(0).toUpperCase()
-  }
 </script>
 
 <nav class="navbar">
@@ -64,25 +62,5 @@
       {/each}
     </ul>
   </div>
-  <div class="flex-none">
-    {#if avatarUrl}
-      <div class="avatar btn btn-circle btn-ghost">
-        <div class="w-10 rounded-full">
-          <img src={avatarUrl.toString()} alt="Profile" />
-        </div>
-      </div>
-    {:else if avatarPlaceholder}
-      <div class="avatar placeholder btn btn-circle btn-ghost">
-        <div class="bg-neutral-300 text-base w-10 rounded-full">
-          <span>{getAvatarInitial()}</span>
-        </div>
-      </div>
-    {:else }
-      <div class="avatar placeholder btn btn-circle btn-ghost">
-        <div class="bg-neutral-300 w-10 rounded-full">
-          <Icon icon={icons["circleUser"]} />
-        </div>
-      </div>
-    {/if}
-  </div>
+  <Avatar {avatarUrl} {avatarPlaceholder} menuItems={avatarMenu} />
 </nav>

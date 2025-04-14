@@ -40,6 +40,7 @@ and providing the main content area for child components.
         {navBarItems}
         currentUrlPath={page.url.pathname}
         {avatarPlaceholder}
+        avatarMenu={data.avatarMenu}
       />
     </header>
   {/if}
