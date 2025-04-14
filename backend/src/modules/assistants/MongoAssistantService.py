@@ -6,6 +6,7 @@ from pymongo.asynchronous.database import AsyncDatabase
 from src.common.mongo import is_valid_mongo_id
 from src.modules.assistants.models.Assistant import Assistant
 from src.modules.assistants.models.AssistantMeta import AssistantMeta
+from src.modules.assistants.models.Model import Model
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
 from src.modules.resources.protocols.IResourceService import IResourceService
 
@@ -32,6 +33,21 @@ class MongoAssistantService(IAssistantService):
             '_id': ObjectId(assistant.id)
         })
         return str(result.inserted_id)
+
+    async def get_available_models(self, as_uid: str) -> list[Model]:
+        cursor = self._database['chat_models'].find(projection=['key', 'provider', 'display_name'])
+        return [Model(key=doc['key'], provider=doc['provider'], display_name=doc['display_name']) async for doc in
+                cursor]
+
+    async def set_available_models(self, models: list[Model]) -> bool:
+        await self._database['chat_models'].drop()
+        if len(models) == 0:
+            return True
+        result = await self._database['chat_models'].insert_many([
+            {'key': model.key, 'provider': model.provider, 'display_name': model.display_name}
+            for model in models
+        ])
+        return len(result.inserted_ids) == len(models)
 
     async def get_assistant(self, as_uid: str, assistant_id: str, redact_key: bool = True) -> Assistant | None:
         if not is_valid_mongo_id(assistant_id):
