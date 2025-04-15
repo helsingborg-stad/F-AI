@@ -1,19 +1,25 @@
-<!--TODO: Remove dropdown from navbar and place it in top `+layout.page`-->
 <script lang="ts">
   import type { IMenuItem } from '$lib/types.js'
+  import Avatar from '$lib/components/Navbar/Avatar.svelte'
 
-  export let navbarTitle: string = ''
+  interface Props {
+    navbarTitle: string
+    avatarUrl?: URL
+    navBarItems: IMenuItem[]
+    currentUrlPath: string
+    avatarPlaceholder: string
+    avatarMenu: [{
+      title: string,
+      action: string
+    }]
+  }
 
-  export let avatarUrl: URL | null = null
-  export let avatarName: string = ''
+  let { navbarTitle, avatarUrl, navBarItems, currentUrlPath, avatarPlaceholder, avatarMenu }: Props = $props()
 
-  export let navBarItems: IMenuItem[] = []
-  export let currentUrlPath: string
-
-  $: urlFirstDirectory = (() => {
+  let urlFirstDirectory = $derived.by(() => {
     const segments = currentUrlPath.split('/').filter(Boolean)
     return segments.length > 0 ? `/${segments[0]}` : '/'
-  })()
+  })
 
   const isActive = (path: string) => path === urlFirstDirectory
 </script>
@@ -56,13 +62,5 @@
       {/each}
     </ul>
   </div>
-  <div class="flex-none">
-    {#if avatarUrl}
-      <div class="avatar btn btn-circle btn-ghost">
-        <div class="w-10 rounded-full">
-          <img src={avatarUrl.toString()} alt={avatarName} />
-        </div>
-      </div>
-    {/if}
-  </div>
+  <Avatar {avatarUrl} {avatarPlaceholder} menuItems={avatarMenu} />
 </nav>
