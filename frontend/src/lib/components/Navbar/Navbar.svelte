@@ -5,7 +5,7 @@
   interface Props {
     navbarTitle: string
     avatarUrl?: URL
-    navBarItems: IMenuItem[]
+    navbarMenu: IMenuItem[]
     currentUrlPath: string
     avatarPlaceholder: string
     avatarMenu: [{
@@ -14,7 +14,7 @@
     }]
   }
 
-  let { navbarTitle, avatarUrl, navBarItems, currentUrlPath, avatarPlaceholder, avatarMenu }: Props = $props()
+  let { navbarTitle, avatarUrl, navbarMenu, currentUrlPath, avatarPlaceholder, avatarMenu }: Props = $props()
 
   let urlFirstDirectory = $derived.by(() => {
     const segments = currentUrlPath.split('/').filter(Boolean)
@@ -44,7 +44,7 @@
         </svg>
       </div>
       <ul class="menu dropdown-content z-10 mt-3 w-52 gap-3 bg-base-200 p-2 shadow">
-        {#each navBarItems as { label, path }}
+        {#each navbarMenu as { label, path }}
           <li><a href={path} class:active={isActive(path)}>{label}</a></li>
         {/each}
       </ul>
@@ -57,7 +57,7 @@
   </div>
   <div class="hidden grow justify-end md:flex">
     <ul class="menu menu-horizontal gap-2">
-      {#each navBarItems as { label, path }}
+      {#each navbarMenu as { label, path }}
         <li><a href={path} class:active={isActive(path)}>{label}</a></li>
       {/each}
     </ul>

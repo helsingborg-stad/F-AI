@@ -3,22 +3,11 @@
   import { page } from '$app/state'
 
   import Navbar from '$lib/components/Navbar/Navbar.svelte'
-  import { hasScope, setUser, userState } from '$lib/state/user.svelte.js'
+  import { userState } from '$lib/state/user.svelte.js'
 
   let { children, data } = $props()
 
-  setUser(data.user)
-
-  const NAVBAR_TITLE = 'Folkets AI'
-
-  const navBarItems = [
-    { label: 'Chat', path: '/chat' },
-    { label: 'Assistants', path: '/assistant' },
-  ]
-
-  if (hasScope('settings.read')) {
-    navBarItems.push({ label: 'Settings', path: '/settings' })
-  }
+  const navbarData = data.navbar
 
   let showNavbar = $derived(!page.url.pathname.startsWith('/login'))
 
@@ -36,8 +25,8 @@ and providing the main content area for child components.
   {#if showNavbar}
     <header class="flex w-full bg-base-200 md:px-4">
       <Navbar
-        navbarTitle={NAVBAR_TITLE}
-        {navBarItems}
+        navbarTitle={navbarData.title}
+        navbarMenu={navbarData.navbarMenu}
         currentUrlPath={page.url.pathname}
         {avatarPlaceholder}
         avatarMenu={data.avatarMenu}
