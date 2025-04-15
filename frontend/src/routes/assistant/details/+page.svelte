@@ -1,0 +1,1 @@
+<p>Assistant details</p>

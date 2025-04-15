@@ -45,6 +45,17 @@ export interface IScopesResponse {
   scopes: UserScopeType[]
 }
 
+export interface IAssistant {
+  id: string
+  owner: string
+  name: string
+  description: string
+}
+
+export interface IAssistants {
+  assistants: IAssistant[]
+}
+
 // Dummy export to prevent empty module at runtime.
 // Fixes Storybook error where module is empty after TypeScript compilation.
 export const __types = {}
