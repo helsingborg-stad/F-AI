@@ -8,10 +8,10 @@
     navbarMenu: IMenuItem[]
     currentUrlPath: string
     avatarPlaceholder: string
-    avatarMenu: [{
+    avatarMenu: {
       title: string,
       action: string
-    }]
+    }[]
   }
 
   let { navbarTitle, avatarUrl, navbarMenu, currentUrlPath, avatarPlaceholder, avatarMenu }: Props = $props()
