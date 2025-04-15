@@ -5,6 +5,7 @@ from src.modules.assistants.models.AssistantMeta import AssistantMeta
 
 class Assistant(BaseModel):
     id: str
+    owner: str
     meta: AssistantMeta
     model: str
     llm_api_key: str | None

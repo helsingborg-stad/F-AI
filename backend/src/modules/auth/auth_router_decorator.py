@@ -24,12 +24,13 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         if required_scopes is None:
             required_scopes = []
 
-        responses = get_auth_responses(response_400_description)
+        responses = get_auth_responses(response_400_description, response_404_description)
 
         def inner_decorator(func):
             security_dependency = Security(auth_route_dependency, scopes=required_scopes)
@@ -37,6 +38,7 @@ class AuthRouterDecorator:
             function_has_identity_parameter = 'auth_identity' in parameters
             fn = partial(func,
                          auth_identity=security_dependency) if function_has_identity_parameter else func
+            fn.__name__ = func.__name__
             deps = [] if function_has_identity_parameter else [security_dependency]
 
             router_method(
@@ -61,6 +63,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -72,6 +75,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )
 
@@ -84,6 +88,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -95,6 +100,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )
 
@@ -107,6 +113,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -118,6 +125,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )
 
@@ -130,6 +138,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -141,6 +150,7 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )
 
@@ -153,6 +163,7 @@ class AuthRouterDecorator:
             response_model: Any | None = None,
             response_description: str | None = None,
             response_400_description: str | None = None,
+            response_404_description: str | None = None,
             status_code: int | None = None,
     ):
         return AuthRouterDecorator.route(
@@ -164,5 +175,6 @@ class AuthRouterDecorator:
             response_model=response_model,
             response_description=response_description,
             response_400_description=response_400_description,
+            response_404_description=response_404_description,
             status_code=status_code,
         )

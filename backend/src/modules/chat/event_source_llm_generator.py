@@ -6,6 +6,7 @@ from sse_starlette import ServerSentEvent, EventSourceResponse
 
 
 async def event_source_llm_generator(
+        calling_uid: str,
         assistant_or_conversation_id: str,
         start_new_conversation: bool,
         user_message: str,
@@ -15,11 +16,13 @@ async def event_source_llm_generator(
         try:
             if start_new_conversation:
                 chat_generator = chat_service.start_new_chat(
+                    as_uid=calling_uid,
                     assistant_id=assistant_or_conversation_id,
                     message=user_message
                 )
             else:
                 chat_generator = chat_service.continue_chat(
+                    as_uid=calling_uid,
                     conversation_id=assistant_or_conversation_id,
                     message=user_message
                 )

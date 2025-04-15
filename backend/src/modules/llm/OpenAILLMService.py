@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 
+from src.modules.llm.helpers.parse_model_key import parse_model_key
 from src.modules.llm.models.Delta import Delta
 from src.modules.llm.models.Message import Message
 from src.modules.llm.models.ToolCall import ToolCall
@@ -16,8 +17,9 @@ class OpenAILLMService(ILLMService):
             temperature: float = 0.0,
             api_key: str = '',
     ) -> AsyncGenerator[Delta, None]:
+        [_, model_name] = parse_model_key(model)
         runner = OpenAIRunner(
-            model=model,
+            model=model_name,
             messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,

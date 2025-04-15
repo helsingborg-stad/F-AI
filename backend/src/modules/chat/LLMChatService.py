@@ -5,56 +5,66 @@ from src.modules.assistants.protocols.IAssistantService import IAssistantService
 from src.modules.chat.models.ChatEvent import ChatEvent
 from src.modules.chat.protocols.IChatService import IChatService
 from src.modules.conversations.protocols.IConversationService import IConversationService
+from src.modules.llm.factory import LLMServiceFactory
 from src.modules.llm.models.Message import Message
-from src.modules.llm.protocols.ILLMService import ILLMService
 
 
 class LLMChatService(IChatService):
     def __init__(
             self,
-            llm_service: ILLMService,
+            llm_factory: LLMServiceFactory,
             assistant_service: IAssistantService,
             conversation_service: IConversationService
     ):
-        self._llm_service = llm_service
+        self._llm_factory = llm_factory
         self._assistant_service = assistant_service
         self._conversation_service = conversation_service
 
-    async def start_new_chat(self, assistant_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
-        assistant = await self._assistant_service.get_assistant(assistant_id)
+    async def start_new_chat(self, as_uid: str, assistant_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
+        assistant = await self._assistant_service.get_assistant(
+            as_uid=as_uid,
+            assistant_id=assistant_id,
+            redact_key=False
+        )
 
         if not assistant:
             yield ChatEvent(event='error', message='invalid assistant')
             return
 
-        conversation_id = await self._conversation_service.create_conversation(assistant_id=assistant_id)
+        conversation_id = await self._conversation_service.create_conversation(as_uid=as_uid, assistant_id=assistant_id)
 
         yield ChatEvent(event='conversation_id', conversation_id=conversation_id)
 
         await self._conversation_service.add_message_to_conversation(
+            as_uid=as_uid,
             conversation_id=conversation_id,
             timestamp=get_timestamp(),
             role='system',
             message=assistant.instructions
         )
 
-        async for m in self.continue_chat(conversation_id, message):
+        async for m in self.continue_chat(as_uid=as_uid, conversation_id=conversation_id, message=message):
             yield m
 
-    async def continue_chat(self, conversation_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
-        conversation = await self._conversation_service.get_conversation(conversation_id)
+    async def continue_chat(self, as_uid: str, conversation_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
+        conversation = await self._conversation_service.get_conversation(as_uid=as_uid, conversation_id=conversation_id)
 
         if not conversation:
             yield ChatEvent(event='error', message='invalid conversation')
             return
 
-        assistant = await self._assistant_service.get_assistant(conversation.assistant_id)
+        assistant = await self._assistant_service.get_assistant(
+            as_uid=as_uid,
+            assistant_id=conversation.assistant_id,
+            redact_key=False
+        )
 
         if not assistant:
             yield ChatEvent(event='error', message='invalid assistant')
             return
 
         await self._conversation_service.add_message_to_conversation(
+            as_uid=as_uid,
             conversation_id=conversation_id,
             timestamp=get_timestamp(),
             role='user',
@@ -62,13 +72,21 @@ class LLMChatService(IChatService):
         )
 
         await self._conversation_service.add_message_to_conversation(
+            as_uid=as_uid,
             conversation_id=conversation_id,
             timestamp=get_timestamp(),
             role='',
             message=''
         )
 
-        async for delta in self._llm_service.stream_llm(
+        try:
+            llm_service = self._llm_factory.get(model_key=assistant.model)
+        except ValueError as e:
+            yield ChatEvent(event='error', source='error',
+                            message=str(e))
+            return
+
+        async for delta in llm_service.stream_llm(
                 model=assistant.model,
                 messages=[
                     *[Message(role=m.role, content=m.content) for m in conversation.messages],
@@ -80,6 +98,7 @@ class LLMChatService(IChatService):
         ):
             if delta.role != 'error':
                 await self._conversation_service.add_to_conversation_last_message(
+                    as_uid=as_uid,
                     conversation_id=conversation_id,
                     timestamp=get_timestamp(),
                     role=delta.role,

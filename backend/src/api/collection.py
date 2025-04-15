@@ -1,8 +1,8 @@
 import os
 from tempfile import TemporaryDirectory
 
-from fastapi import APIRouter, status, UploadFile
-from pydantic import BaseModel
+from fastapi import APIRouter, status, UploadFile, HTTPException
+from pydantic import BaseModel, Field
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
@@ -16,19 +16,26 @@ auth = AuthRouterDecorator(collection_router)
 
 
 class CreateCollectionRequest(BaseModel):
-    label: str
-    embedding_model: str
+    label: str = Field(..., example='My collection')
+    embedding_model: str = Field(..., example='default')
+
+
+class CreateCollectionResponse(BaseModel):
+    collection_id: str
 
 
 @auth.post(
     '',
     required_scopes=['collection.write'],
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_collection(body: CreateCollectionRequest, services: ServicesDependency):
-    await services.collection_service.create_collection(
+    collection_id = await services.collection_service.create_collection(
         label=body.label,
         embedding_model=body.embedding_model,
     )
+
+    return CreateCollectionResponse(collection_id=collection_id)
 
 
 class GetCollectionResponseCollectionFile(BaseModel):
@@ -67,15 +74,6 @@ async def get_collections(services: ServicesDependency):
     ])
 
 
-@auth.delete(
-    '/{collection_id}',
-    required_scopes=['collection.write'],
-    status_code=status.HTTP_204_NO_CONTENT,
-)
-async def delete_collection(collection_id: str, services: ServicesDependency):
-    await services.collection_service.delete_collection(collection_id)
-
-
 class UpdateCollectionRequest(BaseModel):
     label: str
 
@@ -83,9 +81,13 @@ class UpdateCollectionRequest(BaseModel):
 @auth.patch(
     '/{collection_id}',
     required_scopes=['collection.write'],
+    response_404_description='Collection not found',
 )
 async def update_collection_metadata(body: UpdateCollectionRequest, collection_id: str, services: ServicesDependency):
-    await services.collection_service.set_collection_label(collection_id, body.label)
+    success = await services.collection_service.set_collection_label(collection_id, body.label)
+
+    if not success:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @auth.put(
@@ -97,7 +99,8 @@ Replaces the content of the collection with the files/URLs provided.
 
 Note: depending on the size and complexity of the content this may take several minutes
 to complete.
-    '''
+    ''',
+    response_404_description='Collection not found',
 )
 async def set_collection_content(
         collection_id: str,
@@ -119,7 +122,19 @@ async def set_collection_content(
 
         paths_and_urls = [p for p in file_paths + (urls or []) if len(p) > 0]
 
-        await services.collection_service.set_collection_documents(collection_id, paths_and_urls)
+        success = await services.collection_service.set_collection_documents(collection_id, paths_and_urls)
+
+        if not success:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@auth.delete(
+    '/{collection_id}',
+    required_scopes=['collection.write'],
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_collection(collection_id: str, services: ServicesDependency):
+    await services.collection_service.delete_collection(collection_id)
 
 
 class QueryCollectionRequest(BaseModel):

@@ -16,6 +16,7 @@ from src.modules.groups.factory import GroupServiceFactory
 from src.modules.llm.factory import LLMServiceFactory
 from src.modules.login.factory import LoginServiceFactory
 from src.modules.notification.factory import NotificationServiceFactory
+from src.modules.resources.factory import ResourceServiceFactory
 from src.modules.settings.factory import SettingsServiceFactory
 from src.modules.vector.factory import VectorServiceFactory
 
@@ -34,9 +35,10 @@ async def create_services() -> Services:
     settings_service = SettingsServiceFactory(mongo_database=mongo_database).get()
     notification_service = NotificationServiceFactory(settings_service=settings_service).get()
     vector_service = VectorServiceFactory(settings_service=settings_service).get()
-    llm_service = LLMServiceFactory().get()
-    assistant_service = AssistantServiceFactory(mongo_database=mongo_database).get()
+    resource_service = ResourceServiceFactory(group_service=group_service).get()
+    assistant_service = AssistantServiceFactory(mongo_database=mongo_database, resource_service=resource_service).get()
     conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
+    llm_factory = LLMServiceFactory()
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
@@ -51,7 +53,7 @@ async def create_services() -> Services:
         ),
         authorization_service=authorization_service,
         api_key_service=api_key_service,
-        llm_service=llm_service,
+        llm_factory=llm_factory,
         document_chunker_factory=document_chunker_factory,
         vector_service=vector_service,
         collection_service=CollectionServiceFactory(
@@ -70,7 +72,7 @@ async def create_services() -> Services:
         assistant_service=assistant_service,
         conversation_service=conversation_service,
         chat_service=ChatServiceFactory(
-            llm_service=llm_service,
+            llm_factory=llm_factory,
             assistant_service=assistant_service,
             conversation_service=conversation_service,
         ).get(),
