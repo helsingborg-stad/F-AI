@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { IAssistants } from '$lib/types.js'
+  import type { IAssistant } from '$lib/types.js'
 
-  let { data }: IAssistants = $props()
+  let { data } = $props<{ assistants: IAssistant[] }>()
 
   const assistants = data.assistants
   const nrOfAssistants = assistants.length
@@ -40,7 +40,7 @@
           <h2 class="card-title">{assistant.name}</h2>
           <p>{assistant.description}</p>
           <div class="card-actions justify-end">
-              <a href="assistant/details" class="btn btn-primary">Details</a>
+            <a href="assistant/details?assistant_id={assistant.id}" class="btn btn-primary">Details</a>
           </div>
         </div>
       </div>
