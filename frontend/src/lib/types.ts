@@ -45,6 +45,16 @@ export interface IScopesResponse {
   scopes: UserScopeType[]
 }
 
+export interface IAssistantModel {
+  key: string
+  provider: string
+  name: string
+}
+
+export interface IAssistantModels {
+  models: IAssistantModel[]
+}
+
 export interface IAssistant {
   id: string
   owner: string
