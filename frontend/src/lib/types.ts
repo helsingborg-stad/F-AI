@@ -60,6 +60,8 @@ export interface IAssistant {
   owner: string
   name: string
   description: string
+  instructions: string
+  model: string
 }
 
 export interface IAssistants {
