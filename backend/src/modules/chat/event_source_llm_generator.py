@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import json
 
 from src.modules.chat.protocols.IChatService import IChatService
 from sse_starlette import ServerSentEvent, EventSourceResponse
@@ -37,21 +38,21 @@ async def event_source_llm_generator(
                     case 'message':
                         yield ServerSentEvent(
                             event='chat.message',
-                            data={
+                            data=json.dumps({
                                 'timestamp': datetime.datetime.utcnow().isoformat(),
                                 'source': chat_event.source,
                                 'message': chat_event.message
-                            }
+                            })
                         )
                     case _:
                         print(f'unhandled chat event {chat_event.event}')
                         yield ServerSentEvent(
                             event=f'chat.{chat_event.event}',
-                            data={
+                            data=json.dumps({
                                 'timestamp': datetime.datetime.utcnow().isoformat(),
                                 'source': chat_event.source,
                                 'message': chat_event.message
-                            }
+                            })
                         )
         except asyncio.CancelledError as e:
             # likely user cancelled generating
@@ -60,9 +61,9 @@ async def event_source_llm_generator(
         finally:
             yield ServerSentEvent(
                 event='chat.message_end',
-                data={
+                data=json.dumps({
                     'timestamp': datetime.datetime.utcnow().isoformat()
-                }
+                })
             )
 
     return EventSourceResponse(sse_generator())
