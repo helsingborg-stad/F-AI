@@ -86,6 +86,7 @@
             oninput={handleOTPChange}
             class="input input-bordered w-full max-w-xs"
             placeholder="1234"
+            autocomplete="one-time-code"
           />
         </label>
         <div class="mt-6">
