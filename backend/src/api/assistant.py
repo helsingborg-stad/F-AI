@@ -33,6 +33,7 @@ class GetAvailableModelsResponseModel(BaseModel):
     key: str
     provider: str
     name: str
+    description: str
 
 
 class GetAvailableModelsResponse(BaseModel):
@@ -56,7 +57,8 @@ async def get_available_models(services: ServicesDependency, auth_identity: Auth
         GetAvailableModelsResponseModel(
             key=model.key,
             provider=model.provider,
-            name=model.display_name
+            name=model.display_name,
+            description=model.description
         ) for model in result
     ])
 
