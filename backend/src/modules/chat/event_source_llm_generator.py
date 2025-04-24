@@ -1,9 +1,10 @@
 import asyncio
-import datetime
 import json
 
-from src.modules.chat.protocols.IChatService import IChatService
 from sse_starlette import ServerSentEvent, EventSourceResponse
+
+from src.common.get_timestamp import get_timestamp
+from src.modules.chat.protocols.IChatService import IChatService
 
 
 async def event_source_llm_generator(
@@ -39,7 +40,17 @@ async def event_source_llm_generator(
                         yield ServerSentEvent(
                             event='chat.message',
                             data=json.dumps({
-                                'timestamp': datetime.datetime.utcnow().isoformat(),
+                                'timestamp': get_timestamp(),
+                                'source': chat_event.source,
+                                'message': chat_event.message
+                            })
+                        )
+                    case 'error':
+                        print(f'chat error: {chat_event.message}')
+                        yield ServerSentEvent(
+                            event='chat.error',
+                            data=json.dumps({
+                                'timestamp': get_timestamp(),
                                 'source': chat_event.source,
                                 'message': chat_event.message
                             })
@@ -49,7 +60,7 @@ async def event_source_llm_generator(
                         yield ServerSentEvent(
                             event=f'chat.{chat_event.event}',
                             data=json.dumps({
-                                'timestamp': datetime.datetime.utcnow().isoformat(),
+                                'timestamp': get_timestamp(),
                                 'source': chat_event.source,
                                 'message': chat_event.message
                             })
@@ -62,7 +73,7 @@ async def event_source_llm_generator(
             yield ServerSentEvent(
                 event='chat.message_end',
                 data=json.dumps({
-                    'timestamp': datetime.datetime.utcnow().isoformat()
+                    'timestamp': get_timestamp()
                 })
             )
 
