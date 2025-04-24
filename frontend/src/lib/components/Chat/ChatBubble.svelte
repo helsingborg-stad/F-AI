@@ -1,15 +1,37 @@
 <script lang="ts">
-  export let sender: 'user' | 'bot' = 'bot';
-  export let text: string = '';
-  export let name: string = '';
-  export let time: string = '';
-  export let avatar: string = '';
-  export let status: string = '';
-  export let bubbleColor: string = ''; // e.g., 'primary', 'secondary', 'accent', etc.
+  import dayjs from 'dayjs'
 
-  $: alignmentClass = sender === 'user' ? 'chat-end' : 'chat-start';
+  interface Props {
+    sender?: string;
+    text?: string;
+    name?: string;
+    time?: string;
+    avatar?: string;
+    status?: string;
+    bubbleColor?: string; // e.g., 'primary', 'secondary', 'accent', etc.
+  }
 
-  $: bubbleClass = bubbleColor ? `chat-bubble-${bubbleColor}` : '';
+  const {
+    sender = '',
+    text = '',
+    name = '',
+    time = '',
+    avatar = '',
+    status = '',
+    bubbleColor = '',
+  }: Props = $props()
+
+  const alignmentClass = $derived(sender === 'user' ? 'chat-end' : 'chat-start')
+  const bubbleClass = $derived(bubbleColor ? `chat-bubble-${bubbleColor}` : '')
+
+  function parseTimestamp(timestamp: string | undefined) {
+    if (!timestamp) return undefined
+    const d = dayjs(timestamp)
+    if (!d.isValid()) return timestamp
+    return d.format('YYYY-MM-DD HH:mm:ss')
+  }
+
+  const parsedTime = $derived(parseTimestamp(time))
 </script>
 
 <div class="chat {alignmentClass}">
@@ -20,11 +42,11 @@
       </div>
     </div>
   {/if}
-  {#if name || time}
+  {#if name || parsedTime}
     <div class="chat-header">
       {#if name}{name}{/if}
-      {#if time}
-        <time class="text-xs opacity-50 ml-2">{time}</time>
+      {#if parsedTime}
+        <time class="text-xs opacity-50 ml-2" datetime={time}>{parsedTime}</time>
       {/if}
     </div>
   {/if}
