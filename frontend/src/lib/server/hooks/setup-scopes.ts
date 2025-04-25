@@ -18,19 +18,15 @@ export async function setupScopes(
   }
 
   if (accessToken && !isPublicPath) {
-    try {
-      const scopesResponse = await api.get('/api/auth/scopes', { withAuth: true, event })
+      const response = await api.get('/api/auth/scopes', { withAuth: true, event })
 
-      if (scopesResponse.ok) {
-        const scopesData: IScopesResponse = await scopesResponse.json()
+      if (response.ok) {
+        const scopesData: IScopesResponse = await response.json()
 
         event.locals.user = {
           scopes: scopesData.scopes || [],
         }
       }
-    } catch (e) {
-      console.log('Failed to fetch user scopes:', e)
-    }
   }
 
   return event
