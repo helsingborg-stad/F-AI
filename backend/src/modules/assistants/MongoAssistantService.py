@@ -35,16 +35,25 @@ class MongoAssistantService(IAssistantService):
         return str(result.inserted_id)
 
     async def get_available_models(self, as_uid: str) -> list[Model]:
-        cursor = self._database['chat_models'].find(projection=['key', 'provider', 'display_name'])
-        return [Model(key=doc['key'], provider=doc['provider'], display_name=doc['display_name']) async for doc in
-                cursor]
+        cursor = self._database['chat_models'].find(projection=['key', 'provider', 'display_name', 'description'])
+        return [Model(
+            key=doc['key'],
+            provider=doc['provider'],
+            display_name=doc['display_name'],
+            description=doc['description']
+        ) async for doc in cursor]
 
     async def set_available_models(self, models: list[Model]) -> bool:
         await self._database['chat_models'].drop()
         if len(models) == 0:
             return True
         result = await self._database['chat_models'].insert_many([
-            {'key': model.key, 'provider': model.provider, 'display_name': model.display_name}
+            {
+                'key': model.key,
+                'provider': model.provider,
+                'display_name': model.display_name,
+                'description': model.description
+            }
             for model in models
         ])
         return len(result.inserted_ids) == len(models)

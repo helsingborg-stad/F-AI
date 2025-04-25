@@ -2,4 +2,4 @@ import datetime
 
 
 def get_timestamp() -> str:
-    return datetime.datetime.utcnow().isoformat()
+    return datetime.datetime.now(datetime.UTC).isoformat()
