@@ -1,20 +1,22 @@
 <script lang="ts">
   import type { IAssistant } from '$lib/types.js'
-  import Divider from '$lib/components/Divider/Divider.svelte'
+  import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
   import PageHeader from '$lib/components/assistant/PageHeader.svelte'
+  import VerticalDivider from '$lib/components/Divider/VerticalDivider.svelte'
 
   let { data } = $props<{ assistants: IAssistant[] }>()
 
   const assistants = data.assistants
-  const nrOfAssistants = assistants.length
   const enableCreate = true
 </script>
 
-<PageHeader title="Assistants" {enableCreate} />
-<Divider />
-<div class="flex w-full">
-  <p>List of assistants</p>
-  <Divider />
-  <p>Assistant details</p>
+<div class="flex flex-col min-h-0 h-full">
+  <PageHeader title="Assistants" {enableCreate} />
+  <HorizontalDivider />
+  <div class="flex flex-1 gap-4">
+    <p>List of assistants</p>
+    <VerticalDivider />
+    <p>Assistant details</p>
+  </div>
 </div>
 
