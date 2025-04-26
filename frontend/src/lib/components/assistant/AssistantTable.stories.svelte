@@ -15,4 +15,4 @@
 <Story name="With assistants" args={{ assistants: mockAssistants }} />
 
 <Story name="With active assistant"
-       args={{ assistants: mockAssistants, activeAssistantId: '6651afc3a7b5e3c8d9f01234' }} />
+       args={{ assistants: mockAssistants, activeAssistant: mockAssistants[0] }} />
