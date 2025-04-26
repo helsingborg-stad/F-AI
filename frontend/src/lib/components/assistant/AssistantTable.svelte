@@ -3,10 +3,10 @@
 
   interface Props {
     assistants: IAssistant[]
-    activeAssistantId?: string
+    activeAssistant?: IAssistant
   }
 
-  let { assistants, activeAssistantId = '' }: Props = $props()
+  let { assistants, activeAssistant = {} }: Props = $props()
 </script>
 
 
@@ -14,7 +14,7 @@
   <table class="table">
     <tbody>
     {#each assistants as assistant}
-      <tr class="hover" class:bg-base-200={activeAssistantId === assistant.id}>
+      <tr class="hover" class:bg-base-200={activeAssistant.id === assistant.id}>
         <td>
           <div class="flex flex-col">
             <div class="text-base">{assistant.name}</div>
