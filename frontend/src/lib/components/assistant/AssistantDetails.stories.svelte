@@ -9,7 +9,11 @@
     tags: ['autodocs'],
   })
 
-  const assistant: IAssistant = {
+  const newAssistant = {
+    id: '6808ddaffcd3461eea42133f',
+  }
+
+  const gptAssistant: IAssistant = {
     id: '6808ddaffcd3461eea42133f',
     owner: 'user@example.com',
     name: 'Research Assistant',
@@ -21,4 +25,4 @@
 
 <Story name="Default" />
 
-<Story name="With assistant" args={{ assistant }} />
+<Story name="Create new assistant" args={{ assistant: newAssistant }} />
