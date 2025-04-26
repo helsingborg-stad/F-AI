@@ -11,4 +11,4 @@
 
 <Story name="Default" />
 
-<Story name="With create enabled" args={{ enableCreate: true }} />
+<Story name="With create enabled" args={{ canCreateAssistant: true }} />
