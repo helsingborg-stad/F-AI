@@ -35,6 +35,7 @@
           placeholder="Enter a user friendly name"
           class="input input-bordered input-sm w-full"
           value={assistant.name}
+          readonly={!canEdit}
         />
         <div class="label">
           <span class="label-text-alt opacity-50">{assistant.id}</span>
@@ -48,14 +49,16 @@
         <textarea
           name="instructions"
           class="textarea textarea-bordered h-24"
-          placeholder="You are a helpful assistant...">{assistant.instructions}</textarea>
+          placeholder="You are a helpful assistant..."
+          readonly={!canEdit}
+        >{assistant.instructions}</textarea>
       </label>
 
       <label class="form-control w-full">
         <div class="label">
           <span class="label-text">Model</span>
         </div>
-        <select class="select select-bordered select-sm text-sm">
+        <select class="select select-bordered select-sm text-sm" disabled={!canEdit}>
           <option>gpt-4</option>
           <option>claud</option>
         </select>
@@ -66,17 +69,17 @@
         <HorizontalDivider />
         <div class="flex flex-row place-content-between items-center">
           <div class="flex flex-row gap-2">
-            <input type="checkbox" class="toggle toggle-sm toggle-success" />
+            <input type="checkbox" class="toggle toggle-sm toggle-success" disabled={!canEdit} />
             <InfoTooltip
               toolTip="File Search enables the assistant with knowledge from files that you or your users upload.">
               <div class="text-sm font-medium select-none">File search</div>
             </InfoTooltip>
           </div>
           <div>
-            <button class="btn btn-sm">
+            <button class="btn btn-sm" disabled={!canEdit}>
               <Icon icon={icons["settings"]} width={16} height={16} />
             </button>
-            <button class="btn btn-sm">
+            <button class="btn btn-sm" disabled={!canEdit}>
               <Icon icon={icons["plus"]} width={16} height={16} />
               <span class="text-s">Files</span>
             </button>
@@ -91,7 +94,7 @@
             </InfoTooltip>
           </div>
           <div>
-            <button class="btn btn-sm">
+            <button class="btn btn-sm" disabled={!canEdit}>
               <Icon icon={icons["plus"]} width={16} height={16} />
               <span class="text-s">Functions</span>
             </button>
@@ -106,15 +109,13 @@
           <div class="label">
             <span class="label-text">Response format</span>
           </div>
-          <select class="select select-bordered select-sm text-sm">
+          <select class="select select-bordered select-sm text-sm" disabled={!canEdit}>
             <option>text</option>
             <option>json_format</option>
           </select>
         </label>
 
       </div>
-
-
     </form>
   </div>
 {/if}

@@ -18,4 +18,6 @@
 
 <Story name="Create new assistant" args={{ assistant: newAssistant }} />
 
-<Story name="With assistant" args={{assistant: mockAssistants[0]}} />
+<Story name="With 'can edit' enabled" args={{ assistant: mockAssistants[0], canEdit: true }} />
+
+<Story name="With 'can edit' disabled" args={{ assistant: mockAssistants[0], canEdit: false }} />
