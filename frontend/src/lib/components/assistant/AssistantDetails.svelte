@@ -14,11 +14,17 @@
     assistant,
     canEdit = false,
   }: Props = $props()
+
+  let formAction = $state('update')
+
+  function setDeleteAction() {
+    formAction = 'delete'
+  }
 </script>
 
 {#if assistant}
   <div class="flex flex-col gap-y-4">
-    <form method="POST" action="?/update" class="space-y-4">
+    <form method="POST" action="?/{formAction}" class="space-y-4">
       <input
         type="hidden"
         name="assistant_id"
@@ -114,8 +120,24 @@
             <option>json_format</option>
           </select>
         </label>
-
       </div>
+
+      {#if canEdit}
+        <div class="flex justify-between">
+          <div>
+            <button type="submit" class="btn btn-sm btn-error text-white" onclick={setDeleteAction}>
+              <Icon icon={icons["trash"]} width={20} height={20} />
+            </button>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-sm btn-success text-white">
+              <Icon icon={icons["save"]} width={20} height={20} />
+              <span class="text-s">Save</span>
+            </button>
+          </div>
+        </div>
+      {/if}
+
     </form>
   </div>
 {/if}
