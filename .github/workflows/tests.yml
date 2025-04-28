@@ -27,9 +27,9 @@ jobs:
           python-version: "3.11"
 
       - name: install poetry
-        uses: abatilo/actions-poetry@v2
+        uses: abatilo/actions-poetry@v3
         with:
-          poetry-version: "1.8.2"
+          poetry-version: "2.0.1"
 
       # create a local environment to use for GitHub Actions caching
       - name: setup poetry
