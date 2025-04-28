@@ -48,6 +48,4 @@ jobs:
           poetry install
 
       - name: Run tests
-        with:
-          PYTHONPATH: ./
-        run: poetry run pytest --cov=src/ -v -m "not mongo"
+        run: PYTHONPATH=./ poetry run pytest --cov=src/ -v -m "not mongo"
