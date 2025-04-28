@@ -48,5 +48,8 @@ jobs:
           poetry lock --no-update
           poetry install
 
+      - name: Verify installed packages
+        run: poetry run pip list
+
       - name: Run tests
-        run: PYTHONPATH=./ poetry run pytest --cov=src/ -v -m "not mongo"
+        run: PYTHONPATH=./ poetry run python -m pytest --cov=src/ -v -m "not mongo"
