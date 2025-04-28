@@ -10,7 +10,7 @@
 </script>
 
 
-<div class="overflow-x-auto">
+<div class="overflow-x-auto pt-4">
   <table class="table">
     <tbody>
     {#each assistants as assistant}
