@@ -45,8 +45,9 @@ jobs:
 
       - name: install dependencies
         run: |
-          poetry lock --no-update
           poetry install
 
       - name: Run tests
-        run: ./run_tests.sh
+        with:
+          PYTHONPATH: ./
+        run: poetry run pytest --cov=src/ -v -m "not mongo"
