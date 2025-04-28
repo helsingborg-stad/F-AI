@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./fai-rag-app/fai-backend
+        working-directory: ./backend
 
     steps:
       - name: checkout
@@ -40,17 +40,13 @@ jobs:
       - name: cache
         uses: actions/cache@v3
         with:
-          path: ./fai-rag-app/fai-backend/.venv
-          key: venv-${{ hashFiles('fai-rag-app/fai-backend/poetry.lock') }}
+          path: ./backend/.venv
+          key: venv-${{ hashFiles('backend/poetry.lock') }}
 
       - name: install dependencies
         run: |
-          sudo apt-get install -y --no-install-recommends \
-          poppler-utils \
-          tesseract-ocr
-
           poetry lock --no-update
           poetry install
 
       - name: Run tests
-        run: poetry run pytest -s -vv
+        run: run_tests.sh
