@@ -49,4 +49,4 @@ jobs:
           poetry install
 
       - name: Run tests
-        run: run_tests.sh
+        run: ./run_tests.sh
