@@ -48,3 +48,11 @@ export function hasAnyScope(possibleScopes: UserScopeType[]): boolean {
     userState.scopes ? userState.scopes.includes(scope) : false,
   )
 }
+
+export function canCreateAssistant(): boolean {
+  return hasScope('assistant.write')
+}
+
+export function canReadAssistants(): boolean {
+  return hasScope('assistant.read')
+}
