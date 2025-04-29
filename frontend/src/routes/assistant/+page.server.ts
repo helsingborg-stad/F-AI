@@ -30,8 +30,6 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
   create: async (event) => {
-    const formData = await event.request.formData()
-
     const createAssistantResponse = await api.post('/api/assistant', {
       event
     })
@@ -87,5 +85,39 @@ export const actions = {
     }
 
     throw redirect(303, '/assistant')
+  },
+
+  copy: async (event) => {
+    const formData = await event.request.formData()
+    const name = formData.get('name')
+    const model = formData.get('model')
+    const instructions = formData.get('instructions')
+    const description = formData.get('description')
+
+    const body = {
+      name: `Copy of ${name}`,
+      model: model,
+      instructions: instructions,
+      description: description,
+    }
+
+    const createAssistantResponse = await api.post('/api/assistant', {
+      event
+    })
+
+    if (!createAssistantResponse.ok) {
+      return { success: false }
+    }
+
+    const assistantId = (await createAssistantResponse.json()).assistant_id
+
+    await api.put(`/api/assistant/${assistantId}`, {
+      event,
+      withAuth: true,
+      body,
+    })
+
+
+    redirect(303, `/assistant?assistant_id=${assistantId}`)
   }
 }

@@ -8,17 +8,23 @@
   interface Props {
     assistant?: IAssistant
     canEdit?: boolean
+    canCreate?: boolean
   }
 
   let {
     assistant,
     canEdit = false,
+    canCreate = false,
   }: Props = $props()
 
   let formAction = $state('update')
 
   function setDeleteAction() {
     formAction = 'delete'
+  }
+
+  function setCopyAction() {
+    formAction = 'copy'
   }
 </script>
 
@@ -124,11 +130,19 @@
 
       {#if canEdit}
         <div class="flex justify-between">
-          <div>
+          <div class="flex flex-row gap-2">
+            <div>
             <button type="submit" class="btn btn-sm btn-error text-white" onclick={setDeleteAction}>
               <Icon icon={icons["trash"]} width={20} height={20} />
             </button>
           </div>
+            <div>
+            <button type="submit" class="btn btn-sm bg-gray-400 text-white" onclick={setCopyAction}>
+              <Icon icon={icons["copy"]} width={20} height={20} />
+            </button>
+          </div>
+          </div>
+
           <div>
             <button type="submit" class="btn btn-sm btn-success text-white">
               <Icon icon={icons["save"]} width={20} height={20} />
