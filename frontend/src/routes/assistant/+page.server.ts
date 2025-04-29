@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types.js'
 import { api } from '$lib/api-fetch-factory.js'
 import type { IAssistant } from '$lib/types.js'
 import { canCreateAssistant, canReadAssistants } from '$lib/state/user.svelte.js'
-import { redirect } from '@sveltejs/kit'
+import { error, redirect } from '@sveltejs/kit'
 
 export const load: PageServerLoad = async (event) => {
   const userCanListAssistants = canReadAssistants()
@@ -36,7 +36,6 @@ export const actions = {
       event
     })
 
-    console.log(createAssistantResponse)
     if (!createAssistantResponse.ok) {
       return { success: false }
     }
@@ -69,5 +68,24 @@ export const actions = {
     })
 
     throw redirect(303, `/assistant?assistant_id=${assistantId}`)
+  },
+
+  delete: async (event) => {
+    const formData = await event.request.formData()
+    const assistantI = formData.get('assistant_id')
+
+    if (!assistantI) {
+      throw error(404, 'Valid assistant ID is required')
+    }
+
+    const response = await api.delete(`/api/assistant/${assistantI}`, {
+      event
+    })
+
+    if (!response.ok) {
+      throw error(500, 'Failed to delete assistant')
+    }
+
+    throw redirect(303, '/assistant')
   }
 }
