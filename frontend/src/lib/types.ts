@@ -5,11 +5,6 @@ export interface IMenuItem {
   path: string
 }
 
-export type MessageType = {
-  sender: 'user' | 'bot'
-  text: string
-}
-
 export type ItemOptionsType = {
   iconName: keyof typeof icons
   title: string
@@ -67,7 +62,3 @@ export interface IAssistant {
 export interface IAssistants {
   assistants: IAssistant[]
 }
-
-// Dummy export to prevent empty module at runtime.
-// Fixes Storybook error where module is empty after TypeScript compilation.
-export const __types = {}
