@@ -10,6 +10,7 @@
   const assistants = data.assistants
   const canCreateAssistant = data.canCreateAssistant
   const activeAssistant = data.activeAssistant
+  const canEditActiveAssistant = data.canEditActiveAssistant
 </script>
 
-<MainPage {canCreateAssistant} {assistants} {activeAssistant} />
+<MainPage {canCreateAssistant} {assistants} {activeAssistant} {canEditActiveAssistant} />
