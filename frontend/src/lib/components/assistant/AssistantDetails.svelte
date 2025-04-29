@@ -26,6 +26,10 @@
   function setCopyAction() {
     formAction = 'copy'
   }
+
+  function setUpdateAction() {
+    formAction = 'update'
+  }
 </script>
 
 {#if assistant}
@@ -144,7 +148,7 @@
           </div>
 
           <div>
-            <button type="submit" class="btn btn-sm btn-success text-white">
+            <button type="submit" class="btn btn-sm btn-success text-white" onclick={setUpdateAction}>
               <Icon icon={icons["save"]} width={20} height={20} />
               <span class="text-s">Save</span>
             </button>
