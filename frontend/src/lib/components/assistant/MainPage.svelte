@@ -25,7 +25,7 @@
     </div>
     <VerticalDivider />
     <div class="flex-1">
-      <AssistantDetails assistant={activeAssistant} canEdit={canEditActiveAssistant} />
+      <AssistantDetails assistant={activeAssistant} canEdit={canEditActiveAssistant} canCreate={canCreateAssistant} />
     </div>
   </div>
 </div>
