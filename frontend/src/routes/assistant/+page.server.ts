@@ -29,6 +29,22 @@ export const load: PageServerLoad = async (event) => {
 }
 
 export const actions = {
+  create: async (event) => {
+    const formData = await event.request.formData()
+
+    const createAssistantResponse = await api.post('/api/assistant', {
+      event
+    })
+
+    console.log(createAssistantResponse)
+    if (!createAssistantResponse.ok) {
+      return { success: false }
+    }
+
+    const assistantId = (await createAssistantResponse.json()).assistant_id
+    redirect(303, `/assistant?assistant_id=${assistantId}`)
+  },
+
   update: async (event) => {
     const formData = await event.request.formData()
     const assistantId = formData.get('assistant_id')

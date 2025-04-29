@@ -13,9 +13,7 @@
     url.searchParams.set('assistant_id', assistant.id)
     window.location.href = url.toString()
   }
-
 </script>
-
 
 <div class="overflow-x-auto pt-4">
   <table class="table">
@@ -30,7 +28,7 @@
       >
         <td>
           <div class="flex flex-col">
-            <div class="text-base">{assistant.name}</div>
+            <div class="text-base">{assistant.name ? assistant.name : 'Untitled assistant'}</div>
             <div class="text-xs opacity-50">{assistant.id}</div>
           </div>
         </td>
