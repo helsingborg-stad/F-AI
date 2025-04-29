@@ -10,21 +10,22 @@
     canCreateAssistant?: boolean
     assistants?: IAssistant[]
     activeAssistant?: IAssistant
+    canEditActiveAssistant?: boolean
   }
 
-  let { canCreateAssistant = false, assistants = [], activeAssistant }: Props = $props()
+  let { canCreateAssistant = false, assistants = [], activeAssistant, canEditActiveAssistant = false }: Props = $props()
 </script>
 
 <div class="flex flex-col min-h-0 h-full">
   <PageHeader title="Assistants" {canCreateAssistant} />
   <HorizontalDivider />
-  <div class="flex w-full justify-center flex-1 gap-4">
+  <div class="flex w-full justify-center flex-1 gap-4 px-4">
     <div class="flex-1">
       <AssistantTable {assistants} {activeAssistant} />
     </div>
     <VerticalDivider />
     <div class="flex-1">
-      <AssistantDetails assistant={activeAssistant} />
+      <AssistantDetails assistant={activeAssistant} canEdit={canEditActiveAssistant} />
     </div>
   </div>
 </div>

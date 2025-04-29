@@ -8,6 +8,8 @@
   let { data } = $props<{ assistants: IAssistant[] }>()
 
   const assistants = data.assistants
+  const canCreateAssistant = data.canCreateAssistant
+  const activeAssistant = data.activeAssistant
 </script>
 
-<MainPage canCreateAssistant={true}/>
+<MainPage {canCreateAssistant} {assistants} {activeAssistant} />
