@@ -33,6 +33,7 @@ class GetAvailableModelsResponseModel(BaseModel):
     key: str
     provider: str
     name: str
+    description: str
 
 
 class GetAvailableModelsResponse(BaseModel):
@@ -56,7 +57,8 @@ async def get_available_models(services: ServicesDependency, auth_identity: Auth
         GetAvailableModelsResponseModel(
             key=model.key,
             provider=model.provider,
-            name=model.display_name
+            name=model.display_name,
+            description=model.description
         ) for model in result
     ])
 
@@ -192,3 +194,30 @@ class DeleteAssistantRequest(BaseModel):
 )
 async def delete_assistant(assistant_id: str, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
     await services.assistant_service.delete_assistant(as_uid=auth_identity.uid, assistant_id=assistant_id)
+
+
+class SetAssistantVisibilityRequest(BaseModel):
+    public: bool
+
+
+@auth.post(
+    '/{assistant_id}/visibility',
+    ['assistant.write'],
+    summary='Set Assistant Visibility',
+    description='''
+Set if a given assistant is visible to other users (public) or only self (private).
+    '''
+)
+async def set_assistant_visibility(
+        assistant_id: str,
+        body: SetAssistantVisibilityRequest,
+        services: ServicesDependency,
+        auth_identity: AuthenticatedIdentity,
+):
+    my_assistants = await services.assistant_service.get_owned_assistants(as_uid=auth_identity.uid)
+
+    if not assistant_id in [a.id for a in my_assistants]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    await services.resource_service.set_resource_visibility(as_uid=auth_identity.uid, resource=assistant_id,
+                                                            public=body.public)

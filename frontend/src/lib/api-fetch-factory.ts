@@ -25,7 +25,6 @@ class ApiFetchFactory {
 
     const headers = new Headers(fetchOptions.headers)
 
-    // Set content type for JSON requests
     if (body && !headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json')
     }
@@ -46,7 +45,13 @@ class ApiFetchFactory {
       body: body ? JSON.stringify(body) : undefined,
     }
 
-    return await fetch(url, requestOptions)
+    const response = await fetch(url, requestOptions)
+
+    if (!response.ok) {
+      throw response
+    }
+
+    return response
   }
 
   async get<T>(endpoint: string, options: ApiOptions<T>): Promise<Response> {

@@ -16,3 +16,22 @@ class GroupBasedResourceService(IResourceService):
 
     async def can_access(self, as_uid: str, resource: str) -> bool:
         return resource in await self.get_resources(as_uid=as_uid)
+
+    async def set_resource_visibility(self, as_uid: str, resource: str, public: bool) -> bool:
+        groups = await self._group_service.get_owned_groups(as_uid=as_uid)
+        public_group = next((g for g in groups if g.label == '__public__'), None)
+
+        if not public_group:
+            gid = await self._group_service.create_group(as_uid=as_uid, label='__public__', members=['*@*'],
+                                                         scopes=[], resources=[])
+            public_group = await self._group_service.get_group_by_id(as_uid=as_uid, group_id=gid)
+
+        if public and resource not in public_group.resources:
+            return await self._group_service.add_group_resource(as_uid=as_uid, group_id=public_group.id,
+                                                                resource=resource)
+
+        elif not public and resource in public_group.resources:
+            return await self._group_service.remove_group_resource(as_uid=as_uid, group_id=public_group.id,
+                                                                   resource=resource)
+
+        return False

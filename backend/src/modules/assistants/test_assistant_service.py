@@ -34,8 +34,8 @@ class BaseAssistantServiceTestClass:
     @pytest.mark.mongo
     async def test_get_available_models(service: IAssistantService):
         success = await service.set_available_models(models=[
-            Model(key='a', provider='A', display_name='Cool Model A'),
-            Model(key='b', provider='B', display_name='Cool Model B'),
+            Model(key='a', provider='A', display_name='Cool Model A', description='cool model A'),
+            Model(key='b', provider='B', display_name='Cool Model B', description='cool model B'),
         ])
 
         result = await service.get_available_models(as_uid='john')
@@ -45,20 +45,22 @@ class BaseAssistantServiceTestClass:
         assert result[0].key == 'a'
         assert result[0].provider == 'A'
         assert result[0].display_name == 'Cool Model A'
+        assert result[0].description == 'cool model A'
         assert result[1].key == 'b'
         assert result[1].provider == 'B'
         assert result[1].display_name == 'Cool Model B'
+        assert result[1].description == 'cool model B'
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
     async def test_set_available_models_override(service: IAssistantService):
         success1 = await service.set_available_models(models=[
-            Model(key='a', provider='A', display_name='Cool Model A'),
-            Model(key='b', provider='B', display_name='Cool Model B'),
+            Model(key='a', provider='A', display_name='Cool Model A', description='my cool model A'),
+            Model(key='b', provider='B', display_name='Cool Model B', description='my cool model B'),
         ])
         success2 = await service.set_available_models(models=[
-            Model(key='c', provider='C', display_name='Cool Model C'),
+            Model(key='c', provider='C', display_name='Cool Model C', description='my cool model C'),
         ])
 
         result = await service.get_available_models(as_uid='john')
@@ -69,6 +71,7 @@ class BaseAssistantServiceTestClass:
         assert result[0].key == 'c'
         assert result[0].provider == 'C'
         assert result[0].display_name == 'Cool Model C'
+        assert result[0].description == 'my cool model C'
 
     @staticmethod
     @pytest.mark.asyncio

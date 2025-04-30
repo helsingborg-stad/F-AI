@@ -10,3 +10,6 @@ class IResourceService(Protocol):
 
     async def can_access(self, as_uid: str, resource: str) -> bool:
         ...
+
+    async def set_resource_visibility(self, as_uid: str, resource: str, public: bool) -> bool:
+        ...

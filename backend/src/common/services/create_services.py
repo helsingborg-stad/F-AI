@@ -18,6 +18,7 @@ from src.modules.login.factory import LoginServiceFactory
 from src.modules.notification.factory import NotificationServiceFactory
 from src.modules.resources.factory import ResourceServiceFactory
 from src.modules.settings.factory import SettingsServiceFactory
+from src.modules.token.factory import TokenServiceFactory
 from src.modules.vector.factory import VectorServiceFactory
 
 
@@ -77,4 +78,7 @@ async def create_services() -> Services:
             conversation_service=conversation_service,
         ).get(),
         message_store_service=await MessageStoreServiceFactory(mongo_database=mongo_database).get(),
+        token_factory=TokenServiceFactory(assistant_service=assistant_service,
+                                          conversation_service=conversation_service),
+        resource_service=resource_service,
     )

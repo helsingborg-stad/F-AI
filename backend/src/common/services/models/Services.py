@@ -13,7 +13,9 @@ from src.modules.groups.protocols.IGroupService import IGroupService
 from src.modules.llm.factory import LLMServiceFactory
 from src.modules.login.protocols.ILoginService import ILoginService
 from src.modules.notification.protocols.INotificationService import INotificationService
+from src.modules.resources.protocols.IResourceService import IResourceService
 from src.modules.settings.protocols.ISettingsService import ISettingsService
+from src.modules.token.factory import TokenServiceFactory
 from src.modules.vector.protocols.IVectorService import IVectorService
 
 
@@ -34,3 +36,5 @@ class Services:
     conversation_service: IConversationService
     chat_service: IChatService
     message_store_service: IMessageStoreService
+    token_factory: TokenServiceFactory
+    resource_service: IResourceService

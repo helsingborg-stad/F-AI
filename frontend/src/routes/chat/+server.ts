@@ -1,31 +1,44 @@
-import type { RequestHandler } from './$types.ts';
-import { json } from '@sveltejs/kit';
-import { SECRET_API_URL } from '$env/static/private';
+import { error, json } from '@sveltejs/kit'
+import { api } from '$lib/api-fetch-factory.js'
+import type { RequestHandler } from './$types.js'
 
-export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const { message } = await request.json();
+/** Store Message handler */
+export const POST: RequestHandler = async (event) => {
+  const { message }: { message: string } = await event.request.json()
 
-    // Send POST request to the back-end
-    const response = await fetch(`${SECRET_API_URL}/chat/stream/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message }),
-    });
+  const response = await api.post('/api/chat/store',
+    {
+      body: { message },
+      event,
+    },
+  )
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      return json({ error: `Back-end error: ${errorText}` }, { status: response.status });
-    }
-
-    const data = await response.json();
-
-    // Return the response to the client
-    return json({ response: data.response });
-  } catch (error) {
-    console.error('Server Error:', error);
-    return json({ error: 'An error occurred on the server.' }, { status: 500 });
+  if (!response.ok) {
+    error(response.status, await response.text())
   }
-};
+
+  const { stored_message_id } = await response.json()
+
+  return json({ messageId: stored_message_id })
+}
+
+/** SSE chat handler */
+export const GET: RequestHandler = async (event) => {
+  const messageId = event.url.searchParams.get('message')
+  const conversationId = event.url.searchParams.get('conversation')
+  const assistantId = event.url.searchParams.get('assistant')
+
+  if (!messageId) {
+    error(400, 'message parameter is required')
+  }
+
+  if (!conversationId && !assistantId) {
+    error(400, 'conversation or assistant parameter is required')
+  }
+
+  const url = conversationId
+    ? `/api/chat/sse/${conversationId}?stored_message_id=${messageId}`
+    : `/api/chat/sse?assistant_id=${assistantId}&stored_message_id=${messageId}`
+
+  return api.get(url, { withAuth: true, event })
+}

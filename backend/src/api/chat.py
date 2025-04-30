@@ -14,6 +14,77 @@ chat_router = APIRouter(
 auth = AuthRouterDecorator(chat_router)
 
 
+class CountTokensRequest(BaseModel):
+    query: str
+    assistant_id: str | None = None
+    conversation_id: str | None = None
+
+
+class CountTokensResponse(BaseModel):
+    count: int
+
+
+@auth.post(
+    '/count-tokens',
+    ['chat'],
+    summary='Count Tokens',
+    description='''
+Return the (approximate) token count that would be used by
+a query to an assistant.
+
+If `conversation_id` is provided the token count will take
+into account the history of the conversation.
+
+''',
+    response_model=CountTokensResponse,
+)
+async def count_tokens(body: CountTokensRequest, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    if body.conversation_id is None and body.assistant_id is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail='Must provide assistant_id or conversation_id')
+
+    if body.conversation_id is not None:
+        conversation = await services.conversation_service.get_conversation(
+            as_uid=auth_identity.uid,
+            conversation_id=body.conversation_id
+        )
+
+        if conversation is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail='Conversation not found')
+
+        assistant = await services.assistant_service.get_assistant(
+            as_uid=auth_identity.uid,
+            assistant_id=conversation.assistant_id
+        )
+
+        if assistant is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail='Assistant not found')
+
+        num_tokens = await services.token_factory.get(assistant.model).get_token_count_with_history(
+            as_uid=auth_identity.uid,
+            conversation_id=body.conversation_id,
+            message=body.query)
+
+        return CountTokensResponse(count=num_tokens)
+
+    assistant = await services.assistant_service.get_assistant(
+        as_uid=auth_identity.uid,
+        assistant_id=body.assistant_id
+    )
+
+    if assistant is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail='Assistant not found')
+
+    num_tokens = await services.token_factory.get(assistant.model).get_token_count(as_uid=auth_identity.uid,
+                                                                                   assistant_id=body.assistant_id,
+                                                                                   message=body.query)
+
+    return CountTokensResponse(count=num_tokens)
+
+
 class BufferedChatRequest(BaseModel):
     assistant_id: str
     message: str
