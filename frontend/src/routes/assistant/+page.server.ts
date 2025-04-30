@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types.js'
 import { api } from '$lib/api-fetch-factory.js'
 import type { IAssistant } from '$lib/types.js'
 import { canCreateAssistant, canReadAssistants } from '$lib/state/user.svelte.js'
-import { error, redirect } from '@sveltejs/kit'
+import { error, redirect, type RequestEvent } from '@sveltejs/kit'
 
 export const load: PageServerLoad = async (event) => {
   const userCanListAssistants = canReadAssistants()
@@ -11,6 +11,7 @@ export const load: PageServerLoad = async (event) => {
   const activeAssistantID = event.url.searchParams.get('assistant_id') || ''
 
   let assistants: IAssistant[] = []
+  let activeAssistant: IAssistant = {} as IAssistant
 
   if (userCanListAssistants) {
     const response = await api.get('/api/assistant', { event, withAuth: true })
@@ -21,9 +22,17 @@ export const load: PageServerLoad = async (event) => {
     }
   }
 
-  const activeAssistant = assistants.find(
-    (assistant) => assistant.id === activeAssistantID,
-  )
+  if (activeAssistantID) {
+    const activeAssistantResponse = await api.get(`/api/assistant/${activeAssistantID}`, {
+      event,
+    })
+
+    if (activeAssistantResponse.ok) {
+      const data = await activeAssistantResponse.json()
+      activeAssistant = data.assistant
+      activeAssistant.id = activeAssistantID
+    }
+  }
 
   return {
     assistants,
@@ -33,7 +42,7 @@ export const load: PageServerLoad = async (event) => {
   }
 }
 
-async function createAssistant(event) {
+async function createAssistant(event: RequestEvent) {
   const response = await api.post('/api/assistant', {
     event,
   })
@@ -46,7 +55,7 @@ async function createAssistant(event) {
   return { success: true, assistantId }
 }
 
-async function updateAssistant(event, assistantId = null) {
+async function updateAssistant(event: RequestEvent, assistantId = null) {
   const formData = await event.request.formData()
   const computedAssistantId = assistantId ? assistantId : formData.get('assistant_id')
   const modelKey = formData.get('model_key')
@@ -128,6 +137,6 @@ export const actions = {
       return { success: false }
     }
 
-    redirect(303, `/assistant?assistant_id=${assistantId}`)
+    throw redirect(303, `/assistant?assistant_id=${assistantId}`)
   },
 }
