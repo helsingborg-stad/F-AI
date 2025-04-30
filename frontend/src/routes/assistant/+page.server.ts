@@ -63,6 +63,7 @@ async function updateAssistant(event: RequestEvent, assistantId = null) {
   const model = formData.get('model')
   const instructions = formData.get('instructions')
   const description = formData.get('description')
+  const visibility = formData.get('public') === 'on'
 
   const body = {
     model_key: modelKey,
@@ -79,6 +80,20 @@ async function updateAssistant(event: RequestEvent, assistantId = null) {
 
   if (!response.ok) {
     return { success: false, assistantId: null }
+  }
+
+  if (visibility) {
+    const body = {
+      public: visibility,
+    }
+    const visibilityResponse = await api.post(
+      `/api/assistant/${computedAssistantId}/visibility`,
+      { event, body },
+    )
+
+    if (!visibilityResponse.ok) {
+      return { success: false, assistantId: null }
+    }
   }
 
   return { success: true, assistantId: computedAssistantId }
