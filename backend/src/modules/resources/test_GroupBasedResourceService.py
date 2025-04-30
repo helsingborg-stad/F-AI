@@ -131,3 +131,32 @@ class TestGroupBasedResourceService:
 
         assert result1 is True
         assert result2 is False
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_set_visibility(group_service: IGroupService, resource_service: IResourceService):
+        success1 = await resource_service.set_resource_visibility(as_uid='john@example.com', resource='resource_a',
+                                                                  public=True)
+
+        result1 = await resource_service.can_access(as_uid='jane@example.com', resource='resource_a')
+        filtered1 = await resource_service.filter_accessible_resources(as_uid='jane@example.com',
+                                                                       resources=['resource_a', 'resource_b'])
+        resources1 = await resource_service.get_resources(as_uid='jane@example.com')
+
+        success2 = await resource_service.set_resource_visibility(as_uid='john@example.com', resource='resource_a',
+                                                                  public=False)
+
+        result2 = await resource_service.can_access(as_uid='jane@example.com', resource='resource_a')
+        filtered2 = await resource_service.filter_accessible_resources(as_uid='jane@example.com',
+                                                                       resources=['resource_a', 'resource_b'])
+        resources2 = await resource_service.get_resources(as_uid='jane@example.com')
+
+        assert success1 is True
+        assert result1 is True
+        assert filtered1 == ['resource_a']
+        assert resources1 == ['resource_a']
+        assert success2 is True
+        assert result2 is False
+        assert filtered2 == []
+        assert resources2 == []

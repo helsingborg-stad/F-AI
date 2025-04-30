@@ -79,5 +79,6 @@ async def create_services() -> Services:
         ).get(),
         message_store_service=await MessageStoreServiceFactory(mongo_database=mongo_database).get(),
         token_factory=TokenServiceFactory(assistant_service=assistant_service,
-                                          conversation_service=conversation_service)
+                                          conversation_service=conversation_service),
+        resource_service=resource_service,
     )
