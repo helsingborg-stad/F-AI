@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { IAssistant } from '$lib/types.js'
-  import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
-  import { icons } from '$lib/components/Icon/icons.js'
-  import Icon from '$lib/components/Icon/Icon.svelte'
-  import InfoTooltip from '$lib/components/InfoTooltip/InfoTooltip.svelte'
+  import ActionButtons from '$lib/components/Form/ActionButtons.svelte'
+  import AccessSection from '$lib/components/assistant/AccessSection.svelte'
+  import ToolsSection from '$lib/components/assistant/ToolsSection.svelte'
+  import ModelConfigSection from '$lib/components/assistant/ModelConfigSection.svelte'
 
   interface Props {
     assistant?: IAssistant
@@ -32,7 +32,7 @@
   }
 </script>
 
-{#if assistant}
+{#if assistant && Object.keys(assistant).length > 0}
   <div class="flex flex-col gap-y-4">
     <form method="POST" action="?/{formAction}" class="space-y-4">
       <input
@@ -52,6 +52,7 @@
           class="input input-bordered input-sm w-full"
           value={assistant.name}
           readonly={!canEdit}
+          autocomplete="off"
         />
         <div class="label">
           <span class="label-text-alt opacity-50">{assistant.id}</span>
@@ -80,94 +81,18 @@
         </select>
       </label>
       <div class="space-y-2 pt-5">
-        <div class="pt-5">
-          <div class="opacity-50 pb-2">Access</div>
-          <HorizontalDivider />
-          <div class="flex flex-row place-content-between items-center mt-2">
-            <div class="flex flex-row gap-2">
-              <input type="checkbox" name="public" class="toggle toggle-sm toggle-success" disabled={!canEdit} />
-              <InfoTooltip
-                toolTip="Public access allows other users to see and use, but not edit this assistant.">
-                <div class="text-sm font-medium select-none">Public</div>
-              </InfoTooltip>
-            </div>
-          </div>
-        </div>
-        <div class="pt-5">
-          <div class="opacity-50 pb-2">Tools</div>
-          <HorizontalDivider />
-          <div class="flex flex-row place-content-between items-center mt-2">
-            <div class="flex flex-row gap-2">
-              <input type="checkbox" class="toggle toggle-sm toggle-success" disabled={!canEdit} />
-              <InfoTooltip
-                toolTip="File Search enables the assistant with knowledge from files that you or your users upload.">
-                <div class="text-sm font-medium select-none">File search</div>
-              </InfoTooltip>
-            </div>
-            <div>
-              <button class="btn btn-sm" disabled={!canEdit}>
-                <Icon icon={icons["settings"]} width={16} height={16} />
-              </button>
-              <button class="btn btn-sm" disabled={!canEdit}>
-                <Icon icon={icons["plus"]} width={16} height={16} />
-                <span class="text-s">Files</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <HorizontalDivider />
-        <div class="flex flex-row place-content-between items-center">
-          <div>
-            <InfoTooltip
-              toolTip="Function calling lets you describe custom functions of your app or external APIs to the assistant.">
-              <div class="text-sm font-medium select-none">Functions</div>
-            </InfoTooltip>
-          </div>
-          <div>
-            <button class="btn btn-sm" disabled={!canEdit}>
-              <Icon icon={icons["plus"]} width={16} height={16} />
-              <span class="text-s">Functions</span>
-            </button>
-          </div>
-        </div>
-        <div class="pt-5">
-          <div class="opacity-50 pb-2">Model configuration</div>
-          <HorizontalDivider />
-          <label class="form-control w-full">
-            <div class="label">
-              <span class="label-text">Response format</span>
-            </div>
-            <select class="select select-bordered select-sm text-sm" disabled={!canEdit}>
-              <option>text</option>
-              <option>json_format</option>
-            </select>
-          </label>
-        </div>
+        <AccessSection {canEdit} />
+        <ToolsSection {canEdit} />
+        <ModelConfigSection {canEdit} />
       </div>
-      {#if canEdit}
-        <div class="flex justify-between">
-          <div class="flex flex-row gap-2">
-            <div>
-              <button type="submit" class="btn btn-sm btn-error text-white" onclick={setDeleteAction}>
-                <Icon icon={icons["trash"]} width={20} height={20} />
-              </button>
-            </div>
-            {#if canCreate}
-              <div>
-                <button type="submit" class="btn btn-sm bg-gray-400 text-white" onclick={setCopyAction}>
-                  <Icon icon={icons["copy"]} width={20} height={20} />
-                </button>
-              </div>
-            {/if}
-          </div>
-          <div>
-            <button type="submit" class="btn btn-sm btn-success text-white" onclick={setUpdateAction}>
-              <Icon icon={icons["save"]} width={20} height={20} />
-              <span class="text-s">Save</span>
-            </button>
-          </div>
-        </div>
-      {/if}
+      <ActionButtons
+        {canEdit}
+        {canCreate}
+        canDelete={true}
+        onDelete={setDeleteAction}
+        onCopy={setCopyAction}
+        onUpdate={setUpdateAction}
+      />
     </form>
   </div>
 {/if}

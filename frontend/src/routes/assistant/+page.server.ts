@@ -57,12 +57,17 @@ async function createAssistant(event: RequestEvent) {
 
 async function updateAssistant(event: RequestEvent, assistantId = null) {
   const formData = await event.request.formData()
-  const computedAssistantId = assistantId ? assistantId : formData.get('assistant_id')
-  const modelKey = formData.get('model_key')
-  const name = formData.get('name')
-  const model = formData.get('model')
-  const instructions = formData.get('instructions')
-  const description = formData.get('description')
+  const computedAssistantId = assistantId ? assistantId : formData.get('assistant_id') as string
+
+  if (!computedAssistantId) {
+    return { success: false, assistantId: null }
+  }
+
+  const modelKey = formData.get('model_key') as string
+  const name = formData.get('name') as string
+  const model = formData.get('model') as string
+  const instructions = formData.get('instructions') as string
+  const description = formData.get('description') as string
   const visibility = formData.get('public') === 'on'
 
   const body = {
@@ -82,18 +87,17 @@ async function updateAssistant(event: RequestEvent, assistantId = null) {
     return { success: false, assistantId: null }
   }
 
-  if (visibility) {
-    const body = {
-      public: visibility,
-    }
-    const visibilityResponse = await api.post(
-      `/api/assistant/${computedAssistantId}/visibility`,
-      { event, body },
-    )
+  const visibilityBody = {
+    public: visibility,
+  }
 
-    if (!visibilityResponse.ok) {
-      return { success: false, assistantId: null }
-    }
+  const visibilityResponse = await api.post(
+    `/api/assistant/${computedAssistantId}/visibility`,
+    { event, body: visibilityBody },
+  )
+
+  if (!visibilityResponse.ok) {
+    return { success: false, assistantId: null }
   }
 
   return { success: true, assistantId: computedAssistantId }
@@ -122,13 +126,13 @@ export const actions = {
 
   delete: async (event) => {
     const formData = await event.request.formData()
-    const assistantI = formData.get('assistant_id')
+    const assistantId = formData.get('assistant_id')
 
-    if (!assistantI) {
+    if (!assistantId) {
       throw error(404, 'Valid assistant ID is required')
     }
 
-    const response = await api.delete(`/api/assistant/${assistantI}`, {
+    const response = await api.delete(`/api/assistant/${assistantId}`, {
       event,
     })
 
