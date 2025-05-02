@@ -56,3 +56,7 @@ export function canCreateAssistant(): boolean {
 export function canReadAssistants(): boolean {
   return hasScope('assistant.read')
 }
+
+export function canEditAssistants(): boolean {
+  return hasScope('assistant.write')
+}

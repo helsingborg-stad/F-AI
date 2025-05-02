@@ -40,3 +40,45 @@ export async function fetchAssistantById(
 
   throw new Response('Assistant not found', { status: 404 })
 }
+
+export async function createAssistant(event: RequestEvent): Promise<string> {
+  const response = await api.post('/api/assistant', { event, withAuth: true })
+
+  if (!response.ok) {
+    throw new Response('Failed to create assistant', { status: response.status })
+  }
+
+  const data = await response.json()
+  return data.assistant_id
+}
+
+export async function updateAssistant(
+  assistantId: string,
+  updates: {
+    name?: string
+    description?: string
+    model?: string
+    instructions?: string
+    model_key?: string
+  },
+  event: RequestEvent,
+) {
+  const response = await api.put(`/api/assistant/${assistantId}`, {
+    event,
+    body: updates,
+  })
+
+  if (!response.ok) {
+    throw new Response('Failed to update assistant', { status: response.status })
+  }
+}
+
+export async function deleteAssistant(event: RequestEvent, assistantId: string) {
+  const response = await api.delete(`/api/assistant/${assistantId}`, {
+    event,
+  })
+
+  if (!response.ok) {
+    throw new Response('Failed to delete assistant', { status: response.status })
+  }
+}

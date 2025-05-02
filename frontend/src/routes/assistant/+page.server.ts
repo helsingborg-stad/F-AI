@@ -1,68 +1,17 @@
 import type { PageServerLoad } from './$types.js'
-import { api } from '$lib/api-fetch-factory.js'
 import type { IAssistant } from '$lib/types.js'
 import { canCreateAssistant, canReadAssistants } from '$lib/state/user.svelte.js'
-import { error, redirect, type RequestEvent } from '@sveltejs/kit'
+import { error, redirect } from '@sveltejs/kit'
+import {
+  createAssistant,
+  deleteAssistant,
+  fetchAllAssistants,
+  fetchAssistantById,
+  updateAssistant,
+} from '$lib/utils/assistant.js'
+import { handleApiError } from '$lib/utils/handle-api-errors.js'
 
-export const load: PageServerLoad = async (event) => {
-  const userCanListAssistants = canReadAssistants()
-  const userCanCreateAssistant = canCreateAssistant()
-  const userCanEditAssistant = true
-  const activeAssistantID = event.url.searchParams.get('assistant_id') || ''
-
-  let assistants: IAssistant[] = []
-  let activeAssistant: IAssistant = {} as IAssistant
-
-  if (userCanListAssistants) {
-    const response = await api.get('/api/assistant', { event, withAuth: true })
-
-    if (response.ok) {
-      const data = await response.json()
-      assistants = data.assistants
-    }
-  }
-
-  if (activeAssistantID) {
-    const activeAssistantResponse = await api.get(`/api/assistant/${activeAssistantID}`, {
-      event,
-    })
-
-    if (activeAssistantResponse.ok) {
-      const data = await activeAssistantResponse.json()
-      activeAssistant = data.assistant
-      activeAssistant.id = activeAssistantID
-    }
-  }
-
-  return {
-    assistants,
-    canCreateAssistant: userCanCreateAssistant,
-    activeAssistant,
-    canEditActiveAssistant: userCanEditAssistant,
-  }
-}
-
-async function createAssistant(event: RequestEvent) {
-  const response = await api.post('/api/assistant', {
-    event,
-  })
-
-  if (!response.ok) {
-    return { success: false, assistantId: null }
-  }
-
-  const assistantId = (await response.json()).assistant_id
-  return { success: true, assistantId }
-}
-
-async function updateAssistant(event: RequestEvent, assistantId = null) {
-  const formData = await event.request.formData()
-  const computedAssistantId = assistantId ? assistantId : formData.get('assistant_id') as string
-
-  if (!computedAssistantId) {
-    return { success: false, assistantId: null }
-  }
-
+async function getAssistantFormValues(formData: FormData, overwrite = {}) {
   const modelKey = formData.get('model_key') as string
   const name = formData.get('name') as string
   const model = formData.get('model') as string
@@ -70,92 +19,102 @@ async function updateAssistant(event: RequestEvent, assistantId = null) {
   const description = formData.get('description') as string
   const visibility = formData.get('public') === 'on'
 
-  const body = {
+  return {
     model_key: modelKey,
-    name: assistantId ? `Copy of ${name}` : name,
+    name: name,
     model: model,
     instructions: instructions,
     description: description,
-  }
-
-  const response = await api.put(`/api/assistant/${computedAssistantId}`, {
-    event,
-    body,
-  })
-
-  if (!response.ok) {
-    return { success: false, assistantId: null }
-  }
-
-  const visibilityBody = {
     public: visibility,
+    ...overwrite,
+  }
+}
+
+export const load: PageServerLoad = async (event) => {
+  const userCanListAssistants = canReadAssistants()
+  const userCanCreateAssistant = canCreateAssistant()
+  const userCanEditAssistant = canCreateAssistant()
+  const activeAssistantID = event.url.searchParams.get('assistant_id') || ''
+
+  let assistants: IAssistant[] = []
+  let activeAssistant: IAssistant = {} as IAssistant
+
+  if (userCanListAssistants) {
+    assistants = await fetchAllAssistants(event)
   }
 
-  const visibilityResponse = await api.post(
-    `/api/assistant/${computedAssistantId}/visibility`,
-    { event, body: visibilityBody },
-  )
-
-  if (!visibilityResponse.ok) {
-    return { success: false, assistantId: null }
+  if (activeAssistantID) {
+    activeAssistant = await fetchAssistantById(event, activeAssistantID)
+    activeAssistant.id = activeAssistantID
   }
 
-  return { success: true, assistantId: computedAssistantId }
+  return {
+    assistants,
+    activeAssistant,
+    canCreateAssistant: userCanCreateAssistant,
+    canEditActiveAssistant: userCanEditAssistant,
+  }
 }
 
 export const actions = {
   create: async (event) => {
-    const { success, assistantId } = await createAssistant(event)
+    let assistantId = ''
 
-    if (!success) {
-      return { success: false }
+    try {
+      assistantId = await createAssistant(event)
+    } catch (error) {
+      return handleApiError(error)
     }
 
     redirect(303, `/assistant?assistant_id=${assistantId}`)
   },
 
   update: async (event) => {
-    const { success, assistantId } = await updateAssistant(event)
+    const formData = await event.request.formData()
+    const assistantId = formData.get('assistant_id') as string
 
-    if (!success) {
-      return { success: false }
+    try {
+      const updateData = await getAssistantFormValues(formData)
+      await updateAssistant(assistantId, updateData, event)
+    } catch (error) {
+      return handleApiError(error)
     }
 
-    throw redirect(303, `/assistant?assistant_id=${assistantId}`)
+    redirect(303, `/assistant?assistant_id=${assistantId}`)
   },
 
   delete: async (event) => {
     const formData = await event.request.formData()
-    const assistantId = formData.get('assistant_id')
+    const assistantId = formData.get('assistant_id') as string
 
     if (!assistantId) {
       throw error(404, 'Valid assistant ID is required')
     }
 
-    const response = await api.delete(`/api/assistant/${assistantId}`, {
-      event,
-    })
-
-    if (!response.ok) {
-      throw error(500, 'Failed to delete assistant')
+    try {
+      await deleteAssistant(event, assistantId)
+    } catch (error) {
+      return handleApiError(error)
     }
 
-    throw redirect(303, '/assistant')
+    redirect(303, '/assistant')
   },
 
   copy: async (event) => {
-    const { success, assistantId } = await createAssistant(event)
+    const formData = await event.request.formData()
+    const originalName = formData.get('name') as string
+    let assistantId = ''
 
-    if (!success) {
-      return { success: false }
+    try {
+      assistantId = await createAssistant(event)
+      const updateData = await getAssistantFormValues(formData, {
+        name: `Copy of ${originalName}`,
+      })
+      await updateAssistant(assistantId, updateData, event)
+    } catch (error) {
+      return handleApiError(error)
     }
 
-    const { success: updateSuccess } = await updateAssistant(event, assistantId)
-
-    if (!updateSuccess) {
-      return { success: false }
-    }
-
-    throw redirect(303, `/assistant?assistant_id=${assistantId}`)
+    redirect(303, `/assistant?assistant_id=${assistantId}`)
   },
 }
