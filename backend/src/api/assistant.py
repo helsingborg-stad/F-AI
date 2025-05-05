@@ -68,6 +68,7 @@ class GetAssistantResponseAssistant(BaseModel):
     description: str
     sample_questions: list[str]
     allow_files: bool
+    is_public: bool
     model: str
     llm_api_key: str | None
     instructions: str
@@ -99,6 +100,7 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
             description=result.meta.description,
             allow_files=result.meta.allow_files,
             sample_questions=result.meta.sample_questions,
+            is_public=result.meta.is_public,
             model=result.model,
             llm_api_key=result.llm_api_key,
             instructions=result.instructions,
@@ -143,6 +145,7 @@ class UpdateAssistantRequest(BaseModel):
     description: str | None = None
     allow_files: bool | None = None
     sample_questions: list[str] | None = None
+    is_public: bool | None = None
     model: str | None = None
     llm_api_key: str | None = None
     instructions: str | None = None
@@ -170,6 +173,7 @@ async def update_assistant(
         description=body.description,
         allow_files=body.allow_files,
         sample_questions=body.sample_questions,
+        is_public=body.is_public,
         model=body.model,
         llm_api_key=body.llm_api_key,
         instructions=body.instructions,
@@ -180,6 +184,10 @@ async def update_assistant(
 
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    if body.is_public is not None:
+        await services.resource_service.set_resource_visibility(as_uid=auth_identity.uid, resource=assistant_id,
+                                                                public=body.is_public)
 
 
 class DeleteAssistantRequest(BaseModel):

@@ -31,6 +31,7 @@ class IAssistantService(Protocol):
             description: str | None = None,
             allow_files: bool | None = None,
             sample_questions: list[str] | None = None,
+            is_public: bool | None = None,
             model: str | None = None,
             llm_api_key: str | None = None,
             instructions: str | None = None,

@@ -20,7 +20,7 @@ class MongoAssistantService(IAssistantService):
         assistant = Assistant(
             id=str(ObjectId()),
             owner=as_uid,
-            meta=AssistantMeta(name='', description='', sample_questions=[], allow_files=False),
+            meta=AssistantMeta(name='', description='', sample_questions=[], allow_files=False, is_public=False),
             model='',
             llm_api_key=None,
             instructions='',
@@ -125,6 +125,7 @@ class MongoAssistantService(IAssistantService):
             description: str | None = None,
             allow_files: bool | None = None,
             sample_questions: list[str] | None = None,
+            is_public: bool | None = None,
             model: str | None = None,
             llm_api_key: str | None = None,
             instructions: str | None = None,
@@ -141,6 +142,7 @@ class MongoAssistantService(IAssistantService):
         self._add_to_dict_unless_none(update_dict, 'meta.description', description)
         self._add_to_dict_unless_none(update_dict, 'meta.allow_files', allow_files)
         self._add_to_dict_unless_none(update_dict, 'meta.sample_questions', sample_questions)
+        self._add_to_dict_unless_none(update_dict, 'meta.is_public', is_public)
         self._add_to_dict_unless_none(update_dict, 'model', model)
         self._add_to_dict_unless_none(update_dict, 'llm_api_key', llm_api_key)
         self._add_to_dict_unless_none(update_dict, 'instructions', instructions)
@@ -158,9 +160,8 @@ class MongoAssistantService(IAssistantService):
         return result.matched_count == 1
 
     async def delete_assistant(self, as_uid: str, assistant_id: str) -> None:
-        if not is_valid_mongo_id(assistant_id):
-            return None
-        await self._database['assistants'].delete_one({'_id': ObjectId(assistant_id), 'owner': as_uid})
+        if is_valid_mongo_id(assistant_id):
+            await self._database['assistants'].delete_one({'_id': ObjectId(assistant_id), 'owner': as_uid})
 
     @staticmethod
     def _doc_to_assistant(doc: Mapping[str, Any], redact_key: bool) -> Assistant:
@@ -172,6 +173,7 @@ class MongoAssistantService(IAssistantService):
                 description=doc['meta']['description'],
                 allow_files=doc['meta']['allow_files'],
                 sample_questions=doc['meta']['sample_questions'],
+                is_public=doc['meta']['is_public'] if 'is_public' in doc['meta'] else False,
             ),
             model=doc['model'],
             llm_api_key=MongoAssistantService._redact_key(doc['llm_api_key']) if redact_key else doc['llm_api_key'],

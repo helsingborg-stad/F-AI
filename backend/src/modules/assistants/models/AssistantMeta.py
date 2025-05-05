@@ -6,3 +6,4 @@ class AssistantMeta(BaseModel):
     description: str
     allow_files: bool
     sample_questions: list[str]
+    is_public: bool

@@ -32,6 +32,16 @@ class BaseAssistantServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
+    async def test_important_defaults(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
+
+        assert result.meta.is_public is False
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_get_available_models(service: IAssistantService):
         success = await service.set_available_models(models=[
             Model(key='a', provider='A', display_name='Cool Model A', description='cool model A'),
@@ -211,6 +221,7 @@ class BaseAssistantServiceTestClass:
             description='b',
             allow_files=True,
             sample_questions=['c', 'd', 'e'],
+            is_public=True,
             model='f',
             llm_api_key='g',
             instructions='h',
@@ -228,6 +239,7 @@ class BaseAssistantServiceTestClass:
         assert result.meta.description == 'b'
         assert result.meta.allow_files is True
         assert result.meta.sample_questions == ['c', 'd', 'e']
+        assert result.meta.is_public is True
         assert result.model == 'f'
         assert result.instructions == 'h'
         assert result.temperature == 3.1415
