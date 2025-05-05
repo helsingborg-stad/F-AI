@@ -178,6 +178,33 @@ class BaseAssistantServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
+    async def test_get_available_assistants_public(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+
+        result1 = await service.get_assistant(as_uid='jane', assistant_id=aid)
+        available1 = await service.get_available_assistants(as_uid='jane')
+
+        await service.update_assistant(as_uid='john', assistant_id=aid, is_public=True)
+        result2 = await service.get_assistant(as_uid='jane', assistant_id=aid)
+        available2 = await service.get_available_assistants(as_uid='jane')
+
+        await service.update_assistant(as_uid='john', assistant_id=aid, is_public=False)
+        result3 = await service.get_assistant(as_uid='jane', assistant_id=aid)
+        available3 = await service.get_available_assistants(as_uid='jane')
+
+        assert result1 is None
+        assert len(available1) == 0
+
+        assert result2.id == aid
+        assert len(available2) == 1
+        assert next((a for a in available2 if a.id == aid), None) is not None
+
+        assert result3 is None
+        assert len(available3) == 0
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_update_assistant_basic(service: IAssistantService):
         aid = await service.create_assistant(as_uid='john')
 

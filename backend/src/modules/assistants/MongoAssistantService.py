@@ -68,7 +68,10 @@ class MongoAssistantService(IAssistantService):
             {
                 "$and": [
                     {'_id': ObjectId(assistant_id)},
-                    {"$or": [{'owner': as_uid}] if not can_access else [{"_id": {"$exists": True}}]}
+                    {"$or":
+                         [{'owner': as_uid}, {"meta.is_public": True}] if not can_access else
+                         [{'$or': [{"_id": {"$exists": True}}]}]
+                     }
                 ]
             },
             projection=[
@@ -113,6 +116,7 @@ class MongoAssistantService(IAssistantService):
             {"$or": [
                 {'owner': as_uid},
                 {'_id': {"$in": [ObjectId(resource) for resource in resources]}},
+                {'meta.is_public': True}
             ]}
         )
         return [self._doc_to_assistant(doc, True) async for doc in cursor]
