@@ -5,25 +5,24 @@ from src.modules.llm.models.Delta import Delta
 from src.modules.llm.models.Message import Message
 from src.modules.llm.models.ToolCall import ToolCall
 from src.modules.llm.protocols.ILLMService import ILLMService
-from src.modules.llm.runner import OpenAIRunner
+from src.modules.llm.openai_runner import OpenAIRunner
 
 
 class OpenAILLMService(ILLMService):
     async def stream_llm(
             self,
             model: str,
+            api_key: str,
             messages: list[Message],
-            max_tokens: int = 0,
-            temperature: float = 0.0,
-            api_key: str = '',
+            extra_params: dict[str, float | int | bool | str] | None = None
     ) -> AsyncGenerator[Delta, None]:
         [_, model_name] = parse_model_key(model)
         runner = OpenAIRunner(
             model=model_name,
             messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
             api_key=api_key,
+            max_tokens=extra_params.get('max_tokens', None),
+            temperature=extra_params.get('temperature', None),
         )
         async for output in runner.run():
             yield output
@@ -31,16 +30,20 @@ class OpenAILLMService(ILLMService):
     async def run_llm(
             self,
             model: str,
+            api_key: str,
             messages: list[Message],
-            max_tokens: int = 0,
-            temperature: float = 0.0,
-            api_key: str = ''
+            extra_params: dict[str, float | int | bool | str] | None = None
     ) -> Message:
         role: str | None = None
         content: str | None = None
         tool_calls: list[ToolCall] | None = None
 
-        async for output in self.stream_llm(model, messages, max_tokens, temperature, api_key):
+        async for output in self.stream_llm(
+                api_key=api_key,
+                model=model,
+                messages=messages,
+                extra_params=extra_params
+        ):
             role = output.role if output.role else role
             content = (content or '') + output.content if output.content else content
             tool_calls = output.tool_calls if output.tool_calls else tool_calls

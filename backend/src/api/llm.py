@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 
 from src.common.services.fastapi_get_services import ServicesDependency
@@ -15,13 +15,13 @@ class RunRequestMessage(BaseModel):
 
 
 class RunRequest(BaseModel):
-    model: str = Field(examples=['o3-mini'])
+    model: str = Field(examples=['openai:o3-mini'])
     messages: list[RunRequestMessage] = Field(examples=[[
         {"role": "system", "content": "Answer like a pirate"},
         {"role": "user", "content": "Who is the king of Sweden?"}],
     ])
-    maxTokens: int = Field(examples=[16000]),
-    temperature: float = Field(examples=[1.0])
+    api_key: str | None = Field(examples=['my-api-key'])
+    extra_params: dict[str, float | int | bool | str] = Field(examples=[{'temperature': 0.5}])
 
 
 class RunResponse(BaseModel):
@@ -37,16 +37,19 @@ class RunResponse(BaseModel):
     response_model=RunResponse,
 )
 async def run(request: RunRequest, services: ServicesDependency):
-    message = await services.llm_factory.get(model_key=request.model).run_llm(
-        model=request.model,
-        max_tokens=request.maxTokens,
-        temperature=request.temperature,
-        messages=[
-            Message(
-                role=message.role,
-                content=message.content
-            )
-            for message in request.messages
-        ]
-    )
-    return RunResponse(role=message.role, content=message.content)
+    try:
+        message = await services.llm_factory.get(model_key=request.model).run_llm(
+            model=request.model,
+            messages=[
+                Message(
+                    role=message.role,
+                    content=message.content
+                )
+                for message in request.messages
+            ],
+            api_key=request.api_key,
+            extra_params=request.extra_params
+        )
+        return RunResponse(role=message.role, content=message.content)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

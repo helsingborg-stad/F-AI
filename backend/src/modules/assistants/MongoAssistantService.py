@@ -24,9 +24,8 @@ class MongoAssistantService(IAssistantService):
             model='',
             llm_api_key=None,
             instructions='',
-            temperature=1,
-            max_tokens=16000,
-            collection_id=None
+            collection_id=None,
+            extra_llm_params=None
         )
         result = await self._database['assistants'].insert_one({
             **assistant.model_dump(exclude={'id'}),
@@ -85,6 +84,7 @@ class MongoAssistantService(IAssistantService):
                 'max_tokens',
                 'allow_files',
                 'collection_id',
+                'extra_llm_params',
             ]
         )
         if doc is None:
@@ -106,6 +106,7 @@ class MongoAssistantService(IAssistantService):
                 'max_tokens',
                 'allow_files',
                 'collection_id',
+                'extra_llm_params',
             ]
         )
         return [self._doc_to_assistant(doc, True) async for doc in cursor]
@@ -133,9 +134,8 @@ class MongoAssistantService(IAssistantService):
             model: str | None = None,
             llm_api_key: str | None = None,
             instructions: str | None = None,
-            temperature: float | None = None,
-            max_tokens: int | None = None,
             collection_id: str | None = None,
+            extra_llm_params: dict[str, float | int | bool | str] | None = None
     ) -> bool:
         if not is_valid_mongo_id(assistant_id):
             return False
@@ -150,8 +150,7 @@ class MongoAssistantService(IAssistantService):
         self._add_to_dict_unless_none(update_dict, 'model', model)
         self._add_to_dict_unless_none(update_dict, 'llm_api_key', llm_api_key)
         self._add_to_dict_unless_none(update_dict, 'instructions', instructions)
-        self._add_to_dict_unless_none(update_dict, 'temperature', temperature)
-        self._add_to_dict_unless_none(update_dict, 'max_tokens', max_tokens)
+        self._add_to_dict_unless_none(update_dict, 'extra_llm_params', extra_llm_params)
         self._add_to_dict_unless_none(update_dict, 'collection_id', collection_id)
 
         result = await self._database['assistants'].update_one(
@@ -182,9 +181,8 @@ class MongoAssistantService(IAssistantService):
             model=doc['model'],
             llm_api_key=MongoAssistantService._redact_key(doc['llm_api_key']) if redact_key else doc['llm_api_key'],
             instructions=doc['instructions'],
-            temperature=doc['temperature'],
-            max_tokens=doc['max_tokens'],
-            collection_id=doc['collection_id']
+            collection_id=doc['collection_id'],
+            extra_llm_params=doc['extra_llm_params'] if 'extra_llm_params' in doc else None,
         )
 
     @staticmethod

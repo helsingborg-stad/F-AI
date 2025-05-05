@@ -10,6 +10,5 @@ class Assistant(BaseModel):
     model: str
     llm_api_key: str | None
     instructions: str
-    temperature: float
-    max_tokens: int
     collection_id: str | None
+    extra_llm_params: dict[str, float | int | bool | str] | None

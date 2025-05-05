@@ -9,19 +9,17 @@ class ILLMService(Protocol):
     def stream_llm(
             self,
             model: str,
+            api_key: str,
             messages: list[Message],
-            max_tokens: int = 0,
-            temperature: float = 0.0,
-            api_key: str = ''
+            extra_params: dict[str, float | int | bool | str] | None = None
     ) -> AsyncGenerator[Delta, None]:
         ...
 
     async def run_llm(
             self,
             model: str,
+            api_key: str,
             messages: list[Message],
-            max_tokens: int = 0,
-            temperature: float = 0.0,
-            api_key: str = ''
+            extra_params: dict[str, float | int | bool | str] | None = None
     ) -> Message:
         ...

@@ -92,9 +92,8 @@ class LLMChatService(IChatService):
                     *[Message(role=m.role, content=m.content) for m in conversation.messages],
                     Message(role='user', content=message)
                 ],
-                max_tokens=assistant.max_tokens,
-                temperature=assistant.temperature,
                 api_key=assistant.llm_api_key,
+                extra_params=assistant.extra_llm_params
         ):
             if delta.role != 'error':
                 await self._conversation_service.add_to_conversation_last_message(

@@ -2,7 +2,7 @@ import collections
 from typing import Iterable, Any
 
 import openai
-from openai import BadRequestError
+from openai import BadRequestError, NOT_GIVEN
 from openai.types.chat import ChatCompletionToolParam
 
 from .models.Message import Message
@@ -16,8 +16,8 @@ class OpenAIRunner:
             self,
             model: str,
             messages: list[Message],
-            max_tokens: int,
-            temperature: float,
+            max_tokens: int | None,
+            temperature: float | None,
             url: str | None = None,
             api_key: str | None = None,
             tools: Iterable[ChatCompletionToolParam] = None,
@@ -45,8 +45,8 @@ class OpenAIRunner:
                 stream=True,
                 model=self.model,
                 messages=[m.model_dump(exclude_none=True) for m in full_messages],
-                temperature=self.temperature,
-                max_completion_tokens=self.max_tokens,
+                temperature=self.temperature if self.temperature is not None else NOT_GIVEN,
+                max_completion_tokens=self.max_tokens if self.max_tokens is not None else NOT_GIVEN,
                 tools=self.tools,
                 response_format=self.response_format
             )

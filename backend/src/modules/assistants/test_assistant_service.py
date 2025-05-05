@@ -223,9 +223,11 @@ class BaseAssistantServiceTestClass:
     async def test_update_assistant_consecutive(service: IAssistantService):
         aid = await service.create_assistant(as_uid='john')
 
-        success1 = await service.update_assistant(as_uid='john', assistant_id=aid, name='test assistant')
+        success1 = await service.update_assistant(as_uid='john', assistant_id=aid, name='test assistant',
+                                                  extra_llm_params={'a': 'a', 'b': 'b'})
         success2 = await service.update_assistant(as_uid='john', assistant_id=aid, sample_questions=['hello', 'world'])
-        success3 = await service.update_assistant(as_uid='john', assistant_id=aid, name='my cool assistant')
+        success3 = await service.update_assistant(as_uid='john', assistant_id=aid, name='my cool assistant',
+                                                  extra_llm_params={'c': 'c'})
 
         result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
@@ -234,6 +236,9 @@ class BaseAssistantServiceTestClass:
         assert success3 is True
         assert result.meta.name == 'my cool assistant'
         assert result.meta.sample_questions == ['hello', 'world']
+        assert result.extra_llm_params['c'] == 'c'
+        assert 'a' not in result.extra_llm_params
+        assert 'b' not in result.extra_llm_params
 
     @staticmethod
     @pytest.mark.asyncio
@@ -252,9 +257,13 @@ class BaseAssistantServiceTestClass:
             model='f',
             llm_api_key='g',
             instructions='h',
-            temperature=3.1415,
-            max_tokens=1337,
             collection_id='i',
+            extra_llm_params={
+                'some_float': 3.1415,
+                'some_int': 1337,
+                'some_bool': True,
+                'some_str': 'j'
+            }
         )
 
         result = await service.get_assistant(as_uid='john', assistant_id=aid)
@@ -269,8 +278,10 @@ class BaseAssistantServiceTestClass:
         assert result.meta.is_public is True
         assert result.model == 'f'
         assert result.instructions == 'h'
-        assert result.temperature == 3.1415
-        assert result.max_tokens == 1337
+        assert result.extra_llm_params['some_float'] == 3.1415
+        assert result.extra_llm_params['some_int'] == 1337
+        assert result.extra_llm_params['some_bool'] is True
+        assert result.extra_llm_params['some_str'] == 'j'
         assert result.collection_id == 'i'
 
     @staticmethod

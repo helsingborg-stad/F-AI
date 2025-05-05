@@ -72,9 +72,8 @@ class GetAssistantResponseAssistant(BaseModel):
     model: str
     llm_api_key: str | None
     instructions: str
-    temperature: float
-    max_tokens: int
     collection_id: str | None
+    extra_llm_params: dict[str, float | int | bool | str]
 
 
 class GetAssistantResponse(BaseModel):
@@ -104,9 +103,8 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
             model=result.model,
             llm_api_key=result.llm_api_key,
             instructions=result.instructions,
-            temperature=result.temperature,
-            max_tokens=result.max_tokens,
-            collection_id=result.collection_id
+            collection_id=result.collection_id,
+            extra_llm_params=result.extra_llm_params if result.extra_llm_params else {}
         )
     )
 
@@ -149,9 +147,8 @@ class UpdateAssistantRequest(BaseModel):
     model: str | None = None
     llm_api_key: str | None = None
     instructions: str | None = None
-    temperature: float | None = None
-    max_tokens: int | None = None
     collection_id: str | None = None
+    extra_llm_params: dict[str, float | int | bool | str] | None
 
 
 @auth.put(
@@ -177,9 +174,8 @@ async def update_assistant(
         model=body.model,
         llm_api_key=body.llm_api_key,
         instructions=body.instructions,
-        temperature=body.temperature,
-        max_tokens=body.max_tokens,
         collection_id=body.collection_id,
+        extra_llm_params=body.extra_llm_params,
     )
 
     if not success:

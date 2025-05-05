@@ -35,9 +35,8 @@ class IAssistantService(Protocol):
             model: str | None = None,
             llm_api_key: str | None = None,
             instructions: str | None = None,
-            temperature: float | None = None,
-            max_tokens: int | None = None,
             collection_id: str | None = None,
+            extra_llm_params: dict[str, float | int | bool | str] | None = None
     ) -> bool:
         ...
 
