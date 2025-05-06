@@ -33,6 +33,9 @@ class AnthropicLLMService(ILLMService):
         [_, model_name] = parse_model_key(model)
         client = anthropic.AsyncAnthropic(api_key=api_key)
 
+        if not extra_params:
+            extra_params = {}
+
         async with client.messages.stream(
                 max_tokens=extra_params.get('max_tokens', 16000),
                 model=model_name,
