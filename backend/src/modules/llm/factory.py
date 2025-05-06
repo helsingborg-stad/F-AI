@@ -1,3 +1,4 @@
+from src.modules.llm.AnthropicLLMService import AnthropicLLMService
 from src.modules.llm.OpenAILLMService import OpenAILLMService
 from src.modules.llm.helpers.parse_model_key import parse_model_key
 from src.modules.llm.protocols import ILLMService
@@ -10,5 +11,7 @@ class LLMServiceFactory:
         match model_provider:
             case 'openai':
                 return OpenAILLMService()
+            case 'anthropic':
+                return AnthropicLLMService()
             case _:
                 raise ValueError(f'Invalid model key: {model_key}')
