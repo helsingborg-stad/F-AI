@@ -33,8 +33,8 @@
 </script>
 
 {#if assistant && Object.keys(assistant).length > 0}
-  <div class="flex flex-col gap-y-4">
-    <form method="POST" action="?/{formAction}" class="space-y-4">
+  <div class="h-full">
+    <form method="POST" action="?/{formAction}" class="space-y-4 pb-8">
       <input
         type="hidden"
         name="assistant_id"
