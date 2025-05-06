@@ -148,7 +148,7 @@ class UpdateAssistantRequest(BaseModel):
     llm_api_key: str | None = None
     instructions: str | None = None
     collection_id: str | None = None
-    extra_llm_params: dict[str, float | int | bool | str] | None
+    extra_llm_params: dict[str, float | int | bool | str] | None = None
 
 
 @auth.put(

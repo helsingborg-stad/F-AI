@@ -21,7 +21,7 @@ class RunRequest(BaseModel):
         {"role": "user", "content": "Who is the king of Sweden?"}],
     ])
     api_key: str | None = Field(examples=['my-api-key'])
-    extra_params: dict[str, float | int | bool | str] = Field(examples=[{'temperature': 0.5}])
+    extra_params: dict[str, float | int | bool | str] | None = Field(default=None, examples=[{'temperature': 0.5}])
 
 
 class RunResponse(BaseModel):
