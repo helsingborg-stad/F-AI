@@ -5,6 +5,7 @@
   import AssistantTable from '$lib/components/assistant/AssistantTable.svelte'
   import type { IAssistant } from '$lib/types.js'
   import AssistantDetails from '$lib/components/assistant/AssistantDetails.svelte'
+  import { onMount } from 'svelte'
 
   interface Props {
     canCreateAssistant?: boolean
@@ -14,18 +15,58 @@
   }
 
   let { canCreateAssistant = false, assistants = [], activeAssistant, canEditActiveAssistant = false }: Props = $props()
+
+  let detailsContainer: HTMLElement
+  let detailsContent: HTMLElement
+  let needsScroll = $state(true)
+
+  function checkOverflow() {
+    if (detailsContainer && detailsContent) {
+      needsScroll = detailsContent.scrollHeight > detailsContainer.clientHeight
+    }
+  }
+
+  onMount(() => {
+    checkOverflow()
+
+    const resizeObserver = new ResizeObserver(() => {
+      checkOverflow()
+    })
+
+    if (detailsContainer) resizeObserver.observe(detailsContainer)
+    if (detailsContent) resizeObserver.observe(detailsContent)
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  })
+
+  $effect(() => {
+    // Wait for the DOM to update before measuring
+    setTimeout(checkOverflow, 0)
+  })
 </script>
 
-<div class="flex flex-col min-h-0 h-full">
+<div class="flex flex-col h-full">
   <PageHeader title="Assistants" {canCreateAssistant} />
   <HorizontalDivider />
-  <div class="flex w-full justify-center flex-1 gap-4 px-4">
-    <div class="flex-1">
+  <div class="flex flex-1 w-full justify-center gap-4 overflow-hidden">
+    <div class="flex-1 pl-4 overflow-hidden">
       <AssistantTable {assistants} {activeAssistant} />
     </div>
     <VerticalDivider />
-    <div class="flex-1">
-      <AssistantDetails assistant={activeAssistant} canEdit={canEditActiveAssistant} canCreate={canCreateAssistant} />
+    <div
+      bind:this={detailsContainer}
+      class={`flex-1 ${needsScroll ? 'overflow-auto' : 'overflow-hidden'} pb-4 pr-4`}
+      style="max-height: calc(100vh - 120px);"
+    >
+      <div bind:this={detailsContent}>
+        <AssistantDetails
+          assistant={activeAssistant}
+          canEdit={canEditActiveAssistant}
+          canCreate={canCreateAssistant}
+        />
+      </div>
     </div>
   </div>
 </div>
