@@ -26,6 +26,7 @@
   let detailsContainer: HTMLElement
   let detailsContent: HTMLElement
   let needsScroll = $state(true)
+  let isLoadingAssistant = $state(true)
 
   function checkOverflow() {
     if (detailsContainer && detailsContent) {
@@ -49,9 +50,13 @@
   })
 
   $effect(() => {
-    // Wait for the DOM to update before measuring
+    // Wait for the DOM to update before measuring overflow
     setTimeout(checkOverflow, 0)
   })
+
+  function handleAssistantReady() {
+    isLoadingAssistant = false
+  }
 </script>
 
 <div class="flex flex-col h-full">
@@ -73,6 +78,8 @@
           canEdit={canEditActiveAssistant}
           canCreate={canCreateAssistant}
           {models}
+          loading={isLoadingAssistant}
+          onReady={handleAssistantReady}
         />
       </div>
     </div>

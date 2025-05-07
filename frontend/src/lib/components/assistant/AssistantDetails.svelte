@@ -10,6 +10,8 @@
     models?: IAssistantModel[]
     canCreate?: boolean
     canEdit?: boolean
+    loading?: boolean
+    onReady?: () => void
   }
 
   let {
@@ -17,9 +19,19 @@
     models = [],
     canCreate = false,
     canEdit = false,
+    loading = false,
+    onReady = () => {},
   }: Props = $props()
 
   let formAction = $state('update')
+
+  $effect(() => {
+    if (assistant && Object.keys(assistant).length > 0) {
+      // Notify parent that assistant data is processed and ready, used for spinner
+      onReady()
+    }
+  })
+
 
   function setDeleteAction() {
     formAction = 'delete'
@@ -36,7 +48,11 @@
   let selectedModelKey = $state(assistant ? assistant.model : '')
 </script>
 
-{#if assistant && Object.keys(assistant).length > 0}
+{#if loading}
+  <div class="flex h-screen items-center justify-center">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
+  </div>
+{:else if assistant && Object.keys(assistant).length > 0}
   <div class="h-full">
     <form method="POST" action="?/{formAction}" class="space-y-4 pb-8">
       <input
