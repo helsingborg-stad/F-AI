@@ -7,6 +7,7 @@ import {
   deleteAssistant,
   fetchAllAssistants,
   fetchAssistantById,
+  fetchAssistantModels,
   updateAssistant,
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
@@ -48,9 +49,12 @@ export const load: PageServerLoad = async (event) => {
     activeAssistant.id = activeAssistantID
   }
 
+  const models = await fetchAssistantModels(event)
+
   return {
     assistants,
     activeAssistant,
+    models,
     canCreateAssistant: userCanCreateAssistant,
     canEditActiveAssistant: userCanEditAssistant,
   }
