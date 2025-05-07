@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { IAssistant } from '$lib/types.js'
+  import type { IAssistant, IAssistantModel } from '$lib/types.js'
   import ActionButtons from '$lib/components/Form/ActionButtons.svelte'
   import AccessSection from '$lib/components/assistant/AccessSection.svelte'
   import ToolsSection from '$lib/components/assistant/ToolsSection.svelte'
@@ -7,14 +7,16 @@
 
   interface Props {
     assistant?: IAssistant
-    canEdit?: boolean
+    models?: IAssistantModel[]
     canCreate?: boolean
+    canEdit?: boolean
   }
 
   let {
     assistant,
-    canEdit = false,
+    models = [],
     canCreate = false,
+    canEdit = false,
   }: Props = $props()
 
   let formAction = $state('update')
@@ -30,6 +32,8 @@
   function setUpdateAction() {
     formAction = 'update'
   }
+
+  let selectedModelKey = $state(assistant ? assistant.model : '')
 </script>
 
 {#if assistant && Object.keys(assistant).length > 0}
@@ -40,6 +44,11 @@
         name="assistant_id"
         value={assistant.id}
       />
+      <input
+        type="hidden"
+        name="model_key"
+        bind:value={selectedModelKey}
+      >
 
       <label class="form-control w-full">
         <div class="label">
@@ -75,9 +84,16 @@
         <div class="label">
           <span class="label-text">Model</span>
         </div>
-        <select class="select select-bordered select-sm text-sm" disabled={!canEdit}>
-          <option>gpt-4</option>
-          <option>claud</option>
+        <select
+          name="model"
+          bind:value={selectedModelKey}
+          class="select select-bordered select-sm text-sm"
+          disabled={!canEdit}
+        >
+          <option value="" disabled selected>Select a model</option>
+          {#each models as model}
+            <option>{model.name}</option>
+          {/each}
         </select>
       </label>
       <div class="space-y-2 pt-5">
