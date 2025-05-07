@@ -20,14 +20,17 @@
     canCreate = false,
     canEdit = false,
     loading = false,
-    onReady = () => {},
+    onReady = () => {
+    },
   }: Props = $props()
 
   let formAction = $state('update')
 
   $effect(() => {
-    if (assistant && Object.keys(assistant).length > 0) {
-      // Notify parent that assistant data is processed and ready, used for spinner
+    // Notify parent that assistant data is processed and ready, used for spinner
+    if (!assistant || Object.keys(assistant).length === 0) {
+      onReady()
+    } else if (assistant && Object.keys(assistant).length > 0) {
       onReady()
     }
   })
