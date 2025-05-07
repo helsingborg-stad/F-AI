@@ -19,5 +19,8 @@ class TokenServiceFactory:
             case 'anthropic':
                 from src.modules.token.AnthropicTokenService import AnthropicTokenService
                 return AnthropicTokenService(self._assistant_service, self._conversation_service)
+            case 'mistral':
+                from src.modules.token.MistralTokenService import MistralTokenService
+                return MistralTokenService(self._assistant_service, self._conversation_service)
             case _:
                 raise ValueError(f'No valid token service for model with key {model_key}')

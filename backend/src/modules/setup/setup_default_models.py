@@ -17,4 +17,6 @@ async def setup_default_models(assistant_service: IAssistantService):
 
         Model(key='anthropic:claude-3-7-sonnet-latest', provider='Anthropic', display_name='Claude 3.7 Sonnet',
               description=''),
+
+        Model(key='mistral:mistral-large-latest', provider='Mistral', display_name='Mistral Large', description='')
     ])

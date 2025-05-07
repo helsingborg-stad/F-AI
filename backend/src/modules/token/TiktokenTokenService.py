@@ -3,6 +3,7 @@ import tiktoken
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
 from src.modules.conversations.protocols.IConversationService import IConversationService
 from src.modules.llm.helpers.parse_model_key import parse_model_key
+from src.modules.token.helpers.get_conversation_assistant_model import get_conversation_assistant_model
 from src.modules.token.protocols.ITokenService import ITokenService
 
 
@@ -32,17 +33,18 @@ class TiktokenTokenService(ITokenService):
         return await self._get_tokens(model_name, messages)
 
     async def get_token_count_with_history(self, as_uid: str, conversation_id: str, message: str) -> int:
-        conversation = await self._conversation_service.get_conversation(as_uid=as_uid, conversation_id=conversation_id)
+        fetched = await get_conversation_assistant_model(
+            as_uid=as_uid,
+            assistant_service=self._assistant_service,
+            conversation_service=self._conversation_service,
+            conversation_id=conversation_id
+        )
 
-        if not conversation:
+        if not fetched:
             return -1
 
-        assistant = await self._assistant_service.get_assistant(as_uid=as_uid, assistant_id=conversation.assistant_id)
+        conversation, assistant, model_name = fetched
 
-        if not assistant:
-            return -1
-
-        [_, model_name] = parse_model_key(assistant.model)
         conversation_messages = [m.content for m in conversation.messages]
         messages = [*conversation_messages, message]
 

@@ -1,4 +1,5 @@
 from src.modules.llm.AnthropicLLMService import AnthropicLLMService
+from src.modules.llm.MistralLLMService import MistralLLMService
 from src.modules.llm.OpenAILLMService import OpenAILLMService
 from src.modules.llm.helpers.parse_model_key import parse_model_key
 from src.modules.llm.protocols import ILLMService
@@ -13,5 +14,7 @@ class LLMServiceFactory:
                 return OpenAILLMService()
             case 'anthropic':
                 return AnthropicLLMService()
+            case 'mistral':
+                return MistralLLMService()
             case _:
                 raise ValueError(f'Invalid model key: {model_key}')
