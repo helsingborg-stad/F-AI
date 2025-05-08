@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
 from src.modules.settings.models.SettingValue import SettingValue, SettingsDict
+from src.modules.settings.settings import SettingKey
 
 settings_router = APIRouter(
     prefix='/settings',
@@ -53,7 +54,8 @@ async def set_setting(body: SetSettingRequest, services: ServicesDependency):
 
 
 class PatchSettingsRequest(BaseModel):
-    settings: SettingsDict = Field(examples=[{"login.fixed_otp": "asdfasdf", "jwt.expire_minutes": 900}])
+    settings: SettingsDict = Field(
+        examples=[{SettingKey.JWT_USER_SECRET: "asdfasdf", SettingKey.JWT_EXPIRE_MINUTES: 900}])
 
 
 @auth.patch(

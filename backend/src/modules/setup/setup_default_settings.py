@@ -1,6 +1,7 @@
 from typing import Any
 
 from src.modules.settings.protocols.ISettingsService import ISettingsService
+from src.modules.settings.settings import SettingKey
 
 
 async def _set_if_not_set(
@@ -16,7 +17,5 @@ async def _set_if_not_set(
 async def setup_default_settings(settings_service: ISettingsService):
     all_settings = await settings_service.get_settings()
 
-    await _set_if_not_set(all_settings, settings_service, 'login.fixed_otp', '1234')
-    await _set_if_not_set(all_settings, settings_service, 'jwt.user_secret', 'CHANGE THIS')
-    await _set_if_not_set(all_settings, settings_service, 'jwt.expire_minutes', 600)
-    await _set_if_not_set(all_settings, settings_service, 'brevo.url', 'https://api.brevo.com/v3/smtp/email')
+    for _, setting in SettingKey:
+        await _set_if_not_set(all_settings, settings_service, setting.key, setting.default)

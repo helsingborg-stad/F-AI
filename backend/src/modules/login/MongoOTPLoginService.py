@@ -14,6 +14,7 @@ from src.modules.login.protocols.ILoginService import ILoginService
 from src.modules.notification.models.NotificationPayload import NotificationPayload
 from src.modules.notification.protocols.INotificationService import INotificationService
 from src.modules.settings.protocols.ISettingsService import ISettingsService
+from src.modules.settings.settings import SettingKey
 
 
 class MongoOTPLoginService(ILoginService):
@@ -35,7 +36,7 @@ class MongoOTPLoginService(ILoginService):
         await ensure_expiry_index(self._database['login_otp'], self._otp_expiry_seconds)
 
     async def initiate_login(self, user_id: str) -> str:
-        otp = self._generate_otp(await self._settings_service.get_setting('login.fixed_otp'))
+        otp = self._generate_otp(await self._settings_service.get_setting(SettingKey.FIXED_OTP.key))
         hashed_otp = hash_secret(otp)
         stored_otp = StoredOTP(user_id=user_id, hashed_otp=hashed_otp)
 
@@ -64,8 +65,10 @@ class MongoOTPLoginService(ILoginService):
         jwt = create_user_jwt(
             result['user_id'],
             {},
-            datetime.utcnow() + timedelta(minutes=await self._settings_service.get_setting('jwt.expire_minutes', 600)),
-            await self._settings_service.get_setting('jwt.user_secret'))
+            datetime.utcnow() + timedelta(
+                minutes=await self._settings_service.get_setting(SettingKey.JWT_EXPIRE_MINUTES.key,
+                                                                 SettingKey.JWT_EXPIRE_MINUTES.default)),
+            await self._settings_service.get_setting(SettingKey.JWT_USER_SECRET.key))
         return ConfirmedLogin(user_id=result['user_id'], access_token=jwt)
 
     @staticmethod

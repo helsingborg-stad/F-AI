@@ -1,12 +1,11 @@
-import os
-
 import chromadb
 from chromadb import EmbeddingFunction
 from chromadb.errors import InvalidCollectionException
-from chromadb.utils.embedding_functions.openai_embedding_function import OpenAIEmbeddingFunction
 from chromadb.utils import embedding_functions
+from chromadb.utils.embedding_functions.openai_embedding_function import OpenAIEmbeddingFunction
 
 from src.modules.settings.protocols.ISettingsService import ISettingsService
+from src.modules.settings.settings import SettingKey
 from src.modules.vector.models.VectorDocument import VectorDocument
 from src.modules.vector.models.VectorSpace import VectorSpace
 from src.modules.vector.protocols.IVectorService import IVectorService
@@ -88,7 +87,7 @@ class ChromaDBVectorService(IVectorService):
         ]
 
     async def _get_embedding_function(self, embedding_model_name: str) -> EmbeddingFunction:
-        openai_api_key = await self._settings_service.get_setting('openai_api_key')
+        openai_api_key = await self._settings_service.get_setting(SettingKey.OPENAI_API_KEY.key)
         embedding_model_map = {
             'default': lambda: embedding_functions.DefaultEmbeddingFunction(),
             'text-embedding-3-small': lambda: OpenAIEmbeddingFunction(
