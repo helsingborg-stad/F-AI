@@ -111,7 +111,7 @@
         >
           <option value="" disabled selected>Select a model</option>
           {#each models as model}
-            <option>{model.name}</option>
+            <option value={model.key} selected={assistant.model === model.key}>{model.name}</option>
           {/each}
         </select>
       </label>
