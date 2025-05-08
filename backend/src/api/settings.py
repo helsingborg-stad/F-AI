@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
-from src.modules.settings.models.SettingValue import SettingValue
+from src.modules.settings.models.SettingValue import SettingValue, SettingsDict
 
 settings_router = APIRouter(
     prefix='/settings',
@@ -14,11 +14,11 @@ auth = AuthRouterDecorator(settings_router)
 
 
 class GetSettingsResponse(BaseModel):
-    settings: dict[str, SettingValue]
+    settings: SettingsDict
 
 
 @auth.get(
-    '/settings',
+    '',
     ['settings.read']
 )
 async def get_settings(services: ServicesDependency):
@@ -31,7 +31,7 @@ class GetSettingResponse(BaseModel):
 
 
 @auth.get(
-    'settings/{key}',
+    '/{key}',
     ['settings.read']
 )
 async def get_setting(key: str, services: ServicesDependency):
@@ -45,8 +45,20 @@ class SetSettingRequest(BaseModel):
 
 
 @auth.post(
-    'settings/{key}',
+    '/{key}',
     ['settings.write']
 )
 async def set_setting(body: SetSettingRequest, services: ServicesDependency):
     await services.settings_service.set_setting(key=body.key, value=body.value)
+
+
+class PatchSettingsRequest(BaseModel):
+    settings: SettingsDict = Field(examples=[{"login.fixed_otp": "asdfasdf", "jwt.expire_minutes": 900}])
+
+
+@auth.patch(
+    '',
+    ['settings.write']
+)
+async def patch_settings(body: PatchSettingsRequest, services: ServicesDependency):
+    await services.settings_service.patch_settings(patch=body.settings)

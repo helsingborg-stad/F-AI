@@ -2,7 +2,7 @@ from typing import Any
 
 from pymongo.asynchronous.database import AsyncDatabase
 
-from src.modules.settings.models.SettingValue import SettingValue
+from src.modules.settings.models.SettingValue import SettingValue, SettingsDict
 from src.modules.settings.protocols.ISettingsService import ISettingsService
 
 
@@ -16,15 +16,19 @@ class MongoSettingsService(ISettingsService):
             return fallback_value
         return self._to_valid_value(result['value'])
 
-    async def get_settings(self) -> dict[str, SettingValue]:
+    async def get_settings(self) -> SettingsDict:
         cursor = self._database['settings'].find(projection=['key', 'value'])
-        out_dict: dict[str, SettingValue] = {}
+        out_dict: SettingsDict = {}
         async for doc in cursor:
             out_dict[doc['key']] = self._to_valid_value(doc['value'])
         return out_dict
 
     async def set_setting(self, key: str, value: SettingValue) -> None:
         await self._database['settings'].update_one({'key': key}, {'$set': {"value": value}}, upsert=True)
+
+    async def patch_settings(self, patch: SettingsDict) -> None:
+        for key, value in patch.items():
+            await self.set_setting(key, value)
 
     @staticmethod
     def _to_valid_value(value: Any) -> SettingValue:
