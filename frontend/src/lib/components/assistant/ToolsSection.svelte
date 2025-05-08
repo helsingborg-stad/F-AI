@@ -22,10 +22,10 @@
       </InfoTooltip>
     </div>
     <div>
-      <button class="btn btn-sm" disabled={!canEdit}>
+      <button type="button" class="btn btn-sm" disabled={!canEdit}>
         <Icon icon={icons["settings"]} width={16} height={16} />
       </button>
-      <button class="btn btn-sm" disabled={!canEdit}>
+      <button type="button" class="btn btn-sm" disabled={!canEdit}>
         <Icon icon={icons["plus"]} width={16} height={16} />
         <span class="text-s">Files</span>
       </button>
@@ -40,7 +40,7 @@
       </InfoTooltip>
     </div>
     <div>
-      <button class="btn btn-sm" disabled={!canEdit}>
+      <button type="button" class="btn btn-sm" disabled={!canEdit}>
         <Icon icon={icons["plus"]} width={16} height={16} />
         <span class="text-s">Functions</span>
       </button>
