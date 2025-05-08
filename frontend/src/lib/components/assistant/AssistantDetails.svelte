@@ -81,6 +81,7 @@
           value={assistant.name}
           readonly={!canEdit}
           autocomplete="off"
+          onkeydown={(e) => e.key === 'Enter' && e.preventDefault()}
         />
         <div class="label">
           <span class="label-text-alt opacity-50">{assistant.id}</span>
