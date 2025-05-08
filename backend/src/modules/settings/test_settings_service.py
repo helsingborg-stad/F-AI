@@ -89,3 +89,22 @@ class BaseSettingsServiceTest:
         assert result['test_int'] == 100000
         assert result['test_float'] == 3.14159265358979
         assert result['test_bool'] is False
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_patch_settings(service: ISettingsService):
+        await service.set_setting('test_str', 'blablabla')
+        await service.set_setting('test_int', 100000)
+        await service.set_setting('test_float', 3.14159265358979)
+        await service.set_setting('test_bool', False)
+
+        result = await service.patch_settings({'test_str': 'hello', 'test_int': 123})
+
+        settings = await service.get_settings()
+
+        assert result is None
+        assert settings['test_str'] == 'hello'
+        assert settings['test_int'] == 123
+        assert settings['test_float'] == 3.14159265358979
+        assert settings['test_bool'] is False
