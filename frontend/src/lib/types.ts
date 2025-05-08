@@ -62,3 +62,12 @@ export interface IAssistant {
 export interface IAssistants {
   assistants: IAssistant[]
 }
+
+export interface IApiSettings {
+  fixedOptCode: string
+  openAiApiKey: string
+  jwtUserSecret: string
+  jwtExpireMinutes: string
+  brevoApiUrl: string
+  brevoApiKey: string
+}
