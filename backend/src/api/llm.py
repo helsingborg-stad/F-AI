@@ -20,7 +20,7 @@ class RunRequest(BaseModel):
         {"role": "system", "content": "Answer like a pirate"},
         {"role": "user", "content": "Who is the king of Sweden?"}],
     ])
-    api_key: str | None = Field(examples=['my-api-key'])
+    api_key: str | None = Field(default=None, examples=['my-api-key'])
     extra_params: dict[str, float | int | bool | str] | None = Field(default=None, examples=[{'temperature': 0.5}])
 
 
@@ -47,8 +47,8 @@ async def run(request: RunRequest, services: ServicesDependency):
                 )
                 for message in request.messages
             ],
-            api_key=request.api_key,
-            extra_params=request.extra_params
+            api_key=request.api_key if request.api_key else "",
+            extra_params=request.extra_params if request.extra_params else {}
         )
         return RunResponse(role=message.role, content=message.content)
     except ValueError as e:

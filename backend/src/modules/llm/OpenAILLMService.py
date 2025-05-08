@@ -6,9 +6,14 @@ from src.modules.llm.models.Delta import Delta
 from src.modules.llm.models.Message import Message
 from src.modules.llm.openai_runner import OpenAIRunner
 from src.modules.llm.protocols.ILLMService import ILLMService
+from src.modules.settings.protocols.ISettingsService import ISettingsService
+from src.modules.settings.settings import SettingKey
 
 
 class OpenAILLMService(ILLMService):
+    def __init__(self, settings_service: ISettingsService):
+        self._settings_service = settings_service
+
     async def stream_llm(
             self,
             model: str,
@@ -17,6 +22,10 @@ class OpenAILLMService(ILLMService):
             extra_params: dict[str, float | int | bool | str] | None = None
     ) -> AsyncGenerator[Delta, None]:
         [_, model_name] = parse_model_key(model)
+
+        if len(api_key) == 0:
+            api_key = await self._settings_service.get_setting(SettingKey.OPENAI_API_KEY.key)
+
         runner = OpenAIRunner(
             model=model_name,
             messages=messages,

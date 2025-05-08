@@ -39,7 +39,7 @@ async def create_services() -> Services:
     resource_service = ResourceServiceFactory(group_service=group_service).get()
     assistant_service = AssistantServiceFactory(mongo_database=mongo_database, resource_service=resource_service).get()
     conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
-    llm_factory = LLMServiceFactory()
+    llm_factory = LLMServiceFactory(setting_service=settings_service)
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
