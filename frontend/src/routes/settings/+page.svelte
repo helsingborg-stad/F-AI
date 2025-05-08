@@ -5,6 +5,7 @@
   let { data } = $props<{ settings: IApiSettings }>()
 
   const backendSettings = data.settings
+  console.log(backendSettings.fixedOptCode)
 </script>
 
 <div class="p-4">
@@ -13,8 +14,7 @@
   <form method="POST" action="?/update">
     <h2 class="mt-12">Basic</h2>
     <TextInput
-      label="Fixed pin" value={backendSettings.fixedOptCode}
-      placeholder="NOTE: Make sure Brevo API is setup correctly to avoid account lock-out!" />
+      label="Fixed pin" value={backendSettings.fixedOptCode} />
     <h2 class="mt-12">AI Settings</h2>
     <TextInput
       label="OpenAI API Key" value={backendSettings.openAiApiKey}
