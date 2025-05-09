@@ -168,6 +168,8 @@ class MongoAssistantService(IAssistantService):
 
     @staticmethod
     def _doc_to_assistant(doc: Mapping[str, Any], redact_key: bool) -> Assistant:
+        api_key = (MongoAssistantService._redact_key(doc['llm_api_key']) if redact_key else doc[
+            'llm_api_key']) if 'llm_api_key' in doc else None
         return Assistant(
             id=str(doc['_id']),
             owner=doc['owner'],
@@ -179,7 +181,7 @@ class MongoAssistantService(IAssistantService):
                 is_public=doc['meta']['is_public'] if 'is_public' in doc['meta'] else False,
             ),
             model=doc['model'],
-            llm_api_key=MongoAssistantService._redact_key(doc['llm_api_key']) if redact_key else doc['llm_api_key'],
+            llm_api_key=api_key,
             instructions=doc['instructions'],
             collection_id=doc['collection_id'],
             extra_llm_params=doc['extra_llm_params'] if 'extra_llm_params' in doc else None,

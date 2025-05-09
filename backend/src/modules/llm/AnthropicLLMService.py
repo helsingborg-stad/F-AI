@@ -10,9 +10,13 @@ from src.modules.llm.helpers.parse_model_key import parse_model_key
 from src.modules.llm.models.Delta import Delta
 from src.modules.llm.models.Message import Message
 from src.modules.llm.protocols.ILLMService import ILLMService
+from src.modules.settings.protocols.ISettingsService import ISettingsService
+from src.modules.settings.settings import SettingKey
 
 
 class AnthropicLLMService(ILLMService):
+    def __init__(self, settings_service: ISettingsService):
+        self._settings_service = settings_service
 
     @staticmethod
     def _to_role(role: str) -> Literal['user', 'assistant']:
@@ -31,6 +35,10 @@ class AnthropicLLMService(ILLMService):
             extra_params: dict[str, float | int | bool | str] | None = None
     ) -> AsyncGenerator[Delta, None]:
         [_, model_name] = parse_model_key(model)
+
+        if not api_key or len(api_key) == 0:
+            api_key = await self._settings_service.get_setting(SettingKey.ANTHROPIC_API_KEY.key)
+
         client = anthropic.AsyncAnthropic(api_key=api_key)
 
         if not extra_params:

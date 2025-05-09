@@ -23,7 +23,7 @@ class OpenAILLMService(ILLMService):
     ) -> AsyncGenerator[Delta, None]:
         [_, model_name] = parse_model_key(model)
 
-        if len(api_key) == 0:
+        if not api_key or len(api_key) == 0:
             api_key = await self._settings_service.get_setting(SettingKey.OPENAI_API_KEY.key)
 
         runner = OpenAIRunner(
