@@ -26,6 +26,9 @@ class OpenAILLMService(ILLMService):
         if not api_key or len(api_key) == 0:
             api_key = await self._settings_service.get_setting(SettingKey.OPENAI_API_KEY.key)
 
+        if not extra_params:
+            extra_params = {}
+
         runner = OpenAIRunner(
             model=model_name,
             messages=messages,
