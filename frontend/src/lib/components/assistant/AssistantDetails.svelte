@@ -117,7 +117,7 @@
         </select>
       </label>
       <div class="space-y-2 pt-5">
-        <AccessSection {canEdit} />
+        <AccessSection {canEdit} isPublic={assistant.isPublic} />
         <ToolsSection {canEdit} />
         <ModelConfigSection {canEdit} />
       </div>

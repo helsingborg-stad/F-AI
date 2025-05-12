@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types.js'
-import type { IAssistant } from '$lib/types.js'
+import type { IAssistant, IBackendAssistant } from '$lib/types.js'
 import { canCreateAssistant, canReadAssistants } from '$lib/state/user.svelte.js'
 import { error, redirect } from '@sveltejs/kit'
 import {
@@ -12,7 +12,7 @@ import {
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
 
-async function getAssistantFormValues(formData: FormData, overwrite = {}) {
+function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
   const modelKey = formData.get('model_key') as string
   const name = formData.get('name') as string
   const model = formData.get('model') as string
@@ -26,7 +26,7 @@ async function getAssistantFormValues(formData: FormData, overwrite = {}) {
     model: model,
     instructions: instructions,
     description: description,
-    public: visibility,
+    is_public: visibility,
     ...overwrite,
   }
 }
@@ -45,7 +45,15 @@ export const load: PageServerLoad = async (event) => {
   }
 
   if (activeAssistantID) {
-    activeAssistant = await fetchAssistantById(event, activeAssistantID)
+    const assistantData = await fetchAssistantById(event, activeAssistantID)
+    activeAssistant = {
+      id: activeAssistantID,
+      name: assistantData.name,
+      description: assistantData.description,
+      instructions: assistantData.instructions,
+      model: assistantData.model,
+      isPublic: assistantData.is_public,
+    }
     activeAssistant.id = activeAssistantID
   }
 

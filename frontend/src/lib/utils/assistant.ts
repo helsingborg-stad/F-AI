@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import type { IAssistant, IAssistantModels } from '$lib/types.js'
+import type { IAssistant, IAssistantModels, IBackendAssistant } from '$lib/types.js'
 import { api } from '$lib/api-fetch-factory.js'
 
 export async function fetchAllAssistants(event: RequestEvent): Promise<IAssistant[]> {
@@ -25,7 +25,7 @@ export async function fetchAssistantModels(
 export async function fetchAssistantById(
   event: RequestEvent,
   assistantId: string,
-): Promise<IAssistant> {
+): Promise<IBackendAssistant> {
   const response = await api.get(`/api/assistant/${assistantId}`, {
     event,
     withAuth: true,
@@ -33,8 +33,9 @@ export async function fetchAssistantById(
 
   if (response.ok) {
     const data = await response.json()
+    console.log(data)
     if (data.assistant) {
-      return data.assistant as IAssistant
+      return data.assistant as IBackendAssistant
     }
   }
 

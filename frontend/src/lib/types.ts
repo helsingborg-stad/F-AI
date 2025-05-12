@@ -50,13 +50,22 @@ export interface IAssistantModels {
   models: IAssistantModel[]
 }
 
-export interface IAssistant {
-  id: string
-  owner: string
+export interface IBackendAssistant {
+  model_key: string
   name: string
   description: string
   instructions: string
   model: string
+  is_public: boolean
+}
+
+export interface IAssistant {
+  id: string
+  name: string
+  description: string
+  instructions: string
+  model: string
+  isPublic: boolean
 }
 
 export interface IAssistants {
