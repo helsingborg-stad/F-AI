@@ -61,6 +61,7 @@ export async function updateAssistant(
     model?: string
     instructions?: string
     model_key?: string
+    collection_id?: string
   },
   event: RequestEvent,
 ) {
