@@ -26,12 +26,18 @@
 
 <Section title={"Tools"}>
   <div class="flex flex-row place-content-between items-center">
-    <div class="flex flex-row gap-2">
-      <input type="checkbox" class="toggle toggle-sm toggle-success" disabled={!canEdit} />
-      <InfoTooltip
-        toolTip="File Search enables the assistant with knowledge from files that you or your users upload.">
-        <div class="text-sm font-medium select-none">File search</div>
-      </InfoTooltip>
+    <div class="flex items-center gap-2">
+      {#if collectionId}
+        <button type="button" class="btn btn-xs" disabled={!canEdit}>
+          <Icon icon={icons["database"]} width={16} height={16} />
+        </button>
+      {/if}
+      {#if attachingFiles}
+        <span class="loading loading-spinner loading-xs"></span>
+      {/if}
+      {#if collectionId}
+        <span class="text-xs">Attached vector store {collectionId}</span>
+      {/if}
     </div>
     <div>
       <button type="button" class="btn btn-sm" disabled={!canEdit}>
@@ -43,22 +49,6 @@
       </button>
     </div>
   </div>
-
-  {#if collectionId || attachingFiles}
-    <div class="flex flex-row place-content-between items-center">
-      <div class="flex items-center gap-2">
-        <button type="button" class="btn btn-xs" disabled={!canEdit}>
-          <Icon icon={icons["database"]} width={16} height={16} />
-        </button>
-        {#if attachingFiles}
-          <span class="loading loading-spinner loading-xs"></span>
-        {:else }
-          <span class="text-xs">Attached vector store {collectionId}</span>
-        {/if}
-      </div>
-    </div>
-  {/if}
-
   <HorizontalDivider />
   <div class="flex flex-row place-content-between items-center">
     <div>
