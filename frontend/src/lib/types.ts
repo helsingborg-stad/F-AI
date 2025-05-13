@@ -75,10 +75,24 @@ export interface IAssistants {
 }
 
 export interface IApiSettings {
-  fixedOptCode: string
-  openAiApiKey: string
-  jwtUserSecret: string
-  jwtExpireMinutes: string
-  brevoApiUrl: string
-  brevoApiKey: string
+  fixedOptCode?: string
+  openAiApiKey?: string
+  anthropicApiKey?: string
+  mistralApiKey?: string
+  jwtUserSecret?: string
+  jwtExpireMinutes?: string
+  brevoApiUrl?: string
+  brevoApiKey?: string
+}
+
+export interface IBackendApiSettings {
+  settings: {
+    'login.fixed_otp'?: string
+    'jwt.user_secret'?: string
+    'brevo.url'?: string
+    'brevo.api_key'?: string
+    'openai.api_key'?: string
+    'anthropic.api_key'?: string
+    'mistral.api_key'?: string
+  }
 }
