@@ -10,7 +10,7 @@
 </script>
 
 <div class="flex bg-base-200 max-h-full flex-grow overflow-hidden">
-  <aside class="w-60 flex-shrink-0 bg-base-200 max-md:!w-0">
+  <aside class="w-60 flex-shrink-0 overflow-hidden bg-base-200 max-md:!w-0">
     <MenuSidebar
       menuSidebarTitle="Chat"
       menuSidebarItems={[]}
