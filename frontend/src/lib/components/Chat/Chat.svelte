@@ -28,9 +28,9 @@
   }
 </script>
 
-<div class="flex h-full flex-1 flex-col">
+<div class="flex flex-col h-full max-h-full">
   <!-- Chat Bubbles Area -->
-  <div class="flex-1 overflow-y-auto p-4">
+  <div class="overflow-auto grow p-4">
     {#each messages as msg (`${msg.timestamp}${msg.message}`)}
       <ChatBubble sender={msg.source} name={msg.source} text={msg.message} time={msg.timestamp}
                   bubbleColor={getBubbleColor(msg.source)} />
@@ -38,8 +38,8 @@
   </div>
 
   <!-- Chat Input -->
-  <div class="p-2">
-    <div class="m-3.5 rounded-2xl border bg-white p-2">
+  <div class="p-2 ">
+    <div class="m-3.5 rounded-2xl border bg-white p-2 bg-orange-400">
       <ChatInput send={onSubmitMessage} placeholder={inputPlaceholder} />
     </div>
   </div>

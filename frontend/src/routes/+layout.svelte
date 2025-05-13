@@ -21,7 +21,7 @@ Root layout component
 This layout file is responsible for setting the Navbar for the application
 and providing the main content area for child components.
 -->
-<div class="flex h-screen flex-col overflow-hidden">
+<div class="flex h-screen max-h-screen overflow-auto flex-col bg-red-700">
   {#if showNavbar}
     <header class="flex w-full bg-base-200 md:px-4">
       <Navbar
@@ -33,7 +33,7 @@ and providing the main content area for child components.
       />
     </header>
   {/if}
-  <div class="flex flex-grow">
+  <div class="flex flex-grow overflow-auto">
     <main class="flex h-full flex-grow flex-col">
       {@render children()}
     </main>

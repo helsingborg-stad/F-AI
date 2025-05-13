@@ -9,15 +9,15 @@
   const { messages, inputPlaceholder, onSubmitMessage }: Props = $props()
 </script>
 
-<div class="flex flex-grow bg-base-200">
-  <aside class="w-60 flex-shrink-0 overflow-hidden bg-base-200 max-md:!w-0">
+<div class="flex bg-base-200 max-h-full flex-grow overflow-hidden">
+  <aside class="w-60 flex-shrink-0 bg-base-200 max-md:!w-0">
     <MenuSidebar
       menuSidebarTitle="Chat"
       menuSidebarItems={[]}
       currentUrlPath={page.url.pathname}
     />
   </aside>
-  <main class="m-2 flex-grow rounded-lg border bg-stone-50">
+  <main class="m-2 w-full rounded-lg border bg-stone-50 overflow-auto">
     <Chat messages={messages} inputPlaceholder={inputPlaceholder} onSubmitMessage={onSubmitMessage} />
   </main>
 </div>
