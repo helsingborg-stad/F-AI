@@ -68,6 +68,11 @@
         name="model_key"
         bind:value={selectedModelKey}
       >
+      <input
+        type="hidden"
+        name="collection_id"
+        bind:value={assistant.collectionId}
+      >
 
       <label class="form-control w-full">
         <div class="label">
@@ -118,7 +123,11 @@
       </label>
       <div class="space-y-2 pt-5">
         <AccessSection {canEdit} isPublic={assistant.isPublic} />
-        <ToolsSection {canEdit} />
+        <ToolsSection
+          {canEdit}
+          assistantId={assistant.id}
+          collectionId={assistant.collectionId}
+        />
         <ModelConfigSection {canEdit} />
       </div>
       <ActionButtons

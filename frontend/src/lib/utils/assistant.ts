@@ -33,7 +33,6 @@ export async function fetchAssistantById(
 
   if (response.ok) {
     const data = await response.json()
-    console.log(data)
     if (data.assistant) {
       return data.assistant as IBackendAssistant
     }
@@ -61,6 +60,7 @@ export async function updateAssistant(
     model?: string
     instructions?: string
     model_key?: string
+    collection_id?: string
   },
   event: RequestEvent,
 ) {

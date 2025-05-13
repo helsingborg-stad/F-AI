@@ -25,7 +25,9 @@ class ApiFetchFactory {
 
     const headers = new Headers(fetchOptions.headers)
 
-    if (body && !headers.has('Content-Type')) {
+    if (body instanceof FormData) {
+      headers.delete('Content-Type')
+    } else if (body && !headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json')
     }
 
@@ -42,7 +44,7 @@ class ApiFetchFactory {
       headers,
       credentials: 'include',
       ...fetchOptions,
-      body: body ? JSON.stringify(body) : undefined,
+      body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
     }
 
     const response = await fetch(url, requestOptions)

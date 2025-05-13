@@ -11,11 +11,13 @@ import {
   updateAssistant,
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
+import { createCollection, replaceContextCollection } from '$lib/utils/collection.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
   const modelKey = formData.get('model_key') as string
   const name = formData.get('name') as string
   const model = formData.get('model') as string
+  const collectionId = formData.get('collection_id') as string
   const instructions = formData.get('instructions') as string
   const description = formData.get('description') as string
   const visibility = formData.get('public') === 'on'
@@ -24,6 +26,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
     model_key: modelKey,
     name: name,
     model: model,
+    collection_id: collectionId,
     instructions: instructions,
     description: description,
     is_public: visibility,
@@ -53,6 +56,7 @@ export const load: PageServerLoad = async (event) => {
       instructions: assistantData.instructions,
       model: assistantData.model,
       isPublic: assistantData.is_public,
+      collectionId: assistantData.collection_id,
     }
     activeAssistant.id = activeAssistantID
   }
@@ -122,6 +126,40 @@ export const actions = {
       const updateData = await getAssistantFormValues(formData, {
         name: `Copy of ${originalName}`,
       })
+      await updateAssistant(assistantId, updateData, event)
+    } catch (error) {
+      return handleApiError(error)
+    }
+
+    redirect(303, `/assistant?assistant_id=${assistantId}`)
+  },
+
+  uploadFiles: async (event) => {
+    const formData = await event.request.formData()
+    const assistantId = formData.get('assistant_id') as string
+    let collectionId = ''
+
+    try {
+      const body = {
+        label: 'collection',
+        embedding_model: 'default',
+      }
+
+      const collectionResponse = await createCollection(event, body)
+      collectionId = collectionResponse.collection_id
+    } catch (error) {
+      return handleApiError(error)
+    }
+
+    const files = formData.getAll('files') as File[]
+    try {
+      await replaceContextCollection(event, collectionId, files)
+    } catch (error) {
+      return handleApiError(error)
+    }
+
+    try {
+      const updateData = { collection_id: collectionId }
       await updateAssistant(assistantId, updateData, event)
     } catch (error) {
       return handleApiError(error)
