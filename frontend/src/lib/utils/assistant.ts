@@ -33,7 +33,6 @@ export async function fetchAssistantById(
 
   if (response.ok) {
     const data = await response.json()
-    console.log(data)
     if (data.assistant) {
       return data.assistant as IBackendAssistant
     }

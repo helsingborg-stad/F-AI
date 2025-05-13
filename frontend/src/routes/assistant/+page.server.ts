@@ -56,6 +56,7 @@ export const load: PageServerLoad = async (event) => {
       instructions: assistantData.instructions,
       model: assistantData.model,
       isPublic: assistantData.is_public,
+      collectionId: assistantData.collection_id,
     }
     activeAssistant.id = activeAssistantID
   }
@@ -158,7 +159,7 @@ export const actions = {
     }
 
     try {
-      const updateData = {collection_id: collectionId}
+      const updateData = { collection_id: collectionId }
       await updateAssistant(assistantId, updateData, event)
     } catch (error) {
       return handleApiError(error)

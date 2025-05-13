@@ -71,7 +71,7 @@
       <input
         type="hidden"
         name="collection_id"
-        bind:value={assistant.collection_id}
+        bind:value={assistant.collectionId}
       >
 
       <label class="form-control w-full">
@@ -126,7 +126,7 @@
         <ToolsSection
           {canEdit}
           assistantId={assistant.id}
-          collectionId={assistant.collection_id}
+          collectionId={assistant.collectionId}
         />
         <ModelConfigSection {canEdit} />
       </div>

@@ -57,6 +57,7 @@ export interface IBackendAssistant {
   instructions: string
   model: string
   is_public: boolean
+  collection_id: string
 }
 
 export interface IAssistant {
@@ -65,7 +66,8 @@ export interface IAssistant {
   description: string
   instructions: string
   model: string
-  collection_id: string
+  collectionId: string
+  isPublic: boolean
 }
 
 export interface IAssistants {
