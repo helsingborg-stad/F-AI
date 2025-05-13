@@ -6,8 +6,6 @@
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
   import FileUploadModal from '$lib/components/assistant/FileUploadModal.svelte'
 
-  const FILE_MODAL_ID = 'files_modal'
-
   interface Props {
     canEdit: boolean
     assistantId: string
@@ -15,10 +13,10 @@
   }
 
   let { canEdit, assistantId, collectionId }: Props = $props()
+  let fileModal: FileUploadModal
 
   function openFilesModal() {
-    const modal = document.getElementById(FILE_MODAL_ID) as HTMLDialogElement
-    if (modal) modal.showModal()
+    if (fileModal) fileModal.showModal()
   }
 
   let attachingFiles = $state(false)
@@ -66,4 +64,4 @@
   </div>
 </Section>
 
-<FileUploadModal dialogId={FILE_MODAL_ID} {assistantId} bind:uploadingFiles={attachingFiles} />
+<FileUploadModal bind:this={fileModal} {assistantId} bind:uploadingFiles={attachingFiles} />

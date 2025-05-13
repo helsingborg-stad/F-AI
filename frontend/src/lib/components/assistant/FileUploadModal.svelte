@@ -3,12 +3,16 @@
   import type { SubmitFunction } from '@sveltejs/kit'
 
   interface Props {
-    dialogId: string;
     assistantId: string;
     uploadingFiles?: boolean
   }
 
-  let { dialogId, assistantId, uploadingFiles = $bindable(false) }: Props = $props()
+  let { assistantId, uploadingFiles = $bindable(false) }: Props = $props()
+  let dialog: HTMLDialogElement
+
+  export function showModal() {
+    dialog.showModal()
+  }
 
   function handleEnhance(): ReturnType<SubmitFunction> {
     uploadingFiles = true
@@ -25,7 +29,7 @@
   }
 </script>
 
-<dialog id={dialogId} class="modal">
+<dialog bind:this={dialog} class="modal">
   <div class="modal-box">
     <h3 class="text-lg font-bold">Attach Files</h3>
     <p class="py-4">Select one or more files to attach to your assistant.</p>
