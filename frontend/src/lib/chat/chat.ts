@@ -12,7 +12,7 @@ export async function sendChatMessage(
   onError: (error: string) => void) {
 
   onAddMessage({ source: 'user', message: message })
-  onAddMessage({ source: 'assistant', message: '<loading>' })
+  onAddMessage({ source: 'assistant', message: '...' })
 
   const storeMessageResponse = await fetch('/chat', {
     method: 'POST',
