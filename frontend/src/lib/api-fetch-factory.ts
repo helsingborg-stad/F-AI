@@ -7,7 +7,7 @@ interface ApiOptions<T = unknown> extends Omit<RequestInit, 'method' | 'body'> {
   event: RequestEvent
 }
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type HttpMethod = 'GET'| 'PATCH' | 'POST' | 'PUT' | 'DELETE'
 
 class ApiFetchFactory {
   private readonly baseUrl: string
@@ -58,6 +58,10 @@ class ApiFetchFactory {
 
   async get<T>(endpoint: string, options: ApiOptions<T>): Promise<Response> {
     return this.request<T>('GET', endpoint, options)
+  }
+
+  async patch<T>(endpoint: string, options: ApiOptions<T>): Promise<Response> {
+    return this.request<T>('PATCH', endpoint, options)
   }
 
   async post<T>(endpoint: string, options: ApiOptions<T>): Promise<Response> {
