@@ -60,3 +60,11 @@ export function canReadAssistants(): boolean {
 export function canEditAssistants(): boolean {
   return hasScope('assistant.write')
 }
+
+export function canReadApiSettings(): boolean {
+  return hasScope('settings.read')
+}
+
+export function canEditApiSettings(): boolean {
+  return hasScope('settings.write')
+}

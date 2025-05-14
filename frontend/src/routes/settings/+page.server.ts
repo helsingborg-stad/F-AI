@@ -4,8 +4,16 @@ import type { RequestEvent } from '@sveltejs/kit'
 import type { IApiSettings } from '$lib/types.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
 import { updateApiSettings } from '$lib/utils/api-settings.js'
+import { canReadApiSettings } from '$lib/state/user.svelte.js'
 
 export const load: PageServerLoad = async (event: RequestEvent) => {
+  const userCanReadSettings = canReadApiSettings()
+
+  if (!userCanReadSettings) {
+    const error = new Error('You do not have permission to view settings')
+    return handleApiError(error)
+  }
+
   try {
     const settingsData = await getSettings(event)
 

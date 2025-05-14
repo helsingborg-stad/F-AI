@@ -4,10 +4,15 @@ export function load({ locals }) {
   const user = locals.user || { scopes: [], email: '' }
   setUser(user)
 
-  const navbarMenu = [
-    { label: 'Chat', path: '/chat' },
-    { label: 'Assistants', path: '/assistant' },
-  ]
+  const navbarMenu = []
+
+  if (hasScope('chat')) {
+    navbarMenu.push({ label: 'Chat', path: '/chat' })
+  }
+
+  if (hasScope('assistant.read')) {
+    navbarMenu.push({ label: 'Assistants', path: '/assistant' })
+  }
 
   if (hasScope('settings.read')) {
     navbarMenu.push({ label: 'Settings', path: '/settings' })
