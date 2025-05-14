@@ -9,7 +9,11 @@ async def setup_default_groups(group_service: IGroupService):
         as_uid=os.environ['SETUP_ADMIN'],
         label='default',
         members=['*@*'],
-        scopes=[],
+        scopes=[
+            'assistant.read',
+            'conversation.read',
+            'chat'
+        ],
         resources=[]
     )
 
