@@ -3,6 +3,19 @@ import type { LayoutServerLoad } from './$types.js'
 import { api } from '$lib/api-fetch-factory.js'
 
 export const load: LayoutServerLoad = async (event) => {
+  const assistantsResponse = await api.get('/api/assistant', { event })
+
+  if (!assistantsResponse.ok) {
+    redirect(307, '/chat')
+  }
+
+  const { assistants }: {
+    assistants: {
+      id: string
+      name: string
+    }[]
+  } = await assistantsResponse.json()
+
   if (event.params.conversationId) {
     const response = await api.get(`/api/conversation/${event.params.conversationId}`, { event })
 
@@ -30,8 +43,9 @@ export const load: LayoutServerLoad = async (event) => {
 
     return {
       messages,
+      assistants,
     }
   }
 
-  return { messages: [] }
+  return { messages: [], assistants }
 }
