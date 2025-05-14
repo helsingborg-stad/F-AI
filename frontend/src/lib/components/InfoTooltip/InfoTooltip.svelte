@@ -11,7 +11,7 @@
   let { toolTip, children }: Props = $props()
 </script>
 
-<div class="tooltip" data-tip={toolTip}>
+<div class="tooltip tooltip-right" data-tip={toolTip}>
   <div class="flex flex-row gap-2 items-center">
     {#if children}
       {@render children()}

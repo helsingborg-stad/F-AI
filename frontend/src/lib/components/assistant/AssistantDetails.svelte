@@ -56,7 +56,7 @@
     <span class="loading loading-spinner loading-lg text-primary"></span>
   </div>
 {:else if assistant && Object.keys(assistant).length > 0}
-  <div class="h-full">
+  <div class="h-full px-1">
     <form method="POST" action="?/{formAction}" class="space-y-4 pb-8">
       <input
         type="hidden"
