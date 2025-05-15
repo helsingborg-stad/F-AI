@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ChatBubble from '$lib/components/Chat/ChatBubble.svelte'
   import ChatInput from '$lib/components/Chat/ChatInput.svelte'
   import Icon from '$lib/components/Icon/Icon.svelte'
   import { icons } from '$lib/components/Icon/icons.js'
+  import ChatMessage from '$lib/components/Chat/ChatMessage.svelte'
 
   interface Message {
     timestamp: string
@@ -38,17 +38,6 @@
       scrollToBottom()
     }
   })
-
-  function getBubbleColor(source: string) {
-    switch (source) {
-      case 'error':
-        return 'error'
-      case 'user':
-        return 'primary'
-      default:
-        return 'secondary'
-    }
-  }
 </script>
 
 <div class="flex flex-col h-full max-h-full">
@@ -59,8 +48,7 @@
     class="overflow-auto grow p-4"
   >
     {#each messages as msg (`${msg.timestamp}${msg.message}`)}
-      <ChatBubble sender={msg.source} name={msg.source} text={msg.message} time={msg.timestamp}
-                  bubbleColor={getBubbleColor(msg.source)} />
+      <ChatMessage sender={msg.source} text={msg.message} time={msg.timestamp} />
     {/each}
   </div>
 
