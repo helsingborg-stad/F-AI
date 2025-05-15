@@ -5,6 +5,7 @@ export interface RealtimeChatMessage {
 
 export async function sendChatMessage(
   message: string,
+  assistantId: string | undefined,
   conversationId: string | undefined,
   onAddMessage: (message: RealtimeChatMessage) => void,
   onUpdateLastMessage: (message: RealtimeChatMessage) => void,
@@ -30,10 +31,9 @@ export async function sendChatMessage(
 
   let accumulatedResponseMessage = ''
 
-  // TODO: Don't use hardcoded assistant id
   const chatUrl = conversationId
     ? `/chat?message=${messageId}&conversation=${conversationId}`
-    : `/chat?message=${messageId}&assistant=67f917fc0a5a03a380523a32`
+    : `/chat?message=${messageId}&assistant=${assistantId}`
 
   const es = new EventSource(chatUrl, { withCredentials: true })
   es.onerror = (e) => {
