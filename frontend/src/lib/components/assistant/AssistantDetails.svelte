@@ -25,6 +25,7 @@
   }: Props = $props()
 
   let formAction = $state('update')
+  const collectionId = assistant?.collection?.id ? assistant.collection.id : ''
 
   $effect(() => {
     // Notify parent that assistant data is processed and ready, used for spinner
@@ -71,7 +72,7 @@
       <input
         type="hidden"
         name="collection_id"
-        bind:value={assistant.collectionId}
+        value={collectionId}
       >
 
       <label class="form-control w-full">
@@ -126,7 +127,7 @@
         <ToolsSection
           {canEdit}
           assistantId={assistant.id}
-          collectionId={assistant.collectionId}
+          collectionId={collectionId}
           collection={assistant.collection}
         />
         <ModelConfigSection {canEdit} />

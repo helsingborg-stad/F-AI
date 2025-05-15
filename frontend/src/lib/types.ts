@@ -66,7 +66,6 @@ export interface IAssistant {
   description: string
   instructions: string
   model: string
-  collectionId: string
   collection?: ICollection
   isPublic: boolean
 }

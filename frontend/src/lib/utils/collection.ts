@@ -1,6 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { api } from '$lib/api-fetch-factory.js'
-import type { IAssistant, ICollection } from '$lib/types.js'
 
 export async function createCollection(
   event: RequestEvent,
