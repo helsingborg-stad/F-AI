@@ -5,14 +5,16 @@
   import Section from '$lib/components/Form/Section.svelte'
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
   import FileUploadModal from '$lib/components/assistant/FileUploadModal.svelte'
+  import type { ICollection } from '$lib/types.js'
 
   interface Props {
     canEdit: boolean
     assistantId: string
     collectionId: string
+    collection?: ICollection
   }
 
-  let { canEdit, assistantId, collectionId }: Props = $props()
+  let { canEdit, assistantId, collectionId, collection }: Props = $props()
   let fileModal: FileUploadModal
 
   function openFilesModal() {
@@ -33,7 +35,7 @@
       {#if attachingFiles}
         <span class="loading loading-spinner loading-xs"></span>
       {/if}
-      {#if collectionId}
+      {#if !attachingFiles && collectionId}
         <span class="text-xs">Attached vector store {collectionId}</span>
       {/if}
     </div>
@@ -45,6 +47,19 @@
         <Icon icon={icons["plus"]} width={16} height={16} />
         <span class="text-s">Files</span>
       </button>
+    </div>
+  </div>
+  <div class="flex flex-row place-content-between items-center">
+    <div class="overflow-x-auto">
+      <table class="table table-xs">
+        <tbody>
+        {#each collection?.files || [] as file}
+          <tr>
+            <td>{file.name}</td>
+          </tr>
+        {/each}
+        </tbody>
+      </table>
     </div>
   </div>
   <HorizontalDivider />

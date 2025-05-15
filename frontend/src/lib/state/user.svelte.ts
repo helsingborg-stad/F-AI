@@ -68,3 +68,11 @@ export function canReadApiSettings(): boolean {
 export function canEditApiSettings(): boolean {
   return hasScope('settings.write')
 }
+
+export function canReadCollections(): boolean {
+  return hasScope('collection.read')
+}
+
+export function canEditCollections(): boolean {
+  return hasScope('collection.write')
+}

@@ -67,6 +67,7 @@ export interface IAssistant {
   instructions: string
   model: string
   collectionId: string
+  collection?: ICollection
   isPublic: boolean
 }
 
@@ -95,4 +96,16 @@ export interface IBackendApiSettings {
     'anthropic.api_key'?: string
     'mistral.api_key'?: string
   }
+}
+
+export interface ICollection {
+  id: string
+  label: string
+  embedding_model: string
+  files: ICollectionFiles[]
+  urls: string[]
+}
+
+export interface ICollectionFiles {
+  name: string
 }

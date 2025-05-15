@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types.js'
-import type { IAssistant, IBackendAssistant } from '$lib/types.js'
-import { canCreateAssistant, canReadAssistants } from '$lib/state/user.svelte.js'
+import type { IAssistant, IBackendAssistant, ICollection } from '$lib/types.js'
+import { canCreateAssistant, canReadAssistants, canReadCollections } from '$lib/state/user.svelte.js'
 import { error, redirect } from '@sveltejs/kit'
 import {
   createAssistant,
@@ -11,7 +11,7 @@ import {
   updateAssistant,
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
-import { createCollection, replaceContextCollection } from '$lib/utils/collection.js'
+import { createCollection, getCollections, replaceContextCollection } from '$lib/utils/collection.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
   const modelKey = formData.get('model_key') as string
@@ -38,6 +38,7 @@ export const load: PageServerLoad = async (event) => {
   const userCanListAssistants = canReadAssistants()
   const userCanCreateAssistant = canCreateAssistant()
   const userCanEditAssistant = canCreateAssistant()
+  const userCanReadCollections = canReadCollections()
   const activeAssistantID = event.url.searchParams.get('assistant_id') || ''
 
   let assistants: IAssistant[] = []
@@ -55,13 +56,23 @@ export const load: PageServerLoad = async (event) => {
       description: assistantData.description,
       instructions: assistantData.instructions,
       model: assistantData.model,
-      isPublic: assistantData.is_public,
       collectionId: assistantData.collection_id,
+      isPublic: assistantData.is_public,
     }
-    activeAssistant.id = activeAssistantID
+  }
+
+  if (userCanReadCollections && activeAssistant.collectionId !== '') {
+    try {
+      const collections = (await getCollections(event)).collections
+      activeAssistant.collection = collections.find((c:ICollection) => c.id === activeAssistant.collectionId)
+
+    } catch (error) {
+      return handleApiError(error)
+    }
   }
 
   const models = await fetchAssistantModels(event)
+
 
   return {
     assistants,

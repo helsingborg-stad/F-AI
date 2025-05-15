@@ -127,6 +127,7 @@
           {canEdit}
           assistantId={assistant.id}
           collectionId={assistant.collectionId}
+          collection={assistant.collection}
         />
         <ModelConfigSection {canEdit} />
       </div>
