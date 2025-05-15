@@ -1,5 +1,7 @@
 <script lang="ts">
   import dayjs from 'dayjs'
+  import MarkdownIt from 'markdown-it'
+  import DOMPurify from 'isomorphic-dompurify'
 
   interface Props {
     sender?: string
@@ -12,6 +14,15 @@
     text = '',
     time = '',
   }: Props = $props()
+
+  const md = new MarkdownIt({
+    html: false,        // Disable HTML tags in source
+    breaks: true,       // Convert '\n' in paragraphs into <br>
+    linkify: true,      // Autoconvert URL-like text to links
+    typographer: true,  // Enable smartquotes and other typographic replacements
+  })
+
+  const renderedMarkdown = $derived(DOMPurify.sanitize(md.render(text)))
 
   const messageClasses = $derived(
     sender === 'user'
@@ -44,10 +55,10 @@
 <div class="{messageClasses}">
   <div>
     <div class="{containerClasses}">
-      <p>{text}</p>
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+      <div class="prose prose-sm max-w-none">{@html renderedMarkdown}</div>
     </div>
-    {#if parsedTime && sender === 'user'}
-      <time class="text-xs opacity-50 absolute -top-5 right-0 whitespace-nowrap" datetime={time}>{parsedTime}</time>
-    {/if}
   </div>
 </div>
+
+
