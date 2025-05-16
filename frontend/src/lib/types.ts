@@ -13,8 +13,9 @@ export type ItemOptionsType = {
 
 export type HistoryItemType = {
   title: string
-  itemOptions: ItemOptionsType[]
-  created: Date
+  id: string
+  options: ItemOptionsType[]
+  createdTimestamp: string
 }
 
 export type UserScopeType =

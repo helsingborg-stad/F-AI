@@ -4,6 +4,7 @@ import {
   isDateInRange,
   type IDateRangeConfig,
 } from '$lib/utils/dates.js'
+import dayjs from 'dayjs'
 
 export const DEFAULT_CATEGORY_TITLES: Record<string, string> = {
   today: 'Today',
@@ -54,7 +55,7 @@ export function categorizeHistoryItems(
   )
 
   items.forEach((item) => {
-    const createdDate = item.created
+    const createdDate = dayjs(item.createdTimestamp).toDate()
     let categorized = false
 
     for (let i = 0; i < sortedRangeKeys.length - 1; i++) {

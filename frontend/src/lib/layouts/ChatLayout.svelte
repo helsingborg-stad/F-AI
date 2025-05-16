@@ -1,13 +1,19 @@
 <script lang="ts">
-  import { page } from '$app/state'
-  import MenuSidebar from '$lib/components/Menu/MenuSidebar.svelte'
   import Chat from '$lib/components/Chat/Chat.svelte'
   import type { Props as ChatProps } from '$lib/components/Chat/Chat.svelte'
+  import SidebarMenu from '$lib/components/Menu/SidebarMenu.svelte'
+  import HistoryTree from '$lib/components/Menu/Chat/HistoryTree/HistoryTree.svelte'
+  import { goto } from '$app/navigation'
 
   type Props = ChatProps & {
     assistants: {
       id: string,
       name: string
+    }[]
+    conversations: {
+      id: string,
+      timestamp: string,
+      title: string
     }[]
     selectedAssistantId: string
     conversationId: string
@@ -16,20 +22,30 @@
   let {
     messages,
     assistants,
+    conversations,
     inputPlaceholder,
     onSubmitMessage,
     selectedAssistantId = $bindable(),
-    conversationId
+    conversationId,
   }: Props = $props()
 </script>
 
 <div class="flex bg-base-200 max-h-full flex-grow overflow-hidden">
-  <aside class="w-60 flex-shrink-0 overflow-hidden bg-base-200 bg-[rgba(255,255,0,0.5)] max-md:!w-0">
-    <MenuSidebar
-      menuSidebarTitle="Chat"
-      menuSidebarItems={[]}
-      currentUrlPath={page.url.pathname}
-    />
+  <aside class="w-60 flex-shrink-0 bg-base-200 max-md:!w-0">
+    <SidebarMenu title="Chat">
+      <div class="pl-2">
+        <HistoryTree
+          items={conversations.map(c => ({
+          id: c.id,
+          title: c.title || c.id,
+          options: [],
+          createdTimestamp: c.timestamp
+        }))}
+          highlightedIds={[conversationId]}
+          onClick={(id) => goto(`/chat/${id}`)}
+        />
+      </div>
+    </SidebarMenu>
   </aside>
   <div class="flex flex-col gap-2 p-2 grow ">
     <div class="flex items-center gap-2">
