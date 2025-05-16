@@ -24,16 +24,18 @@
 
   const renderedMarkdown = $derived(DOMPurify.sanitize(md.render(text)))
 
-  const messageClasses = $derived(
+  const messageClasses = 'flex justify-center'
+
+  const innerContentClasses = $derived(
     sender === 'user'
-      ? 'flex justify-end'
-      : 'flex justify-center',
+      ? 'flex justify-end w-[50rem]'
+      : 'flex justify-center w-[50rem]'
   )
 
   const containerClasses = $derived(
     sender === 'user'
-      ? 'bg-gray-200 rounded-lg p-3'
-      : 'rounded-lg p-3 w-[40rem]',
+      ? 'bg-gray-200 rounded-lg p-3 max-w-[30rem]'
+      : 'rounded-lg p-3 w-[50rem]',
   )
 
   function parseTimestamp(timestamp: string | undefined) {
@@ -47,18 +49,18 @@
 </script>
 
 {#if sender === 'user'}
-  <div class="{messageClasses} py-1 pr-1">
-    <time class="text-xs opacity-50 ml-2" datetime={time}>{parsedTime}</time>
+  <div class="flex justify-center py-1 pr-1">
+    <div class="w-[50rem] flex justify-end">
+      <time class="text-xs opacity-50 ml-2" datetime={time}>{parsedTime}</time>
+    </div>
   </div>
 {/if}
 
 <div class="{messageClasses}">
-  <div>
+  <div class="{innerContentClasses}">
     <div class="{containerClasses}">
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       <div class="prose prose-sm max-w-none">{@html renderedMarkdown}</div>
     </div>
   </div>
 </div>
-
-
