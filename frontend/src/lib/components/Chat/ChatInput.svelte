@@ -23,7 +23,7 @@
 <div class="flex items-center gap-2">
   <input
     type="text"
-    class="flex-grow border-0 bg-white rounded-full px-4 py-2 text-gray-800 placeholder-gray-400"
+    class="flex-grow border-0 bg-white rounded-full px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none"
     placeholder={placeholder}
     bind:value={message}
     on:keydown={handleKeyDown}
@@ -40,4 +40,3 @@
     </svg>
   </button>
 </div>
-

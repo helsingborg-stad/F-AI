@@ -53,7 +53,7 @@
   </div>
 
   <!-- Chat Input -->
-  <div class="relative p-6">
+  <div class="relative px-6 pb-6">
     <div
       class="absolute inset-x-0 bottom-32 flex justify-center transition"
       class:translate-y-24={isContentNearBottom}
@@ -66,7 +66,7 @@
         <Icon icon={icons.scroll} />
       </button>
     </div>
-    <div class="relative rounded-2xl border bg-white p-2 z-10">
+    <div class="relative rounded-2xl border bg-white p-2 z-10 w-[60rem] mx-auto">
       <ChatInput send={onSubmitMessage} placeholder={inputPlaceholder} />
     </div>
   </div>
