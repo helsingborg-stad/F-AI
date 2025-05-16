@@ -41,6 +41,32 @@ class BaseConversationServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
+    async def test_title_defaults_to_user_message(service: IConversationService):
+        cid = await service.create_conversation(as_uid='john', assistant_id='a')
+        await service.add_message_to_conversation(
+            as_uid='john',
+            conversation_id=cid,
+            timestamp=get_timestamp(),
+            role='system',
+            message='Answer truthfully'
+        )
+        await service.add_message_to_conversation(
+            as_uid='john',
+            conversation_id=cid,
+            timestamp=get_timestamp(),
+            role='user',
+            message='Hello how are you?'
+        )
+
+        result1 = await service.get_conversation(as_uid='john', conversation_id=cid)
+        result2 = await service.get_conversations(as_uid='john')
+
+        assert result1.title == 'Hello how are you?'
+        assert result2[0].title == 'Hello how are you?'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_get_conversations(service: IConversationService):
         await service.create_conversation(as_uid='john', assistant_id='a')
         await service.create_conversation(as_uid='john', assistant_id='b')

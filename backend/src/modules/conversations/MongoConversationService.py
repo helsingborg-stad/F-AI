@@ -109,10 +109,17 @@ class MongoConversationService(IConversationService):
 
     @staticmethod
     def _doc_to_conversation(doc):
+        title = doc['title']
+
+        if len(title) == 0:
+            first_user_message = next((m['content'] for m in doc['messages'] if m['role'] == 'user'), None)
+            if first_user_message:
+                title = first_user_message
+
         return Conversation(
             id=str(doc['_id']),
             assistant_id=doc['assistant_id'],
-            title=doc['title'],
+            title=title,
             messages=[
                 Message(timestamp=m['timestamp'], role=m['role'], content=m['content'])
                 for m in doc['messages']
