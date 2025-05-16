@@ -16,6 +16,19 @@ export const load: LayoutServerLoad = async (event) => {
     }[]
   } = await assistantsResponse.json()
 
+  const conversationsResponse = await api.get('/api/conversation', { event })
+  if (!conversationsResponse.ok) {
+    redirect(307, '/chat')
+  }
+
+  const { conversations }: {
+    conversations: {
+      id: string
+      timestamp: string
+      title: string
+    }[]
+  } = await conversationsResponse.json()
+
   if (event.params.conversationId) {
     const response = await api.get(`/api/conversation/${event.params.conversationId}`, { event })
 
@@ -44,8 +57,9 @@ export const load: LayoutServerLoad = async (event) => {
     return {
       messages,
       assistants,
+      conversations,
     }
   }
 
-  return { messages: [], assistants }
+  return { messages: [], assistants, conversations }
 }

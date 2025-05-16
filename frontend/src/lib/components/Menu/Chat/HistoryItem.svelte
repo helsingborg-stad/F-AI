@@ -4,20 +4,30 @@
 
   interface Props {
     title: string,
-    itemOptions: ItemOptionsType[]
+    highlighted: boolean,
+    options: ItemOptionsType[],
+    onClick: () => void,
   }
 
   let {
     title,
-    itemOptions = []
+    highlighted,
+    options,
+    onClick,
   }: Props = $props()
 </script>
 
 <div
-  class="group/item relative flex items-center rounded-md px-4 py-1.5 hover:bg-gray-100"
+  class="group/item w-full max-w-full flex px-2 py-1 rounded-md hover:bg-gray-200 active:bg-gray-300"
+  class:bg-gray-300={highlighted}
 >
-  <span class="flex-1 truncate pr-8">{title}</span>
-  {#if itemOptions.length > 0}
+  <button
+    class="grow truncate text-left pr-2"
+    onclick={onClick}
+  >
+    <span>{title}</span>
+  </button>
+  {#if options.length > 0}
     <div class="group/edit dropdown dropdown-end invisible group-hover/item:visible">
       <button class="btn btn-ghost btn-sm" aria-label="Edit">
         <svg
@@ -31,15 +41,19 @@
           stroke-linecap="round"
           stroke-linejoin="round"
           class="lucide lucide-ellipsis"
-          ><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle
+        >
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+          <circle
             cx="5"
             cy="12"
             r="1"
-          /></svg
+          />
+        </svg
         >
       </button>
       <ul class="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow">
-        {#each itemOptions as option}
+        {#each options as option}
           <HistoryItemOptions
             iconName={option.iconName}
             title={option.title}

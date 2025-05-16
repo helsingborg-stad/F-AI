@@ -8,34 +8,43 @@
   } from '$lib/components/Menu/Chat/HistoryTree/historyUtils.js'
 
   interface Props {
-    historyItems: HistoryItemType[],
-    dateRangeConfig: IDateRangeConfig
+    items: HistoryItemType[],
+    highlightedIds: string[],
+    onClick: (id: string) => void,
+    dateRangeConfig?: IDateRangeConfig
   }
 
   let {
-    historyItems = [],
+    items,
+    highlightedIds,
+    onClick,
     dateRangeConfig = {
       today: true,
       yesterday: true,
-      previousDays: [7, 30]
-    }
+      previousDays: [7, 30],
+    },
   }: Props = $props()
 
   // Get category titles based on configuration
   let categoryTitles = $derived(getCategoryTitles(dateRangeConfig))
 
   // Categorize history items
-  let categorizedItems = $derived(categorizeHistoryItems(historyItems, dateRangeConfig))
+  let categorizedItems = $derived(categorizeHistoryItems(items, dateRangeConfig))
 </script>
 
-<div class="rounded-box">
+<div class="rounded-box flex flex-col gap-1">
   {#each Object.keys(categorizedItems) as category}
     {#if categorizedItems[category].length > 0}
-      <p>
+      <p class="font-bold">
         {categoryTitles[category] || category}
       </p>
       {#each categorizedItems[category] as item}
-        <HistoryItem title={item.title} itemOptions={item.itemOptions} />
+        <HistoryItem
+          title={item.title}
+          highlighted={highlightedIds.includes(item.id)}
+          options={item.options}
+          onClick={() => onClick(item.id)}
+        />
       {/each}
     {/if}
   {/each}

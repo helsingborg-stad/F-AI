@@ -59,37 +59,42 @@ describe('categorizeHistoryItems', () => {
     items = [
       // Today item - same day as test date (May 15, 2023)
       {
+        id: 'today',
         title: 'Today item',
-        created: new Date('2023-05-15T12:00:00.000Z'), // Same day, noon UTC
-        itemOptions: [], // Empty array instead of empty object
+        createdTimestamp: '2023-05-15T12:00:00.000Z', // Same day, noon UTC
+        options: [], // Empty array instead of empty object
       },
 
       // Yesterday item (May 14, 2023)
       {
+        id: 'yesterday',
         title: 'Yesterday item',
-        created: new Date('2023-05-14T12:00:00.000Z'),
-        itemOptions: [],
+        createdTimestamp: '2023-05-14T12:00:00.000Z',
+        options: [],
       },
 
       // Week item (May 10, 2023) - within 7 days but not yesterday
       {
+        id: 'week',
         title: 'Week item',
-        created: new Date('2023-05-10T12:00:00.000Z'),
-        itemOptions: [],
+        createdTimestamp: '2023-05-10T12:00:00.000Z',
+        options: [],
       },
 
       // Month item (April 20, 2023) - within 30 days but not within 7 days
       {
+        id: 'month',
         title: 'Month item',
-        created: new Date('2023-04-20T12:00:00.000Z'),
-        itemOptions: [],
+        createdTimestamp: '2023-04-20T12:00:00.000Z',
+        options: [],
       },
 
       // Old item (March 1, 2023) - older than 30 days
       {
+        id: 'old',
         title: 'Old item',
-        created: new Date('2023-03-01T12:00:00.000Z'),
-        itemOptions: [],
+        createdTimestamp: '2023-03-01T12:00:00.000Z',
+        options: [],
       },
     ]
   })
@@ -137,30 +142,34 @@ describe('categorizeHistoryItems', () => {
     const customItems: HistoryItemType[] = [
       // Today item
       {
+        id: 'today',
         title: 'Today item',
-        created: new Date('2023-05-15T12:00:00.000Z'),
-        itemOptions: [],
+        createdTimestamp: '2023-05-15T12:00:00.000Z',
+        options: [],
       },
 
       // Two weeks item (May 5, 2023) - within 14 days
       {
+        id: 'two-weeks',
         title: 'Two weeks item',
-        created: new Date('2023-05-05T12:00:00.000Z'),
-        itemOptions: [],
+        createdTimestamp: '2023-05-05T12:00:00.000Z',
+        options: [],
       },
 
       // Quarter item (March 15, 2023) - within 90 days
       {
+        id: 'quarter',
         title: 'Quarter item',
-        created: new Date('2023-03-15T12:00:00.000Z'),
-        itemOptions: [],
+        createdTimestamp: '2023-03-15T12:00:00.000Z',
+        options: [],
       },
 
       // Old item (January 1, 2023) - older than 90 days
       {
+        id: 'old',
         title: 'Old item',
-        created: new Date('2023-01-01T12:00:00.000Z'),
-        itemOptions: [],
+        createdTimestamp: '2023-01-01T12:00:00.000Z',
+        options: [],
       },
     ]
 

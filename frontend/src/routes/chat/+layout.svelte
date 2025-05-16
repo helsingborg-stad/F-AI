@@ -70,6 +70,7 @@
 <ChatLayout
   {messages}
   assistants={data.assistants}
+  conversations={data.conversations}
   inputPlaceholder="Fråga Folkets AI"
   onSubmitMessage={sendMessage}
   bind:selectedAssistantId={selectedAssistantId}
