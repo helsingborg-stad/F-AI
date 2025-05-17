@@ -1,25 +1,16 @@
-<script module>
-  import { defineMeta } from '@storybook/addon-svelte-csf';
-  import { action } from '@storybook/addon-actions';
-  import ChatInput from '$lib/components/Chat/ChatInput.svelte';
+<script module lang="ts">
+  import { defineMeta } from '@storybook/addon-svelte-csf'
+  import ChatInput from './ChatInput.svelte'
 
   const { Story } = defineMeta({
     title: 'Components/Chat/ChatInput',
     component: ChatInput,
     tags: ['autodocs'],
-    argTypes: {
-      placeholder: {
-        control: 'text',
-        description: 'Placeholder text for the input field.',
-      },
-    },
-  });
+  })
 </script>
 
-<Story
-  name="Default"
-  args={{
-    placeholder: 'Type your message...',
-  }}
-  send={action('send')}
-></Story>
+<Story name="Default">
+  <ChatInput placeholder='' value='' onSubmit={() => {console.log('Send message!')}}>
+    <div></div>
+  </ChatInput>
+</Story>

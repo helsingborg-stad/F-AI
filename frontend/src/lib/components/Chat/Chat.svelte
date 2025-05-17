@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ChatInput from '$lib/components/Chat/ChatInput.svelte'
   import Icon from '$lib/components/Icon/Icon.svelte'
   import { icons } from '$lib/components/Icon/icons.js'
   import ChatMessage from '$lib/components/Chat/ChatMessage.svelte'
+  import ChatInput from '$lib/components/Chat/ChatInput.svelte'
 
   interface Message {
     timestamp: string
@@ -19,7 +19,10 @@
   const { messages, inputPlaceholder, onSubmitMessage }: Props = $props()
 
   let scrollContainer: HTMLDivElement = undefined as unknown as HTMLDivElement
+
   let isContentNearBottom = $state(false)
+  let chatInput = $state('')
+
   const contentIsScrollable = $derived(messages.length > 0 && scrollContainer && scrollContainer.scrollHeight > scrollContainer.clientHeight)
 
   function scrollToBottom() {
@@ -31,6 +34,13 @@
     isContentNearBottom =
       scrollContainer &&
       scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight <= margin
+  }
+
+  function onHandleSubmit() {
+    if (chatInput.trim()) {
+      onSubmitMessage(chatInput)
+      chatInput = ''
+    }
   }
 
   $effect(() => {
@@ -66,8 +76,10 @@
         <Icon icon={icons.scroll} />
       </button>
     </div>
-    <div class="relative rounded-2xl border bg-white p-2 z-10 w-[60rem] mx-auto">
-      <ChatInput send={onSubmitMessage} placeholder={inputPlaceholder} />
+    <div class="relative rounded-2xl border bg-white z-10 w-[60rem] mx-auto">
+      <ChatInput placeholder={inputPlaceholder} bind:value={chatInput} onSubmit={onHandleSubmit}>
+        <div></div>
+      </ChatInput>
     </div>
   </div>
 </div>
