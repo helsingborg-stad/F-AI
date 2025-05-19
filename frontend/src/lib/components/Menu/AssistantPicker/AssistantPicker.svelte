@@ -1,0 +1,97 @@
+<script lang="ts">
+  import { onMount } from 'svelte'
+
+  interface Props {
+    assistants: {
+      id: string,
+      name: string,
+    }[]
+    selectedAssistantId: string
+  }
+
+  let { assistants, selectedAssistantId = $bindable() }: Props = $props()
+
+  let isOpen = $state(false)
+  let dropdownRef: HTMLDivElement
+
+  function selectAssistant(assistant: { id: string, name: string }) {
+    selectedAssistantId = assistant.id
+    isOpen = false
+  }
+
+  function toggleDropdown() {
+    isOpen = !isOpen
+  }
+
+  const selectedAssistantName = $derived(
+    !selectedAssistantId
+      ? 'Select assistant'
+      : assistants.find(a => a.id === selectedAssistantId)?.name || 'Select assistant',
+  )
+
+  function handleClickOutside(event: MouseEvent) {
+    if (isOpen && dropdownRef && !dropdownRef.contains(event.target as Node)) {
+      isOpen = false
+    }
+  }
+
+  onMount(() => {
+    document.addEventListener('click', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  })
+</script>
+
+
+<div class="dropdown dropdown-top dropdown-end" bind:this={dropdownRef}>
+  <button
+    class="btn btn-sm btn-ghost m-1"
+    aria-haspopup="true"
+    aria-expanded={isOpen}
+    aria-controls="dropdown-menu"
+    onclick={(e) => {
+        e.stopPropagation();
+        toggleDropdown();
+      }}
+    onkeydown={(e) => e.key === 'Enter' && toggleDropdown()}
+  >
+    {selectedAssistantName}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="ml-1 {isOpen ? 'rotate-180' : ''} transition-transform duration-300"
+    >
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </button>
+  {#if isOpen}
+    <ul
+      id="dropdown-menu"
+      class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+      role="menu"
+    >
+      {#each assistants as assistant}
+        <li role="menuitem">
+          <button
+            class={selectedAssistantId === assistant.id ? 'active' : ''}
+            onclick={(e) => {
+                e.stopPropagation();
+                selectAssistant(assistant);
+              }}
+          >
+            {assistant.name}
+          </button>
+        </li>
+      {/each}
+    </ul>
+  {/if}
+</div>
