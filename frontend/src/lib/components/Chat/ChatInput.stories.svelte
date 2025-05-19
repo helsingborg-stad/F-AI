@@ -4,7 +4,6 @@
 
   const { Story } = defineMeta({
     title: 'Components/Chat/ChatInput',
-    component: ChatInput,
     tags: ['autodocs'],
   })
 </script>
