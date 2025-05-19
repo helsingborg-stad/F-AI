@@ -1,43 +1,40 @@
 <script module lang="ts">
-  import { defineMeta } from '@storybook/addon-svelte-csf'
+  import { fn } from '@storybook/test'
   import { action } from '@storybook/addon-actions'
+  import { defineMeta } from '@storybook/addon-svelte-csf'
   import HistoryItem from '$lib/components/Menu/Chat/HistoryItem.svelte'
 
   const { Story } = defineMeta({
-    title: 'Components/Menu/Chat/History',
+    title: 'Components/Menu/HistoryItem',
     component: HistoryItem,
     tags: ['autodocs'],
     argTypes: {
       title: { control: 'text' },
-      itemOptions: {
-        control: 'object',
-        description: 'Array of menu options',
-      },
     },
   })
 </script>
 
-<Story name="Default" args={{ title: 'Chat conversation with no options' }} />
+<Story name="Default" args={{
+  title: 'Hello World',
+  options: [],
+  onClick: fn()
+}} />
 
-<Story
-  name="With options"
-  args={{
-    title: 'Chat conversation with options ',
-    itemOptions: [
-      {
-        iconName: 'pencil',
-        title: 'Rename',
-        onClick: (evt: Event) => {
-          action('clicked')(evt)
-        },
-      },
-      {
-        iconName: 'trash',
-        title: 'Delete',
-        onClick: (evt: Event) => {
-          action('clicked')(evt)
-        },
-      },
-    ],
-  }}
-/>
+<Story name="With Options" args={{
+  title: 'Hello World',
+  options: [
+    { iconName: 'copy', title: 'Copy', onClick: action('copy option') },
+    { iconName: 'trash', title: 'Delete', onClick: action('delete option') },
+  ],
+  onClick: action('click')
+}} />
+
+
+<Story name="With Long Title" args={{
+  title: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi, consequatur debitis dicta!',
+  options: [
+    { iconName: 'copy', title: 'Copy', onClick: action('copy option') },
+    { iconName: 'trash', title: 'Delete', onClick: action('delete option') },
+  ],
+  onClick: action('click')
+}} />
