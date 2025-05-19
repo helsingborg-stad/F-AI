@@ -1,7 +1,7 @@
 <script lang="ts">
   import ChatLayout from '$lib/layouts/ChatLayout.svelte'
   import { page } from '$app/state'
-  import { goto } from '$app/navigation'
+  import { goto, invalidateAll } from '$app/navigation'
   import { type RealtimeChatMessage, sendChatMessage } from '$lib/chat/chat.js'
   import dayjs from 'dayjs'
   import type { LayoutData } from './$types.js'
@@ -65,6 +65,21 @@
 
     await sendChatMessage(message, selectedAssistantId, conversationId, onAddMessage, onUpdateLastMessage, onGoto, onError)
   }
+
+  function deleteConversation(id: string) {
+    fetch(`/api/conversation/delete`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ id }),
+      },
+    )
+      .then(() => {
+        if(id === conversationId) {
+          return goto(`/chat/`, {})
+        }
+      })
+      .then(invalidateAll)
+  }
 </script>
 
 <ChatLayout
@@ -75,5 +90,6 @@
   onSubmitMessage={sendMessage}
   bind:selectedAssistantId={selectedAssistantId}
   {conversationId}
+  onDeleteConversation={deleteConversation}
 >
 </ChatLayout>
