@@ -3,6 +3,7 @@
   import { icons } from '$lib/components/Icon/icons.js'
   import ChatMessage from '$lib/components/Chat/ChatMessage.svelte'
   import ChatInput from '$lib/components/Chat/ChatInput.svelte'
+  import ActionButtons from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
 
   interface Message {
     timestamp: string
@@ -11,12 +12,17 @@
   }
 
   export interface Props {
+    assistants: {
+      id: string,
+      name: string
+    }[],
+    selectedAssistantId: string,
     messages: Message[],
     inputPlaceholder: string,
     onSubmitMessage: (message: string) => void
   }
 
-  const { messages, inputPlaceholder, onSubmitMessage }: Props = $props()
+  let { assistants, selectedAssistantId = $bindable(), messages, inputPlaceholder, onSubmitMessage }: Props = $props()
 
   let scrollContainer: HTMLDivElement = undefined as unknown as HTMLDivElement
 
@@ -78,7 +84,7 @@
     </div>
     <div class="relative rounded-2xl border bg-white z-10 w-[60rem] mx-auto">
       <ChatInput placeholder={inputPlaceholder} bind:value={chatInput} onSubmit={onHandleSubmit}>
-        <div></div>
+        <ActionButtons {assistants} bind:selectedAssistantId />
       </ChatInput>
     </div>
   </div>

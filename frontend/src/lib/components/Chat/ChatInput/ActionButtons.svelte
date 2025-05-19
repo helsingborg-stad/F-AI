@@ -13,5 +13,5 @@
 </script>
 
 <div class="flex flex-row px-3 gap-1 justify-end">
-  <AssistantPicker {assistants} bind:selectedAssistantId={selectedAssistantId} />
+  <AssistantPicker {assistants} bind:selectedAssistantId />
 </div>
