@@ -16,7 +16,15 @@
     const target = e.target as HTMLTextAreaElement
     target.style.height = 'auto'
     target.style.height = target.scrollHeight + 'px'
+
+    const maxHeight = parseInt(getComputedStyle(target).maxHeight)
+    if (target.scrollHeight >= maxHeight) {
+      target.style.overflowY = 'auto'
+    } else {
+      target.style.overflowY = 'hidden'
+    }
   }
+
 
   function resetTextareaHeight() {
     if (textareaElement) {
