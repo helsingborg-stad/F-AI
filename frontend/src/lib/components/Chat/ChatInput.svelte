@@ -1,42 +1,93 @@
 <script lang="ts">
-  export let placeholder: string = ''
-  export let send: (message: string) => void = () => {
+  import type { Snippet } from 'svelte'
+
+  interface Props {
+    placeholder: string
+    value: string
+    onSubmit: () => void
+    children: Snippet
   }
 
-  let message = ''
+  let { placeholder, value = $bindable(), onSubmit, children }: Props = $props()
 
-  function handleKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      const currentMessage = (e.target as HTMLInputElement).value
-      handleSend(currentMessage)
+  let textareaElement: HTMLTextAreaElement
+
+  function autoResize(e: Event) {
+    const target = e.target as HTMLTextAreaElement
+    target.style.height = 'auto'
+    target.style.height = target.scrollHeight + 'px'
+
+    const maxHeight = parseInt(getComputedStyle(target).maxHeight)
+    if (target.scrollHeight >= maxHeight) {
+      target.style.overflowY = 'auto'
+    } else {
+      target.style.overflowY = 'hidden'
     }
   }
 
-  function handleSend(currentMessage: string) {
-    if (currentMessage.trim() === '') return
-    send(currentMessage)
-    message = ''
+
+  function resetTextareaHeight() {
+    if (textareaElement) {
+      textareaElement.style.height = 'auto'
+    }
   }
+
+  function handleDivClick(e: MouseEvent | TouchEvent) {
+    if (e.currentTarget === e.target) {
+      textareaElement.focus()
+    }
+  }
+
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      textareaElement.focus()
+      e.preventDefault()
+    }
+  }
+
+  function handleTextareaKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault()
+      onSubmit()
+    }
+  }
+
+  function handleSend() {
+    onSubmit()
+    textareaElement.focus()
+  }
+
+  $effect(() => {
+    if (value === '') {
+      resetTextareaHeight()
+    }
+  })
 </script>
 
-<div class="flex items-center gap-2">
-  <input
-    type="text"
-    class="flex-grow border-0 bg-white rounded-full px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none"
-    placeholder={placeholder}
-    bind:value={message}
-    on:keydown={handleKeyDown}
-  />
-  <button
-    class="btn btn-square bg-orange-600 text-gray-50"
-    on:click={() => handleSend(message)}
-    aria-label="Send message"
+<div class="flex flex-col rounded-2xl p-3 gap-2 w-[60rem]">
+  <div>
+      <textarea
+        bind:this={textareaElement}
+        rows="1"
+        bind:value
+        {placeholder}
+        class="textarea w-full px-1 resize-none focus:outline-none border-none min-h-[20px] max-h-40 overflow-y-hidden"
+        oninput={autoResize}
+        onkeydown={handleTextareaKeyDown}
+      ></textarea>
+  </div>
+  <div
+    role="toolbar"
+    tabindex="0"
+    onclick={handleDivClick}
+    onkeydown={handleKeyDown}
+    class="flex flex-row items-center justify-between"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up">
-      <path d="m5 12 7-7 7 7" />
-      <path d="M12 19V5" />
-    </svg>
-  </button>
+    <div class="flex-1">
+      {@render children()}
+    </div>
+    <div class="flex-shrink-0">
+      <button class="btn btn-sm" onclick={handleSend}>Send</button>
+    </div>
+  </div>
 </div>
