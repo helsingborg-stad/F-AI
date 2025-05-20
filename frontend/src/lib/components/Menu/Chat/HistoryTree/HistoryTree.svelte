@@ -38,7 +38,7 @@
       <p class="font-bold">
         {categoryTitles[category] || category}
       </p>
-      {#each categorizedItems[category] as item}
+      {#each categorizedItems[category] as item(item.id)}
         <HistoryItem
           title={item.title}
           highlighted={highlightedIds.includes(item.id)}

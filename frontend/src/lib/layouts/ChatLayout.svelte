@@ -17,6 +17,7 @@
     }[]
     selectedAssistantId: string
     conversationId: string
+    onDeleteConversation: (id: string) => void
   }
 
   let {
@@ -27,6 +28,7 @@
     onSubmitMessage,
     selectedAssistantId = $bindable(),
     conversationId,
+    onDeleteConversation
   }: Props = $props()
 </script>
 
@@ -38,7 +40,9 @@
           items={conversations.map(c => ({
           id: c.id,
           title: c.title || c.id,
-          options: [],
+          options: [
+            { iconName: 'trash', title: 'Delete', onClick: () => onDeleteConversation(c.id) },
+          ],
           createdTimestamp: c.timestamp
         }))}
           highlightedIds={[conversationId]}
