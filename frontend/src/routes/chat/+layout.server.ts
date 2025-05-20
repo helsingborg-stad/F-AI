@@ -9,7 +9,9 @@ export const load: LayoutServerLoad = async (event) => {
     redirect(307, '/chat')
   }
 
-  const { assistants }: {
+  const {
+    assistants,
+  }: {
     assistants: {
       id: string
       name: string
@@ -21,7 +23,9 @@ export const load: LayoutServerLoad = async (event) => {
     redirect(307, '/chat')
   }
 
-  const { conversations }: {
+  const {
+    conversations,
+  }: {
     conversations: {
       id: string
       timestamp: string
@@ -30,36 +34,50 @@ export const load: LayoutServerLoad = async (event) => {
   } = await conversationsResponse.json()
 
   if (event.params.conversationId) {
-    const response = await api.get(`/api/conversation/${event.params.conversationId}`, { event })
+    const response = await api.get(`/api/conversation/${event.params.conversationId}`, {
+      event,
+    })
 
     if (!response.ok) {
       redirect(307, '/chat')
     }
 
-    const { conversation }: {
+    const {
+      conversation,
+    }: {
       conversation: {
+        assistant_id: string
         messages: {
-          timestamp: string,
-          role: string,
-          content: string,
+          timestamp: string
+          role: string
+          content: string
         }[]
       }
     } = await response.json()
 
     const messages = conversation.messages
-      .filter(msg => msg.role != 'system')
-      .map(msg => ({
+      .filter((msg) => msg.role != 'system')
+      .map((msg) => ({
         timestamp: msg.timestamp,
         source: msg.role,
         message: msg.content,
       }))
 
+    const conversationContext = {
+      assistantId: conversation.assistant_id,
+      messages: messages,
+    }
+
     return {
-      messages,
+      conversationContext,
       assistants,
       conversations,
     }
   }
 
-  return { messages: [], assistants, conversations }
+  return {
+    conversationContext: { assistantId: '', messages: [] },
+    assistants,
+    conversations,
+  }
 }

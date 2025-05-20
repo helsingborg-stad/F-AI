@@ -28,6 +28,7 @@
 
   let isContentNearBottom = $state(false)
   let chatInput = $state('')
+  let disableAssistantPicker = $state(false)
 
   const contentIsScrollable = $derived(messages.length > 0 && scrollContainer && scrollContainer.scrollHeight > scrollContainer.clientHeight)
 
@@ -52,6 +53,12 @@
   $effect(() => {
     if (messages && messages.length > 0 && isContentNearBottom) {
       scrollToBottom()
+    }
+  })
+
+  $effect(() => {
+    if (messages && messages.length > 0) {
+      disableAssistantPicker = true
     }
   })
 </script>
@@ -84,7 +91,7 @@
     </div>
     <div class="relative rounded-2xl border bg-white z-10 w-[60rem] mx-auto">
       <ChatInput placeholder={inputPlaceholder} bind:value={chatInput} onSubmit={onHandleSubmit}>
-        <ActionButtons {assistants} bind:selectedAssistantId />
+        <ActionButtons {assistants} bind:selectedAssistantId {disableAssistantPicker} />
       </ChatInput>
     </div>
   </div>
