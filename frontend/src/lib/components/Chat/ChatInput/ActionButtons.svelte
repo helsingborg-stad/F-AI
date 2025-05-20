@@ -14,5 +14,5 @@
 </script>
 
 <div class="flex flex-row px-3 gap-1 justify-end">
-  <AssistantPicker {assistants} {disableAssistantPicker} bind:selectedAssistantId />
+  <AssistantPicker {assistants} disabled={disableAssistantPicker} bind:selectedAssistantId />
 </div>

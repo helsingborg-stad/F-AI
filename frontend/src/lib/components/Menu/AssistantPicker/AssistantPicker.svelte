@@ -7,13 +7,13 @@
       name: string,
     }[]
     selectedAssistantId: string
-    disableAssistantPicker: boolean
+    disabled: boolean
   }
 
-  let { assistants, selectedAssistantId = $bindable(), disableAssistantPicker }: Props = $props()
+  let { assistants, selectedAssistantId = $bindable(), disabled }: Props = $props()
 
   let isOpen = $state(false)
-  let dropdownRef: HTMLDivElement
+  let dropdownRef: HTMLDivElement = $state(undefined as unknown as HTMLDivElement)
 
   function selectAssistant(assistant: { id: string, name: string }) {
     selectedAssistantId = assistant.id
@@ -46,7 +46,7 @@
 </script>
 
 
-{#if disableAssistantPicker}
+{#if disabled}
   <button class="btn btn-sm btn-ghost m-1 pointer-events-none cursor-not-allowed">
     {selectedAssistantName}
   </button>
