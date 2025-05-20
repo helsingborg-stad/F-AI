@@ -88,7 +88,7 @@
   conversations={data.conversations}
   inputPlaceholder="Fråga Folkets AI"
   onSubmitMessage={sendMessage}
-  bind:selectedAssistantId={selectedAssistantId}
+  bind:selectedAssistantId
   {conversationId}
   onDeleteConversation={deleteConversation}
 >
