@@ -96,6 +96,18 @@
 
       <label class="form-control">
         <div class="label">
+          <span class="label-text">Description</span>
+        </div>
+        <textarea
+          name="description"
+          class="textarea textarea-bordered h-24"
+          placeholder="Provide a clear description of your assistant's purpose, capabilities, and goals. This description will be visible to users if you share this assistant."
+          readonly={!canEdit}
+        >{assistant.description}</textarea>
+      </label>
+
+      <label class="form-control">
+        <div class="label">
           <span class="label-text">System instructions</span>
         </div>
         <textarea
