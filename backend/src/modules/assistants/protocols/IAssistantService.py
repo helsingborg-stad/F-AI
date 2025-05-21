@@ -1,6 +1,7 @@
 from typing import Protocol
 
 from src.modules.assistants.models.Assistant import Assistant
+from src.modules.assistants.models.AssistantInfo import AssistantInfo
 from src.modules.assistants.models.Model import Model
 
 
@@ -20,7 +21,10 @@ class IAssistantService(Protocol):
     async def get_owned_assistants(self, as_uid: str) -> list[Assistant]:
         ...
 
-    async def get_available_assistants(self, as_uid: str) -> list[Assistant]:
+    async def get_assistant_info(self, as_uid: str, assistant_id: str) -> AssistantInfo | None:
+        ...
+
+    async def get_available_assistants(self, as_uid: str) -> list[AssistantInfo]:
         ...
 
     async def update_assistant(

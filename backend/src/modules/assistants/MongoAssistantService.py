@@ -5,6 +5,7 @@ from pymongo.asynchronous.database import AsyncDatabase
 
 from src.common.mongo import is_valid_mongo_id
 from src.modules.assistants.models.Assistant import Assistant
+from src.modules.assistants.models.AssistantInfo import AssistantInfo
 from src.modules.assistants.models.AssistantMeta import AssistantMeta
 from src.modules.assistants.models.Model import Model
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
@@ -111,7 +112,31 @@ class MongoAssistantService(IAssistantService):
         )
         return [self._doc_to_assistant(doc, True) async for doc in cursor]
 
-    async def get_available_assistants(self, as_uid: str) -> list[Assistant]:
+    async def get_assistant_info(self, as_uid: str, assistant_id: str) -> AssistantInfo | None:
+        can_access = await self._resource_service.can_access(as_uid=as_uid, resource=assistant_id)
+
+        doc = await self._database['assistants'].find_one(
+            {
+                "$and": [
+                    {'_id': ObjectId(assistant_id)},
+                    {"$or":
+                         [{'owner': as_uid}, {"meta.is_public": True}] if not can_access else
+                         [{'$or': [{"_id": {"$exists": True}}]}]
+                     }
+                ]
+            },
+            projection=[
+                '_id',
+                'meta',
+                'model'
+            ]
+        )
+        if doc is None:
+            return None
+
+        return self._doc_to_assistant_info(doc)
+
+    async def get_available_assistants(self, as_uid: str) -> list[AssistantInfo]:
         resources = await self._resource_service.get_resources(as_uid=as_uid)
         cursor = self._database['assistants'].find(
             {"$or": [
@@ -120,7 +145,7 @@ class MongoAssistantService(IAssistantService):
                 {'meta.is_public': True}
             ]}
         )
-        return [self._doc_to_assistant(doc, True) async for doc in cursor]
+        return [self._doc_to_assistant_info(doc) async for doc in cursor]
 
     async def update_assistant(
             self,
@@ -185,6 +210,16 @@ class MongoAssistantService(IAssistantService):
             instructions=doc['instructions'],
             collection_id=doc['collection_id'],
             extra_llm_params=doc['extra_llm_params'] if 'extra_llm_params' in doc else None,
+        )
+
+    @staticmethod
+    def _doc_to_assistant_info(doc: Mapping[str, Any]) -> AssistantInfo:
+        return AssistantInfo(
+            id=str(doc['_id']),
+            name=doc['meta']['name'],
+            description=doc['meta']['description'],
+            sample_questions=doc['meta']['sample_questions'],
+            model=doc['model'],
         )
 
     @staticmethod

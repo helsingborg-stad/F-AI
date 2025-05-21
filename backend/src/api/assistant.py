@@ -93,6 +93,9 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
+    # if not result.owner == auth_identity.uid:
+    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     return GetAssistantResponse(
         assistant=GetAssistantResponseAssistant(
             name=result.meta.name,
@@ -109,9 +112,36 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
     )
 
 
+class GetAssistantInfoResponse(BaseModel):
+    name: str
+    description: str
+    sample_questions: list[str]
+    model: str
+
+
+@auth.get(
+    '/{assistant_id}/info',
+    ['assistant.read'],
+    summary='Get Assistant Info',
+    response_model=GetAssistantInfoResponse,
+    response_404_description='Assistant not found',
+)
+async def get_assistant_info(assistant_id: str, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    result = await services.assistant_service.get_assistant_info(as_uid=auth_identity.uid, assistant_id=assistant_id)
+
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return GetAssistantInfoResponse(
+        name=result.name,
+        description=result.description,
+        sample_questions=result.sample_questions,
+        model=result.model,
+    )
+
+
 class GetAvailableAssistantsResponseAssistant(BaseModel):
     id: str
-    owner: str
     name: str
     description: str
 
@@ -131,9 +161,8 @@ async def get_available_assistants(services: ServicesDependency, auth_identity: 
     return GetAvailableAssistantsResponse(assistants=[
         GetAvailableAssistantsResponseAssistant(
             id=assistant.id,
-            owner=assistant.owner,
-            name=assistant.meta.name,
-            description=assistant.meta.description,
+            name=assistant.name,
+            description=assistant.description,
         ) for assistant in result
     ])
 
