@@ -24,7 +24,7 @@
   const isActive = (path: string) => path === urlFirstDirectory
 </script>
 
-<nav class="navbar">
+<nav class="navbar p-0 min-h-0">
   <div class="grow md:grow-0">
     <div class="dropdown">
       <div tabindex="0" role="button" class="btn btn-circle btn-ghost md:hidden">
@@ -56,7 +56,7 @@
     </div>
   </div>
   <div class="hidden grow justify-end md:flex">
-    <ul class="menu menu-horizontal gap-2">
+    <ul class="menu menu-horizontal gap-1">
       {#each navbarMenu as { label, path }}
         <li><a href={path} class:active={isActive(path)}>{label}</a></li>
       {/each}

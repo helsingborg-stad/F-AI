@@ -51,7 +51,7 @@
       </div>
     </SidebarMenu>
   </aside>
-  <div class="flex flex-col w-full gap-2 p-2 overflow-hidden">
+  <div class="flex flex-col w-full gap-2 p-2 pt-0 overflow-hidden">
     <main class="flex-grow rounded-lg border bg-stone-50 overflow-auto">
       <Chat
         {assistants}

@@ -23,7 +23,7 @@
         </div>
       </div>
     {:else}
-      <div tabindex="0" role="button" class="avatar placeholder btn btn-circle btn-ghost">
+      <div tabindex="0" role="button" class="avatar placeholder btn btn-sm btn-circle btn-ghost">
         <div class="bg-neutral-300 text-base w-10 rounded-full">
           {#if avatarPlaceholder}
             <span>{avatarPlaceholder.charAt(0).toUpperCase()}</span>
