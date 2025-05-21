@@ -4,6 +4,7 @@
   import AccessSection from '$lib/components/assistant/AccessSection.svelte'
   import ToolsSection from '$lib/components/assistant/ToolsSection.svelte'
   import ModelConfigSection from '$lib/components/assistant/ModelConfigSection.svelte'
+  import AvatarSection from '$lib/components/assistant/Edit/Avatar/AvatarSection.svelte'
 
   interface Props {
     assistant?: IAssistant
@@ -75,30 +76,7 @@
         value={collectionId}
       >
 
-      <label class="form-control w-full">
-
-        <div class="flex gap-2">
-
-          <div class="avatar">
-            <div class="w-32 rounded">
-              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" alt="avatar" />
-            </div>
-          </div>
-
-          <div class="flex flex-col mt-auto">
-            <input
-              type="file"
-              name="avatar"
-              accept="image/*"
-              class="file-input file-input-bordered file-input-sm w-full max-w-xs"
-              disabled={!canEdit}
-            />
-            <div class="label pb-0">
-              <span class="label-text-alt">Upload a square image for best results (max 1MB)</span>
-            </div>
-          </div>
-        </div>
-      </label>
+      <AvatarSection placeholderCharacter={assistant.name}/>
 
       <label class="form-control w-full">
         <div class="label">
