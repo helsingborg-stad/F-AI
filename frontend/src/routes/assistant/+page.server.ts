@@ -13,6 +13,7 @@ import {
   fetchAssistantById,
   fetchAssistantModels,
   updateAssistant,
+  updateAssistantAvatar,
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
 import {
@@ -106,10 +107,13 @@ export const actions = {
   update: async (event) => {
     const formData = await event.request.formData()
     const assistantId = formData.get('assistant_id') as string
+    const avatar = formData.get('avatar') as File
 
     try {
       const updateData = await getAssistantFormValues(formData)
       await updateAssistant(assistantId, updateData, event)
+
+      await updateAssistantAvatar(assistantId, avatar, event)
     } catch (error) {
       return handleApiError(error)
     }

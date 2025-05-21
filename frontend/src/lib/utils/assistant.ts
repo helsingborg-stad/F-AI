@@ -83,3 +83,23 @@ export async function deleteAssistant(event: RequestEvent, assistantId: string) 
     throw new Response('Failed to delete assistant', { status: response.status })
   }
 }
+
+export async function updateAssistantAvatar(
+  assistantId: string,
+  avatar: File,
+  event: RequestEvent,
+) {
+  const formData = new FormData()
+  formData.append('file', avatar)
+
+  const response = await api.put(`/api/assistant/${assistantId}/avatar`, {
+    event,
+    body: {
+      file: formData
+    }
+  })
+
+  if (!response.ok) {
+    throw new Response('Failed to update assistant avatar', { status: response.status })
+  }
+}
