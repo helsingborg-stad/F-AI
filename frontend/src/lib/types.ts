@@ -65,6 +65,7 @@ export interface IAssistant {
   id: string
   name: string
   description: string
+  avatar_base64: string
   instructions: string
   model: string
   collection?: ICollection

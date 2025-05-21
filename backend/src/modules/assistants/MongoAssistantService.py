@@ -1,10 +1,13 @@
+import base64
 from typing import Mapping, Any
 
+import gridfs
 from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
 
 from src.common.mongo import is_valid_mongo_id
 from src.modules.assistants.models.Assistant import Assistant
+from src.modules.assistants.models.AssistantInfo import AssistantInfo
 from src.modules.assistants.models.AssistantMeta import AssistantMeta
 from src.modules.assistants.models.Model import Model
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
@@ -20,7 +23,8 @@ class MongoAssistantService(IAssistantService):
         assistant = Assistant(
             id=str(ObjectId()),
             owner=as_uid,
-            meta=AssistantMeta(name='', description='', sample_questions=[], allow_files=False, is_public=False),
+            meta=AssistantMeta(name='', description='', avatar_base64='', sample_questions=[], allow_files=False,
+                               is_public=False),
             model='',
             llm_api_key=None,
             instructions='',
@@ -90,7 +94,7 @@ class MongoAssistantService(IAssistantService):
         if doc is None:
             return None
 
-        return self._doc_to_assistant(doc, redact_key=redact_key)
+        return await self._doc_to_assistant(doc, redact_key=redact_key)
 
     async def get_owned_assistants(self, as_uid: str) -> list[Assistant]:
         cursor = self._database['assistants'].find(
@@ -109,9 +113,33 @@ class MongoAssistantService(IAssistantService):
                 'extra_llm_params',
             ]
         )
-        return [self._doc_to_assistant(doc, True) async for doc in cursor]
+        return [await self._doc_to_assistant(doc, True) async for doc in cursor]
 
-    async def get_available_assistants(self, as_uid: str) -> list[Assistant]:
+    async def get_assistant_info(self, as_uid: str, assistant_id: str) -> AssistantInfo | None:
+        can_access = await self._resource_service.can_access(as_uid=as_uid, resource=assistant_id)
+
+        doc = await self._database['assistants'].find_one(
+            {
+                "$and": [
+                    {'_id': ObjectId(assistant_id)},
+                    {"$or":
+                         [{'owner': as_uid}, {"meta.is_public": True}] if not can_access else
+                         [{'$or': [{"_id": {"$exists": True}}]}]
+                     }
+                ]
+            },
+            projection=[
+                '_id',
+                'meta',
+                'model'
+            ]
+        )
+        if doc is None:
+            return None
+
+        return await self._doc_to_assistant_info(doc)
+
+    async def get_available_assistants(self, as_uid: str) -> list[AssistantInfo]:
         resources = await self._resource_service.get_resources(as_uid=as_uid)
         cursor = self._database['assistants'].find(
             {"$or": [
@@ -120,7 +148,7 @@ class MongoAssistantService(IAssistantService):
                 {'meta.is_public': True}
             ]}
         )
-        return [self._doc_to_assistant(doc, True) async for doc in cursor]
+        return [await self._doc_to_assistant_info(doc) async for doc in cursor]
 
     async def update_assistant(
             self,
@@ -128,6 +156,7 @@ class MongoAssistantService(IAssistantService):
             assistant_id: str,
             name: str | None = None,
             description: str | None = None,
+            avatar_base64: str | None = None,
             allow_files: bool | None = None,
             sample_questions: list[str] | None = None,
             is_public: bool | None = None,
@@ -160,14 +189,37 @@ class MongoAssistantService(IAssistantService):
             }
         )
 
+        if avatar_base64 is not None:
+            fs = gridfs.AsyncGridFS(self._database)
+
+            doc = await self._database['assistants'].find_one({'_id': ObjectId(assistant_id), 'owner': as_uid},
+                                                              projection=['meta'])
+
+            if doc and 'gfs_avatar' in doc['meta'] and doc['meta']['gfs_avatar'] is not None:
+                await fs.delete(doc['meta']['gfs_avatar'])
+
+            decoded = base64.b64decode(avatar_base64)
+            new_id = await fs.put(decoded, filename=f'{assistant_id}.png')
+
+            await self._database['assistants'].update_one({'_id': ObjectId(assistant_id), 'owner': as_uid},
+                                                          {'$set': {'meta.gfs_avatar': new_id}})
+
         return result.matched_count == 1
 
     async def delete_assistant(self, as_uid: str, assistant_id: str) -> None:
         if is_valid_mongo_id(assistant_id):
             await self._database['assistants'].delete_one({'_id': ObjectId(assistant_id), 'owner': as_uid})
 
-    @staticmethod
-    def _doc_to_assistant(doc: Mapping[str, Any], redact_key: bool) -> Assistant:
+    async def _get_avatar_base64(self, file_id: ObjectId | None) -> str | None:
+        if file_id is None:
+            return None
+        fs = gridfs.AsyncGridFS(self._database)
+        file = await fs.get(file_id)
+        if file is None:
+            return None
+        return base64.b64encode(await file.read()).decode('utf-8')
+
+    async def _doc_to_assistant(self, doc: Mapping[str, Any], redact_key: bool) -> Assistant:
         api_key = (MongoAssistantService._redact_key(doc['llm_api_key']) if redact_key else doc[
             'llm_api_key']) if 'llm_api_key' in doc else None
         return Assistant(
@@ -176,6 +228,8 @@ class MongoAssistantService(IAssistantService):
             meta=AssistantMeta(
                 name=doc['meta']['name'],
                 description=doc['meta']['description'],
+                avatar_base64=await self._get_avatar_base64(doc['meta']['gfs_avatar']) if 'gfs_avatar' in doc[
+                    'meta'] else None,
                 allow_files=doc['meta']['allow_files'],
                 sample_questions=doc['meta']['sample_questions'],
                 is_public=doc['meta']['is_public'] if 'is_public' in doc['meta'] else False,
@@ -185,6 +239,17 @@ class MongoAssistantService(IAssistantService):
             instructions=doc['instructions'],
             collection_id=doc['collection_id'],
             extra_llm_params=doc['extra_llm_params'] if 'extra_llm_params' in doc else None,
+        )
+
+    async def _doc_to_assistant_info(self, doc: Mapping[str, Any]) -> AssistantInfo:
+        return AssistantInfo(
+            id=str(doc['_id']),
+            name=doc['meta']['name'],
+            description=doc['meta']['description'],
+            avatar_base64=await self._get_avatar_base64(doc['meta']['gfs_avatar']) if 'gfs_avatar' in doc[
+                'meta'] else None,
+            sample_questions=doc['meta']['sample_questions'],
+            model=doc['model'],
         )
 
     @staticmethod

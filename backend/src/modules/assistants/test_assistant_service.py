@@ -160,6 +160,59 @@ class BaseAssistantServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
+    async def test_get_assistant_info(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+        await service.update_assistant(
+            as_uid='john',
+            assistant_id=aid,
+            name='cool name',
+            description='cool desc',
+            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+            sample_questions=['a', 'b', 'c'],
+            model='fai:my_model',
+        )
+
+        result = await service.get_assistant_info(as_uid='john', assistant_id=aid)
+
+        assert result.id == aid
+        assert result.name == 'cool name'
+        assert result.description == 'cool desc'
+        assert result.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result.sample_questions == ['a', 'b', 'c']
+        assert result.model == 'fai:my_model'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_get_assistant_info_public(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+        await service.update_assistant(
+            as_uid='john',
+            assistant_id=aid,
+            name='cool name',
+            description='cool desc',
+            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+            sample_questions=['a', 'b', 'c'],
+            model='fai:my_model',
+            is_public=True
+        )
+        private_aid = await service.create_assistant(as_uid='john')
+
+        result1 = await service.get_assistant_info(as_uid='jane', assistant_id=aid)
+        result2 = await service.get_assistant_info(as_uid='jane', assistant_id=private_aid)
+
+        assert result1.id == aid
+        assert result1.name == 'cool name'
+        assert result1.description == 'cool desc'
+        assert result1.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result1.sample_questions == ['a', 'b', 'c']
+        assert result1.model == 'fai:my_model'
+
+        assert result2 is None
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_get_available_assistants(service: IAssistantService, group_service: IGroupService):
         john_private_aid = await service.create_assistant(as_uid='john')
         shared_aid = await service.create_assistant(as_uid='john')
@@ -170,10 +223,33 @@ class BaseAssistantServiceTestClass:
 
         assert len(result) == 2
         assert jane_private_aid in [a.id for a in result]
-        assert next(a for a in result if a.id == jane_private_aid).owner == 'jane'
         assert shared_aid in [a.id for a in result]
-        assert next(a for a in result if a.id == shared_aid).owner == 'john'
         assert john_private_aid not in [a.id for a in result]
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_get_available_assistants_completeness(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+        await service.update_assistant(
+            as_uid='john',
+            assistant_id=aid,
+            name='cool name',
+            description='cool desc',
+            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+            sample_questions=['a', 'b', 'c'],
+            model='fai:my_model',
+        )
+
+        result = await service.get_available_assistants(as_uid='john')
+
+        assert result[0].id == aid
+        assert result[0].name == 'cool name'
+        assert result[0].description == 'cool desc'
+        assert result[
+                   0].avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result[0].sample_questions == ['a', 'b', 'c']
+        assert result[0].model == 'fai:my_model'
 
     @staticmethod
     @pytest.mark.asyncio
@@ -251,6 +327,7 @@ class BaseAssistantServiceTestClass:
             assistant_id=aid,
             name='a',
             description='b',
+            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
             allow_files=True,
             sample_questions=['c', 'd', 'e'],
             is_public=True,
@@ -273,6 +350,7 @@ class BaseAssistantServiceTestClass:
         assert result.owner == 'john'
         assert result.meta.name == 'a'
         assert result.meta.description == 'b'
+        assert result.meta.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
         assert result.meta.allow_files is True
         assert result.meta.sample_questions == ['c', 'd', 'e']
         assert result.meta.is_public is True

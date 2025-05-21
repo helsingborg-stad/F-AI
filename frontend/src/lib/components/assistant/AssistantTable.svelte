@@ -28,6 +28,10 @@
       >
         <td>
           <div class="flex flex-col">
+            {#if assistant.avatar_base64}
+              <img src={`data:image/png;base64,${assistant.avatar_base64}`} alt="avatar"
+                   class="w-10 h-10 bg-white object-contain p-2" />
+            {/if}
             <div class="text-base">{assistant.name ? assistant.name : 'Untitled assistant'}</div>
             <div class="text-xs opacity-50">{assistant.id}</div>
           </div>

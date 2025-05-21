@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, status
+import base64
+
+from fastapi import APIRouter, HTTPException, status, UploadFile
 from pydantic import BaseModel
 
 from src.common.services.fastapi_get_services import ServicesDependency
@@ -66,6 +68,7 @@ async def get_available_models(services: ServicesDependency, auth_identity: Auth
 class GetAssistantResponseAssistant(BaseModel):
     name: str
     description: str
+    avatar_base64: str | None
     sample_questions: list[str]
     allow_files: bool
     is_public: bool
@@ -93,10 +96,14 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
     if not result:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
+    # if not result.owner == auth_identity.uid:
+    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     return GetAssistantResponse(
         assistant=GetAssistantResponseAssistant(
             name=result.meta.name,
             description=result.meta.description,
+            avatar_base64=result.meta.avatar_base64,
             allow_files=result.meta.allow_files,
             sample_questions=result.meta.sample_questions,
             is_public=result.meta.is_public,
@@ -109,11 +116,41 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
     )
 
 
-class GetAvailableAssistantsResponseAssistant(BaseModel):
-    id: str
-    owner: str
+class GetAssistantInfoResponse(BaseModel):
     name: str
     description: str
+    avatar_base64: str | None
+    sample_questions: list[str]
+    model: str
+
+
+@auth.get(
+    '/{assistant_id}/info',
+    ['assistant.read'],
+    summary='Get Assistant Info',
+    response_model=GetAssistantInfoResponse,
+    response_404_description='Assistant not found',
+)
+async def get_assistant_info(assistant_id: str, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    result = await services.assistant_service.get_assistant_info(as_uid=auth_identity.uid, assistant_id=assistant_id)
+
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return GetAssistantInfoResponse(
+        name=result.name,
+        description=result.description,
+        avatar_base64=result.avatar_base64,
+        sample_questions=result.sample_questions,
+        model=result.model,
+    )
+
+
+class GetAvailableAssistantsResponseAssistant(BaseModel):
+    id: str
+    name: str
+    description: str
+    avatar_base64: str | None
 
 
 class GetAvailableAssistantsResponse(BaseModel):
@@ -131,9 +168,9 @@ async def get_available_assistants(services: ServicesDependency, auth_identity: 
     return GetAvailableAssistantsResponse(assistants=[
         GetAvailableAssistantsResponseAssistant(
             id=assistant.id,
-            owner=assistant.owner,
-            name=assistant.meta.name,
-            description=assistant.meta.description,
+            name=assistant.name,
+            description=assistant.description,
+            avatar_base64=assistant.avatar_base64,
         ) for assistant in result
     ])
 
@@ -184,6 +221,29 @@ async def update_assistant(
     if body.is_public is not None:
         await services.resource_service.set_resource_visibility(as_uid=auth_identity.uid, resource=assistant_id,
                                                                 public=body.is_public)
+
+
+@auth.put(
+    '/{assistant_id}/avatar',
+    ['assistant.write'],
+    summary='Update Assistant Avatar',
+    description='Update an assistants avatar image. PNG only. Max size 1 MB.',
+    response_404_description='Assistant not found',
+)
+async def update_assistant_avatar(assistant_id: str, file: UploadFile, services: ServicesDependency,
+                                  auth_identity: AuthenticatedIdentity):
+    if not file.content_type == 'image/png':
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid file type')
+
+    if file.size > 1024 * 1024:  # 1 Mb
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='File too large')
+
+    base64_encoded = base64.b64encode(await file.read())
+    success = await services.assistant_service.update_assistant(as_uid=auth_identity.uid, assistant_id=assistant_id,
+                                                                avatar_base64=base64_encoded)
+
+    if not success:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 class DeleteAssistantRequest(BaseModel):
