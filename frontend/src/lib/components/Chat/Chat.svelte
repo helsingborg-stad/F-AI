@@ -71,7 +71,7 @@
   <!-- Chat Input -->
   <div class="relative px-6 pb-6">
     <div
-      class="absolute inset-x-0 bottom-32 flex justify-center transition"
+      class="absolute inset-x-0 bottom-40 flex justify-center transition"
       class:translate-y-24={isContentNearBottom}
       class:invisible={!contentIsScrollable}
     >
