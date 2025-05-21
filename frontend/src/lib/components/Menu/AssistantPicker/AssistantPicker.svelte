@@ -27,7 +27,7 @@
   const selectedAssistantName = $derived(
     !selectedAssistantId
       ? 'Select assistant'
-      : assistants.find(a => a.id === selectedAssistantId)?.name || 'Select assistant',
+      : assistants.find(a => a.id === selectedAssistantId)?.name || (disabled ? '<unknown assistant>' : 'Select assistant'),
   )
 
   function handleClickOutside(event: MouseEvent) {
