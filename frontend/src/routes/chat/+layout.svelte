@@ -12,12 +12,17 @@
 
   const { data }: Props = $props()
 
-
   let selectedAssistantId = $state('')
 
-  // Clear state when changing assistant
   $effect(() => {
-    if (selectedAssistantId !== '') {
+    if (data.conversationContext && data.conversationContext.assistantId) {
+      selectedAssistantId = data.conversationContext.assistantId
+    }
+  })
+
+  // Clear state when manually changing assistant
+  $effect(() => {
+    if (selectedAssistantId !== '' && selectedAssistantId !== data.conversationContext?.assistantId) {
       goto(`/chat/`, {
         replaceState: false,
         noScroll: true,
@@ -26,14 +31,13 @@
     }
   })
 
-
   const conversationId: string | undefined = $derived(page.params.conversationId)
 
-  let messages = $state(data.messages)
+  let messages = $state(data.conversationContext.messages)
 
   // Used to set messages when going from one chat to another when components are not re-mounted
   $effect(() => {
-    messages = data.messages
+    messages = data.conversationContext.messages
   })
 
   async function sendMessage(message: string) {
