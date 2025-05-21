@@ -1,6 +1,5 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import { fn } from '@storybook/test'
   import ChatLayout from '$lib/layouts/ChatLayout.svelte'
   import dayjs from 'dayjs'
 
@@ -9,6 +8,9 @@
     component: ChatLayout,
     tags: ['autodocs'],
   })
+</script>
+<script>
+  import { action } from '@storybook/addon-actions'
 </script>
 
 <Story
@@ -31,6 +33,9 @@
     selectedAssistantId: 'ai1',
     conversationId: 'current',
     inputPlaceholder: "Fråga Folkets AI",
-    onSubmitMessage: fn()
+    onSubmitMessage: action('onSubmitMessage'),
+    onStartNewChat: action('onStartNewChat'),
+    onDeleteConversation: action('onDeleteConversation'),
+    canChat: true
   }}
 />

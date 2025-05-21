@@ -1,8 +1,11 @@
 import { redirect } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types.js'
 import { api } from '$lib/api-fetch-factory.js'
+import { canChat } from '$lib/state/user.svelte.js'
 
 export const load: LayoutServerLoad = async (event) => {
+  const userCanChat = canChat()
+
   const assistantsResponse = await api.get('/api/assistant', { event })
 
   if (!assistantsResponse.ok) {
@@ -72,12 +75,9 @@ export const load: LayoutServerLoad = async (event) => {
       conversationContext,
       assistants,
       conversations,
+      canChat: userCanChat,
     }
   }
 
-  return {
-    conversationContext: { assistantId: '', messages: [] },
-    assistants,
-    conversations,
-  }
+  return { conversationContext: { assistantId: '', messages: [] }, assistants, conversations, canChat: userCanChat }
 }
