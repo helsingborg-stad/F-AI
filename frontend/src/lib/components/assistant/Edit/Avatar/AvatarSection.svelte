@@ -2,10 +2,10 @@
   interface Props {
     avatarBase64: string
     altImagePlaceholder: string
-    avatarColor: string
+    avatarPrimaryColor: string
   }
 
-  let { avatarBase64, altImagePlaceholder, avatarColor }: Props = $props()
+  let { avatarBase64, altImagePlaceholder, avatarPrimaryColor }: Props = $props()
 
   const colors = [
     '#e28a8a',
@@ -18,7 +18,7 @@
     '#e0bd91',
   ]
 
-  let selectedColor = $state(avatarColor || colors[Math.floor(Math.random() * colors.length)])
+  let selectedColor = $state(avatarPrimaryColor || colors[Math.floor(Math.random() * colors.length)])
   let enableImagePlaceholder = $state(!avatarBase64)
   let imagePreviewUrl = $state(`data:image/png;base64,${avatarBase64}`)
 
@@ -31,22 +31,39 @@
 
     if (fileInput.files && fileInput.files[0]) {
       imagePreviewUrl = URL.createObjectURL(fileInput.files[0])
-
       enableImagePlaceholder = false
     } else {
       imagePreviewUrl = ''
       enableImagePlaceholder = true
     }
   }
+
+  function resetAvatar() {
+    imagePreviewUrl = ''
+    enableImagePlaceholder = true
+  }
 </script>
 
 <div class="form-control w-full">
   <div class="flex gap-2">
-    <div class="avatar" class:placeholder={enableImagePlaceholder}>
+    <div class="avatar relative" class:placeholder={enableImagePlaceholder}>
       <div class="w-32 rounded transition duration-500" style:background-color={selectedColor}>
         {#if enableImagePlaceholder}
           <span class="text-3xl">{altImagePlaceholder.charAt(0)}</span>
         {:else}
+          <button
+            type="button"
+            class="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs hover:bg-opacity-70 transition-all"
+            onclick={resetAvatar}
+            aria-label="Reset avatar"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+            </svg>
+          </button>
           <img src={imagePreviewUrl} alt="Selected avatar" />
         {/if}
       </div>
@@ -57,7 +74,7 @@
       <!-- Color picker -->
       <input
         type="hidden"
-        name="avatarColor"
+        name="avatarPrimaryColor"
         value={selectedColor}
       >
       <div class="flex mt-3 ml-1">
