@@ -32,8 +32,8 @@
   }: Props = $props()
 </script>
 
-<div class="flex bg-base-200 max-h-full flex-grow overflow-hidden">
-  <aside class="w-60 flex-shrink-0 bg-base-200 max-md:!w-0">
+<div class="flex flex-col md:flex-row bg-base-200 h-full overflow-hidden">
+  <aside class="hidden md:block md:w-60 flex-shrink-0 bg-base-200">
     <SidebarMenu title="Chat">
       <div class="pl-2">
         <HistoryTree
@@ -51,8 +51,8 @@
       </div>
     </SidebarMenu>
   </aside>
-  <div class="flex flex-col gap-2 p-2 grow ">
-    <main class="grow rounded-lg border bg-stone-50 overflow-auto">
+  <div class="flex flex-col w-full gap-2 p-2 overflow-hidden">
+    <main class="flex-grow rounded-lg border bg-stone-50 overflow-auto">
       <Chat
         {assistants}
         bind:selectedAssistantId

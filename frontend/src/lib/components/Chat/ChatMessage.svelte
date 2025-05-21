@@ -24,18 +24,19 @@
 
   const renderedMarkdown = $derived(DOMPurify.sanitize(md.render(text)))
 
-  const messageClasses = 'flex justify-center'
+  const layoutJustifyCenter = 'flex w-full justify-center'
+  const layoutMaxWidth = 'flex w-full px-2 md:w-[50rem]'
 
   const innerContentClasses = $derived(
     sender === 'user'
-      ? 'flex justify-end w-[50rem]'
-      : 'flex justify-center w-[50rem]'
+      ? `${layoutMaxWidth} justify-end`
+      : `${layoutMaxWidth} justify-start`,
   )
 
   const containerClasses = $derived(
     sender === 'user'
-      ? 'bg-gray-200 rounded-lg p-3 max-w-[30rem]'
-      : 'rounded-lg p-3 w-[50rem]',
+      ? 'bg-gray-200 rounded-lg p-3 max-w-[85%] md:max-w-[30rem]'
+      : 'rounded-lg p-3 max-w-[95%] md:max-w-full w-full',
   )
 
   function parseTimestamp(timestamp: string | undefined) {
@@ -49,14 +50,14 @@
 </script>
 
 {#if sender === 'user'}
-  <div class="flex justify-center py-1 pr-1">
-    <div class="w-[50rem] flex justify-end">
-      <time class="text-xs opacity-50 ml-2" datetime={time}>{parsedTime}</time>
+  <div class="{layoutJustifyCenter} py-1">
+    <div class="{innerContentClasses}">
+      <time class="text-xs opacity-50 mr-1" datetime={time}>{parsedTime}</time>
     </div>
   </div>
 {/if}
 
-<div class="{messageClasses}">
+<div class="{layoutJustifyCenter}">
   <div class="{innerContentClasses}">
     <div class="{containerClasses}">
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
