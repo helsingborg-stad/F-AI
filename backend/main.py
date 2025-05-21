@@ -16,6 +16,7 @@ from src.api.collection import collection_router
 from src.api.login import login_router
 from src.api.settings import settings_router
 from src.common.services.create_services import create_services
+from src.modules.setup.setup_default_assistants import setup_default_assistants
 from src.modules.setup.setup_default_groups import setup_default_groups
 from src.modules.setup.setup_default_models import setup_default_models
 from src.modules.setup.setup_default_settings import setup_default_settings
@@ -27,6 +28,7 @@ async def lifespan(app: FastAPI):
     await setup_default_settings(app.state.services.settings_service)
     await setup_default_groups(app.state.services.group_service)
     await setup_default_models(app.state.services.assistant_service)
+    await setup_default_assistants(app.state.services.assistant_service)
     yield
 
 
