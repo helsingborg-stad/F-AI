@@ -167,6 +167,7 @@ class BaseAssistantServiceTestClass:
             assistant_id=aid,
             name='cool name',
             description='cool desc',
+            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
             sample_questions=['a', 'b', 'c'],
             model='fai:my_model',
         )
@@ -176,6 +177,7 @@ class BaseAssistantServiceTestClass:
         assert result.id == aid
         assert result.name == 'cool name'
         assert result.description == 'cool desc'
+        assert result.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
         assert result.sample_questions == ['a', 'b', 'c']
         assert result.model == 'fai:my_model'
 
@@ -189,6 +191,7 @@ class BaseAssistantServiceTestClass:
             assistant_id=aid,
             name='cool name',
             description='cool desc',
+            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
             sample_questions=['a', 'b', 'c'],
             model='fai:my_model',
             is_public=True
@@ -201,6 +204,7 @@ class BaseAssistantServiceTestClass:
         assert result1.id == aid
         assert result1.name == 'cool name'
         assert result1.description == 'cool desc'
+        assert result1.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
         assert result1.sample_questions == ['a', 'b', 'c']
         assert result1.model == 'fai:my_model'
 
@@ -232,6 +236,7 @@ class BaseAssistantServiceTestClass:
             assistant_id=aid,
             name='cool name',
             description='cool desc',
+            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
             sample_questions=['a', 'b', 'c'],
             model='fai:my_model',
         )
@@ -241,6 +246,8 @@ class BaseAssistantServiceTestClass:
         assert result[0].id == aid
         assert result[0].name == 'cool name'
         assert result[0].description == 'cool desc'
+        assert result[
+                   0].avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
         assert result[0].sample_questions == ['a', 'b', 'c']
         assert result[0].model == 'fai:my_model'
 
@@ -320,6 +327,7 @@ class BaseAssistantServiceTestClass:
             assistant_id=aid,
             name='a',
             description='b',
+            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
             allow_files=True,
             sample_questions=['c', 'd', 'e'],
             is_public=True,
@@ -342,6 +350,7 @@ class BaseAssistantServiceTestClass:
         assert result.owner == 'john'
         assert result.meta.name == 'a'
         assert result.meta.description == 'b'
+        assert result.meta.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
         assert result.meta.allow_files is True
         assert result.meta.sample_questions == ['c', 'd', 'e']
         assert result.meta.is_public is True
