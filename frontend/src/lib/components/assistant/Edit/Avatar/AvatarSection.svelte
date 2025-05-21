@@ -1,10 +1,11 @@
 <script lang="ts">
   interface Props {
-    placeholderCharacter: string
-    avatarColor?: string
+    avatarBase64: string
+    altImagePlaceholder: string
+    avatarColor: string
   }
 
-  let { placeholderCharacter, avatarColor }: Props = $props()
+  let { avatarBase64, altImagePlaceholder, avatarColor }: Props = $props()
 
   const colors = [
     '#e28a8a',
@@ -18,21 +19,35 @@
   ]
 
   let selectedColor = $state(avatarColor || colors[Math.floor(Math.random() * colors.length)])
-  let enableAvatarPlaceholder = $state(true)
+  let enableImagePlaceholder = $state(!avatarBase64)
+  let imagePreviewUrl = $state(`data:image/png;base64,${avatarBase64}`)
 
   function selectColor(color: string) {
     selectedColor = color
+  }
+
+  function handleFileChange(event: Event) {
+    const fileInput = event.target as HTMLInputElement
+
+    if (fileInput.files && fileInput.files[0]) {
+      imagePreviewUrl = URL.createObjectURL(fileInput.files[0])
+
+      enableImagePlaceholder = false
+    } else {
+      imagePreviewUrl = ''
+      enableImagePlaceholder = true
+    }
   }
 </script>
 
 <div class="form-control w-full">
   <div class="flex gap-2">
-    <div class="avatar" class:placeholder={enableAvatarPlaceholder}>
+    <div class="avatar" class:placeholder={enableImagePlaceholder}>
       <div class="w-32 rounded transition duration-500" style:background-color={selectedColor}>
-        {#if enableAvatarPlaceholder}
-          <span class="text-3xl">{placeholderCharacter.charAt(0)}</span>
+        {#if enableImagePlaceholder}
+          <span class="text-3xl">{altImagePlaceholder.charAt(0)}</span>
         {:else}
-          <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" alt="avatar" />
+          <img src={imagePreviewUrl} alt="Selected avatar" />
         {/if}
       </div>
     </div>
@@ -40,6 +55,11 @@
       <div class="prose prose-sm">Upload an image or pick a color to make your assistant unique.</div>
 
       <!-- Color picker -->
+      <input
+        type="hidden"
+        name="avatarColor"
+        value={selectedColor}
+      >
       <div class="flex mt-3 ml-1">
         {#each colors as color, i}
           <button
@@ -62,8 +82,9 @@
             id="avatar-upload"
             type="file"
             name="avatar"
-            accept="image/*"
+            accept="image/png"
             class="file-input file-input-bordered file-input-sm w-full max-w-xs"
+            onchange={handleFileChange}
           />
         </label>
         <div class="label pb-0">

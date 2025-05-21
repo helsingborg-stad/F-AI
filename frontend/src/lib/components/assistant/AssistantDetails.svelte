@@ -26,6 +26,8 @@
   }: Props = $props()
 
   let formAction = $state('update')
+  let assistantName = $state(assistant?.name || '')
+
   const collectionId = assistant?.collection?.id ? assistant.collection.id : ''
 
   $effect(() => {
@@ -76,7 +78,11 @@
         value={collectionId}
       >
 
-      <AvatarSection placeholderCharacter={assistant.name}/>
+      <AvatarSection
+        avatarBase64={assistant.avatar_base64}
+        altImagePlaceholder={assistantName.charAt(0)}
+        avatarColor=""
+      />
 
       <label class="form-control w-full">
         <div class="label">
@@ -87,8 +93,8 @@
           name="name"
           placeholder="Enter a user friendly name"
           class="input input-bordered input-sm w-full"
-          value={assistant.name}
           required
+          bind:value={assistantName}
           readonly={!canEdit}
           autocomplete="off"
           onkeydown={(e) => e.key === 'Enter' && e.preventDefault()}

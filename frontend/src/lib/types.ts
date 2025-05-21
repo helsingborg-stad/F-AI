@@ -59,6 +59,7 @@ export interface IBackendAssistant {
   model: string
   is_public: boolean
   collection_id: string
+  avatar_base64: string
 }
 
 export interface IAssistant {

@@ -30,6 +30,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
   const instructions = formData.get('instructions') as string
   const description = formData.get('description') as string
   const visibility = formData.get('public') === 'on'
+  const avatar = formData.get('avatar_base64') as string
 
   return {
     model_key: modelKey,
@@ -39,6 +40,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
     instructions: instructions,
     description: description,
     is_public: visibility,
+    avatar_base64: avatar,
     ...overwrite,
   }
 }
@@ -66,6 +68,7 @@ export const load: PageServerLoad = async (event) => {
       instructions: assistantData.instructions,
       model: assistantData.model,
       isPublic: assistantData.is_public,
+      avatar_base64: assistantData.avatar_base64,
     }
 
     if (userCanReadCollections && assistantData.collection_id) {
