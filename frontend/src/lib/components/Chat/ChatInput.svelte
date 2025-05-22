@@ -46,9 +46,13 @@
   }
 
   function handleTextareaKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-      e.preventDefault()
-      onSubmit()
+    if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        return
+      } else {
+        e.preventDefault()
+        onSubmit()
+      }
     }
   }
 
