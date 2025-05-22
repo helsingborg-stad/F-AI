@@ -198,8 +198,11 @@ class MongoAssistantService(IAssistantService):
             if doc and 'gfs_avatar' in doc['meta'] and doc['meta']['gfs_avatar'] is not None:
                 await fs.delete(doc['meta']['gfs_avatar'])
 
-            decoded = base64.b64decode(avatar_base64)
-            new_id = await fs.put(decoded, filename=f'{assistant_id}.png')
+            if avatar_base64 == '':
+                new_id = None
+            else:
+                decoded = base64.b64decode(avatar_base64)
+                new_id = await fs.put(decoded, filename=f'{assistant_id}.png')
 
             await self._database['assistants'].update_one({'_id': ObjectId(assistant_id), 'owner': as_uid},
                                                           {'$set': {'meta.gfs_avatar': new_id}})

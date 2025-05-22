@@ -246,6 +246,18 @@ async def update_assistant_avatar(assistant_id: str, file: UploadFile, services:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
+@auth.delete(
+    '/{assistant_id}/avatar',
+    ['assistant.write'],
+    summary='Delete Assistant Avatar',
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_assistant_avatar(assistant_id: str, services: ServicesDependency,
+                                  auth_identity: AuthenticatedIdentity):
+    await services.assistant_service.update_assistant(as_uid=auth_identity.uid, assistant_id=assistant_id,
+                                                      avatar_base64='')
+
+
 class DeleteAssistantRequest(BaseModel):
     assistant_id: str
 

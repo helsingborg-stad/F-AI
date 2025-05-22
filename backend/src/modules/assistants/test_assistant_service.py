@@ -319,6 +319,23 @@ class BaseAssistantServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
+    async def test_update_assistant_remove_avatar(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+        await service.update_assistant(
+            as_uid='john',
+            assistant_id=aid,
+            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        )
+
+        await service.update_assistant(as_uid='john', assistant_id=aid, avatar_base64='')
+
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
+
+        assert result.meta.avatar_base64 is None
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_update_assistant_full(service: IAssistantService):
         aid = await service.create_assistant(as_uid='john')
 
