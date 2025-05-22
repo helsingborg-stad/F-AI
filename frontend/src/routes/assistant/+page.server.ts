@@ -116,7 +116,9 @@ export const actions = {
       const updateData = await getAssistantFormValues(formData)
       await updateAssistant(assistantId, updateData, event)
 
-      await updateAssistantAvatar(assistantId, avatar, event)
+      if (avatar && avatar.size > 0) {
+        await updateAssistantAvatar(assistantId, avatar, event)
+      }
     } catch (error) {
       return handleApiError(error)
     }
