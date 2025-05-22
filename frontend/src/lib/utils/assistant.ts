@@ -2,7 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit'
 import type { IAssistant, IAssistantModels, IBackendAssistant } from '$lib/types.js'
 import { api } from '$lib/api-fetch-factory.js'
 
-export async function fetchAllAssistants(event: RequestEvent): Promise<IAssistant[]> {
+export async function fetchAllAssistants(event: RequestEvent): Promise<IBackendAssistant[]> {
   const response = await api.get('/api/assistant', { event, withAuth: true })
   if (response.ok) {
     const data = await response.json()

@@ -52,6 +52,7 @@ export interface IAssistantModels {
 }
 
 export interface IBackendAssistant {
+  id: string
   model_key: string
   name: string
   description: string
@@ -66,7 +67,7 @@ export interface IAssistant {
   id: string
   name: string
   description: string
-  avatar_base64: string
+  avatarBase64: string
   instructions: string
   model: string
   collection?: ICollection

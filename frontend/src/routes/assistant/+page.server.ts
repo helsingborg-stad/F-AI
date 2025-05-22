@@ -56,7 +56,15 @@ export const load: PageServerLoad = async (event) => {
   let activeAssistant: IAssistant = {} as IAssistant
 
   if (userCanListAssistants) {
-    assistants = await fetchAllAssistants(event)
+    assistants = (await fetchAllAssistants(event)).map((assistant) => ({
+      id: assistant.id,
+      name: assistant.name,
+      description: assistant.description,
+      instructions: assistant.instructions,
+      model: assistant.model,
+      isPublic: assistant.is_public,
+      avatarBase64: assistant.avatar_base64,
+    }))
   }
 
   if (activeAssistantID) {
@@ -68,7 +76,7 @@ export const load: PageServerLoad = async (event) => {
       instructions: assistantData.instructions,
       model: assistantData.model,
       isPublic: assistantData.is_public,
-      avatar_base64: assistantData.avatar_base64,
+      avatarBase64: assistantData.avatar_base64,
     }
 
     if (userCanReadCollections && assistantData.collection_id) {

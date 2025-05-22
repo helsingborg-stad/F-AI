@@ -84,7 +84,7 @@
       >
 
       <AvatarSection
-        avatarBase64={assistant.avatar_base64}
+        avatarBase64={assistant.avatarBase64}
         altImagePlaceholder={assistantName.charAt(0)}
         avatarPrimaryColor=""
       />
