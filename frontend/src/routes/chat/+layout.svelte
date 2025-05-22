@@ -14,6 +14,14 @@
 
   let selectedAssistantId = $state('')
 
+  function startNewChat() {
+    goto(`/chat/`, {
+      replaceState: false,
+      noScroll: true,
+      keepFocus: true,
+    })
+  }
+
   $effect(() => {
     if (data.conversationContext && data.conversationContext.assistantId) {
       selectedAssistantId = data.conversationContext.assistantId
@@ -23,11 +31,7 @@
   // Clear state when manually changing assistant
   $effect(() => {
     if (selectedAssistantId !== '' && selectedAssistantId !== data.conversationContext?.assistantId) {
-      goto(`/chat/`, {
-        replaceState: false,
-        noScroll: true,
-        keepFocus: true,
-      })
+      startNewChat()
     }
   })
 
@@ -78,7 +82,7 @@
       },
     )
       .then(() => {
-        if(id === conversationId) {
+        if (id === conversationId) {
           return goto(`/chat/`, {})
         }
       })
@@ -87,6 +91,7 @@
 </script>
 
 <ChatLayout
+  canChat={data.canChat}
   {messages}
   assistants={data.assistants}
   conversations={data.conversations}
@@ -95,5 +100,6 @@
   bind:selectedAssistantId
   {conversationId}
   onDeleteConversation={deleteConversation}
+  onStartNewChat={startNewChat}
 >
 </ChatLayout>

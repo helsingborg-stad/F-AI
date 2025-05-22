@@ -4,8 +4,11 @@
   import SidebarMenu from '$lib/components/Menu/SidebarMenu.svelte'
   import HistoryTree from '$lib/components/Menu/Chat/HistoryTree/HistoryTree.svelte'
   import { goto } from '$app/navigation'
+  import { icons } from '$lib/components/Icon/icons.js'
+  import Icon from '$lib/components/Icon/Icon.svelte'
 
   type Props = ChatProps & {
+    canChat: boolean
     assistants: {
       id: string,
       name: string
@@ -18,9 +21,11 @@
     selectedAssistantId: string
     conversationId: string
     onDeleteConversation: (id: string) => void
+    onStartNewChat: () => void
   }
 
   let {
+    canChat,
     messages,
     assistants,
     conversations,
@@ -28,16 +33,22 @@
     onSubmitMessage,
     selectedAssistantId = $bindable(),
     conversationId,
-    onDeleteConversation
+    onDeleteConversation,
+    onStartNewChat,
   }: Props = $props()
 </script>
 
 <div class="flex flex-col md:flex-row bg-base-200 h-full overflow-hidden">
   <aside class="hidden md:block md:w-60 flex-shrink-0 bg-base-200">
     <SidebarMenu title="Chat">
-      <div class="pl-2">
-        <HistoryTree
-          items={conversations.map(c => ({
+      <div class="flex flex-col h-full gap-2">
+        <button type="button" class="btn btn-neutral btn-sm" disabled={!canChat} onclick={onStartNewChat}>
+          <Icon icon={icons["plus"]} width={16} height={16} />
+          <span class="text-s">Start New Chat</span>
+        </button>
+        <div class="pl-2 overflow-y-auto h-full">
+          <HistoryTree
+            items={conversations.map(c => ({
           id: c.id,
           title: c.title || c.id,
           options: [
@@ -45,9 +56,10 @@
           ],
           createdTimestamp: c.timestamp
         }))}
-          highlightedIds={[conversationId]}
-          onClick={(id) => goto(`/chat/${id}`)}
-        />
+            highlightedIds={[conversationId]}
+            onClick={(id) => goto(`/chat/${id}`)}
+          />
+        </div>
       </div>
     </SidebarMenu>
   </aside>

@@ -2,7 +2,7 @@ import type { IUserInfo, UserScopeType } from '$lib/types.js'
 import { browser } from '$app/environment'
 
 // Initialize state from localStorage if available, otherwise use default
-const initialState: IUserInfo = browser 
+const initialState: IUserInfo = browser
   ? JSON.parse(localStorage.getItem('userState') || '{"email":"","scopes":[]}')
   : { email: '', scopes: [] }
 
@@ -23,7 +23,7 @@ export function setUser(userData: IUserInfo) {
   if ('scopes' in userData) {
     userState.scopes = userData.scopes
   }
-  
+
   persistState()
 }
 
@@ -75,4 +75,8 @@ export function canReadCollections(): boolean {
 
 export function canEditCollections(): boolean {
   return hasScope('collection.write')
+}
+
+export function canChat(): boolean {
+  return hasScope('chat')
 }
