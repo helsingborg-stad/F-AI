@@ -94,9 +94,7 @@ export async function updateAssistantAvatar(
 
   const response = await api.put(`/api/assistant/${assistantId}/avatar`, {
     event,
-    body: {
-      file: formData
-    }
+    body: formData
   })
 
   if (!response.ok) {

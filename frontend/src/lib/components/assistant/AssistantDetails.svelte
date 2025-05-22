@@ -61,7 +61,12 @@
   </div>
 {:else if assistant && Object.keys(assistant).length > 0}
   <div class="h-full px-1">
-    <form method="POST" action="?/{formAction}" class="space-y-4 pb-8">
+    <form
+      method="POST"
+      action="?/{formAction}"
+      enctype="multipart/form-data"
+      class="space-y-4 pb-8"
+    >
       <input
         type="hidden"
         name="assistant_id"
