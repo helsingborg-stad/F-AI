@@ -85,6 +85,7 @@
           placeholder="Enter a user friendly name"
           class="input input-bordered input-sm w-full"
           value={assistant.name}
+          required
           readonly={!canEdit}
           autocomplete="off"
           onkeydown={(e) => e.key === 'Enter' && e.preventDefault()}
@@ -126,6 +127,7 @@
           name="model"
           bind:value={selectedModelKey}
           class="select select-bordered select-sm text-sm"
+          required
           disabled={!canEdit}
         >
           <option value="" disabled selected>Select a model</option>
