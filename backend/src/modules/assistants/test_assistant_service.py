@@ -168,6 +168,7 @@ class BaseAssistantServiceTestClass:
             name='cool name',
             description='cool desc',
             avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+            primary_color='#facade',
             sample_questions=['a', 'b', 'c'],
             model='fai:my_model',
         )
@@ -178,6 +179,7 @@ class BaseAssistantServiceTestClass:
         assert result.name == 'cool name'
         assert result.description == 'cool desc'
         assert result.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result.primary_color == '#facade'
         assert result.sample_questions == ['a', 'b', 'c']
         assert result.model == 'fai:my_model'
 
@@ -192,6 +194,7 @@ class BaseAssistantServiceTestClass:
             name='cool name',
             description='cool desc',
             avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+            primary_color='#facade',
             sample_questions=['a', 'b', 'c'],
             model='fai:my_model',
             is_public=True
@@ -205,6 +208,7 @@ class BaseAssistantServiceTestClass:
         assert result1.name == 'cool name'
         assert result1.description == 'cool desc'
         assert result1.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result1.primary_color == '#facade'
         assert result1.sample_questions == ['a', 'b', 'c']
         assert result1.model == 'fai:my_model'
 
@@ -237,6 +241,7 @@ class BaseAssistantServiceTestClass:
             name='cool name',
             description='cool desc',
             avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+            primary_color='#facade',
             sample_questions=['a', 'b', 'c'],
             model='fai:my_model',
         )
@@ -248,6 +253,7 @@ class BaseAssistantServiceTestClass:
         assert result[0].description == 'cool desc'
         assert result[
                    0].avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result[0].primary_color == '#facade'
         assert result[0].sample_questions == ['a', 'b', 'c']
         assert result[0].model == 'fai:my_model'
 
@@ -345,6 +351,7 @@ class BaseAssistantServiceTestClass:
             name='a',
             description='b',
             avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+            primary_color='#facade',
             allow_files=True,
             sample_questions=['c', 'd', 'e'],
             is_public=True,
@@ -368,6 +375,7 @@ class BaseAssistantServiceTestClass:
         assert result.meta.name == 'a'
         assert result.meta.description == 'b'
         assert result.meta.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result.meta.primary_color == '#facade'
         assert result.meta.allow_files is True
         assert result.meta.sample_questions == ['c', 'd', 'e']
         assert result.meta.is_public is True

@@ -24,7 +24,7 @@ class MongoAssistantService(IAssistantService):
             id=str(ObjectId()),
             owner=as_uid,
             meta=AssistantMeta(name='', description='', avatar_base64='', sample_questions=[], allow_files=False,
-                               is_public=False),
+                               is_public=False, primary_color='#ffffff'),
             model='',
             llm_api_key=None,
             instructions='',
@@ -157,6 +157,7 @@ class MongoAssistantService(IAssistantService):
             name: str | None = None,
             description: str | None = None,
             avatar_base64: str | None = None,
+            primary_color: str | None = None,
             allow_files: bool | None = None,
             sample_questions: list[str] | None = None,
             is_public: bool | None = None,
@@ -173,6 +174,7 @@ class MongoAssistantService(IAssistantService):
 
         self._add_to_dict_unless_none(update_dict, 'meta.name', name)
         self._add_to_dict_unless_none(update_dict, 'meta.description', description)
+        self._add_to_dict_unless_none(update_dict, 'meta.primary_color', primary_color)
         self._add_to_dict_unless_none(update_dict, 'meta.allow_files', allow_files)
         self._add_to_dict_unless_none(update_dict, 'meta.sample_questions', sample_questions)
         self._add_to_dict_unless_none(update_dict, 'meta.is_public', is_public)
@@ -236,6 +238,7 @@ class MongoAssistantService(IAssistantService):
                 allow_files=doc['meta']['allow_files'],
                 sample_questions=doc['meta']['sample_questions'],
                 is_public=doc['meta']['is_public'] if 'is_public' in doc['meta'] else False,
+                primary_color=doc['meta']['primary_color'] if 'primary_color' in doc['meta'] else '#ffffff'
             ),
             model=doc['model'],
             llm_api_key=api_key,
@@ -253,6 +256,7 @@ class MongoAssistantService(IAssistantService):
                 'meta'] else None,
             sample_questions=doc['meta']['sample_questions'],
             model=doc['model'],
+            primary_color=doc['meta']['primary_color'] if 'primary_color' in doc['meta'] else '#ffffff'
         )
 
     @staticmethod

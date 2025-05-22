@@ -69,6 +69,7 @@ class GetAssistantResponseAssistant(BaseModel):
     name: str
     description: str
     avatar_base64: str | None
+    primary_color: str | None
     sample_questions: list[str]
     allow_files: bool
     is_public: bool
@@ -104,6 +105,7 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
             name=result.meta.name,
             description=result.meta.description,
             avatar_base64=result.meta.avatar_base64,
+            primary_color=result.meta.primary_color,
             allow_files=result.meta.allow_files,
             sample_questions=result.meta.sample_questions,
             is_public=result.meta.is_public,
@@ -120,6 +122,7 @@ class GetAssistantInfoResponse(BaseModel):
     name: str
     description: str
     avatar_base64: str | None
+    primary_color: str | None
     sample_questions: list[str]
     model: str
 
@@ -141,6 +144,7 @@ async def get_assistant_info(assistant_id: str, services: ServicesDependency, au
         name=result.name,
         description=result.description,
         avatar_base64=result.avatar_base64,
+        primary_color=result.primary_color,
         sample_questions=result.sample_questions,
         model=result.model,
     )
@@ -151,6 +155,7 @@ class GetAvailableAssistantsResponseAssistant(BaseModel):
     name: str
     description: str
     avatar_base64: str | None
+    primary_color: str | None
 
 
 class GetAvailableAssistantsResponse(BaseModel):
@@ -171,6 +176,7 @@ async def get_available_assistants(services: ServicesDependency, auth_identity: 
             name=assistant.name,
             description=assistant.description,
             avatar_base64=assistant.avatar_base64,
+            primary_color=assistant.primary_color,
         ) for assistant in result
     ])
 
@@ -178,6 +184,7 @@ async def get_available_assistants(services: ServicesDependency, auth_identity: 
 class UpdateAssistantRequest(BaseModel):
     name: str | None = None
     description: str | None = None
+    primary_color: str | None = None
     allow_files: bool | None = None
     sample_questions: list[str] | None = None
     is_public: bool | None = None
@@ -205,6 +212,7 @@ async def update_assistant(
         assistant_id=assistant_id,
         name=body.name,
         description=body.description,
+        primary_color=body.primary_color,
         allow_files=body.allow_files,
         sample_questions=body.sample_questions,
         is_public=body.is_public,

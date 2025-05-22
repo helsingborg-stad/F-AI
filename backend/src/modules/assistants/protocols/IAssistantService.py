@@ -34,6 +34,7 @@ class IAssistantService(Protocol):
             name: str | None = None,
             description: str | None = None,
             avatar_base64: str | None = None,
+            primary_color: str | None = None,
             allow_files: bool | None = None,
             sample_questions: list[str] | None = None,
             is_public: bool | None = None,
