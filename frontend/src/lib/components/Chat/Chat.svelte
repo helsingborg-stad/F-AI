@@ -84,7 +84,12 @@
       </button>
     </div>
     <div class="relative rounded-2xl border bg-white z-10 w-[60rem] mx-auto">
-      <ChatInput placeholder={inputPlaceholder} bind:value={chatInput} onSubmit={onHandleSubmit}>
+      <ChatInput
+        placeholder={inputPlaceholder} 
+        bind:value={chatInput}
+        onSubmit={onHandleSubmit}
+        disabled={selectedAssistantId === ''}
+      >
         <ActionButtons {assistants} bind:selectedAssistantId {disableAssistantPicker} />
       </ChatInput>
     </div>

@@ -6,9 +6,14 @@
     value: string
     onSubmit: () => void
     children: Snippet
+    disabled: boolean
   }
 
-  let { placeholder, value = $bindable(), onSubmit, children }: Props = $props()
+  let { placeholder, value = $bindable(), onSubmit, children, disabled }: Props = $props()
+
+  let disableSend = $derived.by(() => {
+    return disabled || value === ''
+  })
 
   let textareaElement: HTMLTextAreaElement
 
@@ -91,7 +96,9 @@
       {@render children()}
     </div>
     <div class="flex-shrink-0">
-      <button class="btn btn-sm" onclick={handleSend}>Send</button>
+      <div class={disableSend ? "tooltip" : ""} data-tip={value === '' ? 'Message is empty' : 'Select a assistant'}>
+        <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}>Send</button>
+      </div>
     </div>
   </div>
 </div>
