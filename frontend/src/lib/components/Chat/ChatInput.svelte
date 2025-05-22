@@ -96,7 +96,7 @@
       {@render children()}
     </div>
     <div class="flex-shrink-0">
-      <div class={disableSend ? "tooltip" : ""} data-tip={value === '' ? 'Message is empty' : 'Select a assistant'}>
+      <div class={disableSend ? "tooltip" : ""} data-tip={value === '' ? 'Message is empty' : 'Select assistant'}>
         <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}>Send</button>
       </div>
     </div>

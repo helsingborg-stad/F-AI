@@ -85,7 +85,7 @@
     </div>
     <div class="relative rounded-2xl border bg-white z-10 w-[60rem] mx-auto">
       <ChatInput
-        placeholder={inputPlaceholder} 
+        placeholder={inputPlaceholder}
         bind:value={chatInput}
         onSubmit={onHandleSubmit}
         disabled={selectedAssistantId === ''}
