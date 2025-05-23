@@ -18,7 +18,7 @@
     '#e0bd91',
   ]
 
-  let selectedColor = $state(avatarPrimaryColor || colors[Math.floor(Math.random() * colors.length)])
+  let selectedColor = $state(avatarPrimaryColor === '' || colors[Math.floor(Math.random() * colors.length)])
   let enableImagePlaceholder = $state(!avatarBase64)
   let imagePreviewUrl = $state(`data:image/png;base64,${avatarBase64}`)
 
@@ -74,7 +74,7 @@
       <!-- Color picker -->
       <input
         type="hidden"
-        name="avatarPrimaryColor"
+        name="primary_color"
         value={selectedColor}
       >
       <div class="flex mt-3 ml-1">

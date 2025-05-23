@@ -31,6 +31,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
   const description = formData.get('description') as string
   const visibility = formData.get('public') === 'on'
   const avatar = formData.get('avatar_base64') as string
+  const primaryColor = formData.get('primary_color') as string
 
   return {
     model_key: modelKey,
@@ -41,6 +42,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
     description: description,
     is_public: visibility,
     avatar_base64: avatar,
+    primary_color: primaryColor,
     ...overwrite,
   }
 }
@@ -64,6 +66,7 @@ export const load: PageServerLoad = async (event) => {
       model: assistant.model,
       isPublic: assistant.is_public,
       avatarBase64: assistant.avatar_base64,
+      primaryColor: assistant.primary_color,
     }))
   }
 
@@ -77,6 +80,7 @@ export const load: PageServerLoad = async (event) => {
       model: assistantData.model,
       isPublic: assistantData.is_public,
       avatarBase64: assistantData.avatar_base64,
+      primaryColor: assistantData.primary_color,
     }
 
     if (userCanReadCollections && assistantData.collection_id) {

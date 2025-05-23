@@ -61,6 +61,7 @@ export interface IBackendAssistant {
   is_public: boolean
   collection_id: string
   avatar_base64: string
+  primary_color: string
 }
 
 export interface IAssistant {
@@ -72,6 +73,7 @@ export interface IAssistant {
   model: string
   collection?: ICollection
   isPublic: boolean
+  primaryColor: string
 }
 
 export interface IAssistants {
