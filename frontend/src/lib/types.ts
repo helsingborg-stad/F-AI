@@ -52,6 +52,7 @@ export interface IAssistantModels {
 }
 
 export interface IBackendAssistant {
+  id: string
   model_key: string
   name: string
   description: string
@@ -59,17 +60,20 @@ export interface IBackendAssistant {
   model: string
   is_public: boolean
   collection_id: string
+  avatar_base64: string
+  primary_color: string
 }
 
 export interface IAssistant {
   id: string
   name: string
   description: string
-  avatar_base64: string
+  avatarBase64: string
   instructions: string
   model: string
   collection?: ICollection
   isPublic: boolean
+  primaryColor: string
 }
 
 export interface IAssistants {

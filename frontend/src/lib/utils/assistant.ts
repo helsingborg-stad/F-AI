@@ -2,7 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit'
 import type { IAssistant, IAssistantModels, IBackendAssistant } from '$lib/types.js'
 import { api } from '$lib/api-fetch-factory.js'
 
-export async function fetchAllAssistants(event: RequestEvent): Promise<IAssistant[]> {
+export async function fetchAllAssistants(event: RequestEvent): Promise<IBackendAssistant[]> {
   const response = await api.get('/api/assistant', { event, withAuth: true })
   if (response.ok) {
     const data = await response.json()
@@ -81,5 +81,36 @@ export async function deleteAssistant(event: RequestEvent, assistantId: string) 
 
   if (!response.ok) {
     throw new Response('Failed to delete assistant', { status: response.status })
+  }
+}
+
+export async function updateAssistantAvatar(
+  assistantId: string,
+  avatar: File,
+  event: RequestEvent,
+) {
+  const formData = new FormData()
+  formData.append('file', avatar)
+
+  const response = await api.put(`/api/assistant/${assistantId}/avatar`, {
+    event,
+    body: formData
+  })
+
+  if (!response.ok) {
+    throw new Response('Failed to update assistant avatar', { status: response.status })
+  }
+}
+
+export async function deleteAssistantAvatar(
+  assistantId: string,
+  event: RequestEvent,
+) {
+  const response = await api.delete(`/api/assistant/${assistantId}/avatar`, {
+    event
+  })
+
+  if (!response.ok) {
+    throw new Response('Failed to delete assistant avatar', { status: response.status })
   }
 }

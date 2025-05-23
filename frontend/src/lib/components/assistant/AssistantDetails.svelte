@@ -4,6 +4,7 @@
   import AccessSection from '$lib/components/assistant/AccessSection.svelte'
   import ToolsSection from '$lib/components/assistant/ToolsSection.svelte'
   import ModelConfigSection from '$lib/components/assistant/ModelConfigSection.svelte'
+  import AvatarSection from '$lib/components/assistant/Edit/Avatar/AvatarSection.svelte'
 
   interface Props {
     assistant?: IAssistant
@@ -25,6 +26,8 @@
   }: Props = $props()
 
   let formAction = $state('update')
+  let assistantName = $state(assistant?.name || '')
+
   const collectionId = assistant?.collection?.id ? assistant.collection.id : ''
 
   $effect(() => {
@@ -58,7 +61,12 @@
   </div>
 {:else if assistant && Object.keys(assistant).length > 0}
   <div class="h-full px-1">
-    <form method="POST" action="?/{formAction}" class="space-y-4 pb-8">
+    <form
+      method="POST"
+      action="?/{formAction}"
+      enctype="multipart/form-data"
+      class="space-y-4 pb-8"
+    >
       <input
         type="hidden"
         name="assistant_id"
@@ -75,6 +83,12 @@
         value={collectionId}
       >
 
+      <AvatarSection
+        avatarBase64={assistant.avatarBase64}
+        altImagePlaceholder={assistantName.charAt(0)}
+        primaryColor={assistant.primaryColor}
+      />
+
       <label class="form-control w-full">
         <div class="label">
           <span class="label-text">Name</span>
@@ -84,8 +98,8 @@
           name="name"
           placeholder="Enter a user friendly name"
           class="input input-bordered input-sm w-full"
-          value={assistant.name}
           required
+          bind:value={assistantName}
           readonly={!canEdit}
           autocomplete="off"
           onkeydown={(e) => e.key === 'Enter' && e.preventDefault()}

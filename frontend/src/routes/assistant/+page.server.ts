@@ -9,10 +9,12 @@ import { error, redirect } from '@sveltejs/kit'
 import {
   createAssistant,
   deleteAssistant,
+  deleteAssistantAvatar,
   fetchAllAssistants,
   fetchAssistantById,
   fetchAssistantModels,
   updateAssistant,
+  updateAssistantAvatar,
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
 import {
@@ -29,6 +31,8 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
   const instructions = formData.get('instructions') as string
   const description = formData.get('description') as string
   const visibility = formData.get('public') === 'on'
+  const avatar = formData.get('avatar_base64') as string
+  const primaryColor = formData.get('primary_color') as string
 
   return {
     model_key: modelKey,
@@ -38,6 +42,8 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
     instructions: instructions,
     description: description,
     is_public: visibility,
+    avatar_base64: avatar,
+    primary_color: primaryColor,
     ...overwrite,
   }
 }
@@ -53,7 +59,16 @@ export const load: PageServerLoad = async (event) => {
   let activeAssistant: IAssistant = {} as IAssistant
 
   if (userCanListAssistants) {
-    assistants = await fetchAllAssistants(event)
+    assistants = (await fetchAllAssistants(event)).map((assistant) => ({
+      id: assistant.id,
+      name: assistant.name,
+      description: assistant.description,
+      instructions: assistant.instructions,
+      model: assistant.model,
+      isPublic: assistant.is_public,
+      avatarBase64: assistant.avatar_base64,
+      primaryColor: assistant.primary_color,
+    }))
   }
 
   if (activeAssistantID) {
@@ -65,6 +80,8 @@ export const load: PageServerLoad = async (event) => {
       instructions: assistantData.instructions,
       model: assistantData.model,
       isPublic: assistantData.is_public,
+      avatarBase64: assistantData.avatar_base64,
+      primaryColor: assistantData.primary_color,
     }
 
     if (userCanReadCollections && assistantData.collection_id) {
@@ -106,10 +123,22 @@ export const actions = {
   update: async (event) => {
     const formData = await event.request.formData()
     const assistantId = formData.get('assistant_id') as string
+    const avatar = formData.get('avatar') as File
+    const shouldDeleteAvatar = formData.get('delete_avatar') === 'true'
 
     try {
       const updateData = await getAssistantFormValues(formData)
       await updateAssistant(assistantId, updateData, event)
+
+      // Only process avatar changes if there's a new file or explicit deletion request
+      if (avatar && avatar.size > 0) {
+        // User uploaded a new avatar
+        await updateAssistantAvatar(assistantId, avatar, event)
+      } else if (shouldDeleteAvatar) {
+        // User explicitly clicked the delete button
+        await deleteAssistantAvatar(assistantId, event)
+      }
+      // Otherwise, keep the existing avatar unchanged
     } catch (error) {
       return handleApiError(error)
     }
