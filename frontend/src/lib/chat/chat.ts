@@ -3,6 +3,10 @@ export interface RealtimeChatMessage {
   message: string,
 }
 
+export interface ChatController {
+  close: () => void,
+}
+
 export async function sendChatMessage(
   message: string,
   assistantId: string | undefined,
@@ -10,7 +14,7 @@ export async function sendChatMessage(
   onAddMessage: (message: RealtimeChatMessage) => void,
   onUpdateLastMessage: (message: RealtimeChatMessage) => void,
   onGoto: (url: string) => void,
-  onError: (error: string) => void) {
+  onError: (error: string) => void): Promise<ChatController | null> {
 
   onAddMessage({ source: 'user', message: message })
   onAddMessage({ source: 'assistant', message: '...' })
@@ -24,7 +28,7 @@ export async function sendChatMessage(
   if (!storeMessageResponse.ok) {
     console.error('Error storing message', storeMessageResponse)
     onError(`Error storing message (${storeMessageResponse.status}). Try again or contact support.`)
-    return
+    return null
   }
 
   const { messageId } = await storeMessageResponse.json()
@@ -62,4 +66,11 @@ export async function sendChatMessage(
     console.log('es message end', e)
     es.close()
   })
+
+  return {
+    close: () => {
+      console.log('es closing chat connection')
+      es.close()
+    }
+  }
 }
