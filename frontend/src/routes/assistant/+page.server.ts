@@ -9,6 +9,7 @@ import { error, redirect } from '@sveltejs/kit'
 import {
   createAssistant,
   deleteAssistant,
+  deleteAssistantAvatar,
   fetchAllAssistants,
   fetchAssistantById,
   fetchAssistantModels,
@@ -121,6 +122,7 @@ export const actions = {
 
   update: async (event) => {
     const formData = await event.request.formData()
+    console.log(formData)
     const assistantId = formData.get('assistant_id') as string
     const avatar = formData.get('avatar') as File
 
@@ -130,6 +132,8 @@ export const actions = {
 
       if (avatar && avatar.size > 0) {
         await updateAssistantAvatar(assistantId, avatar, event)
+      } else {
+        await deleteAssistantAvatar(assistantId, event)
       }
     } catch (error) {
       return handleApiError(error)

@@ -101,3 +101,16 @@ export async function updateAssistantAvatar(
     throw new Response('Failed to update assistant avatar', { status: response.status })
   }
 }
+
+export async function deleteAssistantAvatar(
+  assistantId: string,
+  event: RequestEvent,
+) {
+  const response = await api.delete(`/api/assistant/${assistantId}/avatar`, {
+    event
+  })
+
+  if (!response.ok) {
+    throw new Response('Failed to delete assistant avatar', { status: response.status })
+  }
+}

@@ -21,6 +21,7 @@
   let selectedColor = $state(primaryColor !== '' ?  primaryColor : colors[Math.floor(Math.random() * colors.length)])
   let enableImagePlaceholder = $state(!avatarBase64)
   let imagePreviewUrl = $state(`data:image/png;base64,${avatarBase64}`)
+  let fileInput: HTMLInputElement
 
   function selectColor(color: string) {
     selectedColor = color
@@ -41,6 +42,10 @@
   function resetAvatar() {
     imagePreviewUrl = ''
     enableImagePlaceholder = true
+
+    if (fileInput) {
+      fileInput.value = ''
+    }
   }
 </script>
 
@@ -96,6 +101,7 @@
       <div class="mt-4">
         <label for="avatar-upload" class="w-full">
           <input
+            bind:this={fileInput}
             id="avatar-upload"
             type="file"
             name="avatar"
