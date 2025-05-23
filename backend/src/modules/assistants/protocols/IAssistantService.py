@@ -6,7 +6,7 @@ from src.modules.assistants.models.Model import Model
 
 
 class IAssistantService(Protocol):
-    async def create_assistant(self, as_uid: str) -> str:
+    async def create_assistant(self, as_uid: str, force_id: str | None = None) -> str:
         ...
 
     async def get_available_models(self, as_uid: str) -> list[Model]:
@@ -42,6 +42,7 @@ class IAssistantService(Protocol):
             llm_api_key: str | None = None,
             instructions: str | None = None,
             collection_id: str | None = None,
+            response_schema: dict[str, object] | None = None,
             extra_llm_params: dict[str, float | int | bool | str] | None = None
     ) -> bool:
         ...

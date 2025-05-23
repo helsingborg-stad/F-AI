@@ -89,6 +89,7 @@ class MongoAssistantService(IAssistantService):
                 'allow_files',
                 'collection_id',
                 'extra_llm_params',
+                'response_schema'
             ]
         )
         if doc is None:
@@ -111,6 +112,7 @@ class MongoAssistantService(IAssistantService):
                 'allow_files',
                 'collection_id',
                 'extra_llm_params',
+                'response_schema'
             ]
         )
         return [await self._doc_to_assistant(doc, True) async for doc in cursor]
@@ -165,6 +167,7 @@ class MongoAssistantService(IAssistantService):
             llm_api_key: str | None = None,
             instructions: str | None = None,
             collection_id: str | None = None,
+            response_schema: dict[str, object] | None = None,
             extra_llm_params: dict[str, float | int | bool | str] | None = None
     ) -> bool:
         if not is_valid_mongo_id(assistant_id):
@@ -183,6 +186,7 @@ class MongoAssistantService(IAssistantService):
         self._add_to_dict_unless_none(update_dict, 'instructions', instructions)
         self._add_to_dict_unless_none(update_dict, 'extra_llm_params', extra_llm_params)
         self._add_to_dict_unless_none(update_dict, 'collection_id', collection_id)
+        self._add_to_dict_unless_none(update_dict, 'response_schema', response_schema)
 
         result = await self._database['assistants'].update_one(
             {'_id': ObjectId(assistant_id), 'owner': as_uid},
@@ -245,6 +249,7 @@ class MongoAssistantService(IAssistantService):
             instructions=doc['instructions'],
             collection_id=doc['collection_id'],
             extra_llm_params=doc['extra_llm_params'] if 'extra_llm_params' in doc else None,
+            response_schema=doc['response_schema'] if 'response_schema' in doc else None
         )
 
     async def _doc_to_assistant_info(self, doc: Mapping[str, Any]) -> AssistantInfo:

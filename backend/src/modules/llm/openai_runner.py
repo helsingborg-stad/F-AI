@@ -1,12 +1,12 @@
 import collections
-from typing import Iterable, Any
+from typing import Iterable
 
 import openai
 from openai import BadRequestError, NOT_GIVEN
 from openai.types.chat import ChatCompletionToolParam
 
-from .models.Message import Message
 from .models.Delta import Delta
+from .models.Message import Message
 from .models.ToolCall import ToolCall
 from .models.ToolCallFunction import ToolCallFunction
 
@@ -21,7 +21,7 @@ class OpenAIRunner:
             url: str | None = None,
             api_key: str | None = None,
             tools: Iterable[ChatCompletionToolParam] = None,
-            response_format: Any = None
+            response_format: dict[str, object] | None = None
     ):
         self.model = model
         self.messages = messages
@@ -30,7 +30,10 @@ class OpenAIRunner:
         self.url = url
         self.api_key = api_key
         self.tools = tools
-        self.response_format = response_format
+        self.response_format = {
+            "type": "json_schema",
+            "json_schema": response_format
+        } if response_format else None
 
     async def run(self, message: Message | None = None) -> collections.abc.AsyncGenerator[Delta, None]:
         client = openai.AsyncOpenAI(
@@ -48,7 +51,7 @@ class OpenAIRunner:
                 temperature=self.temperature if self.temperature is not None else NOT_GIVEN,
                 max_completion_tokens=self.max_tokens if self.max_tokens is not None else NOT_GIVEN,
                 tools=self.tools,
-                response_format=self.response_format
+                response_format=self.response_format if self.response_format is not None else NOT_GIVEN,
             )
         except BadRequestError as e:
             yield Delta(

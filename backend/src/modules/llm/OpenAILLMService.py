@@ -19,6 +19,7 @@ class OpenAILLMService(ILLMService):
             model: str,
             api_key: str,
             messages: list[Message],
+            response_schema: dict[str, object] | None = None,
             extra_params: dict[str, float | int | bool | str] | None = None
     ) -> AsyncGenerator[Delta, None]:
         [_, model_name] = parse_model_key(model)
@@ -35,6 +36,7 @@ class OpenAILLMService(ILLMService):
             api_key=api_key,
             max_tokens=extra_params.get('max_tokens', None),
             temperature=extra_params.get('temperature', None),
+            response_format=response_schema
         )
         async for output in runner.run():
             yield output
@@ -44,6 +46,7 @@ class OpenAILLMService(ILLMService):
             model: str,
             api_key: str,
             messages: list[Message],
+            response_schema: dict[str, object] | None = None,
             extra_params: dict[str, float | int | bool | str] | None = None
     ) -> Message:
         return await collect_streamed(
@@ -51,5 +54,6 @@ class OpenAILLMService(ILLMService):
             model=model,
             api_key=api_key,
             messages=messages,
+            response_schema=response_schema,
             extra_params=extra_params
         )
