@@ -122,19 +122,23 @@ export const actions = {
 
   update: async (event) => {
     const formData = await event.request.formData()
-    console.log(formData)
     const assistantId = formData.get('assistant_id') as string
     const avatar = formData.get('avatar') as File
+    const shouldDeleteAvatar = formData.get('delete_avatar') === 'true'
 
     try {
       const updateData = await getAssistantFormValues(formData)
       await updateAssistant(assistantId, updateData, event)
 
+      // Only process avatar changes if there's a new file or explicit deletion request
       if (avatar && avatar.size > 0) {
+        // User uploaded a new avatar
         await updateAssistantAvatar(assistantId, avatar, event)
-      } else {
+      } else if (shouldDeleteAvatar) {
+        // User explicitly clicked the delete button
         await deleteAssistantAvatar(assistantId, event)
       }
+      // Otherwise, keep the existing avatar unchanged
     } catch (error) {
       return handleApiError(error)
     }

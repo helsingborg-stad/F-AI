@@ -21,7 +21,8 @@
 
   let selectedColor = $state(primaryColor && primaryColor !== '' ? primaryColor : colors[Math.floor(Math.random() * (colors.length - 1)) + 1])
   let enableImagePlaceholder = $state(!avatarBase64)
-  let imagePreviewUrl = $state(`data:image/png;base64,${avatarBase64}`)
+  let imagePreviewUrl = $state(avatarBase64 ? `data:image/png;base64,${avatarBase64}` : '')
+  let deleteAvatar = $state(false)
   let fileInput: HTMLInputElement
 
   function selectColor(color: string) {
@@ -34,15 +35,17 @@
     if (fileInput.files && fileInput.files[0]) {
       imagePreviewUrl = URL.createObjectURL(fileInput.files[0])
       enableImagePlaceholder = false
+      deleteAvatar = false
     } else {
-      imagePreviewUrl = ''
-      enableImagePlaceholder = true
+      imagePreviewUrl = avatarBase64 ? `data:image/png;base64,${avatarBase64}` : ''
+      enableImagePlaceholder = !avatarBase64
     }
   }
 
   function resetAvatar() {
     imagePreviewUrl = ''
     enableImagePlaceholder = true
+    deleteAvatar = true // Mark for deletion
 
     if (fileInput) {
       fileInput.value = ''
@@ -92,6 +95,12 @@
         type="hidden"
         name="primary_color"
         value={selectedColor}
+      >
+      <!-- Hidden field to track avatar deletion -->
+      <input
+        type="hidden"
+        name="delete_avatar"
+        value={deleteAvatar ? 'true' : 'false'}
       >
       <div class="flex mt-3 ml-1">
         {#each colors as color, i}
