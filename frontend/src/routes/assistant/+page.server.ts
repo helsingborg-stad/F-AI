@@ -130,15 +130,11 @@ export const actions = {
       const updateData = await getAssistantFormValues(formData)
       await updateAssistant(assistantId, updateData, event)
 
-      // Only process avatar changes if there's a new file or explicit deletion request
       if (avatar && avatar.size > 0) {
-        // User uploaded a new avatar
         await updateAssistantAvatar(assistantId, avatar, event)
       } else if (shouldDeleteAvatar) {
-        // User explicitly clicked the delete button
         await deleteAssistantAvatar(assistantId, event)
       }
-      // Otherwise, keep the existing avatar unchanged
     } catch (error) {
       return handleApiError(error)
     }

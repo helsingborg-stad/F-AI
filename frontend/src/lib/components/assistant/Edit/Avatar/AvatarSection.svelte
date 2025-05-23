@@ -45,7 +45,7 @@
   function resetAvatar() {
     imagePreviewUrl = ''
     enableImagePlaceholder = true
-    deleteAvatar = true // Mark for deletion
+    deleteAvatar = true
 
     if (fileInput) {
       fileInput.value = ''
@@ -96,7 +96,6 @@
         name="primary_color"
         value={selectedColor}
       >
-      <!-- Hidden field to track avatar deletion -->
       <input
         type="hidden"
         name="delete_avatar"
