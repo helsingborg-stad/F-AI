@@ -8,6 +8,7 @@
   let { avatarBase64, altImagePlaceholder, primaryColor }: Props = $props()
 
   const colors = [
+    'transparent',
     '#e28a8a',
     '#d88bb8',
     '#b18be0',
@@ -18,7 +19,7 @@
     '#e0bd91',
   ]
 
-  let selectedColor = $state(primaryColor !== '' ?  primaryColor : colors[Math.floor(Math.random() * colors.length)])
+  let selectedColor = $state(primaryColor && primaryColor !== '' ? primaryColor : colors[Math.floor(Math.random() * (colors.length - 1)) + 1])
   let enableImagePlaceholder = $state(!avatarBase64)
   let imagePreviewUrl = $state(`data:image/png;base64,${avatarBase64}`)
   let fileInput: HTMLInputElement
@@ -57,7 +58,7 @@
         style="background-color: {selectedColor};"
       >
         {#if enableImagePlaceholder}
-          <span class="text-3xl text-white">{altImagePlaceholder.charAt(0)}</span>
+          <span class="text-3xl {selectedColor === 'transparent' ? 'text-gray-600' : 'text-white'}">{altImagePlaceholder.charAt(0)}</span>
         {:else}
           <img
             src={imagePreviewUrl}
@@ -96,15 +97,21 @@
         {#each colors as color, i}
           <button
             type="button"
-            class="w-10 h-10 rounded-full outline outline-white transition-all relative ml-[-8px] first:ml-0 cursor-pointer hover:z-10 hover:scale-110"
-            style="background-color: {color};
+            class="w-10 h-10 rounded-full outline outline-white transition-all relative ml-[-8px] first:ml-0 cursor-pointer hover:z-10 hover:scale-110 overflow-hidden"
+            style="{color === 'transparent' ?
+              'background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 5px, white 5px, white 10px);' :
+              `background-color: ${color};`}
                     {selectedColor === color ?
                       'border: 2px solid white; outline: 2px solid gold; z-index: 5;' :
                       ''}"
             onclick={() => selectColor(color)}
-            aria-label={`Select color ${i+1}`}
+            aria-label={`Select ${color === 'transparent' ? 'transparent' : `color ${i}`}`}
             aria-pressed={selectedColor === color}
-          ></button>
+          >
+            {#if color === 'transparent'}
+              <span class="sr-only">Transparent</span>
+            {/if}
+          </button>
         {/each}
       </div>
 
