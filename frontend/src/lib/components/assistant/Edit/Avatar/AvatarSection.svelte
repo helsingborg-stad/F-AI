@@ -18,7 +18,7 @@
     '#e0bd91',
   ]
 
-  let selectedColor = $state(avatarPrimaryColor === '' || colors[Math.floor(Math.random() * colors.length)])
+  let selectedColor = $state(avatarPrimaryColor !== '' ?  avatarPrimaryColor : colors[Math.floor(Math.random() * colors.length)])
   let enableImagePlaceholder = $state(!avatarBase64)
   let imagePreviewUrl = $state(`data:image/png;base64,${avatarBase64}`)
 
