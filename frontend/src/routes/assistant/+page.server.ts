@@ -24,6 +24,7 @@ import {
 } from '$lib/utils/collection.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
+  const id = formData.get('assistant_id') as string
   const modelKey = formData.get('model_key') as string
   const name = formData.get('name') as string
   const model = formData.get('model') as string
@@ -35,6 +36,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
   const primaryColor = formData.get('primary_color') as string
 
   return {
+    id: id,
     model_key: modelKey,
     name: name,
     model: model,
