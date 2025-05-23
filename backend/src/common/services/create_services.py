@@ -40,6 +40,10 @@ async def create_services() -> Services:
     assistant_service = AssistantServiceFactory(mongo_database=mongo_database, resource_service=resource_service).get()
     conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
     llm_factory = LLMServiceFactory(setting_service=settings_service)
+    collection_service = CollectionServiceFactory(
+        mongo_database=mongo_database,
+        vector_service=vector_service,
+        chunker_factory=document_chunker_factory).get()
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
@@ -57,10 +61,7 @@ async def create_services() -> Services:
         llm_factory=llm_factory,
         document_chunker_factory=document_chunker_factory,
         vector_service=vector_service,
-        collection_service=CollectionServiceFactory(
-            mongo_database=mongo_database,
-            vector_service=vector_service,
-            chunker_factory=document_chunker_factory).get(),
+        collection_service=collection_service,
         notification_service=notification_service,
         login_service=await LoginServiceFactory(
             mongo_database=mongo_database,
@@ -76,6 +77,7 @@ async def create_services() -> Services:
             llm_factory=llm_factory,
             assistant_service=assistant_service,
             conversation_service=conversation_service,
+            collection_service=collection_service,
         ).get(),
         message_store_service=await MessageStoreServiceFactory(mongo_database=mongo_database).get(),
         token_factory=TokenServiceFactory(assistant_service=assistant_service,

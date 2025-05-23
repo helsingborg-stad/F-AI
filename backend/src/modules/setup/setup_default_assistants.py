@@ -1,6 +1,7 @@
 import os
 
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
+from src.modules.assistants.reserved_ids import RAG_SCORING_ID
 
 
 async def setup_default_assistants(assistant_service: IAssistantService):
@@ -9,6 +10,28 @@ async def setup_default_assistants(assistant_service: IAssistantService):
 
     if len(existing) > 0:
         return
+
+    aid = await assistant_service.create_assistant(as_uid=uid, force_id=RAG_SCORING_ID)
+    await assistant_service.update_assistant(
+        as_uid=uid,
+        assistant_id=aid,
+        is_public=False,
+        model='openai:gpt-4o',
+        name='RAG scoring',
+        description='Used internally for RAG scoring. Do not delete. Edit at own risk.',
+        instructions='You are a scoring systems that classifies documents from 0-100 based on how well they answer a query.',
+        response_schema={
+            "name": "score_schema",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {"score": {"type": "number"}},
+                "required": ["score"],
+                "additionalProperties": False
+            },
+        },
+        extra_llm_params={'temperature': 0}
+    )
 
     aid = await assistant_service.create_assistant(as_uid=uid)
     await assistant_service.update_assistant(
