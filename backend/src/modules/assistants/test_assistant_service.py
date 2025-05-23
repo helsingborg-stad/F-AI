@@ -32,6 +32,14 @@ class BaseAssistantServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
+    async def test_create_assistant_force_id(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john', force_id='deadbeefbaadf00dcafe1234')
+
+        assert aid == 'deadbeefbaadf00dcafe1234'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_important_defaults(service: IAssistantService):
         aid = await service.create_assistant(as_uid='john')
 
