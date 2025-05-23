@@ -50,16 +50,16 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./fai-rag-app/
+          context: ./
           platforms: linux/amd64
-          file: ./fai-rag-app/Dockerfile.base
+          file: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           no-cache: false
           build-args: GITHUB_ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy container to Jelastic
-        run: |
-          curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
-        shell: bash
+      # - name: Deploy container to Jelastic
+      #   run: |
+      #     curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
+      #   shell: bash
