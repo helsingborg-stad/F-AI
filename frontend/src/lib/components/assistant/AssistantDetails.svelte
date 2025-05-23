@@ -86,7 +86,7 @@
       <AvatarSection
         avatarBase64={assistant.avatarBase64}
         altImagePlaceholder={assistantName.charAt(0)}
-        avatarPrimaryColor={assistant.primaryColor}
+        primaryColor={assistant.primaryColor}
       />
 
       <label class="form-control w-full">

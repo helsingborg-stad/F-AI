@@ -2,10 +2,10 @@
   interface Props {
     avatarBase64: string
     altImagePlaceholder: string
-    avatarPrimaryColor: string
+    primaryColor: string
   }
 
-  let { avatarBase64, altImagePlaceholder, avatarPrimaryColor }: Props = $props()
+  let { avatarBase64, altImagePlaceholder, primaryColor }: Props = $props()
 
   const colors = [
     '#e28a8a',
@@ -18,7 +18,7 @@
     '#e0bd91',
   ]
 
-  let selectedColor = $state(avatarPrimaryColor !== '' ?  avatarPrimaryColor : colors[Math.floor(Math.random() * colors.length)])
+  let selectedColor = $state(primaryColor !== '' ?  primaryColor : colors[Math.floor(Math.random() * colors.length)])
   let enableImagePlaceholder = $state(!avatarBase64)
   let imagePreviewUrl = $state(`data:image/png;base64,${avatarBase64}`)
 
