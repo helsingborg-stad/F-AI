@@ -359,6 +359,8 @@ class BaseAssistantServiceTestClass:
             llm_api_key='g',
             instructions='h',
             collection_id='i',
+            response_schema={"name": "my_schema",
+                             "schema": {"type": "object", "properties": {"foo": {"type": "number"}}}},
             extra_llm_params={
                 'some_float': 3.1415,
                 'some_int': 1337,
@@ -381,6 +383,8 @@ class BaseAssistantServiceTestClass:
         assert result.meta.is_public is True
         assert result.model == 'f'
         assert result.instructions == 'h'
+        assert result.response_schema == {"name": "my_schema",
+                                          "schema": {"type": "object", "properties": {"foo": {"type": "number"}}}}
         assert result.extra_llm_params['some_float'] == 3.1415
         assert result.extra_llm_params['some_int'] == 1337
         assert result.extra_llm_params['some_bool'] is True

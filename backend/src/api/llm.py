@@ -22,6 +22,7 @@ class RunRequest(BaseModel):
     ])
     api_key: str | None = Field(default=None, examples=['my-api-key'])
     extra_params: dict[str, float | int | bool | str] | None = Field(default=None, examples=[{'temperature': 0.5}])
+    response_schema: dict[str, object] | None = None
 
 
 class RunResponse(BaseModel):
@@ -48,6 +49,7 @@ async def run(request: RunRequest, services: ServicesDependency):
                 for message in request.messages
             ],
             api_key=request.api_key if request.api_key else "",
+            response_schema=request.response_schema,
             extra_params=request.extra_params if request.extra_params else {}
         )
         return RunResponse(role=message.role, content=message.content)
