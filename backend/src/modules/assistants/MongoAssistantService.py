@@ -19,9 +19,12 @@ class MongoAssistantService(IAssistantService):
         self._database = database
         self._resource_service = resource_service
 
-    async def create_assistant(self, as_uid: str) -> str:
+    async def create_assistant(self, as_uid: str, force_id: str | None = None) -> str:
+        if force_id and await self._database['assistants'].find_one({'_id': ObjectId(force_id)}) is not None:
+            return force_id
+
         assistant = Assistant(
-            id=str(ObjectId()),
+            id=force_id if force_id else str(ObjectId()),
             owner=as_uid,
             meta=AssistantMeta(name='', description='', avatar_base64='', sample_questions=[], allow_files=False,
                                is_public=False, primary_color='#ffffff'),
