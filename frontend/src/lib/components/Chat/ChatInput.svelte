@@ -7,9 +7,11 @@
     onSubmit: () => void
     children: Snippet
     disabled: boolean
+    receivingMessage: boolean
+    onStopChat: () => void
   }
 
-  let { placeholder, value = $bindable(), onSubmit, children, disabled }: Props = $props()
+  let { placeholder, value = $bindable(), onSubmit, children, disabled, receivingMessage, onStopChat }: Props = $props()
 
   let disableSend = $derived.by(() => {
     return disabled || value === ''
@@ -96,9 +98,13 @@
       {@render children()}
     </div>
     <div class="flex-shrink-0">
-      <div class={disableSend ? "tooltip" : ""} data-tip={value === '' ? 'Message is empty' : 'Select assistant'}>
-        <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}>Send</button>
-      </div>
+      {#if !receivingMessage}
+        <div class={disableSend ? "tooltip" : ""} data-tip={value === '' ? 'Message is empty' : 'Select assistant'}>
+          <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}>Send</button>
+        </div>
+      {:else }
+        <button class="btn btn-sm" onclick={onStopChat}>Abort</button>
+      {/if}
     </div>
   </div>
 </div>

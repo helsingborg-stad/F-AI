@@ -22,6 +22,8 @@
     conversationId: string
     onDeleteConversation: (id: string) => void
     onStartNewChat: () => void
+    chatStateIdle: boolean
+    onStopChat: () => void
   }
 
   let {
@@ -35,6 +37,8 @@
     conversationId,
     onDeleteConversation,
     onStartNewChat,
+    chatStateIdle,
+    onStopChat,
   }: Props = $props()
 </script>
 
@@ -71,6 +75,8 @@
         messages={messages}
         inputPlaceholder={inputPlaceholder}
         {onSubmitMessage}
+        {chatStateIdle}
+        {onStopChat}
       />
     </main>
   </div>

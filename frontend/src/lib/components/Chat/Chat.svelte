@@ -20,9 +20,11 @@
     messages: Message[],
     inputPlaceholder: string,
     onSubmitMessage: (message: string) => void
+    chatStateIdle: boolean,
+    onStopChat: () => void,
   }
 
-  let { assistants, selectedAssistantId = $bindable(), messages, inputPlaceholder, onSubmitMessage }: Props = $props()
+  let { assistants, selectedAssistantId = $bindable(), messages, inputPlaceholder, onSubmitMessage, chatStateIdle, onStopChat }: Props = $props()
 
   let scrollContainer: HTMLDivElement = undefined as unknown as HTMLDivElement
 
@@ -89,6 +91,8 @@
         bind:value={chatInput}
         onSubmit={onHandleSubmit}
         disabled={selectedAssistantId === ''}
+        receivingMessage={!chatStateIdle}
+        {onStopChat}
       >
         <ActionButtons {assistants} bind:selectedAssistantId {disableAssistantPicker} />
       </ChatInput>
