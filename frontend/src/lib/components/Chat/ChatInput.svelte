@@ -40,6 +40,8 @@
   }
 
   function handleDivClick(e: MouseEvent | TouchEvent) {
+    if (receivingMessage) return
+
     if (e.currentTarget === e.target) {
       textareaElement.focus()
     }
@@ -53,6 +55,8 @@
   }
 
   function handleTextareaKeyDown(e: KeyboardEvent) {
+    if (receivingMessage) return
+
     if (e.key === 'Enter') {
       if (e.shiftKey) {
         return
