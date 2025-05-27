@@ -75,7 +75,7 @@
   })
 </script>
 
-<div class="flex flex-col rounded-2xl p-3 gap-2 w-[60rem]">
+<div class="flex flex-col rounded-2xl p-3 gap-2">
   <div>
       <textarea
         bind:this={textareaElement}
