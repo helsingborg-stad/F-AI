@@ -85,7 +85,7 @@
         <Icon icon={icons.scroll} />
       </button>
     </div>
-    <div class="relative rounded-2xl border bg-white z-10 w-[60rem] mx-auto">
+    <div class="relative rounded-2xl border bg-white z-10 max-w-[60rem] mx-auto">
       <ChatInput
         placeholder={inputPlaceholder}
         bind:value={chatInput}
