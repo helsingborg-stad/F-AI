@@ -2,7 +2,7 @@
   import ChatLayout from '$lib/layouts/ChatLayout.svelte'
   import { page } from '$app/state'
   import { goto, invalidateAll } from '$app/navigation'
-  import { type RealtimeChatMessage, sendChatMessage } from '$lib/chat/chat.js'
+  import { type ChatController, type RealtimeChatMessage, sendChatMessage } from '$lib/chat/chat.js'
   import dayjs from 'dayjs'
   import type { LayoutData } from './$types.js'
 
@@ -13,6 +13,8 @@
   const { data }: Props = $props()
 
   let selectedAssistantId = $state('')
+  let currentChatController = $state<ChatController | null>(null)
+  let chatStateIdle = $state(true)
 
   function startNewChat() {
     goto(`/chat/`, {
@@ -45,7 +47,10 @@
   })
 
   async function sendMessage(message: string) {
-    const onAddMessage = (message: RealtimeChatMessage) => messages = [...messages, { timestamp: dayjs().toISOString(), ...message }]
+    const onAddMessage = (message: RealtimeChatMessage) => {
+      chatStateIdle = false
+      messages = [...messages, { timestamp: dayjs().toISOString(), ...message }]
+    }
 
     const onUpdateLastMessage = (message: RealtimeChatMessage) => messages = [
       ...messages.slice(0, messages.length - 1),
@@ -69,9 +74,32 @@
 
     const onError = (error: string) => {
       onUpdateLastMessage({ source: 'error', message: error })
+      currentChatController = null
+      chatStateIdle = true
     }
 
-    await sendChatMessage(message, selectedAssistantId, conversationId, onAddMessage, onUpdateLastMessage, onGoto, onError)
+    const onMessageEnd = () => {
+      chatStateIdle = true
+    }
+
+    currentChatController = await sendChatMessage(
+      message,
+      selectedAssistantId,
+      conversationId,
+      onAddMessage,
+      onUpdateLastMessage,
+      onGoto,
+      onError,
+      onMessageEnd,
+    )
+  }
+
+  function stopChat() {
+    if (currentChatController) {
+      currentChatController.close()
+      currentChatController = null
+      chatStateIdle = true
+    }
   }
 
   function deleteConversation(id: string) {
@@ -101,5 +129,7 @@
   {conversationId}
   onDeleteConversation={deleteConversation}
   onStartNewChat={startNewChat}
+  onStopChat={stopChat}
+  {chatStateIdle}
 >
 </ChatLayout>

@@ -1,11 +1,13 @@
 export interface RealtimeChatMessage {
-  source: string,
-  message: string,
+  source: string
+  message: string
 }
 
 export interface ChatController {
-  close: () => void,
+  close: () => void
 }
+
+let requestClose = false
 
 export async function sendChatMessage(
   message: string,
@@ -14,7 +16,10 @@ export async function sendChatMessage(
   onAddMessage: (message: RealtimeChatMessage) => void,
   onUpdateLastMessage: (message: RealtimeChatMessage) => void,
   onGoto: (url: string) => void,
-  onError: (error: string) => void): Promise<ChatController | null> {
+  onError: (error: string) => void,
+  onMessageEnd: () => void,
+): Promise<ChatController | null> {
+  requestClose = false
 
   onAddMessage({ source: 'user', message: message })
   onAddMessage({ source: 'assistant', message: '...' })
@@ -27,7 +32,9 @@ export async function sendChatMessage(
 
   if (!storeMessageResponse.ok) {
     console.error('Error storing message', storeMessageResponse)
-    onError(`Error storing message (${storeMessageResponse.status}). Try again or contact support.`)
+    onError(
+      `Error storing message (${storeMessageResponse.status}). Try again or contact support.`,
+    )
     return null
   }
 
@@ -55,6 +62,11 @@ export async function sendChatMessage(
     accumulatedResponseMessage += message
     console.log('es message', e, accumulatedResponseMessage)
     onUpdateLastMessage({ source, message: accumulatedResponseMessage })
+
+    if (requestClose) {
+      es.close()
+      requestClose = false
+    }
   })
   es.addEventListener('chat.error', (e) => {
     console.error('es message error', e)
@@ -65,12 +77,13 @@ export async function sendChatMessage(
   es.addEventListener('chat.message_end', (e) => {
     console.log('es message end', e)
     es.close()
+    onMessageEnd()
   })
 
   return {
     close: () => {
-      console.log('es closing chat connection')
-      es.close()
-    }
+      console.log('es request close')
+      requestClose = true
+    },
   }
 }
