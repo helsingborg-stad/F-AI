@@ -78,3 +78,4 @@ jobs:
           JELASTIC_TAG: ${{ github.event.release.tag_name }}
           DOCKER_CONTEXT: ${{ vars.FRONTEND_DOCKER_CONTEXT }}
           DOCKER_FILE_PATH: ${{ vars.FRONTEND_DOCKER_FILE_PATH }}
+          DOCKER_META_PREFIX: frontend
