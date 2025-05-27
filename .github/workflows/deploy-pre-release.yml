@@ -63,3 +63,18 @@ jobs:
         run: |
           curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
         shell: bash
+  build-frontend:
+     runs-on: codebuild-f-ai-builder-${{ github.run_id }}-${{ github.run_attempt }}-ubuntu-7.0-medium
+     steps:
+       - name: Checkout code
+         uses: actions/checkout@v3
+
+       - name: Build & Deploy to Elastx
+         uses: helsingborg-stad/build-deploy-elastx/1.0@main
+         with:
+          JELASTIC_API_KEY: ${{ secrets.JELASTIC_API_KEY }}
+          JELASTIC_NODE_ID: ${{ secrets.FRONTEND_JELASTIC_NODE_ID_PRE_RELEASE }}
+          JELASTIC_ENV_NAME: ${{ secrets.FRONTEND_JELASTIC_ENV_NAME_PRE_RELEASE }}
+          JELASTIC_TAG: ${{ github.event.release.tag_name }}
+          DOCKER_CONTEXT: ${{ vars.FRONTEND_DOCKER_CONTEXT }}
+          DOCKER_FILE_PATH: ${{ vars.FRONTEND_DOCKER_FILE_PATH }}

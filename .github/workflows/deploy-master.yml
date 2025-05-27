@@ -24,3 +24,18 @@ jobs:
           JELASTIC_TAG: ${{ github.event.release.tag_name }}
           DOCKER_CONTEXT: ${{ vars.DOCKER_CONTEXT }}
           DOCKER_FILE_PATH: ${{ vars.DOCKER_FILE_PATH }}
+  build-frontend:
+    runs-on: codebuild-f-ai-builder-${{ github.run_id }}-${{ github.run_attempt }}-ubuntu-7.0-medium
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build & Deploy to Elastx
+        uses: helsingborg-stad/build-deploy-elastx/1.0@main
+        with:
+        JELASTIC_API_KEY: ${{ secrets.JELASTIC_API_KEY }}
+        JELASTIC_NODE_ID: ${{ secrets.FRONTEND_JELASTIC_NODE_ID }}
+        JELASTIC_ENV_NAME: ${{ secrets.FRONTEND_JELASTIC_ENV_NAME }}
+        JELASTIC_TAG: ${{ github.event.release.tag_name }}
+        DOCKER_CONTEXT: ${{ vars.FRONTEND_DOCKER_CONTEXT }}
+        DOCKER_FILE_PATH: ${{ vars.FRONTEND_DOCKER_FILE_PATH }}
