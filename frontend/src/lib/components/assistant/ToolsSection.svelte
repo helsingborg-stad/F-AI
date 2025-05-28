@@ -16,6 +16,8 @@
 
   let { canEdit, assistantId, collectionId, collection }: Props = $props()
   let fileModal: FileUploadModal
+  let currentCollectionId = $state(collectionId)
+  let currentFiles = $state(collection?.files || [])
 
   function openFilesModal() {
     if (fileModal) fileModal.showModal()
@@ -36,7 +38,7 @@
         <span class="loading loading-spinner loading-xs"></span>
       {/if}
       {#if !attachingFiles && collectionId}
-        <span class="text-xs">Attached vector store {collectionId}</span>
+        <span class="text-xs">Attached vector store {currentCollectionId}</span>
       {/if}
     </div>
     <div>
@@ -53,7 +55,7 @@
     <div class="overflow-x-auto">
       <table class="table table-xs">
         <tbody>
-        {#each collection?.files || [] as file}
+        {#each currentFiles as file}
           <tr>
             <td>{file.name}</td>
           </tr>
@@ -79,4 +81,9 @@
   </div>
 </Section>
 
-<FileUploadModal bind:this={fileModal} {assistantId} bind:uploadingFiles={attachingFiles} />
+<FileUploadModal
+  bind:this={fileModal} {assistantId}
+  bind:uploadingFiles={attachingFiles}
+  bind:collectionId={currentCollectionId}
+  bind:files={currentFiles}
+/>
