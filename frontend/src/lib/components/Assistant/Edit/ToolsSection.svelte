@@ -4,7 +4,7 @@
   import InfoTooltip from '$lib/components/InfoTooltip/InfoTooltip.svelte'
   import Section from '$lib/components/Form/Section.svelte'
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
-  import FileUploadModal from '$lib/components/assistant/FileUploadModal.svelte'
+  import FileUploadModal from '$lib/components/assistant/Edit/FileUploadModal.svelte'
   import type { ICollection } from '$lib/types.js'
 
   interface Props {
