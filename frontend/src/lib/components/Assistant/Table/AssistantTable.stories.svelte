@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import AssistantTable from '$lib/components/assistant/AssistantTable.svelte'
+  import AssistantTable from '$lib/components/Assistant/Table/AssistantTable.svelte'
   import { mockAssistants } from '$lib/mock/assistants.js'
 
   const { Story } = defineMeta({
