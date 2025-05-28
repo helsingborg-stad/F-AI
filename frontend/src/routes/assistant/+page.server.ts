@@ -182,12 +182,16 @@ export const actions = {
   uploadFiles: async (event) => {
     const formData = await event.request.formData()
     const assistantId = formData.get('assistant_id') as string
+    const files = formData.getAll('files') as File[]
+    const label = formData.get('collection') as string || 'collection'
+    const embeddingModel = formData.get('embedding_model') as string || 'default'
+    const urls = ['']
     let collectionId = ''
 
     try {
       const body = {
-        label: 'collection',
-        embedding_model: 'default',
+        label: label,
+        embedding_model: embeddingModel,
       }
 
       const collectionResponse = await createCollection(event, body)
@@ -196,7 +200,6 @@ export const actions = {
       return handleApiError(error)
     }
 
-    const files = formData.getAll('files') as File[]
     try {
       await replaceContextCollection(event, collectionId, files)
     } catch (error) {
@@ -210,6 +213,22 @@ export const actions = {
       return handleApiError(error)
     }
 
-    redirect(303, `/assistant?assistant_id=${assistantId}`)
+    const fileMetadata = files.map((file) => ({
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    }))
+
+    const collection: ICollection = {
+      id: collectionId,
+      label: label,
+      files: fileMetadata,
+      urls: urls,
+      embedding_model: embeddingModel,
+    }
+
+    return {
+      collection,
+    }
   },
 }
