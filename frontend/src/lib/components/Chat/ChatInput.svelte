@@ -87,6 +87,7 @@
         bind:value
         {placeholder}
         class="textarea w-full px-1 resize-none focus:outline-none border-none min-h-[20px] max-h-40 overflow-y-hidden"
+        disabled={disabled}
         oninput={autoResize}
         onkeydown={handleTextareaKeyDown}
       ></textarea>
