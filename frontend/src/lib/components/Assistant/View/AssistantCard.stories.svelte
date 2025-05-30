@@ -12,5 +12,5 @@
 
 <Story
   name="Default"
-  args={mockAssistantCards[0]}
+  args={{...mockAssistantCards[0]}}
 />

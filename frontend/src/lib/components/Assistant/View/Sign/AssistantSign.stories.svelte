@@ -1,6 +1,7 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import AssistantSign from '$lib/components/Assistant/View/AssistantSign.svelte'
+  import AssistantSign from '$lib/components/Assistant/View/Sign/AssistantSign.svelte'
+  import { mockAssistantCards } from '$lib/components/Assistant/View/storiesMockData.js'
 
   const { Story } = defineMeta({
     title: 'Components/Assistant/View/AssistantSign',
@@ -9,4 +10,6 @@
   })
 </script>
 
-<Story name="Default" />
+<Story name="Default" args={{
+  ...mockAssistantCards[0],
+}} />
