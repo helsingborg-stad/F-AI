@@ -22,7 +22,7 @@
           <span class="text-s">Assistant Zoo</span>
         </button>
         <button type="button" class="btn btn-sm {isActive('/edit') ? 'btn-neutral' : 'btn-ghost'}"
-                onclick={() => goto('/assistant')}>
+                onclick={() => goto('/assistant/edit')}>
           <span class="text-s">Your assistants</span>
         </button>
       </div>
