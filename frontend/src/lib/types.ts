@@ -80,6 +80,18 @@ export interface IAssistants {
   assistants: IAssistant[]
 }
 
+export interface IAssistantCard {
+  avatar: string
+  title: string
+  description: string
+}
+
+export interface IExhibit {
+  title: string
+  description: string
+  cards: IAssistantCard[]
+}
+
 export interface IApiSettings {
   fixedOptCode?: string
   openAiApiKey?: string
