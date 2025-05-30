@@ -84,6 +84,10 @@ export interface IAssistantCard {
   avatar: string
   title: string
   description: string
+  owner: string
+  category: string
+  starters: string[]
+  conversationCount: string
 }
 
 export interface IExhibit {
