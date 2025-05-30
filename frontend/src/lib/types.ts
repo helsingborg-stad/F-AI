@@ -62,6 +62,7 @@ export interface IBackendAssistant {
   collection_id: string
   avatar_base64: string
   primary_color: string
+  sample_questions: string[]
 }
 
 export interface IAssistant {
