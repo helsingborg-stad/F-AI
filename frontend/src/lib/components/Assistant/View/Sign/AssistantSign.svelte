@@ -61,20 +61,22 @@
       </div>
 
       <!--      Conversation starters-->
-      <div class="flex flex-col">
-        <div class="font-bold mt-6">
-          Conversation starters
-        </div>
-        <div class="mt-4 grid grid-cols-2 grid-x-1.5 gap-y-2">
-          {#each starters as starter}
-            <div class="chat chat-end">
-              <div class="chat-bubble">
-                {starter}
+      {#if starters}
+        <div class="flex flex-col">
+          <div class="font-bold mt-6">
+            Conversation starters
+          </div>
+          <div class="mt-4 grid grid-cols-2 grid-x-1.5 gap-y-2">
+            {#each starters as starter}
+              <div class="chat chat-end">
+                <div class="chat-bubble">
+                  {starter}
+                </div>
               </div>
-            </div>
-          {/each}
+            {/each}
+          </div>
         </div>
-      </div>
+      {/if}
 
       <!--      Ratings-->
       <div class="flex flex-col">
