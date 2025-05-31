@@ -24,9 +24,12 @@
 
       <div class="flex h-full flex-col items-center">
         <div class="avatar relative mb-3">
-          <div class="w-24 rounded-full">
-            <img src={avatar} alt="avatar" />
-          </div>
+          <img
+            src={avatar}
+            alt="avatar"
+            class="block"
+            style="max-width: 128px; max-height: 188px; width: auto; height: auto;"
+          />
         </div>
         <div class="flex flex-col items-center gap-2">
           <div class="text-center text-2xl font-semibold">
