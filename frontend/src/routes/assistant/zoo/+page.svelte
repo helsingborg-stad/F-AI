@@ -6,7 +6,7 @@
   const { exhibits } = data
 </script>
 
-<div class="w-full mx-auto max-w-3xl p-4">
+<div class="w-full mx-auto max-w-3xl p-4 mb-32">
   <div class="mb-6">
     <div class="my-2 text-center text-3xl font-bold md:my-4 md:text-5xl">
       Assistant Zoo
