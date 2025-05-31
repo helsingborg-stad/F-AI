@@ -32,7 +32,7 @@
       alt="avatar" />
   </figure>
   <div class="card-body">
-    <h2 class="card-title">{title}</h2>
+    <div class="card-title font-semibold md:text-lg">{title}</div>
     <p>{description}</p>
   </div>
 </div>
