@@ -2,7 +2,7 @@
   import type { IAssistantCard } from '$lib/types.js'
   import AssistantSign from '$lib/components/Assistant/View/Sign/AssistantSign.svelte'
 
-  let { avatar, title, description, owner, category, starters, conversationCount }: IAssistantCard = $props()
+  let { id, avatar, title, description, owner, category, starters, conversationCount }: IAssistantCard = $props()
   let dialog: HTMLDialogElement
 
   const height = 'h-24'
@@ -39,7 +39,7 @@
 
 <dialog bind:this={dialog} class="modal">
     <div class="modal-box w-11/12 max-w-3xl">
-    <AssistantSign {avatar} {title} {owner} {description} {category} {starters} {conversationCount} />
+    <AssistantSign {id} {avatar} {title} {owner} {description} {category} {starters} {conversationCount} />
   </div>
   <form method="dialog" class="modal-backdrop">
     <button>close</button>

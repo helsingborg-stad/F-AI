@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { goto } from '$app/navigation'
+
   interface Props {
+    id: string
     avatar: string
     title: string
     owner: string
@@ -9,7 +12,11 @@
     starters: string[]
   }
 
-  let { avatar, title, owner, description, category, conversationCount, starters }: Props = $props()
+  let { id, avatar, title, owner, description, category, conversationCount, starters }: Props = $props()
+
+  function chatWithAssistant() {
+    goto(`/chat/?assistant_id=${id}`)
+  }
 </script>
 
 <div class="grow overflow-y-auto">
@@ -18,7 +25,9 @@
 
       <div class="absolute bottom-[64px]">
         <div class="fixed start-4 end-4 z-10 flex items-end px-2">
-          <button class="btn btn-neutral w-full ">Start chat</button>
+          <button class="btn btn-neutral w-full" onclick={() => {chatWithAssistant()}}>
+            Chat with assistant
+          </button>
         </div>
       </div>
 

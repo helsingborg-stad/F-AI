@@ -12,6 +12,7 @@
     <div class="grid grid-cols-1 gap-x-1.5 gap-y-1 lg:grid-cols-2 lg:gap-x-3 lg:gap-y-2.5">
       {#each cards as card}
         <AssistantCard
+          id="{card.id}"
           avatar={card.avatar}
           title={card.title}
           description={card.description}

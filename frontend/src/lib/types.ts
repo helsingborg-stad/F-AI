@@ -82,6 +82,7 @@ export interface IAssistants {
 }
 
 export interface IAssistantCard {
+  id: string
   avatar: string
   title: string
   description: string
