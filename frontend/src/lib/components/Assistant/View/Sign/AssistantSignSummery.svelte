@@ -38,7 +38,7 @@
 </div>
 
 <dialog bind:this={dialog} class="modal">
-    <div class="modal-box w-11/12 max-w-3xl">
+    <div class="modal-box w-11/12 max-w-xl">
     <AssistantSign {id} {avatar} {title} {owner} {description} {category} {starters} {conversationCount} />
   </div>
   <form method="dialog" class="modal-backdrop">
