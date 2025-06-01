@@ -1,5 +1,5 @@
 <script lang="ts">
-  import AssistantCard from '$lib/components/Assistant/View/AssistantCard.svelte'
+  import AssistantSignSummery from '$lib/components/Assistant/View/Sign/AssistantSignSummery.svelte'
   import type { IExhibit } from '$lib/types.js'
 
   let { title, description, cards }: IExhibit = $props()
@@ -11,7 +11,7 @@
   <div class="mt-4 mb-10">
     <div class="grid grid-cols-1 gap-x-1.5 gap-y-1 lg:grid-cols-2 lg:gap-x-3 lg:gap-y-2.5">
       {#each cards as card}
-        <AssistantCard
+        <AssistantSignSummery
           id={card.id}
           avatar={card.avatar}
           title={card.title}
