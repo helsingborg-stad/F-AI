@@ -10,6 +10,7 @@ export const load: PageServerLoad = async (event) => {
 
   if (userCanListAssistants) {
     assistantCards = (await fetchAllAssistants(event)).map((assistant) => ({
+      id: assistant.id,
       avatar: `data:image/png;base64, ${assistant.avatar_base64}`,
       title: assistant.name,
       description: assistant.description,

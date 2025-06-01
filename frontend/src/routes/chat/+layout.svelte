@@ -116,6 +116,15 @@
       })
       .then(invalidateAll)
   }
+
+    const assistantIdFromQuery = $derived(page.url.searchParams.get('assistant_id'))
+    $effect(() => {
+    if (assistantIdFromQuery) {
+      selectedAssistantId = assistantIdFromQuery
+    } else if (data.conversationContext && data.conversationContext.assistantId) {
+      selectedAssistantId = data.conversationContext.assistantId
+    }
+  })
 </script>
 
 <ChatLayout
