@@ -65,6 +65,37 @@ async def get_available_models(services: ServicesDependency, auth_identity: Auth
     ])
 
 
+class GetMyAssistantsResponseAssistant(BaseModel):
+    id: str
+    name: str
+    description: str
+    avatar_base64: str | None
+    primary_color: str | None
+
+
+class GetMyAssistantsResponse(BaseModel):
+    assistants: list[GetMyAssistantsResponseAssistant]
+
+
+@auth.get(
+    '/me',
+    ['assistant.read'],
+    summary='Get My Assistants',
+    response_model=GetMyAssistantsResponse,
+)
+async def get_my_assistants(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    result = await services.assistant_service.get_owned_assistants(as_uid=auth_identity.uid)
+    return GetMyAssistantsResponse(assistants=[
+        GetMyAssistantsResponseAssistant(
+            id=assistant.id,
+            name=assistant.meta.name,
+            description=assistant.meta.description,
+            avatar_base64=assistant.meta.avatar_base64,
+            primary_color=assistant.meta.primary_color,
+        ) for assistant in result
+    ])
+
+
 class GetAssistantResponseAssistant(BaseModel):
     name: str
     description: str
