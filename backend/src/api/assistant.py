@@ -96,6 +96,94 @@ async def get_my_assistants(services: ServicesDependency, auth_identity: Authent
     ])
 
 
+class GetAvailableAssistantsResponseAssistant(BaseModel):
+    id: str
+    name: str
+    description: str
+    avatar_base64: str | None
+    primary_color: str | None
+
+
+class GetAvailableAssistantsResponse(BaseModel):
+    assistants: list[GetAvailableAssistantsResponseAssistant]
+
+
+@auth.get(
+    '',
+    ['assistant.read'],
+    summary='Get Available Assistants',
+    response_model=GetAvailableAssistantsResponse,
+)
+async def get_available_assistants(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    result = await services.assistant_service.get_available_assistants(as_uid=auth_identity.uid)
+    return GetAvailableAssistantsResponse(assistants=[
+        GetAvailableAssistantsResponseAssistant(
+            id=assistant.id,
+            name=assistant.name,
+            description=assistant.description,
+            avatar_base64=assistant.avatar_base64,
+            primary_color=assistant.primary_color,
+        ) for assistant in result
+    ])
+
+
+@auth.post(
+    '/me/favorite/{assistant_id}',
+    ['assistant.read'],
+    summary='Add favorite assistant'
+)
+async def add_favorite_assistant(assistant_id: str, services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    success = await services.assistant_service.set_assistant_as_favorite(as_uid=auth_identity.uid,
+                                                                         assistant_id=assistant_id)
+
+    if success is False:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+
+
+class GetFavoriteAssistantsResponseAssistant(BaseModel):
+    id: str
+    name: str
+    description: str
+    avatar_base64: str | None
+    primary_color: str | None
+
+
+class GetFavoriteAssistantsResponse(BaseModel):
+    assistants: list[GetFavoriteAssistantsResponseAssistant]
+
+
+@auth.get(
+    '/me/favorite',
+    summary='Get favorite assistants',
+    response_model=GetFavoriteAssistantsResponse
+)
+async def get_favorite_assistants(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
+    result = await services.assistant_service.get_favorite_assistants(as_uid=auth_identity.uid)
+    return GetFavoriteAssistantsResponse(
+        assistants=[GetFavoriteAssistantsResponseAssistant(
+            id=assistant.id,
+            name=assistant.name,
+            description=assistant.description,
+            avatar_base64=assistant.avatar_base64,
+            primary_color=assistant.primary_color,
+        ) for assistant in result]
+    )
+
+
+class RemoveFavoriteAssistantRequest(BaseModel):
+    assistant_id: str
+
+
+@auth.delete(
+    '/me/favorite/{assistant_id}',
+    summary='Remove favorite assistant',
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def remove_favorite_assistant(assistant_id: str, services: ServicesDependency,
+                                    auth_identity: AuthenticatedIdentity):
+    await services.assistant_service.remove_assistant_as_favorite(as_uid=auth_identity.uid, assistant_id=assistant_id)
+
+
 class GetAssistantResponseAssistant(BaseModel):
     name: str
     description: str
@@ -179,37 +267,6 @@ async def get_assistant_info(assistant_id: str, services: ServicesDependency, au
         sample_questions=result.sample_questions,
         model=result.model,
     )
-
-
-class GetAvailableAssistantsResponseAssistant(BaseModel):
-    id: str
-    name: str
-    description: str
-    avatar_base64: str | None
-    primary_color: str | None
-
-
-class GetAvailableAssistantsResponse(BaseModel):
-    assistants: list[GetAvailableAssistantsResponseAssistant]
-
-
-@auth.get(
-    '',
-    ['assistant.read'],
-    summary='Get Available Assistants',
-    response_model=GetAvailableAssistantsResponse,
-)
-async def get_available_assistants(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
-    result = await services.assistant_service.get_available_assistants(as_uid=auth_identity.uid)
-    return GetAvailableAssistantsResponse(assistants=[
-        GetAvailableAssistantsResponseAssistant(
-            id=assistant.id,
-            name=assistant.name,
-            description=assistant.description,
-            avatar_base64=assistant.avatar_base64,
-            primary_color=assistant.primary_color,
-        ) for assistant in result
-    ])
 
 
 class UpdateAssistantRequest(BaseModel):
