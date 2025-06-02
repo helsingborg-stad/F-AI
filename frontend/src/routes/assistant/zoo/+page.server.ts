@@ -15,9 +15,12 @@ export const load: PageServerLoad = async (event) => {
       title: assistant.name,
       description: assistant.description,
       owner: 'Helsingborg',
-      category: 'Demo',
       starters: assistant.sample_questions,
-      conversationCount: '<100'
+      metadata: {
+        category: 'Demo',
+        conversationCount: '<100',
+        likes: 0
+      }
     }))
   }
 
