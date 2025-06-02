@@ -17,9 +17,7 @@
           title={card.title}
           description={card.description}
           owner={card.owner}
-          category={card.category}
-          conversationCount={card.conversationCount}
-          starters={card.starters}
+          metadata={card.metadata}
         />
       {/each}
     </div>

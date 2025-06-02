@@ -87,9 +87,12 @@ export interface IAssistantCard {
   title: string
   description: string
   owner: string
-  category: string
   starters: string[]
-  conversationCount: string
+  metadata: {
+    category: string
+    conversationCount: string
+    likes: string
+  }
 }
 
 export interface IExhibit {

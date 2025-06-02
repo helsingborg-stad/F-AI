@@ -7,12 +7,15 @@
     title: string
     owner: string
     description: string
-    category: string
-    conversationCount: number
     starters: string[]
+    metadata: {
+      category: string
+      conversationCount: string
+      likes: string
+    }
   }
 
-  let { id, avatar, title, owner, description, category, conversationCount, starters }: Props = $props()
+  let { id, avatar, title, owner, description, starters, metadata }: Props = $props()
 
   function chatWithAssistant() {
     goto(`/chat/?assistant_id=${id}`)
@@ -62,11 +65,15 @@
         <div class="stats shadow">
           <div class="stat">
             <div class="stat-title">Category</div>
-            <div class="stat-value">{category}</div>
+            <div class="stat-value">{metadata.category}</div>
           </div>
           <div class="stat">
             <div class="stat-title">Conversations</div>
-            <div class="stat-value">{conversationCount}</div>
+            <div class="stat-value">{metadata.conversationCount}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Total Likes</div>
+            <div class="stat-value">{metadata.likes}</div>
           </div>
         </div>
       </div>
