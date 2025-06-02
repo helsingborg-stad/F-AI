@@ -5,9 +5,9 @@ from src.modules.assistants.protocols.IAssistantService import IAssistantService
 from src.modules.groups.protocols.IGroupService import IGroupService
 
 
-async def _create_mock_group(group_service: IGroupService, resource: str):
+async def _create_mock_group(group_service: IGroupService, resource: str, as_uid='john'):
     await group_service.create_group(
-        as_uid='john',
+        as_uid=as_uid,
         label='MOCK',
         members=['john', 'jane'],
         scopes=[],
@@ -164,6 +164,82 @@ class BaseAssistantServiceTestClass:
         assert aid2 in [a.id for a in result]
         assert next(a for a in result if a.id == aid2).owner == 'john'
         assert aid3 not in [a.id for a in result]
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_set_favorite(service: IAssistantService):
+        aid1 = await service.create_assistant(as_uid='john')
+        aid2 = await service.create_assistant(as_uid='john')
+        aid3 = await service.create_assistant(as_uid='jane')
+
+        result1 = await service.set_assistant_as_favorite(as_uid='john', assistant_id=aid1)
+        result2 = await service.get_favorite_assistants(as_uid='john')
+
+        assert result1 is True
+        assert len(result2) == 1
+        assert result2[0].id == aid1
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_set_favorite_non_private_only(service: IAssistantService, group_service: IGroupService):
+        aid1 = await service.create_assistant(as_uid='jane')
+        aid2 = await service.create_assistant(as_uid='jane')
+        aid3 = await service.create_assistant(as_uid='jane')
+        aid4 = await service.create_assistant(as_uid='jane')
+
+        await service.update_assistant(as_uid='jane', assistant_id=aid1, is_public=True)
+        await service.update_assistant(as_uid='jane', assistant_id=aid3, is_public=True)
+        await _create_mock_group(group_service, aid4, as_uid='jane')
+
+        result1 = await service.set_assistant_as_favorite(as_uid='john', assistant_id=aid1)
+        result2 = await service.set_assistant_as_favorite(as_uid='john', assistant_id=aid2)
+        result3 = await service.set_assistant_as_favorite(as_uid='john', assistant_id=aid3)
+        result4 = await service.set_assistant_as_favorite(as_uid='john', assistant_id=aid4)
+
+        await service.update_assistant(as_uid='jane', assistant_id=aid3, is_public=False)
+
+        result = await service.get_favorite_assistants(as_uid='john')
+
+        assert result1 is True  # is public
+        assert result2 is False  # was never public
+        assert result3 is True  # was public at the time
+        assert result4 is True  # shared via group
+
+        assert len(result) == 2
+        assert result[0].id == aid1
+        assert result[1].id == aid4
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_set_favorite_twice(service: IAssistantService):
+        aid1 = await service.create_assistant(as_uid='john')
+
+        await service.set_assistant_as_favorite(as_uid='john', assistant_id=aid1)
+        await service.set_assistant_as_favorite(as_uid='john', assistant_id=aid1)
+
+        result = await service.get_favorite_assistants(as_uid='john')
+
+        assert len(result) == 1
+        assert result[0].id == aid1
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_remove_favorite(service: IAssistantService):
+        aid1 = await service.create_assistant(as_uid='john')
+        aid2 = await service.create_assistant(as_uid='john')
+
+        await service.set_assistant_as_favorite(as_uid='john', assistant_id=aid1)
+        await service.set_assistant_as_favorite(as_uid='john', assistant_id=aid2)
+
+        await service.remove_assistant_as_favorite(as_uid='john', assistant_id=aid1)
+        result = await service.get_favorite_assistants(as_uid='john')
+
+        assert len(result) == 1
+        assert result[0].id == aid2
 
     @staticmethod
     @pytest.mark.asyncio
