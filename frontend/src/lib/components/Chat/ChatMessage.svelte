@@ -2,17 +2,21 @@
   import dayjs from 'dayjs'
   import MarkdownIt from 'markdown-it'
   import DOMPurify from 'isomorphic-dompurify'
+  import { icons } from '$lib/components/Icon/icons.js'
+  import Icon from '$lib/components/Icon/Icon.svelte'
 
   interface Props {
     sender?: string
     text?: string
     time?: string
+    showLoader: boolean
   }
 
   const {
     sender,
     text = '',
     time = '',
+    showLoader,
   }: Props = $props()
 
   const md = new MarkdownIt({
@@ -60,8 +64,13 @@
 <div class="{layoutJustifyCenter}">
   <div class="{innerContentClasses}">
     <div class="{containerClasses}">
-      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-      <div class="prose prose-sm max-w-none">{@html renderedMarkdown}</div>
+      <div class="prose prose-sm max-w-none">
+        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+        {@html renderedMarkdown}
+        {#if showLoader}
+          <Icon icon={icons.loading} />
+        {/if}
+      </div>
     </div>
   </div>
 </div>

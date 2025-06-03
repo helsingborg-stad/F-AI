@@ -13,7 +13,6 @@
         description: 'Determines the alignment and message styling.',
       },
       text: { control: 'text', description: 'The message text' },
-      userName: { control: 'text', description: 'Name of the sender' },
       time: { control: 'text', description: 'Timestamp of the message.' },
     },
   })

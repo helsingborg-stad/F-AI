@@ -122,7 +122,10 @@
 
 <ChatLayout
   canChat={data.canChat}
-  {messages}
+  messages={messages.map((m, i) => ({
+    ...m,
+    showLoader: i === messages.length - 1 && !['idle', 'error'].includes($chatState),
+  }))}
   assistants={data.assistants}
   conversations={data.conversations}
   inputPlaceholder="Fråga Folkets AI"
