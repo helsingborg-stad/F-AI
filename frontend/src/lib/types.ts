@@ -88,6 +88,7 @@ export interface IAssistantCard {
   description: string
   owner: string
   starters: string[]
+  isFavorite: boolean
   metadata: {
     category: string
     conversationCount: string

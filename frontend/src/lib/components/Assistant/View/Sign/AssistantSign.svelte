@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
+  import FavCheckbox from '$lib/components/Assistant/View/Sign/FavCheckbox.svelte'
 
   interface Props {
     id: string
@@ -8,6 +9,7 @@
     owner: string
     description: string
     starters: string[]
+    isFavorite: boolean
     metadata: {
       category: string
       conversationCount: string
@@ -15,7 +17,7 @@
     }
   }
 
-  let { id, avatar, title, owner, description, starters, metadata }: Props = $props()
+  let { id, avatar, title, owner, description, starters, isFavorite, metadata }: Props = $props()
 
   function chatWithAssistant() {
     goto(`/chat/?assistant_id=${id}`)
@@ -25,6 +27,11 @@
 <div class="grow overflow-y-auto">
   <div class="flex h-full px-2 py-4">
     <div class="relative flex grow flex-col gap-4 overflow-y-auto px-8 pt-16 pb-20">
+      <div class="absolute top-0">
+        <div class="fixed start-4 end-4 z-10 flex px-2">
+          <FavCheckbox {id} {isFavorite} />
+        </div>
+      </div>
 
       <div class="absolute bottom-[64px]">
         <div class="fixed start-4 end-4 z-10 flex items-end px-2">
