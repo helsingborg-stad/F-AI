@@ -17,6 +17,8 @@
           title={card.title}
           description={card.description}
           owner={card.owner}
+          isFavorite={card.isFavorite}
+          starters={card.starters}
           metadata={card.metadata}
         />
       {/each}
