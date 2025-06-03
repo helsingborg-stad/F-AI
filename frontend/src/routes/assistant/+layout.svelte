@@ -2,29 +2,27 @@
   import { goto } from '$app/navigation'
   import SidebarMenu from '$lib/components/Menu/SidebarMenu.svelte'
   import { page } from '$app/state'
+  import type { IMenuItem } from '$lib/types.js'
 
-  let { children } = $props()
+  let { data, children } = $props()
+  const sidebarMenu: IMenuItem[] = data.sidebarMenu
 
-  let urlFirstDirectory = $derived.by(() => {
-    const segments = page.url.pathname.split('/').filter(Boolean)
-    return segments.length > 0 ? `/${segments[1]}` : '/'
-  })
-
-  const isActive = (path: string) => path === urlFirstDirectory
+  const isActive = (path: string) => path === page.url.pathname
 </script>
 
 <div class="flex h-screen bg-base-200">
   <aside class="w-60 flex-shrink-0 overflow-hidden bg-base-200 max-md:!w-0">
     <SidebarMenu title="Assistant">
       <div class="flex flex-col h-full gap-2">
-        <button type="button" class="btn btn-sm {isActive('/zoo') ? 'btn-neutral' : 'btn-ghost'}"
-                onclick={() => goto('/assistant/zoo')}>
-          <span class="text-s">Assistant Zoo</span>
-        </button>
-        <button type="button" class="btn btn-sm {isActive('/edit') ? 'btn-neutral' : 'btn-ghost'}"
-                onclick={() => goto('/assistant/edit')}>
-          <span class="text-s">Your assistants</span>
-        </button>
+        {#each sidebarMenu as item}
+          <button
+            type="button"
+            class="btn btn-sm {isActive(item.path) ? 'btn-neutral' : 'btn-ghost'}"
+            onclick={() => goto(item.path)}
+          >
+            <span class="text-s">{item.label}</span>
+          </button>
+        {/each}
       </div>
     </SidebarMenu>
   </aside>
