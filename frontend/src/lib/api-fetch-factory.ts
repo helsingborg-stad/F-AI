@@ -1,4 +1,4 @@
-import { SECRET_API_URL } from '$env/static/private'
+import { env } from '$env/dynamic/private';
 import type { RequestEvent } from '@sveltejs/kit'
 
 interface ApiOptions<T = unknown> extends Omit<RequestInit, 'method' | 'body'> {
@@ -77,4 +77,4 @@ class ApiFetchFactory {
   }
 }
 
-export const api = new ApiFetchFactory(SECRET_API_URL || 'http://127.0.0.1:8000/')
+export const api = new ApiFetchFactory(env.SECRET_API_URL || 'http://127.0.0.1:8000/')
