@@ -12,6 +12,7 @@ async def setup_default_groups(group_service: IGroupService):
         scopes=[
             'assistant.read',
             'conversation.read',
+            'conversation.write',
             'chat'
         ],
         resources=[]
