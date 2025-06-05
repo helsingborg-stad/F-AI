@@ -1,7 +1,8 @@
 import base64
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, status, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
@@ -67,10 +68,7 @@ async def get_available_models(services: ServicesDependency, auth_identity: Auth
 
 class GetMyAssistantsResponseAssistant(BaseModel):
     id: str
-    name: str
-    description: str
-    avatar_base64: str | None
-    primary_color: str | None
+    meta: dict[str, Any]
 
 
 class GetMyAssistantsResponse(BaseModel):
@@ -88,20 +86,14 @@ async def get_my_assistants(services: ServicesDependency, auth_identity: Authent
     return GetMyAssistantsResponse(assistants=[
         GetMyAssistantsResponseAssistant(
             id=assistant.id,
-            name=assistant.meta.name,
-            description=assistant.meta.description,
-            avatar_base64=assistant.meta.avatar_base64,
-            primary_color=assistant.meta.primary_color,
+            meta=assistant.meta,
         ) for assistant in result
     ])
 
 
 class GetAvailableAssistantsResponseAssistant(BaseModel):
     id: str
-    name: str
-    description: str
-    avatar_base64: str | None
-    primary_color: str | None
+    meta: dict[str, Any]
 
 
 class GetAvailableAssistantsResponse(BaseModel):
@@ -119,10 +111,7 @@ async def get_available_assistants(services: ServicesDependency, auth_identity: 
     return GetAvailableAssistantsResponse(assistants=[
         GetAvailableAssistantsResponseAssistant(
             id=assistant.id,
-            name=assistant.name,
-            description=assistant.description,
-            avatar_base64=assistant.avatar_base64,
-            primary_color=assistant.primary_color,
+            meta=assistant.meta
         ) for assistant in result
     ])
 
@@ -142,10 +131,7 @@ async def add_favorite_assistant(assistant_id: str, services: ServicesDependency
 
 class GetFavoriteAssistantsResponseAssistant(BaseModel):
     id: str
-    name: str
-    description: str
-    avatar_base64: str | None
-    primary_color: str | None
+    meta: dict[str, Any]
 
 
 class GetFavoriteAssistantsResponse(BaseModel):
@@ -162,10 +148,7 @@ async def get_favorite_assistants(services: ServicesDependency, auth_identity: A
     return GetFavoriteAssistantsResponse(
         assistants=[GetFavoriteAssistantsResponseAssistant(
             id=assistant.id,
-            name=assistant.name,
-            description=assistant.description,
-            avatar_base64=assistant.avatar_base64,
-            primary_color=assistant.primary_color,
+            meta=assistant.meta
         ) for assistant in result]
     )
 
@@ -185,13 +168,7 @@ async def remove_favorite_assistant(assistant_id: str, services: ServicesDepende
 
 
 class GetAssistantResponseAssistant(BaseModel):
-    name: str
-    description: str
-    avatar_base64: str | None
-    primary_color: str | None
-    sample_questions: list[str]
-    allow_files: bool
-    is_public: bool
+    meta: dict[str, Any]
     model: str
     llm_api_key: str | None
     instructions: str
@@ -222,13 +199,7 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
 
     return GetAssistantResponse(
         assistant=GetAssistantResponseAssistant(
-            name=result.meta.name,
-            description=result.meta.description,
-            avatar_base64=result.meta.avatar_base64,
-            primary_color=result.meta.primary_color,
-            allow_files=result.meta.allow_files,
-            sample_questions=result.meta.sample_questions,
-            is_public=result.meta.is_public,
+            meta=result.meta,
             model=result.model,
             llm_api_key=result.llm_api_key,
             instructions=result.instructions,
@@ -240,12 +211,8 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
 
 
 class GetAssistantInfoResponse(BaseModel):
-    name: str
-    description: str
-    avatar_base64: str | None
-    primary_color: str | None
-    sample_questions: list[str]
     model: str
+    meta: dict[str, Any]
 
 
 @auth.get(
@@ -262,34 +229,35 @@ async def get_assistant_info(assistant_id: str, services: ServicesDependency, au
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     return GetAssistantInfoResponse(
-        name=result.name,
-        description=result.description,
-        avatar_base64=result.avatar_base64,
-        primary_color=result.primary_color,
-        sample_questions=result.sample_questions,
+        meta=result.meta,
         model=result.model,
     )
 
 
 class UpdateAssistantRequest(BaseModel):
-    name: str | None = None
-    description: str | None = None
-    primary_color: str | None = None
-    allow_files: bool | None = None
-    sample_questions: list[str] | None = None
-    is_public: bool | None = None
-    model: str | None = None
-    llm_api_key: str | None = None
-    instructions: str | None = None
-    collection_id: str | None = None
+    meta: dict[str, Any] | None = Field(default=None, examples=[{'name': 'my assistant'}])
+    model: str | None = Field(default=None, examples=['openai:o3-mini'])
+    llm_api_key: str | None = Field(default=None, examples=['sk-proj-abc123'])
+    instructions: str | None = Field(default=None, examples=['Answer in Swedish.'])
+    collection_id: str | None = Field(default=None, examples=['my-collection-id'])
     max_collection_results: int | None = None
-    extra_llm_params: dict[str, float | int | bool | str] | None = None
+    extra_llm_params: dict[str, float | int | bool | str] | None = Field(default=None, examples=[{}])
 
 
 @auth.put(
     '/{assistant_id}',
     ['assistant.write'],
     summary='Update Assistant',
+    description='''
+Update an assistant. 
+
+Note that `meta` is a generic key-value store and can contain any data.
+It contains any data not needed for the assistant itself to run, such as
+frontend-specific details (name, description, image etc.).
+
+`extra_llm_params` is also a generic key-value store and is model-specific.
+It may contain properties such as `temperature` for certain models.
+''',
     response_404_description='Assistant not found',
 )
 async def update_assistant(
@@ -301,12 +269,7 @@ async def update_assistant(
     success = await services.assistant_service.update_assistant(
         as_uid=auth_identity.uid,
         assistant_id=assistant_id,
-        name=body.name,
-        description=body.description,
-        primary_color=body.primary_color,
-        allow_files=body.allow_files,
-        sample_questions=body.sample_questions,
-        is_public=body.is_public,
+        meta=body.meta,
         model=body.model,
         llm_api_key=body.llm_api_key,
         instructions=body.instructions,
@@ -318,9 +281,9 @@ async def update_assistant(
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    if body.is_public is not None:
+    if body.meta and 'is_public' in body.meta and isinstance(body.meta['is_public'], bool):
         await services.resource_service.set_resource_visibility(as_uid=auth_identity.uid, resource=assistant_id,
-                                                                public=body.is_public)
+                                                                public=body.meta['is_public'])
 
 
 @auth.put(
@@ -338,9 +301,9 @@ async def update_assistant_avatar(assistant_id: str, file: UploadFile, services:
     if file.size > 1024 * 1024:  # 1 Mb
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='File too large')
 
-    base64_encoded = base64.b64encode(await file.read())
+    base64_encoded = base64.b64encode(await file.read()).decode('utf-8')
     success = await services.assistant_service.update_assistant(as_uid=auth_identity.uid, assistant_id=assistant_id,
-                                                                avatar_base64=base64_encoded)
+                                                                meta={'avatar_base64': base64_encoded})
 
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -355,7 +318,7 @@ async def update_assistant_avatar(assistant_id: str, file: UploadFile, services:
 async def delete_assistant_avatar(assistant_id: str, services: ServicesDependency,
                                   auth_identity: AuthenticatedIdentity):
     await services.assistant_service.update_assistant(as_uid=auth_identity.uid, assistant_id=assistant_id,
-                                                      avatar_base64='')
+                                                      meta={'avatar_base64': None})
 
 
 class DeleteAssistantRequest(BaseModel):

@@ -34,11 +34,11 @@ export const load: PageServerLoad = async (event) => {
 
     assistantCards = allAssistants.map((assistant) => ({
       id: assistant.id,
-      avatar: `data:image/png;base64, ${assistant.avatar_base64}`,
-      title: assistant.name,
-      description: assistant.description,
+      avatar: assistant.meta.avatar_base64 ? `data:image/png;base64, ${assistant.meta.avatar_base64}` : null,
+      title: assistant.meta.name?.toString() ?? '',
+      description: assistant.meta.description?.toString() ?? '',
       owner: 'Helsingborg',
-      starters: assistant.sample_questions,
+      starters: assistant.meta.sample_questions as string[] ?? [],
       isFavorite: favoriteAssistantsMap.has(assistant.id),
       metadata: {
         category: 'Demo',
@@ -56,7 +56,7 @@ export const load: PageServerLoad = async (event) => {
 
   const vanillaExhibit = {
     title: 'Vanilla Assistants',
-    description: "When you don't need anything extra",
+    description: 'When you don\'t need anything extra',
     cards: assistantCards.filter((card) => card.title.toLowerCase().includes('vanilla')),
   }
 

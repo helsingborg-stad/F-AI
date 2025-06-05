@@ -14,13 +14,13 @@ export async function getAssistantPickerData(
 
   const favAssistantData = await favAssistantResponse.json()
   const favIds = new Set(
-    favAssistantData.assistants.map((assistant: IAssistant) => assistant.id),
+    favAssistantData.assistants.map((assistant: IBackendAssistant) => assistant.id),
   )
 
   if (favAssistantData.assistants.length > 0) {
-    const favItems = favAssistantData.assistants.map((assistant: IAssistant) => ({
+    const favItems = favAssistantData.assistants.map((assistant: IBackendAssistant) => ({
       id: assistant.id,
-      name: assistant.name,
+      name: assistant.meta.name?.toString() ?? '<unknown>',
     }))
 
     result = [
@@ -33,14 +33,14 @@ export async function getAssistantPickerData(
 
   const allAssistantsData = await fetchAllAssistants(event)
   const vanillaAssistants = allAssistantsData.filter((assistant) =>
-    assistant.name.toLowerCase().includes('vanilla'),
+    assistant.meta.name?.toString().toLowerCase().includes('vanilla'),
   )
 
   const vanillaItems = vanillaAssistants
     .filter((assistant: IBackendAssistant) => !favIds.has(assistant.id))
     .map((assistant: IBackendAssistant) => ({
       id: assistant.id,
-      name: assistant.name,
+      name: assistant.meta.name?.toString() ?? '<unknown>',
     }))
 
   if (vanillaItems.length > 0) {
