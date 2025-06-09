@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { IAssistant, IAssistantModel } from '$lib/types.js'
   import ActionButtons from '$lib/components/Form/ActionButtons.svelte'
-  import AccessSection from '$lib/components/assistant/Edit/AccessSection.svelte'
-  import ToolsSection from '$lib/components/assistant/Edit/ToolsSection.svelte'
-  import ModelConfigSection from '$lib/components/assistant/Edit/ModelConfigSection.svelte'
-  import AvatarSection from '$lib/components/assistant/Edit/AvatarSection.svelte'
+  import AccessSection from '$lib/components/Assistant/Edit/AccessSection.svelte'
+  import ToolsSection from '$lib/components/Assistant/Edit/ToolsSection.svelte'
+  import ModelConfigSection from '$lib/components/Assistant/Edit/ModelConfigSection.svelte'
+  import AvatarSection from '$lib/components/Assistant/Edit/AvatarSection.svelte'
 
   interface Props {
     assistant?: IAssistant
