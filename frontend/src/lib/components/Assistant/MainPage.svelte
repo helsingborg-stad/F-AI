@@ -1,10 +1,10 @@
 <script lang="ts">
-  import PageHeader from '$lib/components/assistant/PageHeader.svelte'
+  import PageHeader from '$lib/components/Assistant/PageHeader.svelte'
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
   import VerticalDivider from '$lib/components/Divider/VerticalDivider.svelte'
-  import AssistantTable from '$lib/components/assistant/Table/AssistantTable.svelte'
+  import AssistantTable from '$lib/components/Assistant/Table/AssistantTable.svelte'
   import type { IAssistant, IAssistantModel } from '$lib/types.js'
-  import AssistantDetails from '$lib/components/assistant/Edit/AssistantDetails.svelte'
+  import AssistantDetails from '$lib/components/Assistant/Edit/AssistantDetails.svelte'
   import { onMount } from 'svelte'
 
   interface Props {
