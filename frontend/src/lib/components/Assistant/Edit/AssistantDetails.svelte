@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { IAssistant, IAssistantModel } from '$lib/types.js'
   import ActionButtons from '$lib/components/Form/ActionButtons.svelte'
-  import AccessSection from '$lib/components/assistant/AccessSection.svelte'
-  import ToolsSection from '$lib/components/assistant/ToolsSection.svelte'
-  import ModelConfigSection from '$lib/components/assistant/ModelConfigSection.svelte'
-  import AvatarSection from '$lib/components/assistant/Edit/Avatar/AvatarSection.svelte'
+  import AccessSection from '$lib/components/Assistant/Edit/AccessSection.svelte'
+  import ToolsSection from '$lib/components/Assistant/Edit/ToolsSection.svelte'
+  import ModelConfigSection from '$lib/components/Assistant/Edit/ModelConfigSection.svelte'
+  import AvatarSection from '$lib/components/Assistant/Edit/AvatarSection.svelte'
 
   interface Props {
     assistant?: IAssistant
@@ -27,11 +27,17 @@
 
   let formAction = $state('update')
   let assistantName = $state(assistant?.name || '')
+  let sentinelTop = $state<HTMLDivElement>()
+  let sentinelBottom = $state<HTMLDivElement>()
+  let buttonsWrapper = $state<HTMLDivElement>()
+  let containerRef = $state<HTMLDivElement>()
+  let isSticky = $state(false)
+  let atBottom = $state(false)
+  let containerBounds = $state({ left: 0, width: 0 })
 
   const collectionId = assistant?.collection?.id ? assistant.collection.id : ''
 
   $effect(() => {
-    // Notify parent that assistant data is processed and ready, used for spinner
     if (!assistant || Object.keys(assistant).length === 0) {
       onReady()
     } else if (assistant && Object.keys(assistant).length > 0) {
@@ -39,6 +45,58 @@
     }
   })
 
+  $effect(() => {
+    if (!sentinelTop || !sentinelBottom || !buttonsWrapper) return
+
+    const topObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isSticky = !entry.isIntersecting
+        })
+      },
+      { threshold: 0 },
+    )
+
+    // Observer for bottom sentinel - detects when at form bottom
+    const bottomObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          atBottom = entry.isIntersecting
+        })
+      },
+      { rootMargin: `0px 0px ${buttonsWrapper.offsetHeight}px 0px` },
+    )
+
+    topObserver.observe(sentinelTop)
+    bottomObserver.observe(sentinelBottom)
+
+    return () => {
+      topObserver.disconnect()
+      bottomObserver.disconnect()
+    }
+  })
+
+  // Track container bounds for sticky positioning
+  $effect(() => {
+    if (!containerRef) return
+
+    const updateBounds = () => {
+      if (!containerRef) return
+
+      const rect = containerRef.getBoundingClientRect()
+      containerBounds = {
+        left: rect.left,
+        width: rect.width,
+      }
+    }
+
+    updateBounds()
+    window.addEventListener('resize', updateBounds)
+
+    return () => {
+      window.removeEventListener('resize', updateBounds)
+    }
+  })
 
   function setDeleteAction() {
     formAction = 'delete'
@@ -53,6 +111,8 @@
   }
 
   let selectedModelKey = $state(assistant ? assistant.model : '')
+
+  let shouldStick = $derived(isSticky && !atBottom)
 </script>
 
 {#if loading}
@@ -60,7 +120,7 @@
     <span class="loading loading-spinner loading-lg text-primary"></span>
   </div>
 {:else if assistant && Object.keys(assistant).length > 0}
-  <div class="h-full px-1">
+  <div class="h-full px-1 relative" bind:this={containerRef}>
     <form
       method="POST"
       action="?/{formAction}"
@@ -150,6 +210,7 @@
           {/each}
         </select>
       </label>
+
       <div class="space-y-2 pt-5">
         <AccessSection {canEdit} isPublic={assistant.isPublic} />
         <ToolsSection
@@ -160,14 +221,28 @@
         />
         <ModelConfigSection {canEdit} />
       </div>
-      <ActionButtons
-        {canEdit}
-        {canCreate}
-        canDelete={true}
-        onDelete={setDeleteAction}
-        onCopy={setCopyAction}
-        onUpdate={setUpdateAction}
-      />
+
+      <div bind:this={sentinelTop} class="h-px"></div>
+
+      <div bind:this={buttonsWrapper} class="relative">
+        <div
+          class="transition-all duration-200 {shouldStick ? 'fixed bottom-0 z-50 bg-base-100 border-t  px-2 py-3 mb-2 rounded-md' : ''}"
+          style="{shouldStick ? `left: ${containerBounds.left}px; width: ${containerBounds.width}px;` : ''}"
+        >
+          <ActionButtons
+            {canEdit}
+            {canCreate}
+            canDelete={true}
+            onDelete={setDeleteAction}
+            onCopy={setCopyAction}
+            onUpdate={setUpdateAction}
+          />
+        </div>
+        {#if shouldStick}
+          <div style="height: 56px"></div>
+        {/if}
+      </div>
+      <div bind:this={sentinelBottom} class="h-px"></div>
     </form>
   </div>
 {/if}

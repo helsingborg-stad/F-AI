@@ -151,7 +151,8 @@ class MongoAssistantService(IAssistantService):
                 {'owner': as_uid},
                 {'_id': {"$in": [ObjectId(resource) for resource in resources]}},
                 {'meta.is_public': True}
-            ]}
+            ]},
+            projection=['_id', 'meta', 'model']
         )
         return [await self._doc_to_assistant_info(doc) async for doc in cursor]
 
@@ -221,6 +222,62 @@ class MongoAssistantService(IAssistantService):
     async def delete_assistant(self, as_uid: str, assistant_id: str) -> None:
         if is_valid_mongo_id(assistant_id):
             await self._database['assistants'].delete_one({'_id': ObjectId(assistant_id), 'owner': as_uid})
+
+    async def set_assistant_as_favorite(self, as_uid: str, assistant_id: str) -> bool:
+        resources = await self._resource_service.get_resources(as_uid=as_uid)
+        assistant = await self._database['assistants'].find_one(
+            {'$and': [
+                {'_id': ObjectId(assistant_id)},
+                {"$or": [
+                    {'owner': as_uid},
+                    {'_id': {"$in": [ObjectId(resource) for resource in resources]}},
+                    {'meta.is_public': True}
+                ]}
+            ]},
+            projection=['_id']
+        )
+
+        if not assistant:
+            return False
+
+        result = await self._database['favorite_assistants'].update_one(
+            {'_id': as_uid},
+            {'$addToSet': {'favorite_assistants': assistant['_id']}},
+            upsert=True
+        )
+
+        return result.matched_count == 1 or result.upserted_id is not None
+
+    async def get_favorite_assistants(self, as_uid: str) -> list[AssistantInfo]:
+        resources = await self._resource_service.get_resources(as_uid=as_uid)
+        favorite_list_doc = await self._database['favorite_assistants'].find_one(
+            {'_id': as_uid},
+            projection=['favorite_assistants']
+        )
+
+        raw_favorite_list = [str(aid) for aid in favorite_list_doc['favorite_assistants']] if favorite_list_doc else []
+
+        if len(raw_favorite_list) > 0:
+            cursor = self._database['assistants'].find(
+                {'$and': [
+                    {"$or": [
+                        {'owner': as_uid},
+                        {'_id': {"$in": [ObjectId(resource) for resource in resources]}},
+                        {'meta.is_public': True}
+                    ]},
+                    {'_id': {"$in": [ObjectId(fid) for fid in raw_favorite_list]}},
+                ]},
+                projection=['_id', 'meta', 'model']
+            )
+            return [await self._doc_to_assistant_info(doc) async for doc in cursor]
+
+        return []
+
+    async def remove_assistant_as_favorite(self, as_uid: str, assistant_id: str) -> None:
+        await self._database['favorite_assistants'].update_one(
+            {'_id': as_uid},
+            {'$pull': {'favorite_assistants': ObjectId(assistant_id)}}
+        )
 
     async def _get_avatar_base64(self, file_id: ObjectId | None) -> str | None:
         if file_id is None:

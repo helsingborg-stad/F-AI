@@ -1,11 +1,11 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import AssistantTable from '$lib/components/assistant/AssistantTable.svelte'
+  import MainPage from '$lib/components/Assistant/MainPage.svelte'
   import { mockAssistants } from '$lib/mock/assistants.js'
 
   const { Story } = defineMeta({
-    title: 'Components/Assistant/Table',
-    component: AssistantTable,
+    title: 'Components/Assistant/MainPage',
+    component: MainPage,
     tags: ['autodocs'],
   })
 </script>
@@ -14,5 +14,4 @@
 
 <Story name="With assistants" args={{ assistants: mockAssistants }} />
 
-<Story name="With active assistant"
-       args={{ assistants: mockAssistants, activeAssistant: mockAssistants[0] }} />
+<Story name="With active assistant" args={{ assistants: mockAssistants, activeAssistant: mockAssistants[0] }} />

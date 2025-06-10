@@ -1,8 +1,10 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import type { IAssistant, IAssistantModels, IBackendAssistant } from '$lib/types.js'
+import type { IAssistantModels, IBackendAssistant } from '$lib/types.js'
 import { api } from '$lib/api-fetch-factory.js'
 
-export async function fetchAllAssistants(event: RequestEvent): Promise<IBackendAssistant[]> {
+export async function fetchAllAssistants(
+  event: RequestEvent,
+): Promise<IBackendAssistant[]> {
   const response = await api.get('/api/assistant', { event, withAuth: true })
   if (response.ok) {
     const data = await response.json()
@@ -60,7 +62,7 @@ export async function updateAssistant(
     model?: string
     instructions?: string
     model_key?: string
-    collection_id?: string
+    collection_id?: string | null
   },
   event: RequestEvent,
 ) {
@@ -94,7 +96,7 @@ export async function updateAssistantAvatar(
 
   const response = await api.put(`/api/assistant/${assistantId}/avatar`, {
     event,
-    body: formData
+    body: formData,
   })
 
   if (!response.ok) {
@@ -102,15 +104,40 @@ export async function updateAssistantAvatar(
   }
 }
 
-export async function deleteAssistantAvatar(
-  assistantId: string,
-  event: RequestEvent,
-) {
+export async function deleteAssistantAvatar(assistantId: string, event: RequestEvent) {
   const response = await api.delete(`/api/assistant/${assistantId}/avatar`, {
-    event
+    event,
   })
 
   if (!response.ok) {
     throw new Response('Failed to delete assistant avatar', { status: response.status })
   }
+}
+
+export async function addAssistantFav(assistantId: string, event: RequestEvent) {
+  const response = await api.post(`/api/assistant/me/favorite/${assistantId}`, { event })
+
+  if (!response.ok) {
+    throw new Response('Failed to favorite assistant', { status: response.status })
+  }
+}
+
+export async function deleteAssistantFav(assistantId: string, event: RequestEvent) {
+  const response = await api.delete(`/api/assistant/me/favorite/${assistantId}`, {
+    event,
+  })
+
+  if (!response.ok) {
+    throw new Response('Failed to favorite assistant', { status: response.status })
+  }
+}
+
+export async function getAssistantFavs(event: RequestEvent) {
+  const response = await api.get('/api/assistant/me/favorite', { event })
+
+  if (!response.ok) {
+    throw new Response('Failed to fetch favorite assistants', { status: response.status })
+  }
+
+  return response
 }

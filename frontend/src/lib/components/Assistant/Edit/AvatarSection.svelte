@@ -136,7 +136,7 @@
           />
         </label>
         <div class="label pb-0">
-          <span class="label-text-alt">Upload an image for best results (max 1MB, recommended: 128x188px portrait)</span>
+          <span class="label-text-alt">Upload a portrait PNG image for best results (max 1MB, recommended: 512x752px portrait)</span>
         </div>
       </div>
     </div>

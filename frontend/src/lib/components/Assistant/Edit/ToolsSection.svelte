@@ -4,7 +4,7 @@
   import InfoTooltip from '$lib/components/InfoTooltip/InfoTooltip.svelte'
   import Section from '$lib/components/Form/Section.svelte'
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
-  import FileUploadModal from '$lib/components/assistant/FileUploadModal.svelte'
+  import FileUploadModal from '$lib/components/Assistant/Edit/FileUploadModal.svelte'
   import type { ICollection } from '$lib/types.js'
 
   interface Props {
@@ -16,6 +16,8 @@
 
   let { canEdit, assistantId, collectionId, collection }: Props = $props()
   let fileModal: FileUploadModal
+  let currentCollectionId = $state(collectionId)
+  let currentFiles = $state(collection?.files || [])
 
   function openFilesModal() {
     if (fileModal) fileModal.showModal()
@@ -36,7 +38,7 @@
         <span class="loading loading-spinner loading-xs"></span>
       {/if}
       {#if !attachingFiles && collectionId}
-        <span class="text-xs">Attached vector store {collectionId}</span>
+        <span class="text-xs">Attached vector store {currentCollectionId}</span>
       {/if}
     </div>
     <div>
@@ -53,7 +55,7 @@
     <div class="overflow-x-auto">
       <table class="table table-xs">
         <tbody>
-        {#each collection?.files || [] as file}
+        {#each currentFiles as file}
           <tr>
             <td>{file.name}</td>
           </tr>
@@ -79,4 +81,9 @@
   </div>
 </Section>
 
-<FileUploadModal bind:this={fileModal} {assistantId} bind:uploadingFiles={attachingFiles} />
+<FileUploadModal
+  bind:this={fileModal} {assistantId}
+  bind:uploadingFiles={attachingFiles}
+  bind:collectionId={currentCollectionId}
+  bind:files={currentFiles}
+/>

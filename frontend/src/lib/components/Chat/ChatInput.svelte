@@ -7,9 +7,11 @@
     onSubmit: () => void
     children: Snippet
     disabled: boolean
+    receivingMessage: boolean
+    onStopChat: () => void
   }
 
-  let { placeholder, value = $bindable(), onSubmit, children, disabled }: Props = $props()
+  let { placeholder, value = $bindable(), onSubmit, children, disabled, receivingMessage, onStopChat }: Props = $props()
 
   let disableSend = $derived.by(() => {
     return disabled || value === ''
@@ -38,6 +40,8 @@
   }
 
   function handleDivClick(e: MouseEvent | TouchEvent) {
+    if (receivingMessage) return
+
     if (e.currentTarget === e.target) {
       textareaElement.focus()
     }
@@ -51,6 +55,8 @@
   }
 
   function handleTextareaKeyDown(e: KeyboardEvent) {
+    if (receivingMessage) return
+
     if (e.key === 'Enter') {
       if (e.shiftKey) {
         return
@@ -73,7 +79,7 @@
   })
 </script>
 
-<div class="flex flex-col rounded-2xl p-3 gap-2 w-[60rem]">
+<div class="flex flex-col rounded-2xl p-3 gap-2">
   <div>
       <textarea
         bind:this={textareaElement}
@@ -81,6 +87,7 @@
         bind:value
         {placeholder}
         class="textarea w-full px-1 resize-none focus:outline-none border-none min-h-[20px] max-h-40 overflow-y-hidden"
+        disabled={disabled}
         oninput={autoResize}
         onkeydown={handleTextareaKeyDown}
       ></textarea>
@@ -96,9 +103,13 @@
       {@render children()}
     </div>
     <div class="flex-shrink-0">
-      <div class={disableSend ? "tooltip" : ""} data-tip={value === '' ? 'Message is empty' : 'Select assistant'}>
-        <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}>Send</button>
-      </div>
+      {#if !receivingMessage}
+        <div class={disableSend ? "tooltip" : ""} data-tip={value === '' ? 'Message is empty' : 'Select assistant'}>
+          <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}>Send</button>
+        </div>
+      {:else }
+        <button class="btn btn-sm" onclick={onStopChat}>Abort</button>
+      {/if}
     </div>
   </div>
 </div>

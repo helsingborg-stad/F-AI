@@ -59,9 +59,10 @@ export interface IBackendAssistant {
   instructions: string
   model: string
   is_public: boolean
-  collection_id: string
+  collection_id: string | null
   avatar_base64: string
   primary_color: string
+  sample_questions: string[]
 }
 
 export interface IAssistant {
@@ -78,6 +79,27 @@ export interface IAssistant {
 
 export interface IAssistants {
   assistants: IAssistant[]
+}
+
+export interface IAssistantCard {
+  id: string
+  avatar: string
+  title: string
+  description: string
+  owner: string
+  starters: string[]
+  isFavorite: boolean
+  metadata: {
+    category: string
+    conversationCount: string
+    likes: string
+  }
+}
+
+export interface IExhibit {
+  title: string
+  description: string
+  cards: IAssistantCard[]
 }
 
 export interface IApiSettings {

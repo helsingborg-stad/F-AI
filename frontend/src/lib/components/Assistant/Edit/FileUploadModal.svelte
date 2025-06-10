@@ -1,13 +1,21 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import type { SubmitFunction } from '@sveltejs/kit'
+  import type { ICollectionFiles } from '$lib/types.js'
 
   interface Props {
-    assistantId: string;
+    assistantId: string
     uploadingFiles?: boolean
+    collectionId: string
+    files: ICollectionFiles[]
   }
 
-  let { assistantId, uploadingFiles = $bindable(false) }: Props = $props()
+  let {
+    assistantId,
+    uploadingFiles = $bindable(false),
+    collectionId = $bindable(),
+    files = $bindable(),
+  }: Props = $props()
   let dialog: HTMLDialogElement
 
   export function showModal() {
@@ -16,11 +24,13 @@
 
   function handleEnhance(): ReturnType<SubmitFunction> {
     uploadingFiles = true
+    files = []
 
     return async ({ update, result }) => {
-      if (result.type === 'redirect') {
-        window.location.href = result.location
-        return
+      if (result.data && result.type === 'success') {
+        collectionId = result.data.collection.id
+        files = result.data.collection.files
+        dialog.close()
       }
 
       await update()
@@ -44,6 +54,16 @@
           type="hidden"
           name="assistant_id"
           value={assistantId}
+        >
+        <input
+          type="hidden"
+          name="label"
+          value="collection"
+        >
+        <input
+          type="hidden"
+          name="embedding_model"
+          value="default"
         >
         <input
           name="files"

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import PageHeader from '$lib/components/assistant/PageHeader.svelte'
+  import PageHeader from '$lib/components/Assistant/PageHeader.svelte'
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
   import VerticalDivider from '$lib/components/Divider/VerticalDivider.svelte'
-  import AssistantTable from '$lib/components/assistant/AssistantTable.svelte'
+  import AssistantTable from '$lib/components/Assistant/Table/AssistantTable.svelte'
   import type { IAssistant, IAssistantModel } from '$lib/types.js'
-  import AssistantDetails from '$lib/components/assistant/AssistantDetails.svelte'
+  import AssistantDetails from '$lib/components/Assistant/Edit/AssistantDetails.svelte'
   import { onMount } from 'svelte'
 
   interface Props {
@@ -63,7 +63,10 @@
   <PageHeader title="Assistants" {canCreateAssistant} />
   <HorizontalDivider />
   <div class="flex flex-1 w-full justify-center gap-4 overflow-hidden">
-    <div class="flex-1 pl-4 overflow-hidden">
+    <div
+      class="flex-1 overflow-auto pb-4 pr-4"
+      style="max-height: calc(100vh - 120px);"
+    >
       <AssistantTable {assistants} {activeAssistant} />
     </div>
     <VerticalDivider />

@@ -2,9 +2,9 @@
   import ChatLayout from '$lib/layouts/ChatLayout.svelte'
   import { page } from '$app/state'
   import { goto, invalidateAll } from '$app/navigation'
-  import { type RealtimeChatMessage, sendChatMessage } from '$lib/chat/chat.js'
   import dayjs from 'dayjs'
   import type { LayoutData } from './$types.js'
+  import { useChatMachine } from '$lib/chat/chat.js'
 
   interface Props {
     data: LayoutData
@@ -13,6 +13,9 @@
   const { data }: Props = $props()
 
   let selectedAssistantId = $state('')
+
+  const chatMachine = useChatMachine()
+  const { state: chatState } = chatMachine
 
   function startNewChat() {
     goto(`/chat/`, {
@@ -44,10 +47,8 @@
     messages = data.conversationContext.messages
   })
 
-  async function sendMessage(message: string) {
-    const onAddMessage = (message: RealtimeChatMessage) => messages = [...messages, { timestamp: dayjs().toISOString(), ...message }]
-
-    const onUpdateLastMessage = (message: RealtimeChatMessage) => messages = [
+  chatMachine.lastMessage.subscribe((message) => {
+    messages = [
       ...messages.slice(0, messages.length - 1),
       {
         timestamp: dayjs().toISOString(),
@@ -55,10 +56,12 @@
         message: message.message,
       },
     ]
+  })
 
-    const onGoto = (url: string) => {
+  chatMachine.conversationId.subscribe((newConversationId) => {
+    if (newConversationId != null) {
       const cachedMessages = messages
-      goto(url, {
+      goto(`/chat/${newConversationId}`, {
         replaceState: false,
         noScroll: true,
         keepFocus: true,
@@ -66,12 +69,30 @@
         .then(() => messages = cachedMessages)
         .catch(e => console.error('goto failed', e))
     }
+  })
 
-    const onError = (error: string) => {
-      onUpdateLastMessage({ source: 'error', message: error })
+  chatMachine.lastError.subscribe((error) => {
+    if (error != null) {
+      messages = [
+        ...messages.slice(0, messages.length - 1),
+        {
+          timestamp: dayjs().toISOString(),
+          source: 'error',
+          message: error,
+        },
+      ]
     }
+  })
 
-    await sendChatMessage(message, selectedAssistantId, conversationId, onAddMessage, onUpdateLastMessage, onGoto, onError)
+  function sendMessage(message: string) {
+    messages = [
+      ...messages,
+      { timestamp: dayjs().toISOString(), source: 'user', message },
+      { timestamp: dayjs().toISOString(), source: 'assistant', message: '' },
+    ]
+
+    chatMachine.sendMessage(message, selectedAssistantId, conversationId ?? null)
+      .catch(e => console.error('chatMachine.sendMessage failed', e))
   }
 
   function deleteConversation(id: string) {
@@ -88,11 +109,23 @@
       })
       .then(invalidateAll)
   }
+
+  const assistantIdFromQuery = $derived(page.url.searchParams.get('assistant_id'))
+  $effect(() => {
+    if (assistantIdFromQuery) {
+      selectedAssistantId = assistantIdFromQuery
+    } else if (data.conversationContext && data.conversationContext.assistantId) {
+      selectedAssistantId = data.conversationContext.assistantId
+    }
+  })
 </script>
 
 <ChatLayout
   canChat={data.canChat}
-  {messages}
+  messages={messages.map((m, i) => ({
+    ...m,
+    showLoader: i === messages.length - 1 && !['idle', 'error'].includes($chatState),
+  }))}
   assistants={data.assistants}
   conversations={data.conversations}
   inputPlaceholder="Fråga Folkets AI"
@@ -101,5 +134,7 @@
   {conversationId}
   onDeleteConversation={deleteConversation}
   onStartNewChat={startNewChat}
+  onStopChat={chatMachine.stop}
+  chatStateIdle={$chatState === 'idle'}
 >
 </ChatLayout>

@@ -9,6 +9,7 @@
     timestamp: string
     source: string
     message: string
+    showLoader: boolean
   }
 
   export interface Props {
@@ -20,9 +21,19 @@
     messages: Message[],
     inputPlaceholder: string,
     onSubmitMessage: (message: string) => void
+    chatStateIdle: boolean,
+    onStopChat: () => void,
   }
 
-  let { assistants, selectedAssistantId = $bindable(), messages, inputPlaceholder, onSubmitMessage }: Props = $props()
+  let {
+    assistants,
+    selectedAssistantId = $bindable(),
+    messages,
+    inputPlaceholder,
+    onSubmitMessage,
+    chatStateIdle,
+    onStopChat,
+  }: Props = $props()
 
   let scrollContainer: HTMLDivElement = undefined as unknown as HTMLDivElement
 
@@ -64,8 +75,8 @@
     onscroll={onScroll}
     class="overflow-auto grow p-4"
   >
-    {#each messages as msg (`${msg.timestamp}${msg.message}`)}
-      <ChatMessage sender={msg.source} text={msg.message} time={msg.timestamp} />
+    {#each messages as msg, i (`${i}${msg.source}`)}
+      <ChatMessage sender={msg.source} text={msg.message} time={msg.timestamp} showLoader={msg.showLoader} />
     {/each}
   </div>
 
@@ -83,12 +94,14 @@
         <Icon icon={icons.scroll} />
       </button>
     </div>
-    <div class="relative rounded-2xl border bg-white z-10 w-[60rem] mx-auto">
+    <div class="relative rounded-2xl border bg-white z-10 max-w-[60rem] mx-auto">
       <ChatInput
         placeholder={inputPlaceholder}
         bind:value={chatInput}
         onSubmit={onHandleSubmit}
         disabled={selectedAssistantId === ''}
+        receivingMessage={!chatStateIdle}
+        {onStopChat}
       >
         <ActionButtons {assistants} bind:selectedAssistantId {disableAssistantPicker} />
       </ChatInput>
