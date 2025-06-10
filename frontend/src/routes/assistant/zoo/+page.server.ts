@@ -4,7 +4,8 @@ import type { IAssistantCard } from '$lib/types.js'
 import {
   addAssistantFav,
   deleteAssistantFav,
-  fetchAllAssistants, getAssistantFavs,
+  fetchAllAssistants,
+  getAssistantFavs,
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
 
@@ -14,7 +15,6 @@ export const load: PageServerLoad = async (event) => {
   let assistantCards: IAssistantCard[] = []
 
   if (userCanListAssistants) {
-    // Fetch all assistants
     const allAssistants = await fetchAllAssistants(event)
 
     let favoriteAssistantsMap = new Map()
@@ -48,21 +48,10 @@ export const load: PageServerLoad = async (event) => {
     }))
   }
 
-  const featuredExhibit = {
-    title: 'Featured Assistants',
-    description: 'Our most popular AI assistants',
-    cards: assistantCards.filter((card) => {
-      return (
-        card.title.toLowerCase().includes('code') ||
-        card.title.toLowerCase().includes('writing')
-      )
-    }),
-  }
-
-  const mathExhibit = {
-    title: 'Specialized Tools',
-    description: 'Domain-specific assistants',
-    cards: assistantCards.filter((card) => card.title.toLowerCase().includes('math')),
+  const hbgExhibit = {
+    title: 'Hbg Assistants',
+    description: 'Assistant created and shared by your colleagues',
+    cards: assistantCards.filter((card) => !card.title.toLowerCase().includes('vanilla')),
   }
 
   const vanillaExhibit = {
@@ -72,7 +61,7 @@ export const load: PageServerLoad = async (event) => {
   }
 
   return {
-    exhibits: [featuredExhibit, mathExhibit, vanillaExhibit],
+    exhibits: [hbgExhibit, vanillaExhibit],
   }
 }
 

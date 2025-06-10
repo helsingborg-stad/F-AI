@@ -59,7 +59,7 @@ export interface IBackendAssistant {
   instructions: string
   model: string
   is_public: boolean
-  collection_id: string
+  collection_id: string | null
   avatar_base64: string
   primary_color: string
   sample_questions: string[]

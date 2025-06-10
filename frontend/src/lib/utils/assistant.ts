@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import type { IAssistant, IAssistantModels, IBackendAssistant } from '$lib/types.js'
+import type { IAssistantModels, IBackendAssistant } from '$lib/types.js'
 import { api } from '$lib/api-fetch-factory.js'
 
 export async function fetchAllAssistants(
@@ -62,7 +62,7 @@ export async function updateAssistant(
     model?: string
     instructions?: string
     model_key?: string
-    collection_id?: string
+    collection_id?: string | null
   },
   event: RequestEvent,
 ) {
