@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from typing import Any
 
-from src.modules.assistants.models.AssistantMeta import AssistantMeta
+from pydantic import BaseModel
 
 
 class Assistant(BaseModel):
     id: str
     owner: str
-    meta: AssistantMeta
+    meta: dict[str, Any]
     model: str
     llm_api_key: str | None
     instructions: str
