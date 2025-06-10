@@ -40,7 +40,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
     model_key: modelKey,
     name: name,
     model: model,
-    collection_id: collectionId,
+    collection_id: collectionId === '' ? null : collectionId,
     instructions: instructions,
     description: description,
     is_public: visibility,
@@ -130,7 +130,7 @@ export const actions = {
     const shouldDeleteAvatar = formData.get('delete_avatar') === 'true'
 
     try {
-      const updateData = await getAssistantFormValues(formData)
+      const updateData = getAssistantFormValues(formData)
       await updateAssistant(assistantId, updateData, event)
 
       if (avatar && avatar.size > 0) {
