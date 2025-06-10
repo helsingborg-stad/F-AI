@@ -50,32 +50,16 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./fai-rag-app/
+          context: ./backend/
           platforms: linux/amd64
-          file: ./fai-rag-app/Dockerfile.base
+          file: ./backend/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           no-cache: false
           build-args: GITHUB_ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy container to Jelastic
-        run: |
-          curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
-        shell: bash
-  build-frontend:
-     runs-on: codebuild-f-ai-builder-${{ github.run_id }}-${{ github.run_attempt }}-ubuntu-7.0-medium
-     steps:
-       - name: Checkout code
-         uses: actions/checkout@v3
-
-       - name: Build & Deploy to Elastx
-         uses: helsingborg-stad/build-deploy-elastx/1.0@main
-         with:
-          JELASTIC_API_KEY: ${{ secrets.JELASTIC_API_KEY }}
-          JELASTIC_NODE_ID: ${{ secrets.FRONTEND_JELASTIC_NODE_ID_PRE_RELEASE }}
-          JELASTIC_ENV_NAME: ${{ secrets.FRONTEND_JELASTIC_ENV_NAME_PRE_RELEASE }}
-          JELASTIC_TAG: ${{ github.event.release.tag_name }}
-          DOCKER_CONTEXT: ${{ vars.FRONTEND_DOCKER_CONTEXT }}
-          DOCKER_FILE_PATH: ${{ vars.FRONTEND_DOCKER_FILE_PATH }}
-          DOCKER_META_PREFIX: frontend
+      # - name: Deploy container to Jelastic
+      #   run: |
+      #     curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
+      #   shell: bash

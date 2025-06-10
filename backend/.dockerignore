@@ -1,0 +1,10 @@
+**/.DS_Store
+**/__pycache__
+**/*.pyo
+**/*.pyd
+**/.Python
+**/db.sqlite3
+**/.env
+**/.example-env
+**/.git
+**/.gitignore
