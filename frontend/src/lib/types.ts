@@ -77,10 +77,6 @@ export interface IAssistant {
   primaryColor: string
 }
 
-export interface IAssistants {
-  assistants: IAssistant[]
-}
-
 export interface IAssistantCard {
   id: string
   avatar: string
@@ -94,6 +90,14 @@ export interface IAssistantCard {
     conversationCount: string
     likes: string
   }
+}
+
+export interface IAssistantMenu {
+  menuTitle: string
+  menuItems: {
+    id: string
+    name: string
+  }[]
 }
 
 export interface IExhibit {

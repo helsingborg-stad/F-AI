@@ -1,11 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import type { IAssistantMenu } from '$lib/types.js'
 
   interface Props {
-    assistants: {
-      id: string,
-      name: string,
-    }[]
+    assistants: IAssistantMenu[]
     selectedAssistantId: string
     disabled: boolean
   }
@@ -27,7 +25,10 @@
   const selectedAssistantName = $derived(
     !selectedAssistantId
       ? 'Select assistant'
-      : assistants.find(a => a.id === selectedAssistantId)?.name || (disabled ? '<unknown assistant>' : 'Select assistant'),
+      : assistants
+        .flatMap(group => group.menuItems)
+        .find(item => item.id === selectedAssistantId)?.name ||
+      (disabled ? '<unknown assistant>' : 'Select assistant'),
   )
 
   function handleClickOutside(event: MouseEvent) {
@@ -85,18 +86,25 @@
         class="dropdown-content menu bg-base-100 rounded-md z-[1] w-52 p-2 shadow"
         role="menu"
       >
-        {#each assistants as assistant}
-          <li role="menuitem">
-            <button
-              class={selectedAssistantId === assistant.id ? 'active' : ''}
-              onclick={(e) => {
+        {#each assistants as item}
+          {#if item.menuTitle}
+            <div class="pt-1">{item.menuTitle}</div>
+          {/if}
+          {#each item.menuItems as menuItem}
+
+            <li role="menuitem">
+              <button
+                class={selectedAssistantId === menuItem.id ? 'active' : ''}
+                onclick={(e) => {
                 e.stopPropagation();
-                selectAssistant(assistant);
+                selectAssistant(menuItem);
               }}
-            >
-              {assistant.name}
-            </button>
-          </li>
+              >
+                {menuItem.name}
+              </button>
+            </li>
+
+          {/each}
         {/each}
       </ul>
     {/if}

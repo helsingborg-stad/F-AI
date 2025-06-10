@@ -1,20 +1,16 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import ActionButtons from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
+  import { mockOnlyAssistants } from '$stories/assets/mockData/assistantPicker.ts'
 
   const { Story } = defineMeta({
     title: 'Components/Chat/ActionButtons',
     component: ActionButtons,
     parameters: {
-      layout: 'centered', // This will center the component
+      layout: 'centered',
     },
   })
 </script>
 
-<Story name="Default" args={{
-  assistants: [
-    {id: '0', name: 'Language assistant'},
-    {id: '1', name: 'Math assistant'},
-    ]
-}}
+<Story name="Default" args={{ assistants: mockOnlyAssistants }}
 />

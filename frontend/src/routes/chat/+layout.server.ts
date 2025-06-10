@@ -2,24 +2,12 @@ import { redirect } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types.js'
 import { api } from '$lib/api-fetch-factory.js'
 import { canChat } from '$lib/state/user.svelte.js'
+import { getAssistantPickerData } from './utils.js'
 
 export const load: LayoutServerLoad = async (event) => {
   const userCanChat = canChat()
 
-  const assistantsResponse = await api.get('/api/assistant', { event })
-
-  if (!assistantsResponse.ok) {
-    redirect(307, '/chat')
-  }
-
-  const {
-    assistants,
-  }: {
-    assistants: {
-      id: string
-      name: string
-    }[]
-  } = await assistantsResponse.json()
+  const assistants = await getAssistantPickerData(event)
 
   const conversationsResponse = await api.get('/api/conversation', { event })
   if (!conversationsResponse.ok) {
@@ -79,5 +67,10 @@ export const load: LayoutServerLoad = async (event) => {
     }
   }
 
-  return { conversationContext: { assistantId: '', messages: [] }, assistants, conversations, canChat: userCanChat }
+  return {
+    conversationContext: { assistantId: '', messages: [] },
+    assistants,
+    conversations,
+    canChat: userCanChat,
+  }
 }

@@ -4,6 +4,7 @@
   import ChatMessage from '$lib/components/Chat/ChatMessage.svelte'
   import ChatInput from '$lib/components/Chat/ChatInput.svelte'
   import ActionButtons from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
+  import type { IAssistantMenu } from '$lib/types.js'
 
   interface Message {
     timestamp: string
@@ -13,10 +14,7 @@
   }
 
   export interface Props {
-    assistants: {
-      id: string,
-      name: string
-    }[],
+    assistants: IAssistantMenu[],
     selectedAssistantId: string,
     messages: Message[],
     inputPlaceholder: string,
