@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { IAssistant, IAssistantModel } from '$lib/types.js'
-  import MainPage from '$lib/components/assistant/MainPage.svelte'
+  import MainPage from '$lib/components/Assistant/MainPage.svelte'
 
   let { data } = $props<{ assistants: IAssistant[], models: IAssistantModel[] }>()
 
