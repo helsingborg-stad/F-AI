@@ -44,6 +44,7 @@
 
   // Used to set messages when going from one chat to another when components are not re-mounted
   $effect(() => {
+    chatMachine.stop()
     messages = data.conversationContext.messages
   })
 
