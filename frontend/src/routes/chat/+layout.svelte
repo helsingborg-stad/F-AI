@@ -42,9 +42,19 @@
 
   let messages = $state(data.conversationContext.messages)
 
+  // Track previous conversation ID to detect actual conversation switches
+  let previousConversationId = $state<string | undefined>(undefined)
+
   // Used to set messages when going from one chat to another when components are not re-mounted
   $effect(() => {
-    chatMachine.stop()
+    const currentConversationId = page.params.conversationId
+
+    // Stop chat machine when switching between different existing conversations
+    if (previousConversationId && currentConversationId && previousConversationId !== currentConversationId) {
+      chatMachine.stop()
+    }
+
+    previousConversationId = currentConversationId
     messages = data.conversationContext.messages
   })
 
