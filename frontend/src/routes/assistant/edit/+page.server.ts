@@ -10,9 +10,8 @@ import {
   createAssistant,
   deleteAssistant,
   deleteAssistantAvatar,
-  fetchAllAssistants,
   fetchAssistantById,
-  fetchAssistantModels,
+  fetchAssistantModels, getUserAssistants,
   updateAssistant,
   updateAssistantAvatar,
 } from '$lib/utils/assistant.js'
@@ -62,7 +61,7 @@ export const load: PageServerLoad = async (event) => {
   let activeAssistant: IAssistant = {} as IAssistant
 
   if (userCanListAssistants) {
-    assistants = (await fetchAllAssistants(event)).map((assistant) => ({
+    assistants = (await getUserAssistants(event)).map((assistant) => ({
       id: assistant.id,
       name: assistant.name,
       description: assistant.description,
@@ -169,7 +168,7 @@ export const actions = {
 
     try {
       assistantId = await createAssistant(event)
-      const updateData = await getAssistantFormValues(formData, {
+      const updateData = getAssistantFormValues(formData, {
         name: `Copy of ${originalName}`,
       })
       await updateAssistant(assistantId, updateData, event)

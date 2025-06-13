@@ -13,6 +13,15 @@ export async function fetchAllAssistants(
   return []
 }
 
+export async function getUserAssistants(event: RequestEvent): Promise<IBackendAssistant[]> {
+  const response = await api.get('/api/assistant/me', { event, withAuth: true })
+  if (response.ok) {
+    const data = await response.json()
+    return data.assistants
+  }
+  return []
+}
+
 export async function fetchAssistantModels(
   event: RequestEvent,
 ): Promise<IAssistantModels[]> {
