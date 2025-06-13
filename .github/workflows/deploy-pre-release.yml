@@ -61,7 +61,7 @@ jobs:
 
       # - name: Deploy container to Jelastic
       #   run: |
-      #     curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
+      #     curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE_BACKEND }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
       #   shell: bash
   build-frontend:
     runs-on: codebuild-f-ai-builder-${{ github.run_id }}-${{ github.run_attempt }}-ubuntu-7.0-medium
@@ -119,6 +119,6 @@ jobs:
 
       # - name: Deploy container to Jelastic
       #   run: |
-      #     curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
+      #     curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE_FRONTEND }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
       #   shell: bash
   
