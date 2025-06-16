@@ -1,4 +1,4 @@
-FROM --platform=amd64 node:21 as builder
+FROM node:21 as builder
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM --platform=amd64 node:21-alpine
+FROM node:21-alpine
 LABEL org.opencontainers.image.source=https://github.com/helsingborg-stad/F-AI
 WORKDIR /app
 

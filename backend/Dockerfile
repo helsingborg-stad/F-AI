@@ -5,7 +5,7 @@ RUN git ls-remote --heads https://github.com/helsingborg-stad/F-AI.git master | 
 
 
 # Stage: Build requirements for the backend
-FROM --platform=arm64 python:3.11.9-slim-bookworm AS requirements-stage
+FROM python:3.11.9-slim-bookworm AS requirements-stage
 
 WORKDIR /tmp
 
@@ -17,7 +17,7 @@ RUN poetry export -f requirements.txt -o requirements.txt --without-hashes
 
 
 # Stage: Build the final image with the backend and the frontend
-FROM --platform=arm64 python:3.11.9-slim-bookworm
+FROM python:3.11.9-slim-bookworm
 LABEL org.opencontainers.image.source=https://github.com/helsingborg-stad/F-AI
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
