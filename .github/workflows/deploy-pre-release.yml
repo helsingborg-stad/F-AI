@@ -111,7 +111,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           no-cache: false
           build-args: GITHUB_ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }}
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
     needs: [build-backend, build-frontend]
     steps:
@@ -119,6 +119,10 @@ jobs:
         run: |
           curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE_BACKEND }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
         shell: bash
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    needs: [build-backend, build-frontend]
+    steps:
       - name: Deploy frontend to Jelastic
         run: |
           curl --request GET --url 'https://app.jelastic.elastx.net/1.0/environment/control/rest/redeploycontainerbyid?session=${{ secrets.JELASTIC_API_KEY }}&nodeId=${{ secrets.JELASTIC_NODE_ID_PRE_RELEASE_FRONTEND }}&envName=${{ secrets.JELASTIC_ENV_NAME_PRE_RELEASE }}&tag=${{github.event.release.tag_name}}&useExistingVolumes=true'
