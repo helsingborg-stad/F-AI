@@ -32,6 +32,7 @@ class MongoAssistantService(IAssistantService):
             llm_api_key=None,
             instructions='',
             collection_id=None,
+            max_collection_results=10,
             extra_llm_params=None
         )
         result = await self._database['assistants'].insert_one({
@@ -91,6 +92,7 @@ class MongoAssistantService(IAssistantService):
                 'max_tokens',
                 'allow_files',
                 'collection_id',
+                'max_collection_results',
                 'extra_llm_params',
                 'response_schema'
             ]
@@ -114,6 +116,7 @@ class MongoAssistantService(IAssistantService):
                 'max_tokens',
                 'allow_files',
                 'collection_id',
+                'max_collection_results',
                 'extra_llm_params',
                 'response_schema'
             ]
@@ -171,6 +174,7 @@ class MongoAssistantService(IAssistantService):
             llm_api_key: str | None = None,
             instructions: str | None = None,
             collection_id: str | None = None,
+            max_collection_results: int | None = None,
             response_schema: dict[str, object] | None = None,
             extra_llm_params: dict[str, float | int | bool | str] | None = None
     ) -> bool:
@@ -190,6 +194,7 @@ class MongoAssistantService(IAssistantService):
         self._add_to_dict_unless_none(update_dict, 'instructions', instructions)
         self._add_to_dict_unless_none(update_dict, 'extra_llm_params', extra_llm_params)
         self._add_to_dict_unless_none(update_dict, 'collection_id', collection_id)
+        self._add_to_dict_unless_none(update_dict, 'max_collection_results', max_collection_results)
         self._add_to_dict_unless_none(update_dict, 'response_schema', response_schema)
 
         result = await self._database['assistants'].update_one(
@@ -299,8 +304,8 @@ class MongoAssistantService(IAssistantService):
                 description=doc['meta']['description'],
                 avatar_base64=await self._get_avatar_base64(doc['meta']['gfs_avatar']) if 'gfs_avatar' in doc[
                     'meta'] else None,
-                allow_files=doc['meta']['allow_files'],
-                sample_questions=doc['meta']['sample_questions'],
+                allow_files=doc['meta']['allow_files'] if 'allow_files' in doc['meta'] else False,
+                sample_questions=doc['meta']['sample_questions'] if 'sample_questions' in doc['meta'] else [],
                 is_public=doc['meta']['is_public'] if 'is_public' in doc['meta'] else False,
                 primary_color=doc['meta']['primary_color'] if 'primary_color' in doc['meta'] else '#ffffff'
             ),
@@ -308,6 +313,7 @@ class MongoAssistantService(IAssistantService):
             llm_api_key=api_key,
             instructions=doc['instructions'],
             collection_id=doc['collection_id'],
+            max_collection_results=doc['max_collection_results'] if 'max_collection_results' in doc else 10,
             extra_llm_params=doc['extra_llm_params'] if 'extra_llm_params' in doc else None,
             response_schema=doc['response_schema'] if 'response_schema' in doc else None
         )
@@ -319,7 +325,7 @@ class MongoAssistantService(IAssistantService):
             description=doc['meta']['description'],
             avatar_base64=await self._get_avatar_base64(doc['meta']['gfs_avatar']) if 'gfs_avatar' in doc[
                 'meta'] else None,
-            sample_questions=doc['meta']['sample_questions'],
+            sample_questions=doc['meta']['sample_questions'] if 'sample_questions' in doc['meta'] else [],
             model=doc['model'],
             primary_color=doc['meta']['primary_color'] if 'primary_color' in doc['meta'] else '#ffffff'
         )
