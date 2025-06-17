@@ -6,6 +6,7 @@
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
   import FileUploadModal from '$lib/components/Assistant/Edit/FileUploadModal.svelte'
   import type { ICollection } from '$lib/types.js'
+  import FilesSettings from '$lib/components/Assistant/Edit/ToolsSection/FilesSettings.svelte'
 
   interface Props {
     canEdit: boolean
@@ -42,9 +43,7 @@
       {/if}
     </div>
     <div>
-      <button type="button" class="btn btn-sm" disabled={!canEdit}>
-        <Icon icon={icons["settings"]} width={16} height={16} />
-      </button>
+      <FilesSettings />
       <button type="button" class="btn btn-sm" disabled={!canEdit} onclick={openFilesModal}>
         <Icon icon={icons["plus"]} width={16} height={16} />
         <span class="text-s">Files</span>
