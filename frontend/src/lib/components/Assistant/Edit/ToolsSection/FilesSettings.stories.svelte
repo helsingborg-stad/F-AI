@@ -12,4 +12,4 @@
   })
 </script>
 
-<Story name="Default" />
+<Story name="Default" args="{{maxCollection: '12'}}" />
