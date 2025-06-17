@@ -37,15 +37,17 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
   return {
     id: id,
     model_key: modelKey,
-    name: name,
+    meta: {
+      name: name,
+      description: description,
+      is_public: visibility,
+      avatar_base64: avatar,
+      primary_color: primaryColor,
+      sample_questions: [],
+    },
     model: model,
     collection_id: collectionId === '' ? null : collectionId,
     instructions: instructions,
-    description: description,
-    is_public: visibility,
-    avatar_base64: avatar,
-    primary_color: primaryColor,
-    sample_questions: [],
     ...overwrite,
   }
 }
@@ -63,13 +65,13 @@ export const load: PageServerLoad = async (event) => {
   if (userCanListAssistants) {
     assistants = (await getUserAssistants(event)).map((assistant) => ({
       id: assistant.id,
-      name: assistant.name,
-      description: assistant.description,
+      name: assistant.meta?.name?.toString() ?? '',
+      description: assistant.meta?.description?.toString() ?? '',
       instructions: assistant.instructions,
       model: assistant.model,
-      isPublic: assistant.is_public,
-      avatarBase64: assistant.avatar_base64,
-      primaryColor: assistant.primary_color,
+      isPublic: assistant.meta.is_public === true,
+      avatarBase64: assistant.meta?.avatar_base64?.toString() ?? '',
+      primaryColor: assistant.meta?.primary_color?.toString() ?? '#ffffff',
     }))
   }
 
@@ -77,13 +79,13 @@ export const load: PageServerLoad = async (event) => {
     const assistantData = await fetchAssistantById(event, activeAssistantID)
     activeAssistant = {
       id: activeAssistantID,
-      name: assistantData.name,
-      description: assistantData.description,
+      name: assistantData.meta?.name?.toString() ?? '',
+      description: assistantData.meta?.description?.toString() ?? '',
       instructions: assistantData.instructions,
       model: assistantData.model,
-      isPublic: assistantData.is_public,
-      avatarBase64: assistantData.avatar_base64,
-      primaryColor: assistantData.primary_color,
+      isPublic: assistantData.meta.is_public === true,
+      avatarBase64: assistantData.meta?.avatar_base64?.toString() ?? '',
+      primaryColor: assistantData.meta?.primary_color?.toString() ?? '#ffffff',
     }
 
     if (userCanReadCollections && assistantData.collection_id) {

@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Protocol, Any
 
 from src.modules.assistants.models.Assistant import Assistant
 from src.modules.assistants.models.AssistantInfo import AssistantInfo
@@ -31,12 +31,7 @@ class IAssistantService(Protocol):
             self,
             as_uid: str,
             assistant_id: str,
-            name: str | None = None,
-            description: str | None = None,
-            avatar_base64: str | None = None,
-            primary_color: str | None = None,
-            allow_files: bool | None = None,
-            sample_questions: list[str] | None = None,
+            meta: dict[str, Any] | None = None,
             is_public: bool | None = None,
             model: str | None = None,
             llm_api_key: str | None = None,
@@ -44,7 +39,7 @@ class IAssistantService(Protocol):
             collection_id: str | None = None,
             max_collection_results: int | None = None,
             response_schema: dict[str, object] | None = None,
-            extra_llm_params: dict[str, float | int | bool | str] | None = None
+            extra_llm_params: dict[str, float | int | bool | str] | None = None,
     ) -> bool:
         ...
 

@@ -8,7 +8,6 @@ from pymongo.asynchronous.database import AsyncDatabase
 from src.common.mongo import is_valid_mongo_id
 from src.modules.assistants.models.Assistant import Assistant
 from src.modules.assistants.models.AssistantInfo import AssistantInfo
-from src.modules.assistants.models.AssistantMeta import AssistantMeta
 from src.modules.assistants.models.Model import Model
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
 from src.modules.resources.protocols.IResourceService import IResourceService
@@ -26,8 +25,7 @@ class MongoAssistantService(IAssistantService):
         assistant = Assistant(
             id=force_id if force_id else str(ObjectId()),
             owner=as_uid,
-            meta=AssistantMeta(name='', description='', avatar_base64='', sample_questions=[], allow_files=False,
-                               is_public=False, primary_color='#ffffff'),
+            meta={},
             model='',
             llm_api_key=None,
             instructions='',
@@ -163,12 +161,7 @@ class MongoAssistantService(IAssistantService):
             self,
             as_uid: str,
             assistant_id: str,
-            name: str | None = None,
-            description: str | None = None,
-            avatar_base64: str | None = None,
-            primary_color: str | None = None,
-            allow_files: bool | None = None,
-            sample_questions: list[str] | None = None,
+            meta: dict[str, Any] | None = None,
             is_public: bool | None = None,
             model: str | None = None,
             llm_api_key: str | None = None,
@@ -176,18 +169,37 @@ class MongoAssistantService(IAssistantService):
             collection_id: str | None = None,
             max_collection_results: int | None = None,
             response_schema: dict[str, object] | None = None,
-            extra_llm_params: dict[str, float | int | bool | str] | None = None
+            extra_llm_params: dict[str, float | int | bool | str] | None = None,
     ) -> bool:
         if not is_valid_mongo_id(assistant_id):
             return False
 
         update_dict: dict[str, Any] = {}
 
-        self._add_to_dict_unless_none(update_dict, 'meta.name', name)
-        self._add_to_dict_unless_none(update_dict, 'meta.description', description)
-        self._add_to_dict_unless_none(update_dict, 'meta.primary_color', primary_color)
-        self._add_to_dict_unless_none(update_dict, 'meta.allow_files', allow_files)
-        self._add_to_dict_unless_none(update_dict, 'meta.sample_questions', sample_questions)
+        if meta and 'avatar_base64' in meta:
+            fs = gridfs.AsyncGridFS(self._database)
+            doc = await self._database['assistants'].find_one({'_id': ObjectId(assistant_id), 'owner': as_uid},
+                                                              projection=['meta'])
+
+            if doc and 'gfs_avatar' in doc['meta'] and doc['meta']['gfs_avatar'] is not None:
+                await fs.delete(doc['meta']['gfs_avatar'])
+
+            in_value = meta['avatar_base64']
+            del meta['avatar_base64']
+            meta['gfs_avatar'] = None
+
+            if isinstance(in_value, str) and len(in_value) > 0:
+                decoded = base64.b64decode(in_value)
+                new_id = await fs.put(decoded, filename=f'{assistant_id}.png')
+                meta['gfs_avatar'] = new_id
+
+        meta_unsets = [f'meta.{k}' for k, v in meta.items() if v is None] if meta else []
+
+        if meta is not None:
+            for k, v in meta.items():
+                if v is not None:
+                    self._add_to_dict_unless_none(update_dict, f'meta.{k}', v)
+
         self._add_to_dict_unless_none(update_dict, 'meta.is_public', is_public)
         self._add_to_dict_unless_none(update_dict, 'model', model)
         self._add_to_dict_unless_none(update_dict, 'llm_api_key', llm_api_key)
@@ -200,27 +212,10 @@ class MongoAssistantService(IAssistantService):
         result = await self._database['assistants'].update_one(
             {'_id': ObjectId(assistant_id), 'owner': as_uid},
             {
-                '$set': {**update_dict}
+                '$set': {**update_dict},
+                '$unset': {**dict.fromkeys(meta_unsets, '')}
             }
         )
-
-        if avatar_base64 is not None:
-            fs = gridfs.AsyncGridFS(self._database)
-
-            doc = await self._database['assistants'].find_one({'_id': ObjectId(assistant_id), 'owner': as_uid},
-                                                              projection=['meta'])
-
-            if doc and 'gfs_avatar' in doc['meta'] and doc['meta']['gfs_avatar'] is not None:
-                await fs.delete(doc['meta']['gfs_avatar'])
-
-            if avatar_base64 == '':
-                new_id = None
-            else:
-                decoded = base64.b64decode(avatar_base64)
-                new_id = await fs.put(decoded, filename=f'{assistant_id}.png')
-
-            await self._database['assistants'].update_one({'_id': ObjectId(assistant_id), 'owner': as_uid},
-                                                          {'$set': {'meta.gfs_avatar': new_id}})
 
         return result.matched_count == 1
 
@@ -293,22 +288,21 @@ class MongoAssistantService(IAssistantService):
             return None
         return base64.b64encode(await file.read()).decode('utf-8')
 
+    async def _parse_meta(self, doc: Mapping[str, Any]) -> dict[str, Any]:
+        result = {k: v for k, v in doc.items() if k != 'gfs_avatar'}
+        if 'gfs_avatar' in doc:
+            avatar_base64 = await self._get_avatar_base64(doc['gfs_avatar'])
+            if avatar_base64 is not None:
+                result['avatar_base64'] = avatar_base64
+        return result
+
     async def _doc_to_assistant(self, doc: Mapping[str, Any], redact_key: bool) -> Assistant:
         api_key = (MongoAssistantService._redact_key(doc['llm_api_key']) if redact_key else doc[
             'llm_api_key']) if 'llm_api_key' in doc else None
         return Assistant(
             id=str(doc['_id']),
             owner=doc['owner'],
-            meta=AssistantMeta(
-                name=doc['meta']['name'],
-                description=doc['meta']['description'],
-                avatar_base64=await self._get_avatar_base64(doc['meta']['gfs_avatar']) if 'gfs_avatar' in doc[
-                    'meta'] else None,
-                allow_files=doc['meta']['allow_files'] if 'allow_files' in doc['meta'] else False,
-                sample_questions=doc['meta']['sample_questions'] if 'sample_questions' in doc['meta'] else [],
-                is_public=doc['meta']['is_public'] if 'is_public' in doc['meta'] else False,
-                primary_color=doc['meta']['primary_color'] if 'primary_color' in doc['meta'] else '#ffffff'
-            ),
+            meta=await self._parse_meta(doc['meta']) if 'meta' in doc else {},
             model=doc['model'],
             llm_api_key=api_key,
             instructions=doc['instructions'],
@@ -321,13 +315,8 @@ class MongoAssistantService(IAssistantService):
     async def _doc_to_assistant_info(self, doc: Mapping[str, Any]) -> AssistantInfo:
         return AssistantInfo(
             id=str(doc['_id']),
-            name=doc['meta']['name'],
-            description=doc['meta']['description'],
-            avatar_base64=await self._get_avatar_base64(doc['meta']['gfs_avatar']) if 'gfs_avatar' in doc[
-                'meta'] else None,
-            sample_questions=doc['meta']['sample_questions'] if 'sample_questions' in doc['meta'] else [],
             model=doc['model'],
-            primary_color=doc['meta']['primary_color'] if 'primary_color' in doc['meta'] else '#ffffff'
+            meta=await self._parse_meta(doc['meta']) if 'meta' in doc else None,
         )
 
     @staticmethod

@@ -1,5 +1,9 @@
 import type { icons } from '$lib/components/Icon/icons.js'
 
+export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+export type JsonObject = { [key: string]: JsonValue };
+export type JsonArray = JsonValue[];
+
 export interface IMenuItem {
   label: string
   path: string
@@ -54,15 +58,10 @@ export interface IAssistantModels {
 export interface IBackendAssistant {
   id: string
   model_key: string
-  name: string
-  description: string
-  instructions: string
   model: string
-  is_public: boolean
+  instructions: string
   collection_id: string | null
-  avatar_base64: string
-  primary_color: string
-  sample_questions: string[]
+  meta: JsonObject
 }
 
 export interface IAssistant {
@@ -79,7 +78,7 @@ export interface IAssistant {
 
 export interface IAssistantCard {
   id: string
-  avatar: string
+  avatar: string | null
   title: string
   description: string
   owner: string

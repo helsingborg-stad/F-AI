@@ -45,7 +45,8 @@ class BaseAssistantServiceTestClass:
 
         result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
-        assert result.meta.is_public is False
+        assert isinstance(result.meta, dict)
+        assert 'is_public' not in result.meta
 
     @staticmethod
     @pytest.mark.asyncio
@@ -249,23 +250,26 @@ class BaseAssistantServiceTestClass:
         await service.update_assistant(
             as_uid='john',
             assistant_id=aid,
-            name='cool name',
-            description='cool desc',
-            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
-            primary_color='#facade',
-            sample_questions=['a', 'b', 'c'],
             model='fai:my_model',
+            meta={
+                'name': 'cool name',
+                'description': 'cool desc',
+                'avatar_base64': 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+                'primary_color': '#facade',
+                'sample_questions': ['a', 'b', 'c'],
+            }
         )
 
         result = await service.get_assistant_info(as_uid='john', assistant_id=aid)
 
         assert result.id == aid
-        assert result.name == 'cool name'
-        assert result.description == 'cool desc'
-        assert result.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
-        assert result.primary_color == '#facade'
-        assert result.sample_questions == ['a', 'b', 'c']
         assert result.model == 'fai:my_model'
+        assert result.meta['name'] == 'cool name'
+        assert result.meta['description'] == 'cool desc'
+        assert result.meta[
+                   'avatar_base64'] == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result.meta['primary_color'] == '#facade'
+        assert result.meta['sample_questions'] == ['a', 'b', 'c']
 
     @staticmethod
     @pytest.mark.asyncio
@@ -275,13 +279,15 @@ class BaseAssistantServiceTestClass:
         await service.update_assistant(
             as_uid='john',
             assistant_id=aid,
-            name='cool name',
-            description='cool desc',
-            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
-            primary_color='#facade',
-            sample_questions=['a', 'b', 'c'],
             model='fai:my_model',
-            is_public=True
+            is_public=True,
+            meta={
+                'name': 'cool name',
+                'description': 'cool desc',
+                'avatar_base64': 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+                'primary_color': '#facade',
+                'sample_questions': ['a', 'b', 'c'],
+            }
         )
         private_aid = await service.create_assistant(as_uid='john')
 
@@ -289,12 +295,13 @@ class BaseAssistantServiceTestClass:
         result2 = await service.get_assistant_info(as_uid='jane', assistant_id=private_aid)
 
         assert result1.id == aid
-        assert result1.name == 'cool name'
-        assert result1.description == 'cool desc'
-        assert result1.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
-        assert result1.primary_color == '#facade'
-        assert result1.sample_questions == ['a', 'b', 'c']
         assert result1.model == 'fai:my_model'
+        assert result1.meta['name'] == 'cool name'
+        assert result1.meta['description'] == 'cool desc'
+        assert result1.meta[
+                   'avatar_base64'] == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result1.meta['primary_color'] == '#facade'
+        assert result1.meta['sample_questions'] == ['a', 'b', 'c']
 
         assert result2 is None
 
@@ -322,24 +329,26 @@ class BaseAssistantServiceTestClass:
         await service.update_assistant(
             as_uid='john',
             assistant_id=aid,
-            name='cool name',
-            description='cool desc',
-            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
-            primary_color='#facade',
-            sample_questions=['a', 'b', 'c'],
             model='fai:my_model',
+            meta={
+                'name': 'cool name',
+                'description': 'cool desc',
+                'avatar_base64': 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+                'primary_color': '#facade',
+                'sample_questions': ['a', 'b', 'c'],
+            }
         )
 
         result = await service.get_available_assistants(as_uid='john')
 
         assert result[0].id == aid
-        assert result[0].name == 'cool name'
-        assert result[0].description == 'cool desc'
-        assert result[
-                   0].avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
-        assert result[0].primary_color == '#facade'
-        assert result[0].sample_questions == ['a', 'b', 'c']
         assert result[0].model == 'fai:my_model'
+        assert result[0].meta['name'] == 'cool name'
+        assert result[0].meta['description'] == 'cool desc'
+        assert result[0].meta[
+                   'avatar_base64'] == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result[0].meta['primary_color'] == '#facade'
+        assert result[0].meta['sample_questions'] == ['a', 'b', 'c']
 
     @staticmethod
     @pytest.mark.asyncio
@@ -374,14 +383,20 @@ class BaseAssistantServiceTestClass:
     async def test_update_assistant_basic(service: IAssistantService):
         aid = await service.create_assistant(as_uid='john')
 
-        success = await service.update_assistant(as_uid='john', assistant_id=aid, name='test assistant',
-                                                 description='test description')
+        success = await service.update_assistant(
+            as_uid='john',
+            assistant_id=aid,
+            meta={
+                'name': 'test assistant',
+                'description': 'test description'
+            }
+        )
 
         result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
         assert success is True
-        assert result.meta.name == 'test assistant'
-        assert result.meta.description == 'test description'
+        assert result.meta['name'] == 'test assistant'
+        assert result.meta['description'] == 'test description'
 
     @staticmethod
     @pytest.mark.asyncio
@@ -389,10 +404,11 @@ class BaseAssistantServiceTestClass:
     async def test_update_assistant_consecutive(service: IAssistantService):
         aid = await service.create_assistant(as_uid='john')
 
-        success1 = await service.update_assistant(as_uid='john', assistant_id=aid, name='test assistant',
+        success1 = await service.update_assistant(as_uid='john', assistant_id=aid, meta={'name': 'test assistant'},
                                                   extra_llm_params={'a': 'a', 'b': 'b'})
-        success2 = await service.update_assistant(as_uid='john', assistant_id=aid, sample_questions=['hello', 'world'])
-        success3 = await service.update_assistant(as_uid='john', assistant_id=aid, name='my cool assistant',
+        success2 = await service.update_assistant(as_uid='john', assistant_id=aid,
+                                                  meta={'sample_questions': ['hello', 'world']})
+        success3 = await service.update_assistant(as_uid='john', assistant_id=aid, meta={'name': 'my cool assistant'},
                                                   extra_llm_params={'c': 'c'})
 
         result = await service.get_assistant(as_uid='john', assistant_id=aid)
@@ -400,8 +416,8 @@ class BaseAssistantServiceTestClass:
         assert success1 is True
         assert success2 is True
         assert success3 is True
-        assert result.meta.name == 'my cool assistant'
-        assert result.meta.sample_questions == ['hello', 'world']
+        assert result.meta['name'] == 'my cool assistant'
+        assert result.meta['sample_questions'] == ['hello', 'world']
         assert result.extra_llm_params['c'] == 'c'
         assert 'a' not in result.extra_llm_params
         assert 'b' not in result.extra_llm_params
@@ -409,19 +425,55 @@ class BaseAssistantServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_update_assistant_remove_avatar(service: IAssistantService):
+    async def test_update_assistant_meta_override(service: IAssistantService):
         aid = await service.create_assistant(as_uid='john')
-        await service.update_assistant(
-            as_uid='john',
-            assistant_id=aid,
-            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
-        )
 
-        await service.update_assistant(as_uid='john', assistant_id=aid, avatar_base64='')
+        await service.update_assistant(as_uid='john', assistant_id=aid, meta={'name': 'A'})
+        await service.update_assistant(as_uid='john', assistant_id=aid, meta={'name': 'B'})
 
         result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
-        assert result.meta.avatar_base64 is None
+        assert result.meta['name'] == 'B'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_update_assistant_meta_preserve(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+
+        await service.update_assistant(as_uid='john', assistant_id=aid, meta={'name': 'A', 'foo': 'bar'})
+        await service.update_assistant(as_uid='john', assistant_id=aid, meta={'name': 'B'})
+
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
+
+        assert result.meta['foo'] == 'bar'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_update_assistant_meta_unset(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+
+        await service.update_assistant(as_uid='john', assistant_id=aid, meta={'name': 'A', 'foo': 'baz'})
+        await service.update_assistant(as_uid='john', assistant_id=aid, meta={'name': None})
+
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
+
+        assert result.meta['foo'] == 'baz'
+        assert 'name' not in result.meta
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_update_assistant_meta_override_array(service: IAssistantService):
+        aid = await service.create_assistant(as_uid='john')
+
+        await service.update_assistant(as_uid='john', assistant_id=aid, meta={'name': 'A', 'foo': ['a', 'b', 'c']})
+        await service.update_assistant(as_uid='john', assistant_id=aid, meta={'foo': ['d', 'e']})
+
+        result = await service.get_assistant(as_uid='john', assistant_id=aid)
+
+        assert result.meta['foo'] == ['d', 'e']
 
     @staticmethod
     @pytest.mark.asyncio
@@ -432,12 +484,6 @@ class BaseAssistantServiceTestClass:
         success = await service.update_assistant(
             as_uid='john',
             assistant_id=aid,
-            name='a',
-            description='b',
-            avatar_base64='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
-            primary_color='#facade',
-            allow_files=True,
-            sample_questions=['c', 'd', 'e'],
             is_public=True,
             model='f',
             llm_api_key='g',
@@ -451,6 +497,14 @@ class BaseAssistantServiceTestClass:
                 'some_int': 1337,
                 'some_bool': True,
                 'some_str': 'j'
+            },
+            meta={
+                'name': 'a',
+                'description': 'b',
+                'avatar_base64': 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
+                'primary_color': '#facade',
+                'allow_files': True,
+                'sample_questions': ['c', 'd', 'e'],
             }
         )
 
@@ -459,13 +513,6 @@ class BaseAssistantServiceTestClass:
         assert success is True
         assert result.id == aid
         assert result.owner == 'john'
-        assert result.meta.name == 'a'
-        assert result.meta.description == 'b'
-        assert result.meta.avatar_base64 == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
-        assert result.meta.primary_color == '#facade'
-        assert result.meta.allow_files is True
-        assert result.meta.sample_questions == ['c', 'd', 'e']
-        assert result.meta.is_public is True
         assert result.model == 'f'
         assert result.instructions == 'h'
         assert result.response_schema == {"name": "my_schema",
@@ -476,6 +523,14 @@ class BaseAssistantServiceTestClass:
         assert result.extra_llm_params['some_str'] == 'j'
         assert result.collection_id == 'i'
         assert result.max_collection_results == 5
+        assert result.meta['is_public'] is True
+        assert result.meta['name'] == 'a'
+        assert result.meta['description'] == 'b'
+        assert result.meta[
+                   'avatar_base64'] == 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+        assert result.meta['primary_color'] == '#facade'
+        assert result.meta['allow_files'] is True
+        assert result.meta['sample_questions'] == ['c', 'd', 'e']
 
     @staticmethod
     @pytest.mark.asyncio
@@ -483,17 +538,17 @@ class BaseAssistantServiceTestClass:
     async def test_update_assistant_invalid_uid(service: IAssistantService):
         aid = await service.create_assistant(as_uid='john')
 
-        success = await service.update_assistant(as_uid='jane', assistant_id=aid, name='evil override')
+        success = await service.update_assistant(as_uid='jane', assistant_id=aid, meta={'name': 'evil override'})
         result = await service.get_assistant(as_uid='john', assistant_id=aid)
 
         assert success is False
-        assert result.meta.name != 'evil override'
+        assert 'name' not in result.meta
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
     async def test_update_assistant_invalid_assistant_id(service: IAssistantService):
-        success = await service.update_assistant(as_uid='john', assistant_id='invalid', name='hello')
+        success = await service.update_assistant(as_uid='john', assistant_id='invalid', meta={'name': 'hello'})
         result = await service.get_assistant(as_uid='john', assistant_id='invalid')
 
         assert success is False
