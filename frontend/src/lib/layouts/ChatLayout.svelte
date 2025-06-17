@@ -6,13 +6,11 @@
   import { goto } from '$app/navigation'
   import { icons } from '$lib/components/Icon/icons.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
+  import type { IAssistantMenu } from '$lib/types.js'
 
   type Props = ChatProps & {
     canChat: boolean
-    assistants: {
-      id: string,
-      name: string
-    }[]
+    assistants: IAssistantMenu[]
     conversations: {
       id: string,
       timestamp: string,

@@ -2,16 +2,12 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import ChatInput from './ChatInput.svelte'
   import ActionButtons from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
+  import { mockOnlyAssistants } from '$stories/assets/mockData/assistantPicker.ts'
 
   const { Story } = defineMeta({
     title: 'Components/Chat/ChatInput',
     tags: ['autodocs'],
   })
-
-  const assistants = [
-    { id: '0', name: 'Language assistant' },
-    { id: '1', name: 'Math assistant' },
-  ]
 </script>
 
 <Story name="Default">
@@ -22,6 +18,10 @@
 
 <Story name="With action button model picker">
   <ChatInput placeholder='' value='' onSubmit={() => {console.log('Send message!')}}>
-    <ActionButtons {assistants} selectedAssistantId={assistants[0].id} />
+    <ActionButtons
+      assistants={mockOnlyAssistants}
+      selectedAssistantId={mockOnlyAssistants[0].menuItems[0].id}
+      disableAssistantPicker={false}
+    />
   </ChatInput>
 </Story>
