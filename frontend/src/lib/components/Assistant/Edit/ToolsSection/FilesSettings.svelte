@@ -3,7 +3,7 @@
   import { icons } from '$lib/components/Icon/icons.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
 
-  const DEFAULT_RESULTS = '10'
+  const DEFAULT_RESULTS = 10
 
   interface Props {
     maxCollection: string
@@ -11,7 +11,7 @@
 
   let { maxCollection }: Props = $props()
 
-  let maxCollectionResults = $state(maxCollection)
+  let maxCollectionResults = $state(Number(maxCollection))
 
   function reset() {
     maxCollectionResults = DEFAULT_RESULTS
