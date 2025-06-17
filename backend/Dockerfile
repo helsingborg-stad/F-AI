@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 # Stage: Get the git revision
 FROM alpine/git AS git-revision
 WORKDIR /tmp
@@ -20,6 +18,7 @@ RUN poetry export -f requirements.txt -o requirements.txt --without-hashes
 
 # Stage: Build the final image with the backend and the frontend
 FROM python:3.11.9-slim-bookworm
+LABEL org.opencontainers.image.source=https://github.com/helsingborg-stad/F-AI
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
