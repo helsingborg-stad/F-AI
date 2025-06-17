@@ -64,7 +64,7 @@
   <HorizontalDivider />
   <div class="flex flex-1 w-full justify-center gap-4 overflow-hidden">
     <div
-      class="flex-1 overflow-auto pb-4 pr-4"
+      class="flex-1 overflow-auto pb-4 px-4"
       style="max-height: calc(100vh - 120px);"
     >
       <AssistantTable {assistants} {activeAssistant} />
