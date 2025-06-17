@@ -2,7 +2,7 @@
   import type { IAssistant, IAssistantModel } from '$lib/types.js'
   import ActionButtons from '$lib/components/Form/ActionButtons.svelte'
   import AccessSection from '$lib/components/Assistant/Edit/AccessSection.svelte'
-  import ToolsSection from '$lib/components/Assistant/Edit/ToolsSection.svelte'
+  import ToolsSection from '$lib/components/Assistant/Edit/ToolsSection/ToolsSection.svelte'
   import ModelConfigSection from '$lib/components/Assistant/Edit/ModelConfigSection.svelte'
   import AvatarSection from '$lib/components/Assistant/Edit/AvatarSection.svelte'
 
@@ -218,6 +218,7 @@
           assistantId={assistant.id}
           collectionId={collectionId}
           collection={assistant.collection}
+          maxCollectionResult={assistant.maxCollectionResults}
         />
         <ModelConfigSection {canEdit} />
       </div>

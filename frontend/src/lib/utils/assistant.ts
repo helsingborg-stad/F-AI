@@ -72,9 +72,11 @@ export async function updateAssistant(
     instructions?: string
     model_key?: string
     collection_id?: string | null
+    max_collection_results?: string
   },
   event: RequestEvent,
 ) {
+
   const response = await api.put(`/api/assistant/${assistantId}`, {
     event,
     body: updates,

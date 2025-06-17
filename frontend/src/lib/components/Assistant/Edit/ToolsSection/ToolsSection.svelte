@@ -6,15 +6,17 @@
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
   import FileUploadModal from '$lib/components/Assistant/Edit/FileUploadModal.svelte'
   import type { ICollection } from '$lib/types.js'
+  import FilesSettings from '$lib/components/Assistant/Edit/ToolsSection/FilesSettings.svelte'
 
   interface Props {
     canEdit: boolean
     assistantId: string
     collectionId: string
     collection?: ICollection
+    maxCollectionResult: string
   }
 
-  let { canEdit, assistantId, collectionId, collection }: Props = $props()
+  let { canEdit, assistantId, collectionId, collection, maxCollectionResult }: Props = $props()
   let fileModal: FileUploadModal
   let currentCollectionId = $state(collectionId)
   let currentFiles = $state(collection?.files || [])
@@ -42,9 +44,7 @@
       {/if}
     </div>
     <div>
-      <button type="button" class="btn btn-sm" disabled={!canEdit}>
-        <Icon icon={icons["settings"]} width={16} height={16} />
-      </button>
+      <FilesSettings maxCollection={maxCollectionResult}/>
       <button type="button" class="btn btn-sm" disabled={!canEdit} onclick={openFilesModal}>
         <Icon icon={icons["plus"]} width={16} height={16} />
         <span class="text-s">Files</span>
