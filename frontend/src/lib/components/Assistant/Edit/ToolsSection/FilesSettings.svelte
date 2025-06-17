@@ -49,7 +49,7 @@
       </div>
       <input
         type="range"
-        name="maxCollectionResults"
+        name="max_collection_results"
         min="0"
         max="30"
         bind:value={maxCollectionResults}

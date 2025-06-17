@@ -61,6 +61,7 @@ export interface IBackendAssistant {
   model: string
   instructions: string
   collection_id: string | null
+  meta: JsonObject
   max_collection_results: string
 }
 
