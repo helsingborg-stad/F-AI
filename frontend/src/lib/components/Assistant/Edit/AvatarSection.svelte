@@ -24,6 +24,7 @@
   let imagePreviewUrl = $state(avatarBase64 ? `data:image/png;base64,${avatarBase64}` : '')
   let deleteAvatar = $state(false)
   let fileInput: HTMLInputElement
+  let currentAvatarBase64 = $state(avatarBase64)
 
   function selectColor(color: string) {
     selectedColor = color
@@ -36,9 +37,11 @@
       imagePreviewUrl = URL.createObjectURL(fileInput.files[0])
       enableImagePlaceholder = false
       deleteAvatar = false
+      currentAvatarBase64 = ''
     } else {
       imagePreviewUrl = avatarBase64 ? `data:image/png;base64,${avatarBase64}` : ''
       enableImagePlaceholder = !avatarBase64
+      currentAvatarBase64 = avatarBase64
     }
   }
 
@@ -46,6 +49,7 @@
     imagePreviewUrl = ''
     enableImagePlaceholder = true
     deleteAvatar = true
+    currentAvatarBase64 = ''
 
     if (fileInput) {
       fileInput.value = ''
@@ -101,6 +105,13 @@
         name="delete_avatar"
         value={deleteAvatar ? 'true' : 'false'}
       >
+      {#if currentAvatarBase64 && !deleteAvatar}
+        <input
+          type="hidden"
+          name="avatar_base64"
+          value={currentAvatarBase64}
+        >
+      {/if}
       <div class="flex mt-3 ml-1">
         {#each colors as color, i}
           <button
