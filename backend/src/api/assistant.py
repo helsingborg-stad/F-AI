@@ -196,6 +196,7 @@ class GetAssistantResponseAssistant(BaseModel):
     llm_api_key: str | None
     instructions: str
     collection_id: str | None
+    max_collection_results: int
     extra_llm_params: dict[str, float | int | bool | str]
 
 
@@ -232,6 +233,7 @@ async def get_assistant(assistant_id: str, services: ServicesDependency, auth_id
             llm_api_key=result.llm_api_key,
             instructions=result.instructions,
             collection_id=result.collection_id,
+            max_collection_results=result.max_collection_results,
             extra_llm_params=result.extra_llm_params if result.extra_llm_params else {}
         )
     )
@@ -280,6 +282,7 @@ class UpdateAssistantRequest(BaseModel):
     llm_api_key: str | None = None
     instructions: str | None = None
     collection_id: str | None = None
+    max_collection_results: int | None = None
     extra_llm_params: dict[str, float | int | bool | str] | None = None
 
 
@@ -308,6 +311,7 @@ async def update_assistant(
         llm_api_key=body.llm_api_key,
         instructions=body.instructions,
         collection_id=body.collection_id,
+        max_collection_results=body.max_collection_results,
         extra_llm_params=body.extra_llm_params,
     )
 

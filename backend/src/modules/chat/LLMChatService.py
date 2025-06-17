@@ -92,7 +92,7 @@ class LLMChatService(IChatService):
             rag_llm_service: ILLMService = self._llm_factory.get(model_key=rag_scoring_assistant.model)
 
             rag_results = await self._collection_service.query_collection(assistant.collection_id, message,
-                                                                          max_results=10)
+                                                                          max_results=assistant.max_collection_results)
 
             formatted_results = [f"(source:{r.source}, page: {r.page_number})\n{r.content}" for r in rag_results]
 

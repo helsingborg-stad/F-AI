@@ -443,6 +443,7 @@ class BaseAssistantServiceTestClass:
             llm_api_key='g',
             instructions='h',
             collection_id='i',
+            max_collection_results=5,
             response_schema={"name": "my_schema",
                              "schema": {"type": "object", "properties": {"foo": {"type": "number"}}}},
             extra_llm_params={
@@ -474,6 +475,7 @@ class BaseAssistantServiceTestClass:
         assert result.extra_llm_params['some_bool'] is True
         assert result.extra_llm_params['some_str'] == 'j'
         assert result.collection_id == 'i'
+        assert result.max_collection_results == 5
 
     @staticmethod
     @pytest.mark.asyncio
