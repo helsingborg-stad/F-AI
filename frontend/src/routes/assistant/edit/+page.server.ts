@@ -11,7 +11,8 @@ import {
   deleteAssistant,
   deleteAssistantAvatar,
   fetchAssistantById,
-  fetchAssistantModels, getUserAssistants,
+  fetchAssistantModels,
+  getUserAssistants,
   updateAssistant,
   updateAssistantAvatar,
 } from '$lib/utils/assistant.js'
@@ -33,6 +34,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
   const visibility = formData.get('public') === 'on'
   const avatar = formData.get('avatar_base64') as string
   const primaryColor = formData.get('primary_color') as string
+  const maxCollectionResults = formData.get('max_collection_results') as string
 
   return {
     id: id,
@@ -48,6 +50,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
     model: model,
     collection_id: collectionId === '' ? null : collectionId,
     instructions: instructions,
+    max_collection_results: maxCollectionResults,
     ...overwrite,
   }
 }
@@ -69,6 +72,7 @@ export const load: PageServerLoad = async (event) => {
       description: assistant.meta?.description?.toString() ?? '',
       instructions: assistant.instructions,
       model: assistant.model,
+      maxCollectionResults: assistant.max_collection_results,
       isPublic: assistant.meta.is_public === true,
       avatarBase64: assistant.meta?.avatar_base64?.toString() ?? '',
       primaryColor: assistant.meta?.primary_color?.toString() ?? '#ffffff',
@@ -83,6 +87,7 @@ export const load: PageServerLoad = async (event) => {
       description: assistantData.meta?.description?.toString() ?? '',
       instructions: assistantData.instructions,
       model: assistantData.model,
+      maxCollectionResults: assistantData.max_collection_results,
       isPublic: assistantData.meta.is_public === true,
       avatarBase64: assistantData.meta?.avatar_base64?.toString() ?? '',
       primaryColor: assistantData.meta?.primary_color?.toString() ?? '#ffffff',
@@ -185,8 +190,8 @@ export const actions = {
     const formData = await event.request.formData()
     const assistantId = formData.get('assistant_id') as string
     const files = formData.getAll('files') as File[]
-    const label = formData.get('collection') as string || 'collection'
-    const embeddingModel = formData.get('embedding_model') as string || 'default'
+    const label = (formData.get('collection') as string) || 'collection'
+    const embeddingModel = (formData.get('embedding_model') as string) || 'default'
     const urls = ['']
     let collectionId = ''
 

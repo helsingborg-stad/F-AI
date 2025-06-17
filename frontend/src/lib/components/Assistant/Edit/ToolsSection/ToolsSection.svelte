@@ -13,9 +13,10 @@
     assistantId: string
     collectionId: string
     collection?: ICollection
+    maxCollectionResult: string
   }
 
-  let { canEdit, assistantId, collectionId, collection }: Props = $props()
+  let { canEdit, assistantId, collectionId, collection, maxCollectionResult }: Props = $props()
   let fileModal: FileUploadModal
   let currentCollectionId = $state(collectionId)
   let currentFiles = $state(collection?.files || [])
@@ -43,7 +44,7 @@
       {/if}
     </div>
     <div>
-      <FilesSettings />
+      <FilesSettings maxCollection={maxCollectionResult}/>
       <button type="button" class="btn btn-sm" disabled={!canEdit} onclick={openFilesModal}>
         <Icon icon={icons["plus"]} width={16} height={16} />
         <span class="text-s">Files</span>

@@ -218,6 +218,7 @@
           assistantId={assistant.id}
           collectionId={collectionId}
           collection={assistant.collection}
+          maxCollectionResult={assistant.maxCollectionResults}
         />
         <ModelConfigSection {canEdit} />
       </div>

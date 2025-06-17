@@ -61,7 +61,7 @@ export interface IBackendAssistant {
   model: string
   instructions: string
   collection_id: string | null
-  meta: JsonObject
+  max_collection_results: string
 }
 
 export interface IAssistant {
@@ -72,6 +72,7 @@ export interface IAssistant {
   instructions: string
   model: string
   collection?: ICollection
+  maxCollectionResults: string
   isPublic: boolean
   primaryColor: string
 }

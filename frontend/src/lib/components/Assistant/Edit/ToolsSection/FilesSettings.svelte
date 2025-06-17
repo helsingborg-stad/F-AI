@@ -3,9 +3,15 @@
   import { icons } from '$lib/components/Icon/icons.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
 
-  const DEFAULT_RESULTS = 10
+  const DEFAULT_RESULTS = '10'
 
-  let maxCollectionResults = $state(DEFAULT_RESULTS)
+  interface Props {
+    maxCollection: string
+  }
+
+  let { maxCollection }: Props = $props()
+
+  let maxCollectionResults = $state(maxCollection)
 
   function reset() {
     maxCollectionResults = DEFAULT_RESULTS
@@ -41,8 +47,16 @@
             class="text-sm select-none w-8 h-8 font-mono flex items-center justify-center">{maxCollectionResults}</div>
         </div>
       </div>
-      <input type="range" min="0" max="30" bind:value={maxCollectionResults} class="range range-xs" />
-      <div class="pt-2 text-xs opacity-50 select-none">Set the max results to retrieve from files. High numbers (>10) may
+      <input
+        type="range"
+        name="maxCollectionResults"
+        min="0"
+        max="30"
+        bind:value={maxCollectionResults}
+        class="range range-xs"
+      />
+      <div class="pt-2 text-xs opacity-50 select-none">Set the max results to retrieve from files. High numbers (>10)
+        may
         increase accuracy but also takes longer to process.
       </div>
     </div>
