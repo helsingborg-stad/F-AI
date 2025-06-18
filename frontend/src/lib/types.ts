@@ -86,6 +86,7 @@ export interface IAssistantCard {
   owner: string
   starters: string[]
   isFavorite: boolean
+  primaryColor: string
   metadata: {
     category: string
     conversationCount: string

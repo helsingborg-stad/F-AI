@@ -40,6 +40,7 @@ export const load: PageServerLoad = async (event) => {
       owner: 'Helsingborg',
       starters: assistant.meta.sample_questions as string[] ?? [],
       isFavorite: favoriteAssistantsMap.has(assistant.id),
+      primaryColor: assistant.meta.primary_color as string ?? 'transparent',
       metadata: {
         category: 'Demo',
         conversationCount: '<100',

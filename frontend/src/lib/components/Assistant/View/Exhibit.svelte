@@ -14,6 +14,7 @@
         <AssistantSignSummery
           id={card.id}
           avatar={card.avatar}
+          primaryColor={card.primaryColor}
           title={card.title}
           description={card.description}
           owner={card.owner}
