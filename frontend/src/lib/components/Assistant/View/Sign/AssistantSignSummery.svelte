@@ -11,7 +11,7 @@
   let onClick = () => {
     dialog.showModal()
   }
-</script>
+</script>krak
 
 <div
   class="card card-compact card-side {height} hover:bg-gray-100 cursor-pointer"
@@ -26,7 +26,10 @@
   tabindex="0"
 >
   {#if !avatar}
-    <div class="bg-[{primaryColor}] w-20 flex items-center justify-center relative rounded overflow-hidden text-center">
+    <div
+      class="w-20 flex items-center justify-center relative rounded overflow-hidden text-center"
+      style="background-color: {primaryColor}"
+    >
       <span
         class="{maxHeight} w-20 text-3xl {primaryColor === 'transparent' ? 'text-gray-600' : 'text-white'}">{title.toUpperCase().charAt(0)}
       </span>
