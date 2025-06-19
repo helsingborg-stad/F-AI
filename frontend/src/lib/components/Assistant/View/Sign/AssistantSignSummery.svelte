@@ -11,7 +11,7 @@
   let onClick = () => {
     dialog.showModal()
   }
-</script>krak
+</script>
 
 <div
   class="card card-compact card-side {height} hover:bg-gray-100 cursor-pointer"
