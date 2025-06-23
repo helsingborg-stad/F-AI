@@ -97,6 +97,7 @@ export interface IAssistantCard {
 export interface IAssistantMenu {
   menuTitle: string
   menuItems: {
+    allowSearch: boolean
     id: string
     name: string
   }[]

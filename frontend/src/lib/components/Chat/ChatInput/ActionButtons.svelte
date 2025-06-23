@@ -4,12 +4,14 @@
   import WebSearch from '$lib/components/Buttons/WebSearch.svelte'
 
   interface Props {
+    allowSearch: boolean
     assistants: IAssistantMenu[],
     selectedAssistantId: string,
     disableAssistantPicker: boolean
   }
 
   let {
+    allowSearch,
     assistants,
     selectedAssistantId = $bindable(),
     disableAssistantPicker,
@@ -17,7 +19,9 @@
 </script>
 
 <div class="flex flex-row pr-3 gap-1">
-  <WebSearch />
+  {#if allowSearch}
+    <WebSearch />
+  {/if}
   <div class="ml-auto">
     <AssistantPicker
       {assistants}

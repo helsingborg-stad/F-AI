@@ -64,6 +64,15 @@
       scrollToBottom()
     }
   })
+  
+  let allowSearch: boolean = $derived(
+    !selectedAssistantId
+      ? false
+      : assistants
+        .flatMap(group => group.menuItems)
+        .find(item => item.id === selectedAssistantId)?.allowSearch || false
+  )
+
 </script>
 
 <div class="flex flex-col h-full max-h-full">
@@ -101,7 +110,7 @@
         receivingMessage={!chatStateIdle}
         {onStopChat}
       >
-        <ActionButtons {assistants} bind:selectedAssistantId {disableAssistantPicker} />
+        <ActionButtons {allowSearch} {assistants} bind:selectedAssistantId {disableAssistantPicker} />
       </ChatInput>
     </div>
   </div>
