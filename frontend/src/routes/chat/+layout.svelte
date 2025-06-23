@@ -13,6 +13,7 @@
   const { data }: Props = $props()
 
   let selectedAssistantId = $state('')
+  let enableSearch = $state(false)
 
   const chatMachine = useChatMachine()
   const { state: chatState } = chatMachine
@@ -147,5 +148,6 @@
   onStartNewChat={startNewChat}
   onStopChat={chatMachine.stop}
   chatStateIdle={$chatState === 'idle'}
+  bind:enableSearch
 >
 </ChatLayout>

@@ -5,6 +5,7 @@
 
   interface Props {
     allowSearch: boolean
+    enableSearch: boolean
     assistants: IAssistantMenu[],
     selectedAssistantId: string,
     disableAssistantPicker: boolean
@@ -12,6 +13,7 @@
 
   let {
     allowSearch,
+    enableSearch = $bindable(),
     assistants,
     selectedAssistantId = $bindable(),
     disableAssistantPicker,
@@ -20,7 +22,7 @@
 
 <div class="flex flex-row pr-3 gap-1">
   {#if allowSearch}
-    <WebSearch />
+    <WebSearch bind:enableSearch />
   {/if}
   <div class="ml-auto">
     <AssistantPicker

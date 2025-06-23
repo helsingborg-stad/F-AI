@@ -2,10 +2,17 @@
   import { icons } from '$lib/components/Icon/icons.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
 
+  interface Props {
+    enableSearch: boolean
+  }
+
+  let { enableSearch = $bindable() }: Props = $props()
+
   let active = $state(false)
 
   function toggleActive() {
     active = !active
+    enableSearch = active
   }
 </script>
 
@@ -21,11 +28,11 @@
 </button>
 
 <style>
-  .text-blue {
-    color: #3b82f6;
-  }
+    .text-blue {
+        color: #3b82f6;
+    }
 
-  .text-blue :global(svg) {
-    stroke: currentColor;
-  }
+    .text-blue :global(svg) {
+        stroke: currentColor;
+    }
 </style>

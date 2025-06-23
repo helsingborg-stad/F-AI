@@ -21,6 +21,7 @@
     onSubmitMessage: (message: string) => void
     chatStateIdle: boolean,
     onStopChat: () => void,
+    enableSearch: boolean,
   }
 
   let {
@@ -31,6 +32,7 @@
     onSubmitMessage,
     chatStateIdle,
     onStopChat,
+    enableSearch = $bindable(),
   }: Props = $props()
 
   let scrollContainer: HTMLDivElement = undefined as unknown as HTMLDivElement
@@ -64,13 +66,13 @@
       scrollToBottom()
     }
   })
-  
+
   let allowSearch: boolean = $derived(
     !selectedAssistantId
       ? false
       : assistants
-        .flatMap(group => group.menuItems)
-        .find(item => item.id === selectedAssistantId)?.allowSearch || false
+      .flatMap(group => group.menuItems)
+      .find(item => item.id === selectedAssistantId)?.allowSearch || false,
   )
 
 </script>
@@ -110,7 +112,13 @@
         receivingMessage={!chatStateIdle}
         {onStopChat}
       >
-        <ActionButtons {allowSearch} {assistants} bind:selectedAssistantId {disableAssistantPicker} />
+        <ActionButtons
+          {allowSearch}
+          bind:enableSearch
+          {assistants}
+          bind:selectedAssistantId
+          {disableAssistantPicker}
+        />
       </ChatInput>
     </div>
   </div>
