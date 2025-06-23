@@ -16,7 +16,7 @@ async def setup_default_assistants(assistant_service: IAssistantService):
         as_uid=uid,
         assistant_id=aid,
         is_public=False,
-        model='openai:gpt-4o',
+        model='openai/gpt-4o',
         meta={
             'name': 'RAG scoring',
             'description': 'Used internally for RAG scoring. Do not delete. Edit at own risk.',
@@ -40,7 +40,7 @@ async def setup_default_assistants(assistant_service: IAssistantService):
         as_uid=uid,
         assistant_id=aid,
         is_public=True,
-        model='openai:gpt-4o',
+        model='openai/gpt-4o',
         meta={
             'name': 'Vanilla ChatGPT',
             'description': 'OpenAI ChatGPT 4o with no additional settings.',
@@ -53,7 +53,7 @@ async def setup_default_assistants(assistant_service: IAssistantService):
         as_uid=uid,
         assistant_id=aid,
         is_public=True,
-        model='anthropic:claude-3-7-sonnet-latest',
+        model='anthropic/claude-3-7-sonnet-latest',
         meta={
             'name': 'Vanilla Claude',
             'description': 'Anthropic Claude 3.7 Sonnet with no additional settings.',
@@ -66,7 +66,7 @@ async def setup_default_assistants(assistant_service: IAssistantService):
         as_uid=uid,
         assistant_id=aid,
         is_public=True,
-        model='mistral:mistral-large-latest',
+        model='mistral/mistral-large-latest',
         meta={
             'name': 'Vanilla Mistral',
             'description': 'Mistral Large with no additional settings.',

@@ -11,12 +11,12 @@ async def setup_default_models(assistant_service: IAssistantService):
         return
 
     await assistant_service.set_available_models(models=[
-        Model(key='openai:o3-mini', provider='OpenAI', display_name='ChatGPT o3-mini', description=''),
-        Model(key='openai:gpt-4o', provider='OpenAI', display_name='ChatGPT 4o', description=''),
-        Model(key='openai:gpt-3.5-turbo', provider='OpenAI', display_name='ChatGPT 3.5 Turbo', description=''),
+        Model(key='openai/o3-mini', provider='OpenAI', display_name='ChatGPT o3-mini', description=''),
+        Model(key='openai/gpt-4o', provider='OpenAI', display_name='ChatGPT 4o', description=''),
+        Model(key='openai/gpt-3.5-turbo', provider='OpenAI', display_name='ChatGPT 3.5 Turbo', description=''),
 
-        Model(key='anthropic:claude-3-7-sonnet-latest', provider='Anthropic', display_name='Claude 3.7 Sonnet',
+        Model(key='anthropic/claude-3-7-sonnet-latest', provider='Anthropic', display_name='Claude 3.7 Sonnet',
               description=''),
 
-        Model(key='mistral:mistral-large-latest', provider='Mistral', display_name='Mistral Large', description='')
+        Model(key='mistral/mistral-large-latest', provider='Mistral', display_name='Mistral Large', description='')
     ])
