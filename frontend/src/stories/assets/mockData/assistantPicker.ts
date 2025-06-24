@@ -13,7 +13,7 @@ export const mockOnlyAssistants: IAssistantMenu[] = [
 export const mockTitleAndAssistants: IAssistantMenu[] = [
   {
     menuTitle: 'Fav',
-    menuItems: [{ id: '0', name: 'Wikipedia assistant', allowSearch: false }],
+    menuItems: [{ id: '0', name: 'Wikipedia assistant', allowSearch: true }],
   },
   {
     menuTitle: 'General',

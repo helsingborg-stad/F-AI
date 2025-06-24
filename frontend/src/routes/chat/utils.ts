@@ -21,7 +21,7 @@ export async function getAssistantPickerData(
     const favItems = favAssistantData.assistants.map((assistant: IBackendAssistant) => ({
       id: assistant.id,
       name: assistant.meta.name?.toString() ?? '<unknown>',
-      allowSearch: false
+      allowSearch: Boolean(assistant.meta?.enable_search),
     }))
 
     result = [
@@ -42,7 +42,7 @@ export async function getAssistantPickerData(
     .map((assistant: IBackendAssistant) => ({
       id: assistant.id,
       name: assistant.meta.name?.toString() ?? '<unknown>',
-      allowSearch: true
+      allowSearch: Boolean(assistant.meta?.enable_search),
     }))
 
   if (vanillaItems.length > 0) {

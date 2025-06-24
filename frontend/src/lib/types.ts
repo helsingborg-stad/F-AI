@@ -76,6 +76,7 @@ export interface IAssistant {
   maxCollectionResults: string
   isPublic: boolean
   primaryColor: string
+  enableSearch: boolean
 }
 
 export interface IAssistantCard {

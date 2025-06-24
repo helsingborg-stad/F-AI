@@ -14,9 +14,10 @@
     collectionId: string
     collection?: ICollection
     maxCollectionResult: string
+    enableSearch: boolean
   }
 
-  let { canEdit, assistantId, collectionId, collection, maxCollectionResult }: Props = $props()
+  let { canEdit, assistantId, collectionId, collection, maxCollectionResult, enableSearch }: Props = $props()
   let fileModal: FileUploadModal
   let currentCollectionId = $state(collectionId)
   let currentFiles = $state(collection?.files || [])
@@ -26,7 +27,14 @@
   }
 
   let attachingFiles = $state(false)
+  let enableSearchValue = $state(enableSearch)
 </script>
+
+<input
+  type="hidden"
+  name="enable_search"
+  bind:value={enableSearchValue}
+>
 
 <Section title={"Tools"}>
   <div class="flex flex-row place-content-between items-center">
@@ -44,7 +52,7 @@
       {/if}
     </div>
     <div>
-      <FilesSettings maxCollection={maxCollectionResult}/>
+      <FilesSettings maxCollection={maxCollectionResult} />
       <button type="button" class="btn btn-sm" disabled={!canEdit} onclick={openFilesModal}>
         <Icon icon={icons["plus"]} width={16} height={16} />
         <span class="text-s">Files</span>
@@ -79,6 +87,22 @@
       </button>
     </div>
   </div>
+  <HorizontalDivider />
+  <div class="flex flex-row place-content-between items-center">
+    <div>
+      <InfoTooltip
+        toolTip="Enable model capabilities">
+        <div class="text-sm font-medium select-none">Capabilities</div>
+      </InfoTooltip>
+    </div>
+    <div class="form-control">
+      <label class="label cursor-pointer">
+        <span class="label-text me-2">Web search</span>
+        <input type="checkbox" class="toggle toggle-sm" bind:checked={enableSearchValue} />
+      </label>
+    </div>
+  </div>
+  <HorizontalDivider />
 </Section>
 
 <FileUploadModal
