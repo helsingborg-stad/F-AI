@@ -39,7 +39,7 @@ class RunResponse(BaseModel):
 )
 async def run(request: RunRequest, services: ServicesDependency):
     try:
-        message = await services.llm_factory.get(model_key=request.model).run_llm(
+        message = await services.llm_factory.get().run_llm(
             model=request.model,
             messages=[
                 Message(

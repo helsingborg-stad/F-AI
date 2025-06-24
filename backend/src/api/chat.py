@@ -62,7 +62,7 @@ async def count_tokens(body: CountTokensRequest, services: ServicesDependency, a
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail='Assistant not found')
 
-        num_tokens = await services.token_factory.get(assistant.model).get_token_count_with_history(
+        num_tokens = await services.token_factory.get().get_token_count_with_history(
             as_uid=auth_identity.uid,
             conversation_id=body.conversation_id,
             message=body.query)
@@ -78,7 +78,7 @@ async def count_tokens(body: CountTokensRequest, services: ServicesDependency, a
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail='Assistant not found')
 
-    num_tokens = await services.token_factory.get(assistant.model).get_token_count(as_uid=auth_identity.uid,
+    num_tokens = await services.token_factory.get().get_token_count(as_uid=auth_identity.uid,
                                                                                    assistant_id=body.assistant_id,
                                                                                    message=body.query)
 

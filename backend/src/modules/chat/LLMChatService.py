@@ -89,7 +89,7 @@ class LLMChatService(IChatService):
                 yield ChatEvent(event='error', message='rag scoring assistant not found')
                 return
 
-            rag_llm_service: ILLMService = self._llm_factory.get(model_key=rag_scoring_assistant.model)
+            rag_llm_service: ILLMService = self._llm_factory.get()
 
             rag_results = await self._collection_service.query_collection(assistant.collection_id, message,
                                                                           max_results=assistant.max_collection_results)
@@ -126,7 +126,7 @@ class LLMChatService(IChatService):
         )
 
         try:
-            llm_service = self._llm_factory.get(model_key=assistant.model)
+            llm_service = self._llm_factory.get()
         except ValueError as e:
             yield ChatEvent(event='error', source='error',
                             message=str(e))
