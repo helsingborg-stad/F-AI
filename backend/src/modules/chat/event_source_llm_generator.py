@@ -5,6 +5,7 @@ from sse_starlette import ServerSentEvent, EventSourceResponse
 
 from src.common.get_timestamp import get_timestamp
 from src.modules.chat.protocols.IChatService import IChatService
+from src.modules.llm.models.Feature import Feature
 
 
 async def event_source_llm_generator(
@@ -12,21 +13,28 @@ async def event_source_llm_generator(
         assistant_or_conversation_id: str,
         start_new_conversation: bool,
         user_message: str,
-        chat_service: IChatService
+        chat_service: IChatService,
+        with_web_search: bool,
 ):
     async def sse_generator():
+        features = [f for f in [
+            Feature.WEB_SEARCH if with_web_search else None
+        ] if f is not None]
+
         try:
             if start_new_conversation:
                 chat_generator = chat_service.start_new_chat(
                     as_uid=calling_uid,
                     assistant_id=assistant_or_conversation_id,
-                    message=user_message
+                    message=user_message,
+                    enabled_features=features
                 )
             else:
                 chat_generator = chat_service.continue_chat(
                     as_uid=calling_uid,
                     conversation_id=assistant_or_conversation_id,
-                    message=user_message
+                    message=user_message,
+                    enabled_features=features
                 )
 
             async for chat_event in chat_generator:

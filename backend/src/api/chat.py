@@ -5,6 +5,7 @@ from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
 from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
 from src.modules.chat.event_source_llm_generator import event_source_llm_generator
+from src.modules.llm.models.Feature import Feature
 
 chat_router = APIRouter(
     prefix='/chat',
@@ -79,8 +80,8 @@ async def count_tokens(body: CountTokensRequest, services: ServicesDependency, a
                             detail='Assistant not found')
 
     num_tokens = await services.token_factory.get().get_token_count(as_uid=auth_identity.uid,
-                                                                                   assistant_id=body.assistant_id,
-                                                                                   message=body.query)
+                                                                    assistant_id=body.assistant_id,
+                                                                    message=body.query)
 
     return CountTokensResponse(count=num_tokens)
 
@@ -88,6 +89,7 @@ async def count_tokens(body: CountTokensRequest, services: ServicesDependency, a
 class BufferedChatRequest(BaseModel):
     assistant_id: str
     message: str
+    with_web_search: bool = False
 
 
 class BufferedChatResponse(BaseModel):
@@ -111,7 +113,10 @@ async def buffered_chat(body: BufferedChatRequest, services: ServicesDependency,
     async for delta in services.chat_service.start_new_chat(
             as_uid=auth_identity.uid,
             assistant_id=body.assistant_id,
-            message=body.message
+            message=body.message,
+            enabled_features=[f for f in [
+                Feature.WEB_SEARCH if body.with_web_search else None
+            ] if f is not None]
     ):
         match delta.event:
             case 'conversation_id':
@@ -137,6 +142,7 @@ async def buffered_chat(body: BufferedChatRequest, services: ServicesDependency,
 
 class BufferedChatContinueRequest(BaseModel):
     message: str
+    with_web_search: bool = False
 
 
 class BufferedChatContinueResponse(BaseModel):
@@ -166,7 +172,10 @@ async def buffered_chat_continue(
     async for delta in services.chat_service.continue_chat(
             as_uid=auth_identity.uid,
             conversation_id=conversation_id,
-            message=body.message
+            message=body.message,
+            enabled_features=[f for f in [
+                Feature.WEB_SEARCH if body.with_web_search else None
+            ] if f is not None]
     ):
         match delta.event:
             case 'message':
@@ -228,7 +237,8 @@ async def stream_chat(
         assistant_id: str,
         stored_message_id: str,
         services: ServicesDependency,
-        auth_identity: AuthenticatedIdentity
+        auth_identity: AuthenticatedIdentity,
+        with_web_search: bool = False,
 ):
     message = await services.message_store_service.consume_message(stored_message_id=stored_message_id)
 
@@ -241,6 +251,7 @@ async def stream_chat(
         start_new_conversation=True,
         user_message=message,
         chat_service=services.chat_service,
+        with_web_search=with_web_search
     )
 
 
@@ -257,7 +268,8 @@ async def stream_chat_continue(
         conversation_id: str,
         stored_message_id: str,
         services: ServicesDependency,
-        auth_identity: AuthenticatedIdentity
+        auth_identity: AuthenticatedIdentity,
+        with_web_search: bool = False,
 ):
     message = await services.message_store_service.consume_message(stored_message_id=stored_message_id)
 
@@ -270,4 +282,5 @@ async def stream_chat_continue(
         start_new_conversation=False,
         user_message=message,
         chat_service=services.chat_service,
+        with_web_search=with_web_search
     )
