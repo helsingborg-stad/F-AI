@@ -32,8 +32,18 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Check if backend image exists
+        id: check-backend-image
+        run: |
+          if docker manifest inspect ghcr.io/${{ steps.string.outputs.lowercase }}-backend:${{ github.event.release.tag_name }} > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+
       - name: Docker meta
         id: meta
+        if: env.exists == 'false'
         uses: docker/metadata-action@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -52,6 +62,7 @@ jobs:
             type=sha,format=long
 
       - name: Build and push
+        if: env.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: ./backend/
@@ -86,8 +97,18 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Check if frontend image exists
+        id: check-frontend-image
+        run: |
+          if docker manifest inspect ghcr.io/${{ steps.string.outputs.lowercase }}-frontend:${{ github.event.release.tag_name }} > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+
       - name: Docker meta
         id: meta
+        if: env.exists == 'false'
         uses: docker/metadata-action@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -106,6 +127,7 @@ jobs:
             type=sha,format=long
 
       - name: Build and push
+        if: env.exists == 'false'
         uses: docker/build-push-action@v5
         with:
           context: ./frontend/
