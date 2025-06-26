@@ -24,7 +24,7 @@
   onclick={() => toggleActive()}
 >
   <Icon icon={icons["globe"]} width={16} height={16} />
-  Search
+  Web search
 </button>
 
 <style>
