@@ -1,10 +1,14 @@
 import os
 from collections.abc import AsyncGenerator
 
+import litellm
 from litellm import acompletion
+from litellm.types.llms.openai import OpenAIWebSearchOptions, OpenAIWebSearchUserLocation, \
+    OpenAIWebSearchUserLocationApproximate
 
 from src.modules.llm.helpers.collect_streamed import collect_streamed
 from src.modules.llm.models.Delta import Delta
+from src.modules.llm.models.Feature import Feature
 from src.modules.llm.models.Message import Message
 from src.modules.llm.protocols.ILLMService import ILLMService
 from src.modules.settings.protocols.ISettingsService import ISettingsService
@@ -25,23 +29,50 @@ class LiteLLMService(ILLMService):
         os.environ.pop('MISTRAL_API_KEY', None)
         os.environ.pop('ANTHROPIC_API_KEY', None)
 
-    async def stream_llm(
+    async def run(
             self,
             model: str,
             api_key: str,
             messages: list[Message],
-            response_schema: dict[str, object] | None = None,
+            enabled_features: list[Feature],
             extra_params: dict[str, float | int | bool | str] | None = None
     ) -> AsyncGenerator[Delta, None]:
         try:
             await self._set_api_keys()
+            model = model.replace(':', '/')  # patch for old model format
+
+            web_search_requested = Feature.WEB_SEARCH in enabled_features
+            web_search_enabled = web_search_requested and litellm.supports_web_search(model)
+            web_search_options = OpenAIWebSearchOptions(
+                search_context_size='medium',
+                user_location=OpenAIWebSearchUserLocation(
+                    type='approximate',
+                    approximate=OpenAIWebSearchUserLocationApproximate(
+                        city='',
+                        country='SE',
+                        region='',
+                        timezone='Europe/Stockholm',
+                    )
+                )
+            )
+
+            if web_search_requested and not web_search_enabled:
+                print(f'WARNING: Web search was requested but is not supported by this model ({model}).')
+
+            messages = [
+                {'content': m.content, 'role': m.role} for m in messages if m.content and len(m.content) > 0
+            ]
+
             response = await acompletion(
-                model=model.replace(':', '/'),  # patch for old model format
-                messages=[
-                    {'content': m.content, 'role': m.role} for m in messages if m.content and len(m.content) > 0
-                ],
+                model=model,
+                messages=messages,
                 stream=True,
                 api_key=api_key,
+
+                # workaround for a bug in tool_call_cost_tracking.py:_get_web_search_options(kwargs) when explicitly setting value to None
+                **{'web_search_options': web_search_options} if web_search_enabled else {},
+
+                **(extra_params if extra_params else {})
             )
 
             role: str | None = None
@@ -68,7 +99,7 @@ class LiteLLMService(ILLMService):
             extra_params: dict[str, float | int | bool | str] | None = None
     ) -> Message:
         return await collect_streamed(
-            stream_llm_func=self.stream_llm,
+            stream_llm_func=self.run,
             model=model,
             api_key=api_key,
             messages=messages,

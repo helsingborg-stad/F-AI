@@ -10,6 +10,7 @@ from src.modules.chat.protocols.IChatService import IChatService
 from src.modules.collections.protocols.ICollectionService import ICollectionService
 from src.modules.conversations.protocols.IConversationService import IConversationService
 from src.modules.llm.factory import LLMServiceFactory
+from src.modules.llm.models.Feature import Feature
 from src.modules.llm.models.Message import Message
 from src.modules.llm.protocols.ILLMService import ILLMService
 
@@ -27,7 +28,8 @@ class LLMChatService(IChatService):
         self._conversation_service = conversation_service
         self._collection_service = collection_service
 
-    async def start_new_chat(self, as_uid: str, assistant_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
+    async def start_new_chat(self, as_uid: str, assistant_id: str, message: str, enabled_features: list[Feature]) -> \
+            AsyncGenerator[ChatEvent, None]:
         assistant = await self._assistant_service.get_assistant(
             as_uid=as_uid,
             assistant_id=assistant_id,
@@ -50,10 +52,12 @@ class LLMChatService(IChatService):
             message=assistant.instructions
         )
 
-        async for m in self.continue_chat(as_uid=as_uid, conversation_id=conversation_id, message=message):
+        async for m in self.continue_chat(as_uid=as_uid, conversation_id=conversation_id, message=message,
+                                          enabled_features=enabled_features):
             yield m
 
-    async def continue_chat(self, as_uid: str, conversation_id: str, message: str) -> AsyncGenerator[ChatEvent, None]:
+    async def continue_chat(self, as_uid: str, conversation_id: str, message: str, enabled_features: list[Feature]) -> \
+            AsyncGenerator[ChatEvent, None]:
         conversation = await self._conversation_service.get_conversation(as_uid=as_uid, conversation_id=conversation_id)
 
         if not conversation:
@@ -138,10 +142,11 @@ class LLMChatService(IChatService):
             Message(role='user', content=rag_message) if rag_message else None
         ]
 
-        async for delta in llm_service.stream_llm(
+        async for delta in llm_service.run(
                 model=assistant.model,
-                messages=[m for m in messages if m],
                 api_key=assistant.llm_api_key,
+                messages=[m for m in messages if m],
+                enabled_features=enabled_features,
                 extra_params=assistant.extra_llm_params
         ):
             if delta.role != 'error':
