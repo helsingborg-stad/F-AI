@@ -7,12 +7,16 @@ export interface ChatMessage {
 
 export type ChatMachineState = 'idle' | 'sending' | 'waiting' | 'responding' | 'error'
 
+export interface SendMessageOptions {
+  enableWebSearch?: boolean
+}
+
 export interface ChatMachine {
   state: Readable<ChatMachineState>
   conversationId: Readable<string | null>
   lastMessage: Readable<ChatMessage>
   lastError: Readable<string | null>
-  sendMessage: (message: string, assistantId: string | null, conversationId: string | null) => Promise<void>
+  sendMessage: (message: string, assistantId: string | null, conversationId: string | null, extraOptions?: SendMessageOptions) => Promise<void>
   stop: () => void
 }
 
@@ -40,7 +44,7 @@ export function useChatMachine(): ChatMachine {
     lastMessage,
     lastError,
 
-    async sendMessage(message: string, assistantId: string | null, conversationId: string | null) {
+    async sendMessage(message: string, assistantId: string | null, conversationId: string | null, extraOptions?: SendMessageOptions) {
       if (es) {
         return
       }
@@ -64,9 +68,10 @@ export function useChatMachine(): ChatMachine {
 
       const { messageId } = await storeMessageResponse.json()
 
+      const webSearchEnabled = extraOptions?.enableWebSearch === true
       const chatUrl = conversationId
-        ? `/chat?message=${messageId}&conversation=${conversationId}`
-        : `/chat?message=${messageId}&assistant=${assistantId}`
+        ? `/chat?message=${messageId}&conversation=${conversationId}&withWebSearch=${webSearchEnabled}`
+        : `/chat?message=${messageId}&assistant=${assistantId}&withWebSearch=${webSearchEnabled}`
 
       if (cancelAnyInProgressCalls) {
         return

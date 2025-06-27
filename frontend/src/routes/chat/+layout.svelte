@@ -103,7 +103,7 @@
       { timestamp: dayjs().toISOString(), source: 'assistant', message: '' },
     ]
 
-    chatMachine.sendMessage(message, selectedAssistantId, conversationId ?? null)
+    chatMachine.sendMessage(message, selectedAssistantId, conversationId ?? null, { enableWebSearch: enableSearch })
       .catch(e => console.error('chatMachine.sendMessage failed', e))
   }
 
