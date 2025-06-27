@@ -4,8 +4,8 @@ export const mockOnlyAssistants: IAssistantMenu[] = [
   {
     menuTitle: '',
     menuItems: [
-      { id: '0', name: 'Language assistant' },
-      { id: '1', name: 'Math assistant' },
+      { id: '0', name: 'Language assistant', allowSearch: false },
+      { id: '1', name: 'Math assistant', allowSearch: false },
     ],
   },
 ]
@@ -13,13 +13,13 @@ export const mockOnlyAssistants: IAssistantMenu[] = [
 export const mockTitleAndAssistants: IAssistantMenu[] = [
   {
     menuTitle: 'Fav',
-    menuItems: [{ id: '0', name: 'Wikipedia assistant' }],
+    menuItems: [{ id: '0', name: 'Wikipedia assistant', allowSearch: true }],
   },
   {
     menuTitle: 'General',
     menuItems: [
-      { id: '0', name: 'Language assistant' },
-      { id: '1', name: 'Math assistant' },
+      { id: '0', name: 'Language assistant', allowSearch: false },
+      { id: '1', name: 'Math assistant', allowSearch: false },
     ],
   },
 ]

@@ -22,6 +22,7 @@
     onStartNewChat: () => void
     chatStateIdle: boolean
     onStopChat: () => void
+    enableSearch: boolean
   }
 
   let {
@@ -37,6 +38,7 @@
     onStartNewChat,
     chatStateIdle,
     onStopChat,
+    enableSearch = $bindable(),
   }: Props = $props()
 </script>
 
@@ -75,6 +77,7 @@
         {onSubmitMessage}
         {chatStateIdle}
         {onStopChat}
+        bind:enableSearch
       />
     </main>
   </div>

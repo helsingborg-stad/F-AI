@@ -13,6 +13,7 @@
   const { data }: Props = $props()
 
   let selectedAssistantId = $state('')
+  let enableSearch = $state(false)
 
   const chatMachine = useChatMachine()
   const { state: chatState } = chatMachine
@@ -102,7 +103,7 @@
       { timestamp: dayjs().toISOString(), source: 'assistant', message: '' },
     ]
 
-    chatMachine.sendMessage(message, selectedAssistantId, conversationId ?? null)
+    chatMachine.sendMessage(message, selectedAssistantId, conversationId ?? null, { enableWebSearch: enableSearch })
       .catch(e => console.error('chatMachine.sendMessage failed', e))
   }
 
@@ -147,5 +148,6 @@
   onStartNewChat={startNewChat}
   onStopChat={chatMachine.stop}
   chatStateIdle={$chatState === 'idle'}
+  bind:enableSearch
 >
 </ChatLayout>

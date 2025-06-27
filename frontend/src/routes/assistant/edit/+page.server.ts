@@ -35,6 +35,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
   const avatar = formData.get('avatar_base64') as string
   const primaryColor = formData.get('primary_color') as string
   const maxCollectionResults = formData.get('max_collection_results') as string
+  const enableSearch = formData.get('enable_search') === 'true'
 
   return {
     id: id,
@@ -46,6 +47,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
       avatar_base64: avatar,
       primary_color: primaryColor,
       sample_questions: [],
+      enable_search: enableSearch,
     },
     model: model,
     collection_id: collectionId === '' ? null : collectionId,
@@ -76,6 +78,7 @@ export const load: PageServerLoad = async (event) => {
       isPublic: assistant.meta.is_public === true,
       avatarBase64: assistant.meta?.avatar_base64?.toString() ?? '',
       primaryColor: assistant.meta?.primary_color?.toString() ?? '#ffffff',
+      enableSearch: assistant.meta?.enable_search === true,
     }))
   }
 
@@ -91,6 +94,7 @@ export const load: PageServerLoad = async (event) => {
       isPublic: assistantData.meta.is_public === true,
       avatarBase64: assistantData.meta?.avatar_base64?.toString() ?? '',
       primaryColor: assistantData.meta?.primary_color?.toString() ?? '#ffffff',
+      enableSearch: assistantData.meta?.enable_search === true,
     }
 
     if (userCanReadCollections && assistantData.collection_id) {

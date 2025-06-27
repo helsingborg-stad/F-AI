@@ -1,4 +1,4 @@
-import type { IAssistant, IAssistantMenu, IBackendAssistant } from '$lib/types.ts'
+import type { IAssistantMenu, IBackendAssistant } from '$lib/types.ts'
 import { fetchAllAssistants, getAssistantFavs } from '$lib/utils/assistant.js'
 import type { RequestEvent } from '@sveltejs/kit'
 
@@ -21,6 +21,7 @@ export async function getAssistantPickerData(
     const favItems = favAssistantData.assistants.map((assistant: IBackendAssistant) => ({
       id: assistant.id,
       name: assistant.meta.name?.toString() ?? '<unknown>',
+      allowSearch: Boolean(assistant.meta?.enable_search),
     }))
 
     result = [
@@ -41,6 +42,7 @@ export async function getAssistantPickerData(
     .map((assistant: IBackendAssistant) => ({
       id: assistant.id,
       name: assistant.meta.name?.toString() ?? '<unknown>',
+      allowSearch: Boolean(assistant.meta?.enable_search),
     }))
 
   if (vanillaItems.length > 0) {

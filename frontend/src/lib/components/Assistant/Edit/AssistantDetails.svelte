@@ -219,6 +219,7 @@
           collectionId={collectionId}
           collection={assistant.collection}
           maxCollectionResult={assistant.maxCollectionResults}
+          enableSearch={assistant.enableSearch}
         />
         <ModelConfigSection {canEdit} />
       </div>
