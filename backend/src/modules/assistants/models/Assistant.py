@@ -12,5 +12,4 @@ class Assistant(BaseModel):
     instructions: str
     collection_id: str | None
     max_collection_results: int
-    response_schema: dict[str, object] | None = None
-    extra_llm_params: dict[str, float | int | bool | str] | None
+    extra_llm_params: dict | None

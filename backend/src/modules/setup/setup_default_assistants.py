@@ -22,17 +22,22 @@ async def setup_default_assistants(assistant_service: IAssistantService):
             'description': 'Used internally for RAG scoring. Do not delete. Edit at own risk.',
         },
         instructions='You are a scoring system that classifies documents from 0-100 based on how well they answer a query.',
-        response_schema={
-            "name": "score_schema",
-            "strict": True,
-            "schema": {
-                "type": "object",
-                "properties": {"score": {"type": "number"}},
-                "required": ["score"],
-                "additionalProperties": False
-            },
-        },
-        extra_llm_params={'temperature': 0}
+        extra_llm_params={
+            'temperature': 0,
+            'response_format': {
+                'type': 'json_schema',
+                'json_schema': {
+                    'name': 'score_schema',
+                    'strict': True,
+                    'schema': {
+                        'type': 'object',
+                        'properties': {'score': {'type': 'number'}},
+                        'required': ['score'],
+                        'additionalProperties': False
+                    },
+                }
+            }
+        }
     )
 
     aid = await assistant_service.create_assistant(as_uid=uid)

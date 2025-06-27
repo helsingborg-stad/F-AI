@@ -76,6 +76,16 @@ async def event_source_llm_generator(
         except asyncio.CancelledError as e:
             # likely user cancelled generating
             raise e
+        except Exception as e:
+            print(f'error generating chat: {e}')
+            yield ServerSentEvent(
+                event='chat.error',
+                data=json.dumps({
+                    'timestamp': get_timestamp(),
+                    'source': 'error',
+                    'message': 'Error:eslg'
+                })
+            )
 
         finally:
             yield ServerSentEvent(

@@ -3,7 +3,9 @@ from pydantic import BaseModel, Field
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
+from src.modules.llm.helpers.collect_streamed import collect_streamed
 from src.modules.llm.models.Message import Message
+from src.modules.llm.protocols.ILLMService import ILLMService
 
 llm_router = APIRouter(prefix='/llm', tags=['LLM'])
 auth = AuthRouterDecorator(llm_router)
@@ -21,8 +23,7 @@ class RunRequest(BaseModel):
         {"role": "user", "content": "Who is the king of Sweden?"}],
     ])
     api_key: str | None = Field(default=None, examples=['my-api-key'])
-    extra_params: dict[str, float | int | bool | str] | None = Field(default=None, examples=[{'temperature': 0.5}])
-    response_schema: dict[str, object] | None = None
+    extra_params: dict | None = Field(default=None, examples=[{'temperature': 0.5}])
 
 
 class RunResponse(BaseModel):
@@ -39,7 +40,8 @@ class RunResponse(BaseModel):
 )
 async def run(request: RunRequest, services: ServicesDependency):
     try:
-        message = await services.llm_factory.get().run_llm(
+        service: ILLMService = services.llm_factory.get()
+        message = await collect_streamed(service.run(
             model=request.model,
             messages=[
                 Message(
@@ -49,9 +51,10 @@ async def run(request: RunRequest, services: ServicesDependency):
                 for message in request.messages
             ],
             api_key=request.api_key if request.api_key else "",
-            response_schema=request.response_schema,
+            enabled_features=[],
             extra_params=request.extra_params if request.extra_params else {}
-        )
+        ))
+
         return RunResponse(role=message.role, content=message.content)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

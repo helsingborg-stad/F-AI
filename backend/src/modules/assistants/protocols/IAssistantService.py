@@ -38,8 +38,7 @@ class IAssistantService(Protocol):
             instructions: str | None = None,
             collection_id: str | None = None,
             max_collection_results: int | None = None,
-            response_schema: dict[str, object] | None = None,
-            extra_llm_params: dict[str, float | int | bool | str] | None = None,
+            extra_llm_params: dict | None = None,
     ) -> bool:
         ...
 
