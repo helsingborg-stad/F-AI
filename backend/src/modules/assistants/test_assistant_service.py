@@ -490,13 +490,24 @@ class BaseAssistantServiceTestClass:
             instructions='h',
             collection_id='i',
             max_collection_results=5,
-            response_schema={"name": "my_schema",
-                             "schema": {"type": "object", "properties": {"foo": {"type": "number"}}}},
             extra_llm_params={
                 'some_float': 3.1415,
                 'some_int': 1337,
                 'some_bool': True,
-                'some_str': 'j'
+                'some_str': 'j',
+                'response_format': {
+                    'type': 'json_schema',
+                    'json_schema': {
+                        'name': 'example_schema',
+                        'strict': True,
+                        'schema': {
+                            'type': 'object',
+                            'properties': {'score': {'type': 'number'}},
+                            'required': ['score'],
+                            'additionalProperties': False
+                        },
+                    }
+                }
             },
             meta={
                 'name': 'a',
@@ -515,12 +526,23 @@ class BaseAssistantServiceTestClass:
         assert result.owner == 'john'
         assert result.model == 'f'
         assert result.instructions == 'h'
-        assert result.response_schema == {"name": "my_schema",
-                                          "schema": {"type": "object", "properties": {"foo": {"type": "number"}}}}
         assert result.extra_llm_params['some_float'] == 3.1415
         assert result.extra_llm_params['some_int'] == 1337
         assert result.extra_llm_params['some_bool'] is True
         assert result.extra_llm_params['some_str'] == 'j'
+        assert result.extra_llm_params['response_format'] == {
+            'type': 'json_schema',
+            'json_schema': {
+                'name': 'example_schema',
+                'strict': True,
+                'schema': {
+                    'type': 'object',
+                    'properties': {'score': {'type': 'number'}},
+                    'required': ['score'],
+                    'additionalProperties': False
+                },
+            }
+        }
         assert result.collection_id == 'i'
         assert result.max_collection_results == 5
         assert result.meta['is_public'] is True

@@ -10,6 +10,7 @@ from src.modules.chat.protocols.IChatService import IChatService
 from src.modules.collections.protocols.ICollectionService import ICollectionService
 from src.modules.conversations.protocols.IConversationService import IConversationService
 from src.modules.llm.factory import LLMServiceFactory
+from src.modules.llm.helpers.collect_streamed import collect_streamed
 from src.modules.llm.models.Feature import Feature
 from src.modules.llm.models.Message import Message
 from src.modules.llm.protocols.ILLMService import ILLMService
@@ -101,16 +102,16 @@ class LLMChatService(IChatService):
             formatted_results = [f"(source:{r.source}, page: {r.page_number})\n{r.content}" for r in rag_results]
 
             async def _score_result(result: str) -> int:
-                response = await rag_llm_service.run_llm(
+                response = await collect_streamed(rag_llm_service.run(
                     model=rag_scoring_assistant.model,
                     messages=[
                         Message(role='system', content=rag_scoring_assistant.instructions),
                         Message(role='user', content=result)
                     ],
                     api_key=rag_scoring_assistant.llm_api_key,
-                    response_schema=rag_scoring_assistant.response_schema,
+                    enabled_features=[],
                     extra_params=rag_scoring_assistant.extra_llm_params
-                )
+                ))
                 return int(json.loads(response.content)['score'])
 
             scored_results = [(fr, await _score_result(fr)) for fr in formatted_results]

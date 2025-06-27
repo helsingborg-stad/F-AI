@@ -13,16 +13,6 @@ class ILLMService(Protocol):
             api_key: str,
             messages: list[Message],
             enabled_features: list[Feature],
-            extra_params: dict[str, float | int | bool | str] | None = None
+            extra_params: dict | None = None
     ) -> AsyncGenerator[Delta, None]:
-        ...
-
-    async def run_llm(
-            self,
-            model: str,
-            api_key: str,
-            messages: list[Message],
-            response_schema: dict[str, object] | None = None,
-            extra_params: dict[str, float | int | bool | str] | None = None
-    ) -> Message:
         ...

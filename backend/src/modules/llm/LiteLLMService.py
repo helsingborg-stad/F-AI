@@ -6,7 +6,6 @@ from litellm import acompletion
 from litellm.types.llms.openai import OpenAIWebSearchOptions, OpenAIWebSearchUserLocation, \
     OpenAIWebSearchUserLocationApproximate
 
-from src.modules.llm.helpers.collect_streamed import collect_streamed
 from src.modules.llm.models.Delta import Delta
 from src.modules.llm.models.Feature import Feature
 from src.modules.llm.models.Message import Message
@@ -35,7 +34,7 @@ class LiteLLMService(ILLMService):
             api_key: str,
             messages: list[Message],
             enabled_features: list[Feature],
-            extra_params: dict[str, float | int | bool | str] | None = None
+            extra_params: dict | None = None
     ) -> AsyncGenerator[Delta, None]:
         try:
             await self._set_api_keys()
@@ -89,20 +88,3 @@ class LiteLLMService(ILLMService):
                     )
         finally:
             await self._clear_api_keys()
-
-    async def run_llm(
-            self,
-            model: str,
-            api_key: str,
-            messages: list[Message],
-            response_schema: dict[str, object] | None = None,
-            extra_params: dict[str, float | int | bool | str] | None = None
-    ) -> Message:
-        return await collect_streamed(
-            stream_llm_func=self.run,
-            model=model,
-            api_key=api_key,
-            messages=messages,
-            response_schema=response_schema,
-            extra_params=extra_params
-        )

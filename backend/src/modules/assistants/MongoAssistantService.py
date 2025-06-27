@@ -91,8 +91,7 @@ class MongoAssistantService(IAssistantService):
                 'allow_files',
                 'collection_id',
                 'max_collection_results',
-                'extra_llm_params',
-                'response_schema'
+                'extra_llm_params'
             ]
         )
         if doc is None:
@@ -115,8 +114,7 @@ class MongoAssistantService(IAssistantService):
                 'allow_files',
                 'collection_id',
                 'max_collection_results',
-                'extra_llm_params',
-                'response_schema'
+                'extra_llm_params'
             ]
         )
         return [await self._doc_to_assistant(doc, True) async for doc in cursor]
@@ -168,8 +166,7 @@ class MongoAssistantService(IAssistantService):
             instructions: str | None = None,
             collection_id: str | None = None,
             max_collection_results: int | None = None,
-            response_schema: dict[str, object] | None = None,
-            extra_llm_params: dict[str, float | int | bool | str] | None = None,
+            extra_llm_params: dict | None = None,
     ) -> bool:
         if not is_valid_mongo_id(assistant_id):
             return False
@@ -207,7 +204,6 @@ class MongoAssistantService(IAssistantService):
         self._add_to_dict_unless_none(update_dict, 'extra_llm_params', extra_llm_params)
         self._add_to_dict_unless_none(update_dict, 'collection_id', collection_id)
         self._add_to_dict_unless_none(update_dict, 'max_collection_results', max_collection_results)
-        self._add_to_dict_unless_none(update_dict, 'response_schema', response_schema)
 
         result = await self._database['assistants'].update_one(
             {'_id': ObjectId(assistant_id), 'owner': as_uid},
@@ -309,7 +305,6 @@ class MongoAssistantService(IAssistantService):
             collection_id=doc['collection_id'],
             max_collection_results=doc['max_collection_results'] if 'max_collection_results' in doc else 10,
             extra_llm_params=doc['extra_llm_params'] if 'extra_llm_params' in doc else None,
-            response_schema=doc['response_schema'] if 'response_schema' in doc else None
         )
 
     async def _doc_to_assistant_info(self, doc: Mapping[str, Any]) -> AssistantInfo:

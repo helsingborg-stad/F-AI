@@ -174,7 +174,7 @@ class GetAssistantResponseAssistant(BaseModel):
     instructions: str
     collection_id: str | None
     max_collection_results: int
-    extra_llm_params: dict[str, float | int | bool | str]
+    extra_llm_params: dict
 
 
 class GetAssistantResponse(BaseModel):
@@ -241,7 +241,7 @@ class UpdateAssistantRequest(BaseModel):
     instructions: str | None = Field(default=None, examples=['Answer in Swedish.'])
     collection_id: str | None = Field(default=None, examples=['my-collection-id'])
     max_collection_results: int | None = None
-    extra_llm_params: dict[str, float | int | bool | str] | None = Field(default=None, examples=[{}])
+    extra_llm_params: dict | None = Field(default=None, examples=[{}])
 
 
 @auth.put(
