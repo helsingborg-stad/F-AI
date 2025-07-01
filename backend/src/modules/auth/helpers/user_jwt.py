@@ -1,6 +1,5 @@
-import os
+import datetime
 import uuid
-from datetime import datetime, timedelta
 
 from jose import jwt
 
@@ -11,7 +10,7 @@ def create_user_jwt(user_id: str, data: dict, exp: datetime, secret: str) -> str
         'sub': user_id,
         'aud': 'fai',
         'exp': exp,
-        'iat': datetime.utcnow(),
+        'iat': datetime.datetime.now(datetime.UTC),
         'jti': str(uuid.uuid4()),
         'data': data,
     }, secret, algorithm='HS256')
