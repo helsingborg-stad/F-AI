@@ -49,6 +49,12 @@ export const load: PageServerLoad = async (event) => {
     }))
   }
 
+  const favExhibit = {
+    title: 'Favorite assistants',
+    description: 'Only assistants you faved. The best of the best!',
+    cards: assistantCards.filter(card => card.isFavorite)
+  }
+
   const hbgExhibit = {
     title: 'Hbg Assistants',
     description: 'Assistant created and shared by your colleagues',
@@ -62,7 +68,7 @@ export const load: PageServerLoad = async (event) => {
   }
 
   return {
-    exhibits: [hbgExhibit, vanillaExhibit],
+    exhibits: [favExhibit, hbgExhibit, vanillaExhibit],
   }
 }
 
