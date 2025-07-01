@@ -23,6 +23,7 @@
 >
   <button
     class="grow truncate text-left pr-2"
+    title={title}
     onclick={onClick}
   >
     <span>{title}</span>
