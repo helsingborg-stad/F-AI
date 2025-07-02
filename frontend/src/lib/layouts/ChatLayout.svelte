@@ -7,6 +7,7 @@
   import { icons } from '$lib/components/Icon/icons.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
   import type { IAssistantMenu } from '$lib/types.js'
+  import RenameConversationModal from '$lib/components/Menu/Chat/RenameConversationModal.svelte'
 
   type Props = ChatProps & {
     canChat: boolean
@@ -18,6 +19,7 @@
     }[]
     selectedAssistantId: string
     conversationId: string
+    onRenameConversation: (id: string, title: string) => void
     onDeleteConversation: (id: string) => void
     onStartNewChat: () => void
     chatStateIdle: boolean
@@ -34,12 +36,18 @@
     onSubmitMessage,
     selectedAssistantId = $bindable(),
     conversationId,
+    onRenameConversation,
     onDeleteConversation,
     onStartNewChat,
     chatStateIdle,
     onStopChat,
     enableSearch = $bindable(),
   }: Props = $props()
+
+  let renameModal: RenameConversationModal
+  function openRenameModal(id: string, title: string) {
+    if (renameModal) renameModal.showModal(id, title)
+  }
 </script>
 
 <div class="flex flex-col md:flex-row bg-base-200 h-full overflow-hidden">
@@ -57,6 +65,7 @@
           title: c.title || c.id,
           options: [
             { iconName: 'trash', title: 'Delete', onClick: () => onDeleteConversation(c.id) },
+            { iconName: 'pencil', title: 'Edit', onClick: () => openRenameModal(c.id, c.title) },
           ],
           createdTimestamp: c.timestamp
         }))}
@@ -82,3 +91,8 @@
     </main>
   </div>
 </div>
+
+<RenameConversationModal
+  onSave={onRenameConversation}
+  bind:this={renameModal}
+/>

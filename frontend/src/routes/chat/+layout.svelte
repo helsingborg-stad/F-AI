@@ -122,6 +122,24 @@
       .then(invalidateAll)
   }
 
+  function renameConversation(conversationId: string, title: string) {
+    fetch(`/api/conversation/${conversationId}/title`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title }),
+      },
+    )
+      .then(() => {
+        if (conversationId === conversationId) {
+          return goto(`/chat/`, {})
+        }
+      })
+      .then(invalidateAll)
+  }
+
   const assistantIdFromQuery = $derived(page.url.searchParams.get('assistant_id'))
   $effect(() => {
     if (assistantIdFromQuery) {
@@ -144,6 +162,7 @@
   onSubmitMessage={sendMessage}
   bind:selectedAssistantId
   {conversationId}
+  onRenameConversation={renameConversation}
   onDeleteConversation={deleteConversation}
   onStartNewChat={startNewChat}
   onStopChat={chatMachine.stop}
@@ -151,3 +170,4 @@
   bind:enableSearch
 >
 </ChatLayout>
+
