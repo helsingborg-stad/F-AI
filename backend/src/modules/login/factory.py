@@ -27,5 +27,5 @@ class LoginServiceFactory:
             authorization_service=self._authorization_service,
             settings_service=self._settings_service
         )
-        await service.init(otp_expiry_seconds=60)
+        await service.init()
         return service

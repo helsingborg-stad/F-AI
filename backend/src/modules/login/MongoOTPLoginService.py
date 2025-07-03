@@ -31,13 +31,16 @@ class MongoOTPLoginService(ILoginService):
         self._database = database
         self._authorization_service = authorization_service
         self._settings_service = settings_service
-        self._otp_expiry_seconds = 60
-        self._refresh_token_expiry_seconds = 30 * 24 * 60 * 60  # 30 days
 
-    async def init(self, otp_expiry_seconds: int):
-        self._otp_expiry_seconds = otp_expiry_seconds
-        await ensure_expiry_index(self._database['login_otp'], self._otp_expiry_seconds)
-        await ensure_expiry_index(self._database['refresh_tokens'], self._refresh_token_expiry_seconds)
+    async def init(self):
+        otp_expire_seconds = await self._settings_service.get_setting(SettingKey.OTP_EXPIRE_SECONDS.key,
+                                                                      SettingKey.OTP_EXPIRE_SECONDS.default)
+
+        refresh_token_expire_seconds = await self._settings_service.get_setting(
+            SettingKey.REFRESH_TOKEN_EXPIRE_MINUTES.key, SettingKey.REFRESH_TOKEN_EXPIRE_MINUTES.default) * 60
+
+        await ensure_expiry_index(self._database['login_otp'], otp_expire_seconds)
+        await ensure_expiry_index(self._database['refresh_tokens'], refresh_token_expire_seconds)
 
     async def initiate_login(self, user_id: str) -> str:
         otp = self._generate_otp(await self._settings_service.get_setting(SettingKey.FIXED_OTP.key))
@@ -59,9 +62,12 @@ class MongoOTPLoginService(ILoginService):
 
         otp_creation_time = result['createdAt'] if result else None
 
+        otp_expire_seconds = await self._settings_service.get_setting(SettingKey.OTP_EXPIRE_SECONDS.key,
+                                                                      SettingKey.OTP_EXPIRE_SECONDS.default)
+
         if not result or (
                 datetime.datetime.now(datetime.UTC).replace(
-                    tzinfo=None) - otp_creation_time).total_seconds() >= self._otp_expiry_seconds:
+                    tzinfo=None) - otp_creation_time).total_seconds() >= otp_expire_seconds:
             raise ValueError('Invalid request ID')
 
         valid_code = verify_hash(confirmation_code, result['hashed_otp'])
@@ -102,15 +108,19 @@ class MongoOTPLoginService(ILoginService):
             access_token_expires_at,
             await self._settings_service.get_setting(SettingKey.JWT_USER_SECRET.key))
 
+        refresh_token_expire_minutes = await self._settings_service.get_setting(
+            SettingKey.REFRESH_TOKEN_EXPIRE_MINUTES.key, SettingKey.REFRESH_TOKEN_EXPIRE_MINUTES.default)
+
         refresh_token = secrets.token_urlsafe(32)
         refresh_token_created_at = datetime.datetime.now(datetime.UTC)
-        refresh_token_expires_at = refresh_token_created_at + datetime.timedelta(
-            seconds=self._refresh_token_expiry_seconds)
+        refresh_token_expires_at = refresh_token_created_at + datetime.timedelta(minutes=refresh_token_expire_minutes)
+
         await self._database['refresh_tokens'].insert_one({
             'token': hashlib.sha1(refresh_token.encode('utf-8')).hexdigest(),
             'user_id': user_id,
             'created_at': refresh_token_created_at
         })
+
         return ConfirmedLogin(
             user_id=user_id,
             access_token=jwt,
