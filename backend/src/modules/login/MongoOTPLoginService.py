@@ -37,7 +37,7 @@ class MongoOTPLoginService(ILoginService):
                                                                       SettingKey.OTP_EXPIRE_SECONDS.default)
 
         refresh_token_expire_seconds = await self._settings_service.get_setting(
-            SettingKey.REFRESH_TOKEN_EXPIRE_MINUTES.key, SettingKey.REFRESH_TOKEN_EXPIRE_MINUTES.default) * 60
+            SettingKey.REFRESH_TOKEN_EXPIRE_SECONDS.key, SettingKey.REFRESH_TOKEN_EXPIRE_SECONDS.default)
 
         await ensure_expiry_index(self._database['login_otp'], otp_expire_seconds)
         await ensure_expiry_index(self._database['refresh_tokens'], refresh_token_expire_seconds)
@@ -100,20 +100,20 @@ class MongoOTPLoginService(ILoginService):
 
     async def _create_confirmed_login(self, user_id):
         access_token_expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
-            minutes=await self._settings_service.get_setting(SettingKey.JWT_EXPIRE_MINUTES.key,
-                                                             SettingKey.JWT_EXPIRE_MINUTES.default))
+            seconds=await self._settings_service.get_setting(SettingKey.JWT_EXPIRE_SECONDS.key,
+                                                             SettingKey.JWT_EXPIRE_SECONDS.default))
         jwt = create_user_jwt(
             user_id,
             {},
             access_token_expires_at,
             await self._settings_service.get_setting(SettingKey.JWT_USER_SECRET.key))
 
-        refresh_token_expire_minutes = await self._settings_service.get_setting(
-            SettingKey.REFRESH_TOKEN_EXPIRE_MINUTES.key, SettingKey.REFRESH_TOKEN_EXPIRE_MINUTES.default)
+        refresh_token_expire_seconds = await self._settings_service.get_setting(
+            SettingKey.REFRESH_TOKEN_EXPIRE_SECONDS.key, SettingKey.REFRESH_TOKEN_EXPIRE_SECONDS.default)
 
         refresh_token = secrets.token_urlsafe(32)
         refresh_token_created_at = datetime.datetime.now(datetime.UTC)
-        refresh_token_expires_at = refresh_token_created_at + datetime.timedelta(minutes=refresh_token_expire_minutes)
+        refresh_token_expires_at = refresh_token_created_at + datetime.timedelta(seconds=refresh_token_expire_seconds)
 
         await self._database['refresh_tokens'].insert_one({
             'token': hashlib.sha1(refresh_token.encode('utf-8')).hexdigest(),
