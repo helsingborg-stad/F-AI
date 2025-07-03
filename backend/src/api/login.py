@@ -103,8 +103,8 @@ async def refresh_login(request: Request, response: Response, services: Services
             raise ValueError("No refresh token cookie found")
 
         login = await services.login_service.refresh_login(refresh_token=refresh_token)
-    except ValueError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     response.set_cookie(
         key='access_token',
