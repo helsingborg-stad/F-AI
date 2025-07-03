@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit'
 import { api } from '$lib/api-fetch-factory.ts'
+import dayjs from 'dayjs'
 
 export const actions = {
   initiateOTP: async (event) => {
@@ -41,21 +42,21 @@ export const actions = {
       event,
     })
 
-    const setCookieHeader = response.headers.get('set-cookie')
 
-    if (setCookieHeader) {
-      const match = setCookieHeader.match(/access_token=([^;]+)/)
-      if (match) {
-        const accessToken = match[1]
+    const cookies = response.headers.getSetCookie()
+    cookies.forEach(cookie => {
+      const pairs = cookie.split(';').map(v => v.split('='))
+      const kvp: Record<string, string> = pairs.reduce((acc, [k, v]) => ({ ...acc, [k.trim().toLowerCase()]: v }), {})
 
-        // Set the cookie in the browser
-        event.cookies.set('access_token', accessToken, {
-          path: '/',
-          httpOnly: true,
-          sameSite: 'lax',
-        })
-      }
-    }
+      const cookieName = pairs[0][0]
+      event.cookies.set(cookieName, kvp[cookieName], {
+        path: '/',
+        sameSite: 'lax',
+        httpOnly: true,
+        secure: true,
+        expires: dayjs(kvp['expires']).toDate(),
+      })
+    })
 
     if (response.ok) {
       throw redirect(303, '/')
