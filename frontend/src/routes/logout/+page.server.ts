@@ -4,16 +4,13 @@ import { clearUser } from '$lib/state/user.svelte.js'
 
 export const actions = {
   default: async (event) => {
-    await api.post('/api/login/logout', { withAuth: false, event })
+    api.post('/api/login/logout', { withAuth: true, event }).catch(() => {
+    })
 
     clearUser()
-    event.cookies.set('access_token', '', {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: true,
-      maxAge: 0,
-    })
+
+    event.cookies.delete('access_token', { path: '/' })
+    event.cookies.delete('refresh_token', { path: '/' })
 
     throw redirect(303, '/login')
   },
