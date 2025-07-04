@@ -15,12 +15,14 @@ auth = AuthRouterDecorator(settings_router)
 
 
 class GetSettingsResponse(BaseModel):
-    settings: SettingsDict
+    settings: SettingsDict = Field(
+        examples=[{SettingKey.JWT_USER_SECRET: "my_jwt_secret", SettingKey.JWT_EXPIRE_SECONDS: 900}])
 
 
 @auth.get(
     '',
-    ['settings.read']
+    ['settings.read'],
+    response_model=GetSettingsResponse,
 )
 async def get_settings(services: ServicesDependency):
     settings = await services.settings_service.get_settings()
@@ -33,7 +35,8 @@ class GetSettingResponse(BaseModel):
 
 @auth.get(
     '/{key}',
-    ['settings.read']
+    ['settings.read'],
+    response_model=GetSettingResponse,
 )
 async def get_setting(key: str, services: ServicesDependency):
     value = await services.settings_service.get_setting(key)
@@ -55,7 +58,7 @@ async def set_setting(body: SetSettingRequest, services: ServicesDependency):
 
 class PatchSettingsRequest(BaseModel):
     settings: SettingsDict = Field(
-        examples=[{SettingKey.JWT_USER_SECRET: "asdfasdf", SettingKey.JWT_EXPIRE_MINUTES: 900}])
+        examples=[{SettingKey.JWT_USER_SECRET: "asdfasdf", SettingKey.JWT_EXPIRE_SECONDS: 900}])
 
 
 @auth.patch(

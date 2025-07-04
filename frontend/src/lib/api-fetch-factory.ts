@@ -1,5 +1,6 @@
-import { env } from '$env/dynamic/private';
-import type { RequestEvent } from '@sveltejs/kit'
+import { env } from '$env/dynamic/private'
+import { redirect, type RequestEvent } from '@sveltejs/kit'
+import dayjs from 'dayjs'
 
 interface ApiOptions<T = unknown> extends Omit<RequestInit, 'method' | 'body'> {
   body?: T
@@ -7,7 +8,7 @@ interface ApiOptions<T = unknown> extends Omit<RequestInit, 'method' | 'body'> {
   event: RequestEvent
 }
 
-type HttpMethod = 'GET'| 'PATCH' | 'POST' | 'PUT' | 'DELETE'
+type HttpMethod = 'GET' | 'PATCH' | 'POST' | 'PUT' | 'DELETE'
 
 class ApiFetchFactory {
   private readonly baseUrl: string
@@ -36,6 +37,11 @@ class ApiFetchFactory {
       if (token) {
         headers.set('Authorization', `Bearer ${token}`)
       }
+
+      const refreshToken = event.cookies.get('refresh_token')
+      if (refreshToken) {
+        headers.append('Cookie', `refresh_token=${refreshToken};`)
+      }
     }
 
     const url = `${this.baseUrl}${endpoint}`
@@ -47,7 +53,38 @@ class ApiFetchFactory {
       body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
     }
 
-    const response = await fetch(url, requestOptions)
+    let response = await fetch(url, requestOptions)
+
+    if (response.status === 401) {
+      const refreshResponse = await fetch(`${this.baseUrl}/api/login/refresh`,
+        {
+          method: 'POST',
+          headers,
+        })
+
+      if (!refreshResponse.ok) {
+        throw redirect(303, '/login')
+      }
+
+      const cookies = refreshResponse.headers.getSetCookie()
+      cookies.forEach(cookie => {
+        const pairs = cookie.split(';').map(v => v.split('='))
+        const kvp: Record<string, string> = pairs.reduce((acc, [k, v]) => ({ ...acc, [k.trim().toLowerCase()]: v }), {})
+
+        const cookieName = pairs[0][0]
+        event.cookies.set(cookieName, kvp[cookieName], {
+          path: '/',
+          sameSite: 'lax',
+          httpOnly: true,
+          secure: true,
+          expires: dayjs(kvp['expires']).toDate(),
+        })
+      })
+
+
+      headers.set('Authorization', `Bearer ${event.cookies.get('access_token')}`)
+      response = await fetch(url, requestOptions)
+    }
 
     if (!response.ok) {
       throw response

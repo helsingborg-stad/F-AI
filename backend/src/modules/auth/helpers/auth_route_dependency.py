@@ -30,12 +30,6 @@ async def _get_auth_credentials(
 
     # Check for missing credentials
     if len(valid_credentials_provided) == 0:
-        if os.environ['DISABLE_AUTH'] == '1':
-            return AuthenticationSourceCredentials(
-                auth_type=AuthenticationType.GUEST,
-                credentials=''
-            )
-
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not Authenticated",

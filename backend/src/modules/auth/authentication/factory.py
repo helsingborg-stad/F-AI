@@ -1,7 +1,4 @@
-import os
-
 from src.modules.api_key.protocols.IApiKeyService import IApiKeyService
-from src.modules.auth.authentication.ForceGuestAuthenticationService import ForceGuestAuthenticationService
 from src.modules.auth.authentication.api_key.ApiKeyAuthenticationService import ApiKeyAuthenticationService
 from src.modules.auth.authentication.bearer_token.BearerTokenAuthenticationService import \
     BearerTokenAuthenticationService
@@ -27,11 +24,7 @@ class AuthenticationServiceFactory:
         if auth_type not in self._supported_auth_methods:
             raise ValueError(f'Authentication method {auth_type} not supported')
 
-        auth_method = AuthenticationType.GUEST if os.environ['DISABLE_AUTH'] == '1' else auth_type
-
-        match auth_method:
-            case AuthenticationType.GUEST:
-                return ForceGuestAuthenticationService()
+        match auth_type:
             case AuthenticationType.API_KEY:
                 return ApiKeyAuthenticationService(api_key_service=self._api_key_service)
             case AuthenticationType.BEARER_TOKEN:

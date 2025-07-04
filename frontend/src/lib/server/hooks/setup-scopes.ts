@@ -3,7 +3,7 @@ import { api } from '$lib/api-fetch-factory.js'
 import type { IScopesResponse } from '$lib/types.js'
 
 export async function setupScopes(
-  event: RequestEvent<Partial<Record<string, string>>, string | null>,
+  event: RequestEvent,
 ) {
   const path = event.url.pathname
   const publicPaths = ['/login']
