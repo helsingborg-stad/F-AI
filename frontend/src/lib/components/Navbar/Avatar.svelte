@@ -14,7 +14,7 @@
   let { avatarUrl, avatarPlaceholder, menuItems }: Props = $props()
 </script>
 
-<div class="flex-none">
+<div class="hidden md:flex md:flex-none">
   <div class="dropdown dropdown-end">
     {#if avatarUrl}
       <div tabindex="0" role="button" class="avatar btn btn-circle btn-ghost">
