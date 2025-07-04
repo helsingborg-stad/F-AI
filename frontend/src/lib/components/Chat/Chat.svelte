@@ -77,12 +77,12 @@
 
 </script>
 
-<div class="flex flex-col h-full max-h-full">
+<div class="flex flex-col h-full">
   <!-- Chat Bubbles Area -->
   <div
     bind:this={scrollContainer}
     onscroll={onScroll}
-    class="overflow-auto grow p-4"
+    class="overflow-auto flex-1 p-4"
   >
     {#each messages as msg, i (`${i}${msg.source}`)}
       <ChatMessage sender={msg.source} text={msg.message} time={msg.timestamp} showLoader={msg.showLoader} />
@@ -90,10 +90,11 @@
   </div>
 
   <!-- Chat Input -->
-  <div class="relative px-6 pb-6">
+  <div class="relative px-3 pb-3 md:px-6 md:pb-6 flex-shrink-0">
     <div
-      class="absolute inset-x-0 bottom-40 flex justify-center transition"
-      class:translate-y-24={isContentNearBottom}
+      class="absolute inset-x-0 bottom-20 md:bottom-40 flex justify-center transition"
+      class:translate-y-12={isContentNearBottom}
+      class:md:translate-y-24={isContentNearBottom}
       class:invisible={!contentIsScrollable}
     >
       <button
@@ -103,7 +104,7 @@
         <Icon icon={icons.scroll} />
       </button>
     </div>
-    <div class="relative rounded-2xl border bg-white z-10 max-w-[60rem] mx-auto">
+    <div class="relative rounded-2xl border bg-white z-10 w-full max-w-[60rem] mx-auto">
       <ChatInput
         placeholder={inputPlaceholder}
         bind:value={chatInput}
