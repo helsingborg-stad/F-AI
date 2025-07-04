@@ -76,8 +76,8 @@
       </div>
     </SidebarMenu>
   </aside>
-  <div class="flex flex-col w-full gap-2 p-2 pt-0 overflow-hidden">
-    <main class="flex-grow rounded-lg border bg-stone-50 overflow-auto">
+  <div class="flex flex-col w-full h-full gap-2 p-2 pt-0 overflow-hidden">
+    <main class="flex-grow h-full rounded-lg border bg-stone-50 overflow-hidden">
       <Chat
         {assistants}
         bind:selectedAssistantId
