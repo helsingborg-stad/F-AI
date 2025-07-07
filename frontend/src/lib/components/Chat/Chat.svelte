@@ -10,6 +10,7 @@
     timestamp: string
     source: string
     message: string
+    reasoning: string
     showLoader: boolean
   }
 
@@ -85,7 +86,7 @@
     class="overflow-auto flex-1 p-4"
   >
     {#each messages as msg, i (`${i}${msg.source}`)}
-      <ChatMessage sender={msg.source} text={msg.message} time={msg.timestamp} showLoader={msg.showLoader} />
+      <ChatMessage sender={msg.source} details={msg.reasoning} text={msg.message} time={msg.timestamp} showLoader={msg.showLoader} />
     {/each}
   </div>
 

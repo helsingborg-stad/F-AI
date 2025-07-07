@@ -15,10 +15,12 @@ async def event_source_llm_generator(
         user_message: str,
         chat_service: IChatService,
         with_web_search: bool,
+        with_reasoning: bool
 ):
     async def sse_generator():
         features = [f for f in [
-            Feature.WEB_SEARCH if with_web_search else None
+            Feature.WEB_SEARCH if with_web_search else None,
+            Feature.REASONING if with_reasoning else None
         ] if f is not None]
 
         try:
@@ -50,7 +52,8 @@ async def event_source_llm_generator(
                             data=json.dumps({
                                 'timestamp': get_timestamp(),
                                 'source': chat_event.source,
-                                'message': chat_event.message
+                                'message': chat_event.message,
+                                'reasoning': chat_event.reasoning
                             })
                         )
                     case 'error':

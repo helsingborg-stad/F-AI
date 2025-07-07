@@ -7,3 +7,4 @@ class Feature(Enum):
         return name.lower()
 
     WEB_SEARCH = auto()
+    REASONING = auto()

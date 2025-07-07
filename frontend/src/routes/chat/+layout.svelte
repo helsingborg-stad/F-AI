@@ -66,6 +66,7 @@
         timestamp: dayjs().toISOString(),
         source: message.source,
         message: message.message,
+        reasoning: message.reasoning,
       },
     ]
   })
@@ -91,6 +92,7 @@
           timestamp: dayjs().toISOString(),
           source: 'error',
           message: error,
+          reasoning: '',
         },
       ]
     }
@@ -99,8 +101,8 @@
   function sendMessage(message: string) {
     messages = [
       ...messages,
-      { timestamp: dayjs().toISOString(), source: 'user', message },
-      { timestamp: dayjs().toISOString(), source: 'assistant', message: '' },
+      { timestamp: dayjs().toISOString(), source: 'user', message, reasoning: '' },
+      { timestamp: dayjs().toISOString(), source: 'assistant', message: '', reasoning: '' },
     ]
 
     chatMachine.sendMessage(message, selectedAssistantId, conversationId ?? null, { enableWebSearch: enableSearch })

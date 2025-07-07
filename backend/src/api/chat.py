@@ -90,6 +90,7 @@ class BufferedChatRequest(BaseModel):
     assistant_id: str
     message: str
     with_web_search: bool = False
+    with_reasoning: bool = False
 
 
 class BufferedChatResponse(BaseModel):
@@ -115,7 +116,8 @@ async def buffered_chat(body: BufferedChatRequest, services: ServicesDependency,
             assistant_id=body.assistant_id,
             message=body.message,
             enabled_features=[f for f in [
-                Feature.WEB_SEARCH if body.with_web_search else None
+                Feature.WEB_SEARCH if body.with_web_search else None,
+                Feature.REASONING if body.with_reasoning else None,
             ] if f is not None]
     ):
         match delta.event:
@@ -143,6 +145,7 @@ async def buffered_chat(body: BufferedChatRequest, services: ServicesDependency,
 class BufferedChatContinueRequest(BaseModel):
     message: str
     with_web_search: bool = False
+    with_reasoning: bool = False
 
 
 class BufferedChatContinueResponse(BaseModel):
@@ -174,7 +177,8 @@ async def buffered_chat_continue(
             conversation_id=conversation_id,
             message=body.message,
             enabled_features=[f for f in [
-                Feature.WEB_SEARCH if body.with_web_search else None
+                Feature.WEB_SEARCH if body.with_web_search else None,
+                Feature.REASONING if body.with_reasoning else None,
             ] if f is not None]
     ):
         match delta.event:
@@ -239,6 +243,7 @@ async def stream_chat(
         services: ServicesDependency,
         auth_identity: AuthenticatedIdentity,
         with_web_search: bool = False,
+        with_reasoning: bool = False,
 ):
     message = await services.message_store_service.consume_message(stored_message_id=stored_message_id)
 
@@ -251,7 +256,8 @@ async def stream_chat(
         start_new_conversation=True,
         user_message=message,
         chat_service=services.chat_service,
-        with_web_search=with_web_search
+        with_web_search=with_web_search,
+        with_reasoning=with_reasoning
     )
 
 
@@ -270,6 +276,7 @@ async def stream_chat_continue(
         services: ServicesDependency,
         auth_identity: AuthenticatedIdentity,
         with_web_search: bool = False,
+        with_reasoning: bool = False,
 ):
     message = await services.message_store_service.consume_message(stored_message_id=stored_message_id)
 
@@ -282,5 +289,6 @@ async def stream_chat_continue(
         start_new_conversation=False,
         user_message=message,
         chat_service=services.chat_service,
-        with_web_search=with_web_search
+        with_web_search=with_web_search,
+        with_reasoning=with_reasoning
     )
