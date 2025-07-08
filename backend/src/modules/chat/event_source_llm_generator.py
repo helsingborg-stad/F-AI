@@ -14,15 +14,9 @@ async def event_source_llm_generator(
         start_new_conversation: bool,
         user_message: str,
         chat_service: IChatService,
-        with_web_search: bool,
-        with_reasoning: bool
+        features: list[Feature],
 ):
     async def sse_generator():
-        features = [f for f in [
-            Feature.WEB_SEARCH if with_web_search else None,
-            Feature.REASONING if with_reasoning else None
-        ] if f is not None]
-
         try:
             if start_new_conversation:
                 chat_generator = chat_service.start_new_chat(

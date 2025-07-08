@@ -13,8 +13,7 @@
   const { data }: Props = $props()
 
   let selectedAssistantId = $state('')
-  let enableSearch = $state(false)
-  let enableReasoning = $state(false)
+  let enabledFeatures: string[] = $state([])
 
   const chatMachine = useChatMachine()
   const { state: chatState } = chatMachine
@@ -107,8 +106,7 @@
     ]
 
     chatMachine.sendMessage(message, selectedAssistantId, conversationId ?? null, {
-      enableWebSearch: enableSearch,
-      enableReasoning,
+      withFeatures: enabledFeatures,
     })
       .catch(e => console.error('chatMachine.sendMessage failed', e))
   }
@@ -173,8 +171,7 @@
   onStartNewChat={startNewChat}
   onStopChat={chatMachine.stop}
   chatStateIdle={$chatState === 'idle'}
-  bind:enableSearch
-  bind:enableReasoning
+  bind:enabledFeatures
 >
 </ChatLayout>
 

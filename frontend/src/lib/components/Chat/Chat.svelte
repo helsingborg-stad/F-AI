@@ -3,7 +3,7 @@
   import { icons } from '$lib/components/Icon/icons.js'
   import ChatMessage from '$lib/components/Chat/ChatMessage.svelte'
   import ChatInput from '$lib/components/Chat/ChatInput.svelte'
-  import ActionButtons from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
+  import ActionButtons, { type AllowedFeature } from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
   import type { IAssistantMenu } from '$lib/types.js'
 
   interface Message {
@@ -22,8 +22,7 @@
     onSubmitMessage: (message: string) => void
     chatStateIdle: boolean,
     onStopChat: () => void,
-    enableSearch: boolean,
-    enableReasoning: boolean
+    enabledFeatures: string[]
   }
 
   let {
@@ -34,8 +33,7 @@
     onSubmitMessage,
     chatStateIdle,
     onStopChat,
-    enableSearch = $bindable(),
-    enableReasoning = $bindable(),
+    enabledFeatures = $bindable(),
   }: Props = $props()
 
   let scrollContainer: HTMLDivElement = undefined as unknown as HTMLDivElement
@@ -70,21 +68,14 @@
     }
   })
 
-  let allowSearch: boolean = $derived(
-    !selectedAssistantId
-      ? false
-      : assistants
-      .flatMap(group => group.menuItems)
-      .find(item => item.id === selectedAssistantId)?.allowSearch || false,
-  )
+  const selectedAssistant = $derived(selectedAssistantId ? assistants.flatMap(g => g.menuItems)
+    .find(i => i.id === selectedAssistantId) : undefined)
 
-  let allowReasoning: boolean = $derived(
-    !selectedAssistantId
-      ? false
-      : assistants
-      .flatMap(group => group.menuItems)
-      .find(item => item.id === selectedAssistantId)?.allowReasoning || false,
-  )
+  let allowedFeatures: AllowedFeature[] = $derived(selectedAssistant ? [
+    selectedAssistant.allowSearch === true && { id: 'web_search', title: 'Web search', icon: icons['globe'] },
+    selectedAssistant.allowReasoning === true && { id: 'reasoning', title: 'Reasoning', icon: icons['brain'] },
+  ].filter<AllowedFeature>(v => v !== false) : [])
+
 
 </script>
 
@@ -126,10 +117,8 @@
         {onStopChat}
       >
         <ActionButtons
-          {allowSearch}
-          bind:enableSearch
-          {allowReasoning}
-          bind:enableReasoning
+          {allowedFeatures}
+          bind:enabledFeatureIds={enabledFeatures}
           {assistants}
           bind:selectedAssistantId
           {disableAssistantPicker}

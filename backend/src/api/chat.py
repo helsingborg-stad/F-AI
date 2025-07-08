@@ -5,7 +5,7 @@ from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
 from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
 from src.modules.chat.event_source_llm_generator import event_source_llm_generator
-from src.modules.llm.models.Feature import Feature
+from src.modules.llm.models.Feature import features_from_string
 
 chat_router = APIRouter(
     prefix='/chat',
@@ -89,8 +89,6 @@ async def count_tokens(body: CountTokensRequest, services: ServicesDependency, a
 class BufferedChatRequest(BaseModel):
     assistant_id: str
     message: str
-    with_web_search: bool = False
-    with_reasoning: bool = False
 
 
 class BufferedChatResponse(BaseModel):
@@ -115,10 +113,7 @@ async def buffered_chat(body: BufferedChatRequest, services: ServicesDependency,
             as_uid=auth_identity.uid,
             assistant_id=body.assistant_id,
             message=body.message,
-            enabled_features=[f for f in [
-                Feature.WEB_SEARCH if body.with_web_search else None,
-                Feature.REASONING if body.with_reasoning else None,
-            ] if f is not None]
+            enabled_features=[]
     ):
         match delta.event:
             case 'conversation_id':
@@ -144,8 +139,6 @@ async def buffered_chat(body: BufferedChatRequest, services: ServicesDependency,
 
 class BufferedChatContinueRequest(BaseModel):
     message: str
-    with_web_search: bool = False
-    with_reasoning: bool = False
 
 
 class BufferedChatContinueResponse(BaseModel):
@@ -176,10 +169,7 @@ async def buffered_chat_continue(
             as_uid=auth_identity.uid,
             conversation_id=conversation_id,
             message=body.message,
-            enabled_features=[f for f in [
-                Feature.WEB_SEARCH if body.with_web_search else None,
-                Feature.REASONING if body.with_reasoning else None,
-            ] if f is not None]
+            enabled_features=[]
     ):
         match delta.event:
             case 'message':
@@ -242,8 +232,7 @@ async def stream_chat(
         stored_message_id: str,
         services: ServicesDependency,
         auth_identity: AuthenticatedIdentity,
-        with_web_search: bool = False,
-        with_reasoning: bool = False,
+        features: str = '',
 ):
     message = await services.message_store_service.consume_message(stored_message_id=stored_message_id)
 
@@ -256,8 +245,7 @@ async def stream_chat(
         start_new_conversation=True,
         user_message=message,
         chat_service=services.chat_service,
-        with_web_search=with_web_search,
-        with_reasoning=with_reasoning
+        features=features_from_string(features)
     )
 
 
@@ -275,8 +263,7 @@ async def stream_chat_continue(
         stored_message_id: str,
         services: ServicesDependency,
         auth_identity: AuthenticatedIdentity,
-        with_web_search: bool = False,
-        with_reasoning: bool = False,
+        features: str = '',
 ):
     message = await services.message_store_service.consume_message(stored_message_id=stored_message_id)
 
@@ -289,6 +276,5 @@ async def stream_chat_continue(
         start_new_conversation=False,
         user_message=message,
         chat_service=services.chat_service,
-        with_web_search=with_web_search,
-        with_reasoning=with_reasoning
+        features=features_from_string(features)
     )

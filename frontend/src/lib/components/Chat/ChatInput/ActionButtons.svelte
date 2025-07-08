@@ -2,36 +2,54 @@
   import AssistantPicker from '$lib/components/Menu/AssistantPicker/AssistantPicker.svelte'
   import type { IAssistantMenu } from '$lib/types.js'
   import IconToggleButton from '$lib/components/Buttons/IconToggleButton.svelte'
-  import { icons } from '$lib/components/Icon/icons.js'
+
+  export interface AllowedFeature {
+    id: string
+    title: string
+    icon: string
+  }
 
   interface Props {
-    allowSearch: boolean
-    allowReasoning: boolean
-    enableSearch: boolean
-    enableReasoning: boolean
+    allowedFeatures: AllowedFeature[]
+    enabledFeatureIds: string[]
     assistants: IAssistantMenu[],
     selectedAssistantId: string,
     disableAssistantPicker: boolean
   }
 
   let {
-    allowSearch,
-    allowReasoning,
-    enableSearch = $bindable(),
-    enableReasoning = $bindable(),
+    allowedFeatures,
+    enabledFeatureIds = $bindable(),
     assistants,
     selectedAssistantId = $bindable(),
     disableAssistantPicker,
   }: Props = $props()
+
+  const isFeatureEnabled = (featureId: string) => enabledFeatureIds.includes(featureId)
+  const setFeatureEnabled = (featureId: string, enabled: boolean) => {
+    enabledFeatureIds = enabled ? [...enabledFeatureIds, featureId] : enabledFeatureIds.filter(id => id !== featureId)
+  }
+
+  $effect(() => {
+    const filteredEnabledFeatures = enabledFeatureIds.filter(id => allowedFeatures.map(f => f.id).includes(id))
+    const isDifferent = enabledFeatureIds.some((id, i) => id !== filteredEnabledFeatures[i])
+    if (isDifferent) {
+      enabledFeatureIds = filteredEnabledFeatures
+    }
+  })
 </script>
 
 <div class="flex flex-row pr-3 gap-1">
-  {#if allowSearch}
-    <IconToggleButton title="Web search" icon={icons['globe']} bind:value={enableSearch} />
-  {/if}
-  {#if allowReasoning}
-    <IconToggleButton title="Reasoning" icon={icons['globe']} bind:value={enableReasoning} />
-  {/if}
+  {#each allowedFeatures as feature}
+    <IconToggleButton
+      title={feature.title}
+      icon={feature.icon}
+      bind:value={
+        () => isFeatureEnabled(feature.id),
+        (v) => setFeatureEnabled(feature.id, v)
+      }
+    />
+  {/each}
   <div class="ml-auto">
     <AssistantPicker
       {assistants}

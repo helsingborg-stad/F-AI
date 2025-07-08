@@ -9,8 +9,7 @@ export interface ChatMessage {
 export type ChatMachineState = 'idle' | 'sending' | 'waiting' | 'responding' | 'error'
 
 export interface SendMessageOptions {
-  enableWebSearch?: boolean
-  enableReasoning?: boolean
+  withFeatures: string[]
 }
 
 export interface ChatMachine {
@@ -69,12 +68,9 @@ export function useChatMachine(): ChatMachine {
       }
 
       const { messageId } = await storeMessageResponse.json()
-
-      const webSearchEnabled = extraOptions?.enableWebSearch === true
-      const reasoningEnabled = extraOptions?.enableReasoning === true
       const chatUrl = conversationId
-        ? `/chat?message=${messageId}&conversation=${conversationId}&withWebSearch=${webSearchEnabled}&withReasoning=${reasoningEnabled}`
-        : `/chat?message=${messageId}&assistant=${assistantId}&withWebSearch=${webSearchEnabled}&withReasoning=${reasoningEnabled}`
+        ? `/chat?message=${messageId}&conversation=${conversationId}&features=${extraOptions?.withFeatures.join(',')}`
+        : `/chat?message=${messageId}&assistant=${assistantId}&features=${extraOptions?.withFeatures.join(',')}`
 
       if (cancelAnyInProgressCalls) {
         return
