@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { IMenuItem } from '$lib/types.js'
   import Avatar from '$lib/components/Navbar/Avatar.svelte'
-  import NavbarMenu from '$lib/components/Menu/Navbar/NavbarMenu.svelte'
+  import Icon from '$lib/components/Icon/Icon.svelte'
+  import { icons } from '$lib/components/Icon/icons.js'
+  import { uiState } from '$lib/state/ui.svelte.js'
 
   interface Props {
     navbarTitle: string
@@ -26,14 +28,21 @@
 </script>
 
 <nav class="navbar py-0 min-h-0">
+  <button
+    class="btn btn-sm btn-square min-w-2"
+    onclick={uiState.toggleSidebar}
+    aria-label={uiState.showSidebar ? 'Hide sidebar' : 'Show sidebar'}
+  >
+    <Icon icon={icons["panelLeft"]} width={24} height={24} />
+  </button>
 
-  <div class="ml-2 grow md:grow-0">
+  <div class="ml-2 grow">
     {#if navbarTitle}
       <span>{navbarTitle}</span>
     {/if}
   </div>
 
-  <div class="hidden grow justify-end md:flex">
+  <div class="grow justify-end flex">
     <ul class="menu menu-horizontal gap-1">
       {#each navbarMenu as { label, path }}
         <li><a href={path} class:active={isActive(path)}>{label}</a></li>
@@ -41,12 +50,7 @@
     </ul>
   </div>
 
-  <div class="hidden md:flex md:flex-none">
+  <div class="flex flex-none">
     <Avatar {avatarUrl} {avatarPlaceholder} menuItems={avatarMenu} />
   </div>
-
-  <div class="md:hidden">
-    <NavbarMenu {navbarMenu} {isActive} />
-  </div>
-
 </nav>

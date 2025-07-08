@@ -8,6 +8,7 @@
   import Icon from '$lib/components/Icon/Icon.svelte'
   import type { IAssistantMenu } from '$lib/types.js'
   import RenameConversationModal from '$lib/components/Menu/Chat/RenameConversationModal.svelte'
+  import { uiState } from '$lib/state/ui.svelte.js'
 
   type Props = ChatProps & {
     canChat: boolean
@@ -50,8 +51,8 @@
   }
 </script>
 
-<div class="flex flex-col md:flex-row bg-base-200 h-full overflow-hidden">
-  <aside class="hidden md:block md:w-60 flex-shrink-0 bg-base-200">
+<div class="flex bg-base-200 h-full overflow-hidden">
+  <aside class="w-60 flex-shrink-0 bg-base-200" class:hidden={!uiState.showSidebar}>
     <SidebarMenu title="Chat">
       <div class="flex flex-col h-full gap-2">
         <button type="button" class="btn btn-neutral btn-sm" disabled={!canChat} onclick={onStartNewChat}>
