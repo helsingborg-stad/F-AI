@@ -22,6 +22,7 @@ export async function getAssistantPickerData(
       id: assistant.id,
       name: assistant.meta.name?.toString() ?? '<unknown>',
       allowSearch: Boolean(assistant.meta?.enable_search),
+      allowReasoning: Boolean(assistant.meta?.enable_reasoning),
     }))
 
     result = [
@@ -43,6 +44,7 @@ export async function getAssistantPickerData(
       id: assistant.id,
       name: assistant.meta.name?.toString() ?? '<unknown>',
       allowSearch: Boolean(assistant.meta?.enable_search),
+      allowReasoning: Boolean(assistant.meta?.enable_reasoning),
     }))
 
   if (vanillaItems.length > 0) {

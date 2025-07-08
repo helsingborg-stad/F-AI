@@ -15,9 +15,18 @@
     collection?: ICollection
     maxCollectionResult: string
     enableSearch: boolean
+    enableReasoning: boolean
   }
 
-  let { canEdit, assistantId, collectionId, collection, maxCollectionResult, enableSearch }: Props = $props()
+  let {
+    canEdit,
+    assistantId,
+    collectionId,
+    collection,
+    maxCollectionResult,
+    enableSearch,
+    enableReasoning,
+  }: Props = $props()
   let fileModal: FileUploadModal
   let currentCollectionId = $state(collectionId)
   let currentFiles = $state(collection?.files || [])
@@ -28,12 +37,19 @@
 
   let attachingFiles = $state(false)
   let enableSearchValue = $state(enableSearch)
+  let enableReasoningValue = $state(enableReasoning)
 </script>
 
 <input
   type="hidden"
   name="enable_search"
   bind:value={enableSearchValue}
+>
+
+<input
+  type="hidden"
+  name="enable_reasoning"
+  bind:value={enableReasoningValue}
 >
 
 <Section title={"Tools"}>
@@ -89,7 +105,7 @@
   </div>
   <HorizontalDivider />
   <div class="flex flex-row place-content-between items-center">
-    <div>
+    <div class="items-start">
       <InfoTooltip
         toolTip="Enable model capabilities">
         <div class="text-sm font-medium select-none">Capabilities</div>
@@ -99,6 +115,10 @@
       <label class="label cursor-pointer">
         <span class="label-text me-2">Web search</span>
         <input type="checkbox" class="toggle toggle-sm" bind:checked={enableSearchValue} />
+      </label>
+      <label class="label cursor-pointer">
+        <span class="label-text me-2">Reasoning</span>
+        <input type="checkbox" class="toggle toggle-sm" bind:checked={enableReasoningValue} />
       </label>
     </div>
   </div>

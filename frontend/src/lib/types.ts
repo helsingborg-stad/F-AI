@@ -77,6 +77,7 @@ export interface IAssistant {
   isPublic: boolean
   primaryColor: string
   enableSearch: boolean
+  enableReasoning: boolean
 }
 
 export interface IAssistantCard {
@@ -99,6 +100,7 @@ export interface IAssistantMenu {
   menuTitle: string
   menuItems: {
     allowSearch: boolean
+    allowReasoning: boolean
     id: string
     name: string
   }[]

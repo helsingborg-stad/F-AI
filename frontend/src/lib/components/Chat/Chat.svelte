@@ -23,6 +23,7 @@
     chatStateIdle: boolean,
     onStopChat: () => void,
     enableSearch: boolean,
+    enableReasoning: boolean
   }
 
   let {
@@ -34,6 +35,7 @@
     chatStateIdle,
     onStopChat,
     enableSearch = $bindable(),
+    enableReasoning = $bindable(),
   }: Props = $props()
 
   let scrollContainer: HTMLDivElement = undefined as unknown as HTMLDivElement
@@ -76,6 +78,14 @@
       .find(item => item.id === selectedAssistantId)?.allowSearch || false,
   )
 
+  let allowReasoning: boolean = $derived(
+    !selectedAssistantId
+      ? false
+      : assistants
+      .flatMap(group => group.menuItems)
+      .find(item => item.id === selectedAssistantId)?.allowReasoning || false,
+  )
+
 </script>
 
 <div class="flex flex-col h-full">
@@ -86,7 +96,8 @@
     class="overflow-auto flex-1 p-4"
   >
     {#each messages as msg, i (`${i}${msg.source}`)}
-      <ChatMessage sender={msg.source} details={msg.reasoning} text={msg.message} time={msg.timestamp} showLoader={msg.showLoader} />
+      <ChatMessage sender={msg.source} details={msg.reasoning} text={msg.message} time={msg.timestamp}
+                   showLoader={msg.showLoader} />
     {/each}
   </div>
 
@@ -117,6 +128,8 @@
         <ActionButtons
           {allowSearch}
           bind:enableSearch
+          {allowReasoning}
+          bind:enableReasoning
           {assistants}
           bind:selectedAssistantId
           {disableAssistantPicker}

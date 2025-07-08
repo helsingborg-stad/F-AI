@@ -28,6 +28,7 @@ export const GET: RequestHandler = async (event) => {
   const conversationId = event.url.searchParams.get('conversation')
   const assistantId = event.url.searchParams.get('assistant')
   const withWebSearch = event.url.searchParams.get('withWebSearch')
+  const withReasoning = event.url.searchParams.get('withReasoning')
 
   if (!messageId) {
     error(400, 'message parameter is required')
@@ -38,8 +39,8 @@ export const GET: RequestHandler = async (event) => {
   }
 
   const url = conversationId
-    ? `/api/chat/sse/${conversationId}?stored_message_id=${messageId}&with_web_search=${withWebSearch}`
-    : `/api/chat/sse?assistant_id=${assistantId}&stored_message_id=${messageId}&with_web_search=${withWebSearch}`
+    ? `/api/chat/sse/${conversationId}?stored_message_id=${messageId}&with_web_search=${withWebSearch}&with_reasoning=${withReasoning}`
+    : `/api/chat/sse?assistant_id=${assistantId}&stored_message_id=${messageId}&with_web_search=${withWebSearch}&with_reasoning=${withReasoning}`
 
   return api.get(url, { withAuth: true, event })
 }

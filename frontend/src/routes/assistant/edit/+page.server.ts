@@ -36,6 +36,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
   const primaryColor = formData.get('primary_color') as string
   const maxCollectionResults = formData.get('max_collection_results') as string
   const enableSearch = formData.get('enable_search') === 'true'
+  const enableReasoning = formData.get('enable_reasoning') === 'true'
 
   return {
     id: id,
@@ -48,6 +49,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
       primary_color: primaryColor,
       sample_questions: [],
       enable_search: enableSearch,
+      enable_reasoning: enableReasoning,
     },
     model: model,
     collection_id: collectionId === '' ? null : collectionId,
@@ -79,6 +81,7 @@ export const load: PageServerLoad = async (event) => {
       avatarBase64: assistant.meta?.avatar_base64?.toString() ?? '',
       primaryColor: assistant.meta?.primary_color?.toString() ?? '#ffffff',
       enableSearch: assistant.meta?.enable_search === true,
+      enableReasoning: assistant.meta?.enable_reasoning === true,
     }))
   }
 
@@ -95,6 +98,7 @@ export const load: PageServerLoad = async (event) => {
       avatarBase64: assistantData.meta?.avatar_base64?.toString() ?? '',
       primaryColor: assistantData.meta?.primary_color?.toString() ?? '#ffffff',
       enableSearch: assistantData.meta?.enable_search === true,
+      enableReasoning: assistantData.meta?.enable_reasoning === true,
     }
 
     if (userCanReadCollections && assistantData.collection_id) {
