@@ -50,6 +50,26 @@
   function openRenameModal(id: string, title: string) {
     if (renameModal) renameModal.showModal(id, title)
   }
+
+  $effect(() => {
+    let resizeTimer: number
+
+    const handleResize = () => {
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(() => {
+        const isMobile = window.innerWidth < 768
+        uiState.showSidebar = !isMobile
+      }, 500)
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      clearTimeout(resizeTimer)
+      window.removeEventListener('resize', handleResize)
+    }
+  })
 </script>
 
 <div class="flex bg-base-200 h-full overflow-hidden relative">
