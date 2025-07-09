@@ -38,7 +38,7 @@
 
 <nav class="navbar py-0 min-h-0">
   <button
-    class="btn btn-sm btn-square min-w-2 {uiState.showSidebar ? 'max-md:z-[40] max-md:relative' : ''}"
+    class="btn btn-ghost btn-sm btn-square min-w-2 {uiState.showSidebar ? 'max-md:z-[40] max-md:relative' : ''}"
     onclick={uiState.toggleSidebar}
     onmouseenter={() => isHovering = true}
     onmouseleave={() => isHovering = false}
