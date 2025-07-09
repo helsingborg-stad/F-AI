@@ -25,15 +25,26 @@
   })
 
   const isActive = (path: string) => path === urlFirstDirectory
+
+  let isHovering = $state(false)
+
+  let currentIcon = $derived.by(() => {
+    if (isHovering) {
+      return uiState.showSidebar ? icons["arrowLeftToLine"] : icons["arrowRightToLine"]
+    }
+    return icons["panelLeft"]
+  })
 </script>
 
 <nav class="navbar py-0 min-h-0">
   <button
-    class="btn btn-sm btn-square min-w-2"
+    class="btn btn-sm btn-square min-w-2 {uiState.showSidebar ? 'max-md:z-[40] max-md:relative' : ''}"
     onclick={uiState.toggleSidebar}
+    onmouseenter={() => isHovering = true}
+    onmouseleave={() => isHovering = false}
     aria-label={uiState.showSidebar ? 'Hide sidebar' : 'Show sidebar'}
   >
-    <Icon icon={icons["panelLeft"]} width={24} height={24} />
+    <Icon icon={currentIcon} width={24} height={24} />
   </button>
 
   <div class="ml-2 grow">
