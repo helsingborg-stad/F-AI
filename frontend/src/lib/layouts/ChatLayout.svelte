@@ -46,13 +46,26 @@
   }: Props = $props()
 
   let renameModal: RenameConversationModal
+
   function openRenameModal(id: string, title: string) {
     if (renameModal) renameModal.showModal(id, title)
   }
 </script>
 
-<div class="flex bg-base-200 h-full overflow-hidden">
-  <aside class="w-60 flex-shrink-0 bg-base-200" class:hidden={!uiState.showSidebar}>
+<div class="flex bg-base-200 h-full overflow-hidden relative">
+  {#if uiState.showSidebar}
+    <button
+      type="button"
+      aria-label="Close sidebar"
+      class="fixed inset-0 z-[999] bg-transparent cursor-default p-0 border-0"
+      onclick={() => uiState.showSidebar = false}
+    ></button>
+  {/if}
+
+  <aside
+    class="w-60 flex-shrink-0 bg-base-200 absolute top-0 left-0 h-full z-[1000] shadow-[2px_0_8px_rgba(0,0,0,0.15)] backdrop-blur"
+    class:hidden={!uiState.showSidebar}
+  >
     <SidebarMenu title="Chat">
       <div class="flex flex-col h-full gap-2">
         <button type="button" class="btn btn-neutral btn-sm" disabled={!canChat} onclick={onStartNewChat}>
