@@ -2,7 +2,7 @@
   import { uiState } from '$lib/state/ui.svelte.js'
   import type { Snippet } from 'svelte'
 
-    interface Props {
+  interface Props {
     children: Snippet
   }
 
@@ -15,7 +15,7 @@
       clearTimeout(resizeTimer)
       resizeTimer = setTimeout(() => {
         const isMobile = window.innerWidth < 768
-        uiState.showSidebar = !isMobile
+        uiState.setShowSidebarAuto(!isMobile)
       }, 500)
     }
 
@@ -34,7 +34,7 @@
     type="button"
     aria-label="Close sidebar"
     class="fixed inset-0 z-[30] bg-transparent cursor-default p-0 border-0 md:hidden"
-    onclick={() => uiState.showSidebar = false}
+    onclick={() => uiState.setShowSidebarManual(false)}
   ></button>
 {/if}
 
