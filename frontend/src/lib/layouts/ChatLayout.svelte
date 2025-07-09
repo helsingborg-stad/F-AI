@@ -8,7 +8,7 @@
   import Icon from '$lib/components/Icon/Icon.svelte'
   import type { IAssistantMenu } from '$lib/types.js'
   import RenameConversationModal from '$lib/components/Menu/Chat/RenameConversationModal.svelte'
-  import { uiState } from '$lib/state/ui.svelte.js'
+  import ResponsiveSidebar from '$lib/components/Menu/Chat/ResponsiveSidebar.svelte'
 
   type Props = ChatProps & {
     canChat: boolean
@@ -50,42 +50,10 @@
   function openRenameModal(id: string, title: string) {
     if (renameModal) renameModal.showModal(id, title)
   }
-
-  $effect(() => {
-    let resizeTimer: number
-
-    const handleResize = () => {
-      clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(() => {
-        const isMobile = window.innerWidth < 768
-        uiState.showSidebar = !isMobile
-      }, 500)
-    }
-
-    handleResize()
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      clearTimeout(resizeTimer)
-      window.removeEventListener('resize', handleResize)
-    }
-  })
 </script>
 
 <div class="flex bg-base-200 h-full overflow-hidden relative">
-  {#if uiState.showSidebar}
-    <button
-      type="button"
-      aria-label="Close sidebar"
-      class="fixed inset-0 z-[999] bg-transparent cursor-default p-0 border-0 md:hidden"
-      onclick={() => uiState.showSidebar = false}
-    ></button>
-  {/if}
-
-  <aside
-    class="w-60 flex-shrink-0 bg-base-200 max-md:absolute max-md:top-0 max-md:left-0 max-md:h-full max-md:z-[1000] max-md:shadow-[2px_0_8px_rgba(0,0,0,0.15)] max-md:backdrop-blur"
-    class:hidden={!uiState.showSidebar}
-  >
+  <ResponsiveSidebar>
     <SidebarMenu title="Chat">
       <div class="flex flex-col h-full gap-2">
         <button type="button" class="btn btn-neutral btn-sm" disabled={!canChat} onclick={onStartNewChat}>
@@ -109,7 +77,8 @@
         </div>
       </div>
     </SidebarMenu>
-  </aside>
+  </ResponsiveSidebar>
+
   <div class="flex flex-col w-full h-full gap-2 p-2 pt-0 overflow-hidden">
     <main class="flex-grow h-full rounded-lg border bg-stone-50 overflow-hidden">
       <Chat
