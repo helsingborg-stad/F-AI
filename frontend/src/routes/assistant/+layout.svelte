@@ -13,7 +13,7 @@
 
 <div class="flex bg-base-200 h-full overflow-hidden relative">
   <ResponsiveSidebar>
-    <SidebarMenu title="Assistant">
+    <SidebarMenu>
       <div class="flex flex-col h-full gap-2">
         {#each sidebarMenu as item}
           <button

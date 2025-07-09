@@ -54,7 +54,7 @@
 
 <div class="flex bg-base-200 h-full overflow-hidden relative">
   <ResponsiveSidebar>
-    <SidebarMenu title="Chat">
+    <SidebarMenu>
       <div class="flex flex-col h-full gap-2">
         <button type="button" class="btn btn-neutral btn-sm" disabled={!canChat} onclick={onStartNewChat}>
           <Icon icon={icons["plus"]} width={16} height={16} />

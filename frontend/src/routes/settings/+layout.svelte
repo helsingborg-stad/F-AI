@@ -7,7 +7,7 @@
 
 <div class="flex bg-base-200 h-full overflow-hidden relative">
   <ResponsiveSidebar>
-    <SidebarMenu title="Settings" />
+    <SidebarMenu/>
   </ResponsiveSidebar>
   <main class="m-2 flex-grow rounded-lg border bg-stone-50">
     {@render children()}
