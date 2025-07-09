@@ -47,7 +47,6 @@ export const uiState = {
     isManualOverride = false
     if (isBrowser) {
       localStorage.removeItem('showSidebar')
-      // Apply automatic logic immediately
       const isMobile = window.innerWidth < 768
       showSidebar = !isMobile
     }
