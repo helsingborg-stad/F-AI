@@ -78,7 +78,6 @@
       </div>
     </SidebarMenu>
   </ResponsiveSidebar>
-
   <div class="flex flex-col w-full h-full gap-2 p-2 pt-0 overflow-hidden">
     <main class="flex-grow h-full rounded-lg border bg-stone-50 overflow-hidden">
       <Chat
