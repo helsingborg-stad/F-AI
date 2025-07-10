@@ -3,6 +3,12 @@
   import type { IExhibit } from '$lib/types.js'
 
   let { title, description, cards }: IExhibit = $props()
+
+  let openedId = $state('')
+
+  $effect(() => {
+    openedId = new URL(window.location.href).searchParams.get('id') ?? ''
+  })
 </script>
 
 <div class="pb-8">
@@ -21,6 +27,7 @@
           isFavorite={card.isFavorite}
           starters={card.starters}
           metadata={card.metadata}
+          dialogOpen={openedId === card.id}
         />
       {/each}
     </div>
