@@ -3,7 +3,7 @@
   import Avatar from '$lib/components/Navbar/Avatar.svelte'
   import Icon from '$lib/components/Icon/Icon.svelte'
   import { icons } from '$lib/components/Icon/icons.js'
-  import { uiState } from '$lib/state/ui.svelte.js'
+  import { getSidebarContext } from '$lib/sidebar-context.js'
 
   interface Props {
     navbarTitle: string
@@ -19,6 +19,8 @@
 
   let { navbarTitle, avatarUrl, navbarMenu, currentUrlPath, avatarPlaceholder, avatarMenu }: Props = $props()
 
+  const sidebarState = getSidebarContext()
+
   let urlFirstDirectory = $derived.by(() => {
     const segments = currentUrlPath.split('/').filter(Boolean)
     return segments.length > 0 ? `/${segments[0]}` : '/'
@@ -30,7 +32,7 @@
 
   let currentIcon = $derived.by(() => {
     if (isHovering) {
-      return uiState.showSidebar ? icons["arrowLeftToLine"] : icons["arrowRightToLine"]
+      return sidebarState.showSidebar ? icons["arrowLeftToLine"] : icons["arrowRightToLine"]
     }
     return icons["panelLeft"]
   })
@@ -38,11 +40,11 @@
 
 <nav class="navbar py-0 min-h-0">
   <button
-    class="btn btn-ghost btn-sm btn-square min-w-2 {uiState.showSidebar ? 'max-md:z-[40] max-md:relative' : ''}"
-    onclick={uiState.toggleSidebar}
+    class="btn btn-ghost btn-sm btn-square min-w-2 {sidebarState.showSidebar ? 'max-md:z-[40] max-md:relative' : ''}"
+    onclick={sidebarState.toggleSidebar}
     onmouseenter={() => isHovering = true}
     onmouseleave={() => isHovering = false}
-    aria-label={uiState.showSidebar ? 'Hide sidebar' : 'Show sidebar'}
+    aria-label={sidebarState.showSidebar ? 'Hide sidebar' : 'Show sidebar'}
   >
     <Icon icon={currentIcon} width={24} height={24} />
   </button>
