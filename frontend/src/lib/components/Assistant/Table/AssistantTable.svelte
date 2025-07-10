@@ -33,7 +33,6 @@
                    class="w-10 h-10 bg-white object-contain p-2" />
             {/if}
             <div class="text-base">{assistant.name ? assistant.name : 'Untitled assistant'}</div>
-            <div class="text-xs opacity-50">{assistant.id}</div>
           </div>
         </td>
       </tr>
