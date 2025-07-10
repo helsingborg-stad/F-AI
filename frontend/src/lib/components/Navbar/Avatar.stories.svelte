@@ -38,7 +38,7 @@
 <Story
   name="With menu"
   args={{
-    avatarPlaceholder: 'John Doe',
+    avatarPlaceholder: 'John.Doe@mail.com',
     menuItems
   }}
 />
