@@ -8,6 +8,7 @@
   import Icon from '$lib/components/Icon/Icon.svelte'
   import type { IAssistantMenu } from '$lib/types.js'
   import RenameConversationModal from '$lib/components/Menu/Chat/RenameConversationModal.svelte'
+  import ResponsiveSidebar from '$lib/components/Menu/Chat/ResponsiveSidebar.svelte'
 
   type Props = ChatProps & {
     canChat: boolean
@@ -45,14 +46,15 @@
   }: Props = $props()
 
   let renameModal: RenameConversationModal
+
   function openRenameModal(id: string, title: string) {
     if (renameModal) renameModal.showModal(id, title)
   }
 </script>
 
-<div class="flex flex-col md:flex-row bg-base-200 h-full overflow-hidden">
-  <aside class="hidden md:block md:w-60 flex-shrink-0 bg-base-200">
-    <SidebarMenu title="Chat">
+<div class="flex bg-base-200 h-full overflow-hidden relative">
+  <ResponsiveSidebar>
+    <SidebarMenu>
       <div class="flex flex-col h-full gap-2">
         <button type="button" class="btn btn-neutral btn-sm" disabled={!canChat} onclick={onStartNewChat}>
           <Icon icon={icons["plus"]} width={16} height={16} />
@@ -75,7 +77,7 @@
         </div>
       </div>
     </SidebarMenu>
-  </aside>
+  </ResponsiveSidebar>
   <div class="flex flex-col w-full h-full gap-2 p-2 pt-0 overflow-hidden">
     <main class="flex-grow h-full rounded-lg border bg-stone-50 overflow-hidden">
       <Chat

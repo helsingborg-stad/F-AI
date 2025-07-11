@@ -1,17 +1,14 @@
 <script lang="ts">
-  import MenuHeader from '$lib/components/Menu/MenuHeader.svelte'
   import type { Snippet } from 'svelte'
 
   interface Props {
-    title: string
     children?: Snippet
   }
 
-  const { title, children }: Props = $props()
+  const { children }: Props = $props()
 </script>
 
-<nav class="h-full flex flex-col pl-2">
-  <MenuHeader iconName="panelLeft" {title} />
+<nav class="h-full flex flex-col p-2">
   <div class="flex flex-col gap-2 h-full overflow-y-scroll">
     {#if children}
       {@render children()}

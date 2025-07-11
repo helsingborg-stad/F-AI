@@ -3,6 +3,7 @@
   import SidebarMenu from '$lib/components/Menu/SidebarMenu.svelte'
   import { page } from '$app/state'
   import type { IMenuItem } from '$lib/types.js'
+  import ResponsiveSidebar from '$lib/components/Menu/Chat/ResponsiveSidebar.svelte'
 
   let { data, children } = $props()
   const sidebarMenu: IMenuItem[] = data.sidebarMenu
@@ -10,9 +11,9 @@
   const isActive = (path: string) => path === page.url.pathname
 </script>
 
-<div class="flex h-screen bg-base-200">
-  <aside class="w-60 flex-shrink-0 overflow-hidden bg-base-200 max-md:!w-0">
-    <SidebarMenu title="Assistant">
+<div class="flex bg-base-200 h-full overflow-hidden relative">
+  <ResponsiveSidebar>
+    <SidebarMenu>
       <div class="flex flex-col h-full gap-2">
         {#each sidebarMenu as item}
           <button
@@ -25,7 +26,7 @@
         {/each}
       </div>
     </SidebarMenu>
-  </aside>
+  </ResponsiveSidebar>
   <main class="m-2 flex-grow rounded-lg border bg-stone-50 overflow-auto">
     {@render children()}
   </main>
