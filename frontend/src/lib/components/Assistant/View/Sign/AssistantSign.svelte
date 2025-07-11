@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import FavCheckbox from '$lib/components/Assistant/View/Sign/FavCheckbox.svelte'
+  import ShareButton from '$lib/components/Assistant/View/Sign/ShareButton.svelte'
 
   interface Props {
     id: string
@@ -28,7 +29,8 @@
   <div class="flex h-full px-2 py-4">
     <div class="relative flex grow flex-col gap-4 overflow-y-auto px-8 pt-16 pb-20">
       <div class="absolute top-0">
-        <div class="fixed end-4 end-4 z-10 flex px-2">
+        <div class="fixed end-4 z-10 flex items-center justify-center gap-1">
+          <ShareButton link={`/assistant/zoo?id=${id}`} />
           <FavCheckbox {id} {isFavorite} />
         </div>
       </div>
