@@ -3,13 +3,14 @@
   import { icons } from '$lib/components/Icon/icons.js'
   import ChatMessage from '$lib/components/Chat/ChatMessage.svelte'
   import ChatInput from '$lib/components/Chat/ChatInput.svelte'
-  import ActionButtons from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
+  import ActionButtons, { type AllowedFeature } from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
   import type { IAssistantMenu } from '$lib/types.js'
 
   interface Message {
     timestamp: string
     source: string
     message: string
+    reasoning: string
     showLoader: boolean
   }
 
@@ -21,7 +22,7 @@
     onSubmitMessage: (message: string) => void
     chatStateIdle: boolean,
     onStopChat: () => void,
-    enableSearch: boolean,
+    enabledFeatures: string[]
   }
 
   let {
@@ -32,7 +33,7 @@
     onSubmitMessage,
     chatStateIdle,
     onStopChat,
-    enableSearch = $bindable(),
+    enabledFeatures = $bindable(),
   }: Props = $props()
 
   let scrollContainer: HTMLDivElement = undefined as unknown as HTMLDivElement
@@ -67,13 +68,14 @@
     }
   })
 
-  let allowSearch: boolean = $derived(
-    !selectedAssistantId
-      ? false
-      : assistants
-      .flatMap(group => group.menuItems)
-      .find(item => item.id === selectedAssistantId)?.allowSearch || false,
-  )
+  const selectedAssistant = $derived(selectedAssistantId ? assistants.flatMap(g => g.menuItems)
+    .find(i => i.id === selectedAssistantId) : undefined)
+
+  let allowedFeatures: AllowedFeature[] = $derived(selectedAssistant ? [
+    selectedAssistant.allowSearch === true && { id: 'web_search', title: 'Web search', icon: icons['globe'] },
+    selectedAssistant.allowReasoning === true && { id: 'reasoning', title: 'Reasoning', icon: icons['brain'] },
+  ].filter<AllowedFeature>(v => v !== false) : [])
+
 
 </script>
 
@@ -85,7 +87,8 @@
     class="overflow-auto flex-1 p-4"
   >
     {#each messages as msg, i (`${i}${msg.source}`)}
-      <ChatMessage sender={msg.source} text={msg.message} time={msg.timestamp} showLoader={msg.showLoader} />
+      <ChatMessage sender={msg.source} details={msg.reasoning} text={msg.message} time={msg.timestamp}
+                   showLoader={msg.showLoader} />
     {/each}
   </div>
 
@@ -114,8 +117,8 @@
         {onStopChat}
       >
         <ActionButtons
-          {allowSearch}
-          bind:enableSearch
+          {allowedFeatures}
+          bind:enabledFeatureIds={enabledFeatures}
           {assistants}
           bind:selectedAssistantId
           {disableAssistantPicker}

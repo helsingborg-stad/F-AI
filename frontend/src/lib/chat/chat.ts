@@ -3,12 +3,13 @@ import { type Readable, type Writable, writable } from 'svelte/store'
 export interface ChatMessage {
   source: string
   message: string
+  reasoning: string
 }
 
 export type ChatMachineState = 'idle' | 'sending' | 'waiting' | 'responding' | 'error'
 
 export interface SendMessageOptions {
-  enableWebSearch?: boolean
+  withFeatures: string[]
 }
 
 export interface ChatMachine {
@@ -25,7 +26,7 @@ export function useChatMachine(): ChatMachine {
 
   const state: Writable<ChatMachineState> = writable('idle')
   const lastConversationId: Writable<string | null> = writable(null)
-  const lastMessage: Writable<ChatMessage> = writable({ source: '', message: '' })
+  const lastMessage: Writable<ChatMessage> = writable({ source: '', message: '', reasoning: '' })
   const lastError: Writable<string | null> = writable(null)
   let cancelAnyInProgressCalls: boolean = false
 
@@ -51,7 +52,7 @@ export function useChatMachine(): ChatMachine {
 
       state.set('sending')
       lastConversationId.set(conversationId)
-      lastMessage.set({ source: '', message: '' })
+      lastMessage.set({ source: '', message: '', reasoning: '' })
       lastError.set(null)
       cancelAnyInProgressCalls = false
 
@@ -67,11 +68,9 @@ export function useChatMachine(): ChatMachine {
       }
 
       const { messageId } = await storeMessageResponse.json()
-
-      const webSearchEnabled = extraOptions?.enableWebSearch === true
       const chatUrl = conversationId
-        ? `/chat?message=${messageId}&conversation=${conversationId}&withWebSearch=${webSearchEnabled}`
-        : `/chat?message=${messageId}&assistant=${assistantId}&withWebSearch=${webSearchEnabled}`
+        ? `/chat?message=${messageId}&conversation=${conversationId}&features=${extraOptions?.withFeatures.join(',')}`
+        : `/chat?message=${messageId}&assistant=${assistantId}&features=${extraOptions?.withFeatures.join(',')}`
 
       if (cancelAnyInProgressCalls) {
         return
@@ -82,6 +81,7 @@ export function useChatMachine(): ChatMachine {
       state.set('waiting')
 
       let accumulatedResponseMessage = ''
+      let accumulatedReasoning = ''
 
       es.onerror = (e) => {
         console.error('chat error', e)
@@ -97,10 +97,17 @@ export function useChatMachine(): ChatMachine {
       })
 
       es.addEventListener('chat.message', (e) => {
-        const { source, message } = JSON.parse(e.data)
-        accumulatedResponseMessage += message
+        const { source, message, reasoning } = JSON.parse(e.data)
+        if (message !== null) {
+          accumulatedResponseMessage += message
+        }
+
+        if (reasoning !== null) {
+          accumulatedReasoning += reasoning
+        }
+
         console.log('es message', e, accumulatedResponseMessage)
-        lastMessage.set({ source, message: accumulatedResponseMessage })
+        lastMessage.set({ source, message: accumulatedResponseMessage, reasoning: accumulatedReasoning })
         state.set('responding')
       })
 

@@ -7,6 +7,7 @@
 
   interface Props {
     sender?: string
+    details?: string
     text?: string
     time?: string
     showLoader: boolean
@@ -14,6 +15,7 @@
 
   const {
     sender,
+    details = '',
     text = '',
     time = '',
     showLoader,
@@ -65,6 +67,18 @@
   <div class="{innerContentClasses}">
     <div class="{containerClasses}">
       <div class="prose prose-sm max-w-none">
+        {#if details}
+          <details class="group w-full mb-2">
+            <summary class="cursor-pointer list-none bg-gray-100 hover:bg-gray-200 p-2 rounded-t">
+              <span class="group-open:rotate-90 inline-block transition-transform">▶</span>
+              <span class="ml-2">Show reasoning</span>
+            </summary>
+            <div class="p-2 border rounded-b">
+              <span>{details}</span>
+            </div>
+          </details>
+        {/if}
+
         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
         {@html renderedMarkdown}
         {#if showLoader}

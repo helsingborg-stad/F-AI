@@ -58,6 +58,12 @@ class LiteLLMService(ILLMService):
             if web_search_requested and not web_search_enabled:
                 print(f'WARNING: Web search was requested but is not supported by this model ({model}).')
 
+            reasoning_requested = Feature.REASONING in enabled_features
+            reasoning_enabled = reasoning_requested and litellm.supports_reasoning(model)
+
+            if reasoning_requested and not reasoning_enabled:
+                print(f'WARNING: Reasoning was requested but is not supported by this model ({model}).')
+
             messages = [
                 {'content': m.content, 'role': m.role} for m in messages if m.content and len(m.content) > 0
             ]
@@ -67,6 +73,7 @@ class LiteLLMService(ILLMService):
                 messages=messages,
                 stream=True,
                 api_key=api_key,
+                reasoning_effort="medium" if reasoning_enabled else None,
 
                 # workaround for a bug in tool_call_cost_tracking.py:_get_web_search_options(kwargs) when explicitly setting value to None
                 **{'web_search_options': web_search_options} if web_search_enabled else {},
@@ -81,7 +88,15 @@ class LiteLLMService(ILLMService):
 
                 delta = output.choices[0].delta
                 role = delta.role or role
-                if delta.content is not None:
+
+                if hasattr(delta, 'reasoning_content') and delta.reasoning_content is not None and len(
+                        delta.reasoning_content) > 0:
+                    yield Delta(
+                        role=role,
+                        reasoning_content=delta.reasoning_content
+                    )
+
+                if delta.content is not None and len(delta.content) > 0:
                     yield Delta(
                         role=role,
                         content=delta.content,

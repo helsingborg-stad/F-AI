@@ -11,5 +11,5 @@
 </script>
 
 {#if finalIcon}
-  <span>{@html finalIcon}</span>
+  <span class="stroke-current">{@html finalIcon}</span>
 {/if}

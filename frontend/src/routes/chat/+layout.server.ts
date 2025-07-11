@@ -42,6 +42,7 @@ export const load: LayoutServerLoad = async (event) => {
           timestamp: string
           role: string
           content: string
+          reasoning: string
         }[]
       }
     } = await response.json()
@@ -52,6 +53,7 @@ export const load: LayoutServerLoad = async (event) => {
         timestamp: msg.timestamp,
         source: msg.role,
         message: msg.content,
+        reasoning: ''
       }))
 
     const conversationContext = {

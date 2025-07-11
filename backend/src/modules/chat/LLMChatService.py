@@ -150,7 +150,7 @@ class LLMChatService(IChatService):
                 enabled_features=enabled_features,
                 extra_params=assistant.extra_llm_params
         ):
-            if delta.role != 'error':
+            if delta.role != 'error' and delta.content is not None:
                 await self._conversation_service.add_to_conversation_last_message(
                     as_uid=as_uid,
                     conversation_id=conversation_id,
@@ -160,4 +160,4 @@ class LLMChatService(IChatService):
                 )
 
             yield ChatEvent(event='error' if delta.role == 'error' else 'message', source=delta.role,
-                            message=delta.content)
+                            message=delta.content, reasoning=delta.reasoning_content)

@@ -25,7 +25,7 @@
     onStartNewChat: () => void
     chatStateIdle: boolean
     onStopChat: () => void
-    enableSearch: boolean
+    enabledFeatures: string[]
   }
 
   let {
@@ -42,7 +42,7 @@
     onStartNewChat,
     chatStateIdle,
     onStopChat,
-    enableSearch = $bindable(),
+    enabledFeatures = $bindable(),
   }: Props = $props()
 
   let renameModal: RenameConversationModal
@@ -88,7 +88,7 @@
         {onSubmitMessage}
         {chatStateIdle}
         {onStopChat}
-        bind:enableSearch
+        bind:enabledFeatures
       />
     </main>
   </div>
