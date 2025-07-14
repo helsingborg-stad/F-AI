@@ -1,24 +1,8 @@
-# create-svelte
-
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
-
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
+# Folkets AI - Frontend
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```bash
 npm run dev
@@ -26,33 +10,22 @@ npm run dev
 # or start the server and open the app in a new browser tab
 npm run dev -- --open
 ```
+## Translations
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+The app uses Paraglide from Inlang i18n library.
 
-## Building
+Translations are defined in "Messages" files `/frontend/messages/{locale}.json` as key-value pairs. 
 
-To build your library:
+### Naming conventions for Pragalide messages
 
-```bash
-npm run package
-```
+#### Naming Pattern
+`{route}_{section}_{element}_{property}`
 
-To create a production version of your showcase app:
+#### Routes
+- `settings_*` → /settings
+- `chat_*` → /chat
+- `some_new_route_*` → /some_new_route
 
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish
-```
+#### Common Prefixes
+- `common_*` → Shared across pages
+- `nav_*` → Navigation elements
