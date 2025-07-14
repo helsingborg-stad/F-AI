@@ -1,4 +1,15 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "hello_world": "Hello, {name} from sv!"
+  "common_action_save": "Spara",
+  "settings_page_title": "Inställningar",
+  "settings_page_description": "Konfigurera dina API-inställningar här",
+  "settings_basic_section_heading": "Grundläggande",
+  "settings_ai_section_heading": "AI-inställningar",
+  "settings_email_section_heading": "E-post (Brevo)",
+  "settings_basic_fixed_pin_label": "Fast PIN-kod",
+  "settings_openai_api_key_label": "OpenAI API-nyckel",
+  "settings_anthropic_api_key_label": "Anthropic API-nyckel",
+  "settings_mistral_api_key_label": "Mistral API-nyckel",
+  "settings_brevo_api_url_label": "Brevo API-URL",
+  "settings_brevo_api_key_label": "Brevo API-nyckel"
 }

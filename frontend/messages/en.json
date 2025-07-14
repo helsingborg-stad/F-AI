@@ -1,4 +1,15 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "hello_world": "Hello, {name} from en!"
+  "common_action_save": "Save",
+  "settings_page_title": "Settings",
+  "settings_page_description": "Configure your API settings here",
+  "settings_basic_section_heading": "Basic",
+  "settings_ai_section_heading": "AI Settings",
+  "settings_email_section_heading": "E-mail (Brevo)",
+  "settings_basic_fixed_pin_label": "Fixed PIN",
+  "settings_openai_api_key_label": "OpenAI API key",
+  "settings_anthropic_api_key_label": "Anthropic API key",
+  "settings_mistral_api_key_label": "Mistral API key",
+  "settings_brevo_api_url_label": "Brevo API URL",
+  "settings_brevo_api_key_label": "Brevo API Key"
 }
