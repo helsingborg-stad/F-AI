@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
   import Chat from '$lib/components/Chat/Chat.svelte'
   import type { Props as ChatProps } from '$lib/components/Chat/Chat.svelte'
   import SidebarMenu from '$lib/components/Menu/SidebarMenu.svelte'
@@ -58,7 +59,7 @@
       <div class="flex flex-col h-full gap-2">
         <button type="button" class="btn btn-neutral btn-sm" disabled={!canChat} onclick={onStartNewChat}>
           <Icon icon={icons["plus"]} width={16} height={16} />
-          <span class="text-s">Start New Chat</span>
+          <span class="text-s">{m.chat_action_start_new()}</span>
         </button>
         <div class="pl-2 overflow-y-auto h-full">
           <HistoryTree
@@ -66,8 +67,8 @@
           id: c.id,
           title: c.title || c.id,
           options: [
-            { iconName: 'trash', title: 'Delete', onClick: () => onDeleteConversation(c.id) },
-            { iconName: 'pencil', title: 'Edit', onClick: () => openRenameModal(c.id, c.title) },
+            { iconName: 'trash', title: m.chat_history_action_delete(), onClick: () => onDeleteConversation(c.id) },
+            { iconName: 'pencil', title: m.chat_history_action_edit(), onClick: () => openRenameModal(c.id, c.title) },
           ],
           createdTimestamp: c.timestamp
         }))}

@@ -1,3 +1,4 @@
+import { m } from '$lib/paraglide/messages.js'
 import type { PageServerLoad } from '../../../../.svelte-kit/types/src/routes/$types.js'
 import { canReadAssistants } from '$lib/state/user.svelte.js'
 import type { IAssistantCard } from '$lib/types.js'
@@ -50,20 +51,20 @@ export const load: PageServerLoad = async (event) => {
   }
 
   const favExhibit = {
-    title: 'Favorite assistants',
-    description: 'Only assistants you faved. The best of the best!',
+    title: m.assistant_zoo_exhibit_favorites_title(),
+    description: m.assistant_zoo_exhibit_favorites_description(),
     cards: assistantCards.filter(card => card.isFavorite)
   }
 
   const hbgExhibit = {
-    title: 'Hbg Assistants',
-    description: 'Assistant created and shared by your colleagues',
+    title: m.assistant_zoo_exhibit_hbg_title(),
+    description: m.assistant_zoo_exhibit_hbg_description(),
     cards: assistantCards.filter((card) => !card.title.toLowerCase().includes('vanilla')),
   }
 
   const vanillaExhibit = {
-    title: 'Vanilla Assistants',
-    description: 'When you don\'t need anything extra',
+    title: m.assistant_zoo_exhibit_vanilla_title(),
+    description: m.assistant_zoo_exhibit_vanilla_description(),
     cards: assistantCards.filter((card) => card.title.toLowerCase().includes('vanilla')),
   }
 

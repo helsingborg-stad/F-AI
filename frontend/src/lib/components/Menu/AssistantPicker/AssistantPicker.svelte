@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { m } from '$lib/paraglide/messages.js'
   import type { IAssistantMenu } from '$lib/types.js'
 
   interface Props {
@@ -24,11 +25,11 @@
 
   const selectedAssistantName = $derived(
     !selectedAssistantId
-      ? 'Select assistant'
+      ? m.chat_assistant_picker_select()
       : assistants
         .flatMap(group => group.menuItems)
         .find(item => item.id === selectedAssistantId)?.name ||
-      (disabled ? '<unknown assistant>' : 'Select assistant'),
+      (disabled ? m.chat_assistant_picker_unknown() : m.chat_assistant_picker_select()),
   )
 
   function handleClickOutside(event: MouseEvent) {

@@ -1,3 +1,4 @@
+import { m } from '$lib/paraglide/messages.js'
 import type { HistoryItemType } from '$lib/types.js'
 import {
   getDateBoundaries,
@@ -7,11 +8,11 @@ import {
 import dayjs from 'dayjs'
 
 export const DEFAULT_CATEGORY_TITLES: Record<string, string> = {
-  today: 'Today',
-  yesterday: 'Yesterday',
-  previous7Days: 'Previous 7 days',
-  previous30Days: 'Last 30 days',
-  olderItems: 'Older items',
+  today: m.chat_history_category_today(),
+  yesterday: m.chat_history_category_yesterday(),
+  previous7Days: m.chat_history_category_previous_7_days(),
+  previous30Days: m.chat_history_category_previous_30_days(),
+  olderItems: m.chat_history_category_older_items(),
 }
 
 export function getCategoryTitles(config: IDateRangeConfig): Record<string, string> {
