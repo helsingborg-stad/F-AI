@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
   import { fade } from 'svelte/transition'
   import { icons } from '$lib/components/Icon/icons.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
@@ -25,11 +26,11 @@
 
   <div
     role="dialog"
-    aria-label="File settings"
+    aria-label={m.assistant_edit_tools_arial_label_file()}
     class="dropdown-content card card-compact bg-white z-[1] w-64 p-2 shadow">
     <div class="card-body">
       <div class="flex flex-row place-content-between items-center">
-        <div class="text-sm font-medium select-none">Max results</div>
+        <div class="text-sm font-medium select-none">{m.assistant_edit_tools_file_max_result()}</div>
         <div class="flex flex-row items-center gap-1">
           {#if maxCollectionResults !== DEFAULT_RESULTS}
             <button
@@ -55,10 +56,7 @@
         bind:value={maxCollectionResults}
         class="range range-xs"
       />
-      <div class="pt-2 text-xs opacity-50 select-none">Set the max results to retrieve from files. High numbers (>10)
-        may
-        increase accuracy but also takes longer to process.
-      </div>
+      <div class="pt-2 text-xs opacity-50 select-none">{m.assistant_edit_tools_file_user_info()}</div>
     </div>
   </div>
 </div>

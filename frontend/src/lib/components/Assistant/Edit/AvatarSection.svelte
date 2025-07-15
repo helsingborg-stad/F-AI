@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
+
   interface Props {
     avatarBase64: string
     altImagePlaceholder: string
@@ -92,7 +94,7 @@
       {/if}
     </div>
     <div class="flex flex-col">
-      <div class="prose prose-sm">Upload an image or pick a color to make your assistant unique.</div>
+      <div class="prose prose-sm">{m.assistant_edit_avatar_description()}</div>
 
       <!-- Color picker -->
       <input
@@ -147,7 +149,7 @@
           />
         </label>
         <div class="label pb-0">
-          <span class="label-text-alt">Upload a portrait PNG image for best results (max 1MB, recommended: 512x752px portrait)</span>
+          <span class="label-text-alt">{m.assistant_edit_avatar_requirements()}</span>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
+import type { RequestEvent } from '@sveltejs/kit'
+import { m } from '$lib/paraglide/messages.js'
 import type { IAssistantMenu, IBackendAssistant } from '$lib/types.ts'
 import { fetchAllAssistants, getAssistantFavs } from '$lib/utils/assistant.js'
-import type { RequestEvent } from '@sveltejs/kit'
 
 export async function getAssistantPickerData(
   event: RequestEvent,
@@ -20,14 +21,14 @@ export async function getAssistantPickerData(
   if (favAssistantData.assistants.length > 0) {
     const favItems = favAssistantData.assistants.map((assistant: IBackendAssistant) => ({
       id: assistant.id,
-      name: assistant.meta.name?.toString() ?? '<unknown>',
+      name: assistant.meta.name?.toString() ?? m.chat_assistant_picker_name_unknown(),
       allowSearch: Boolean(assistant.meta?.enable_search),
       allowReasoning: Boolean(assistant.meta?.enable_reasoning),
     }))
 
     result = [
       {
-        menuTitle: 'Favorites',
+        menuTitle: m.chat_assistant_picker_menu_title_favorites(),
         menuItems: favItems,
       },
     ]
@@ -42,14 +43,14 @@ export async function getAssistantPickerData(
     .filter((assistant: IBackendAssistant) => !favIds.has(assistant.id))
     .map((assistant: IBackendAssistant) => ({
       id: assistant.id,
-      name: assistant.meta.name?.toString() ?? '<unknown>',
+      name: assistant.meta.name?.toString() ?? m.chat_assistant_picker_name_unknown(),
       allowSearch: Boolean(assistant.meta?.enable_search),
       allowReasoning: Boolean(assistant.meta?.enable_reasoning),
     }))
 
   if (vanillaItems.length > 0) {
     result.push({
-      menuTitle: 'Vanilla assistants',
+      menuTitle: m.chat_assistant_picker_menu_title_vanilla(),
       menuItems: vanillaItems,
     })
   }

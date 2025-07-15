@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
   import { enhance } from '$app/forms'
   import type { SubmitFunction } from '@sveltejs/kit'
   import type { ICollectionFiles } from '$lib/types.js'
@@ -41,8 +42,8 @@
 
 <dialog bind:this={dialog} class="modal">
   <div class="modal-box">
-    <h3 class="text-lg font-bold">Attach Files</h3>
-    <p class="py-4">Select one or more files to attach to your assistant.</p>
+    <h3 class="text-lg font-bold">{m.assistant_edit_tools_file_attach()}</h3>
+    <p class="py-4">{m.assistant_edit_tools_file_attach_user_info()}</p>
     <form
       method="POST"
       action="?/uploadFiles"
@@ -84,7 +85,7 @@
             {#if uploadingFiles}
               <span class="loading loading-spinner loading-xs"></span>
             {:else}
-              <span class="text-s">Attach</span>
+              <span class="text-s">{m.assistant_edit_tools_file_attach()}</span>
             {/if}
           </button>
         </div>
