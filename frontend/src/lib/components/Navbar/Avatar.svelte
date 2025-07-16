@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
+  import { setLocale, type Locale, getLocale } from '$lib/paraglide/runtime.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
   import { icons } from '$lib/components/Icon/icons.js'
-  import { setLocale, type Locale } from '$lib/paraglide/runtime.js'
-  import { getLocale } from '../../../paraglide/runtime.js'
 
   interface Props {
     avatarUrl: string
@@ -20,11 +20,12 @@
   }: Props = $props()
 
   let showLanguageMenu = $state(false)
+  let currentLocale = getLocale()
 
   const languages = [
-    { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'sv', name: 'Swedish', flag: '🇸🇪' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'en', name: 'English' },
+    { code: 'sv', name: 'Svenska' },
+    { code: 'fr', name: 'Français' },
   ]
 
   function handleSetLanguage(languageCode: string) {
@@ -53,7 +54,7 @@
   {/if}
   {#if menuItems}
     <ul class="dropdown-content menu gap-1 bg-base-100 rounded-lg z-[30] min-w-64 p-2 shadow">
-      <li>
+      <li tabindex="-1" class="pointer-events-none">
         <div class="text-gray-500 py-1 px-2 overflow-ellipsis select-none">
           {avatarPlaceholder}
         </div>
@@ -64,13 +65,14 @@
           class="flex w-full mx-2 p-1 pr-2 gap-2 items-center text-sm hover:bg-gray-100 rounded-md"
           onclick={() => showLanguageMenu = !showLanguageMenu}
         >
-          Lang
+          {m.nav_menu_language()}
         </button>
         {#if showLanguageMenu}
           <ul class="menu dropdown-content bg-base-100 rounded-lg z-[1] w-52 p-2 shadow">
             {#each languages as lang}
               <li>
                 <button
+                  class:active={lang.code === currentLocale}
                   onclick={() => handleSetLanguage(lang.code)}
                 >
                   {lang.name}
