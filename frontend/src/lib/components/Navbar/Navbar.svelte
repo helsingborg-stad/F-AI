@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
   import type { IMenuItem } from '$lib/types.js'
   import Avatar from '$lib/components/Navbar/Avatar.svelte'
   import Icon from '$lib/components/Icon/Icon.svelte'
@@ -44,7 +45,7 @@
     onclick={sidebarState.toggleSidebar}
     onmouseenter={() => isHovering = true}
     onmouseleave={() => isHovering = false}
-    aria-label={sidebarState.showSidebar ? 'Hide sidebar' : 'Show sidebar'}
+    aria-label={sidebarState.showSidebar ? m.nav_sidebar_hide_aria_label() : m.nav_sidebar_show_aria_label()}
   >
     <Icon icon={currentIcon} width={24} height={24} />
   </button>

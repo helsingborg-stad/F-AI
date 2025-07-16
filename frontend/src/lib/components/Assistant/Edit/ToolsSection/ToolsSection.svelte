@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
   import { icons } from '$lib/components/Icon/icons.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
   import InfoTooltip from '$lib/components/InfoTooltip/InfoTooltip.svelte'
@@ -52,7 +53,7 @@
   bind:value={enableReasoningValue}
 >
 
-<Section title={"Tools"}>
+<Section title={m.assistant_edit_tools_section_title()}>
   <div class="flex flex-row place-content-between items-center">
     <div class="flex items-center gap-2">
       {#if collectionId}
@@ -107,13 +108,13 @@
   <div class="flex flex-row place-content-between items-center">
     <div class="items-start">
       <InfoTooltip
-        toolTip="Enable model capabilities">
-        <div class="text-sm font-medium select-none">Capabilities</div>
+        toolTip={m.assistant_edit_tools_capabilities_tooltip()}>
+        <div class="text-sm font-medium select-none">{m.assistant_edit_tools_capabilities()}</div>
       </InfoTooltip>
     </div>
     <div class="form-control">
       <label class="label cursor-pointer">
-        <span class="label-text me-2">Web search</span>
+        <span class="label-text me-2">{m.assistant_edit_tools_capabilities_web_search()}</span>
         <input type="checkbox" class="toggle toggle-sm" bind:checked={enableSearchValue} />
       </label>
       <label class="label cursor-pointer">

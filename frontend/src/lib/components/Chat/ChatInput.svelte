@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte'
+  import { m } from '$lib/paraglide/messages.js'
 
   interface Props {
     placeholder: string
@@ -104,11 +105,14 @@
     </div>
     <div class="flex-shrink-0">
       {#if !receivingMessage}
-        <div class={disableSend ? "tooltip" : ""} data-tip={value === '' ? 'Message is empty' : 'Select assistant'}>
-          <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}>Send</button>
+        <div
+          class={disableSend ? "tooltip" : ""}
+          data-tip={value === '' ? m.chat_input_tooltip_empty_message() : m.chat_input_tooltip_select_assistant()}
+        >
+          <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}>{m.chat_input_action_send()}</button>
         </div>
       {:else }
-        <button class="btn btn-sm" onclick={onStopChat}>Abort</button>
+        <button class="btn btn-sm" onclick={onStopChat}>{m.chat_input_action_abort()}</button>
       {/if}
     </div>
   </div>

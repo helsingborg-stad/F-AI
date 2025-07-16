@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
   import type { IAssistant, IAssistantModel } from '$lib/types.js'
   import ActionButtons from '$lib/components/Form/ActionButtons.svelte'
   import AccessSection from '$lib/components/Assistant/Edit/AccessSection.svelte'
@@ -151,12 +152,12 @@
 
       <label class="form-control w-full">
         <div class="label">
-          <span class="label-text">Name</span>
+          <span class="label-text">{m.assistant_edit_name_label()}</span>
         </div>
         <input
           type="text"
           name="name"
-          placeholder="Enter a user friendly name"
+          placeholder={m.assistant_edit_name_placeholder()}
           class="input input-bordered input-sm w-full"
           required
           bind:value={assistantName}
@@ -168,31 +169,31 @@
 
       <label class="form-control">
         <div class="label">
-          <span class="label-text">Description</span>
+          <span class="label-text">{m.assistant_edit_description_label()}</span>
         </div>
         <textarea
           name="description"
           class="textarea textarea-bordered h-24"
-          placeholder="Provide a clear description of your assistant's purpose, capabilities, and goals. This description will be visible to users if you share this assistant."
+          placeholder={m.assistant_edit_description_placeholder()}
           readonly={!canEdit}
         >{assistant.description}</textarea>
       </label>
 
       <label class="form-control">
         <div class="label">
-          <span class="label-text">System instructions</span>
+          <span class="label-text">{m.assistant_edit_system_instruction_label()}</span>
         </div>
         <textarea
           name="instructions"
           class="textarea textarea-bordered h-24"
-          placeholder="You are a helpful assistant..."
+          placeholder={m.assistant_edit_system_instruction_placeholder()}
           readonly={!canEdit}
         >{assistant.instructions}</textarea>
       </label>
 
       <label class="form-control w-full">
         <div class="label">
-          <span class="label-text">Model</span>
+          <span class="label-text">{m.assistant_edit_model_placeholder()}</span>
         </div>
         <select
           name="model"
@@ -201,7 +202,7 @@
           required
           disabled={!canEdit}
         >
-          <option value="" disabled selected>Select a model</option>
+          <option value="" disabled selected>{m.assistant_edit_model_select_placeholder()}</option>
           {#each models as model}
             <option value={model.key} selected={assistant.model === model.key}>{model.name}</option>
           {/each}

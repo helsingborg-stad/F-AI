@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
   import { icons } from '$lib/components/Icon/icons.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
 
@@ -33,7 +34,7 @@
     <div>
       <button type="submit" class="btn btn-sm btn-success text-white" onclick={onUpdate}>
         <Icon icon={icons["save"]} width={20} height={20} />
-        <span class="text-s">Save</span>
+        <span class="text-s">{m.common_action_save()}</span>
       </button>
     </div>
   </div>

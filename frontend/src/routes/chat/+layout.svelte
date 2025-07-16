@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { m } from '$lib/paraglide/messages.js'
   import ChatLayout from '$lib/layouts/ChatLayout.svelte'
   import { page } from '$app/state'
   import { goto, invalidateAll } from '$app/navigation'
@@ -162,7 +163,7 @@
   }))}
   assistants={data.assistants}
   conversations={data.conversations}
-  inputPlaceholder="Fråga Folkets AI"
+  inputPlaceholder={m.chat_input_placeholder({ applicationName: 'Folkets AI'})}
   onSubmitMessage={sendMessage}
   bind:selectedAssistantId
   {conversationId}
