@@ -1,7 +1,8 @@
 <script lang="ts">
   import Icon from '$lib/components/Icon/Icon.svelte'
   import { icons } from '$lib/components/Icon/icons.js'
-  import VerticalDivider from '$lib/components/Divider/VerticalDivider.svelte'
+  import { setLocale, type Locale } from '$lib/paraglide/runtime.js'
+  import { getLocale } from '../../../paraglide/runtime.js'
 
   interface Props {
     avatarUrl: string
@@ -12,21 +13,22 @@
     }]
   }
 
-  let { avatarUrl, avatarPlaceholder, menuItems }: Props = $props()
+  let {
+    avatarUrl,
+    avatarPlaceholder,
+    menuItems,
+  }: Props = $props()
+
+  let showLanguageMenu = $state(false)
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇬🇧' },
     { code: 'sv', name: 'Swedish', flag: '🇸🇪' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
   ]
 
-  let currentLanguage = 'en'
-  let showLanguageMenu = $state(false)
-
-  let dropdownRef: HTMLDivElement = $state(undefined as unknown as HTMLDivElement)
-  let isOpen = $state(false)
-
-  function selectLanguage(langCode: string) {
-    // Set language logic
+  function handleSetLanguage(languageCode: string) {
+    setLocale(languageCode as Locale)
   }
 </script>
 
@@ -56,52 +58,11 @@
           {avatarPlaceholder}
         </div>
       </li>
-      <li>
-        <!--        <button-->
-        <!--          class="flex mx-2 p-1 gap-2 items-center text-sm hover:bg-gray-100 rounded-md"-->
-        <!--          onclick={() => showLanguageMenu = !showLanguageMenu}-->
-        <!--        >-->
-        <!--          Language-->
-        <!--        </button>-->
-
-        <!--        <button-->
-        <!--          class="flex mx-2 p-1 gap-2 items-center text-sm hover:bg-gray-100 rounded-md justify-between"-->
-        <!--          onclick={() => showLanguageMenu = !showLanguageMenu}-->
-        <!--        >-->
-        <!--          <span>Language</span>-->
-        <!--          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
-        <!--            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>-->
-        <!--          </svg>-->
-        <!--        </button>-->
-
-        <!--        {#if showLanguageMenu}-->
-        <!--          <div class="absolute left-full top-0">-->
-        <!--            <ul class="menu gap-1 bg-base-100 rounded-lg min-w-48 p-2 shadow-lg border border-gray-200">-->
-        <!--              {#each languages as lang}-->
-        <!--                <li>-->
-        <!--                  <button-->
-        <!--                    class="flex gap-3 items-center text-sm hover:bg-gray-100 rounded-md px-3 py-2 {currentLanguage === lang.code ? 'bg-gray-100' : ''}"-->
-        <!--                    onclick={() => selectLanguage(lang.code)}-->
-        <!--                  >-->
-        <!--                    <span class="text-lg">{lang.flag}</span>-->
-        <!--                    <span>{lang.name}</span>-->
-        <!--                    {#if currentLanguage === lang.code}-->
-        <!--                      <svg class="w-4 h-4 ml-auto text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
-        <!--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>-->
-        <!--                      </svg>-->
-        <!--                    {/if}-->
-        <!--                  </button>-->
-        <!--                </li>-->
-        <!--              {/each}-->
-        <!--            </ul>-->
-        <!--          </div>-->
-        <!--        {/if}-->
-
-      </li>
-
-      <div class="dropdown dropdown-left">
-        <button tabindex="0" class="flex w-full mx-2 p-1 gap-2 items-center text-sm hover:bg-gray-100 rounded-md"
-                onclick={() => showLanguageMenu = !showLanguageMenu}
+      <div class="dropdown dropdown-left pr-2 mr-1">
+        <button
+          tabindex="0"
+          class="flex w-full mx-2 p-1 pr-2 gap-2 items-center text-sm hover:bg-gray-100 rounded-md"
+          onclick={() => showLanguageMenu = !showLanguageMenu}
         >
           Lang
         </button>
@@ -109,7 +70,9 @@
           <ul class="menu dropdown-content bg-base-100 rounded-lg z-[1] w-52 p-2 shadow">
             {#each languages as lang}
               <li>
-                <button>
+                <button
+                  onclick={() => handleSetLanguage(lang.code)}
+                >
                   {lang.name}
                 </button>
               </li>
