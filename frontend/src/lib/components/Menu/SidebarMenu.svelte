@@ -8,8 +8,8 @@
   const { children }: Props = $props()
 </script>
 
-<nav class="h-full flex flex-col p-2">
-  <div class="flex flex-col gap-2 h-full overflow-y-scroll">
+<nav class="h-full flex flex-col pl-1">
+  <div class="flex flex-col gap-2 h-full overflow-y-auto">
     {#if children}
       {@render children()}
     {/if}
