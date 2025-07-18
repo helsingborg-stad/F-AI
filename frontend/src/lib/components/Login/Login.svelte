@@ -4,6 +4,7 @@
     initialIsIdSubmitted: boolean
     errorMessage: string
     requestId: string
+    redirectTo?: string
   }
 
   let {
@@ -11,6 +12,7 @@
     initialIsIdSubmitted,
     errorMessage,
     requestId,
+    redirectTo = '/'
   }: Props = $props()
 
   let id = $state(initialId)
@@ -45,6 +47,7 @@
   <div class="card-body">
     {#if !isIdSubmitted}
       <form method="POST" action="?/initiateOTP" onsubmit={handleForm}>
+        <input type="hidden" name="redirectTo" value={redirectTo}>
         <h2 class="text-3xl font-bold">Login to your account</h2>
         <p class="mt-4 mb-2 text-sm text-gray-500">Enter your email address</p>
         <label class="form-control w-full max-w-xs">
@@ -76,6 +79,7 @@
       <form method="POST" action="?/confirmOTP" onsubmit={handleForm}>
         <input type="hidden" name="request_id" value={requestId}>
         <input type="hidden" name="email" value={id}>
+        <input type="hidden" name="redirectTo" value={redirectTo}>
         <h2 class="text-3xl font-bold">Enter verification code</h2>
         <p class="mt-4 mb-2 text-sm text-gray-500">Enter the code sent to your email {id}</p>
         <label class="form-control w-full max-w-xs">

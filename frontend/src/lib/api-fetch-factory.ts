@@ -63,7 +63,9 @@ class ApiFetchFactory {
         })
 
       if (!refreshResponse.ok) {
-        throw redirect(303, '/login')
+        const redirectTo = event.url.pathname + event.url.search
+        const params = new URLSearchParams({ redirectTo })
+        redirect(303, `/login?${params}`)
       }
 
       const cookies = refreshResponse.headers.getSetCookie()

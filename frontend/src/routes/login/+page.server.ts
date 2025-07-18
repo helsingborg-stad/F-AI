@@ -6,6 +6,7 @@ export const actions = {
   initiateOTP: async (event) => {
     const data = await event.request.formData()
     const email = data?.get('email') || ''
+    const redirectTo = data?.get('redirectTo') || '/'
 
     const response = await api.post('/api/login/initiate', {
       body: { user_id: email },
@@ -20,12 +21,14 @@ export const actions = {
         email,
         request_id: responseData.request_id,
         isIdSubmitted: true,
+        redirectTo,
       }
     } else {
       return {
         email,
         isIdSubmitted: false,
         error: `Error: ${response.status} ${response.statusText}`,
+        redirectTo,
       }
     }
   },
@@ -35,13 +38,13 @@ export const actions = {
     const email = data?.get('email')
     const requestId = data.get('request_id')
     const confirmationCode = data.get('OTPCode')
+    const redirectTo = data.get('redirectTo') || '/'
 
     const response = await api.post('/api/login/confirm', {
       body: { request_id: requestId, confirmation_code: confirmationCode },
       withAuth: false,
       event,
     })
-
 
     const cookies = response.headers.getSetCookie()
     cookies.forEach(cookie => {
@@ -59,7 +62,7 @@ export const actions = {
     })
 
     if (response.ok) {
-      throw redirect(303, '/')
+      redirect(303, redirectTo.toString())
     } else {
       return {
         email,
@@ -67,6 +70,7 @@ export const actions = {
         isIdSubmitted: true,
         error:
           'There was an error verifying your code. If the problem persists contact support for assistance.',
+        redirectTo,
       }
     }
   },
