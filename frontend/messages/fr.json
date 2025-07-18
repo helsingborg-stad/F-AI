@@ -25,6 +25,7 @@
   "chat_assistant_picker_unknown": "<assistant inconnu>",
   "chat_assistant_picker_menu_title_favorites": "Favoris",
   "chat_assistant_picker_menu_title_vanilla": "Assistants vanilla",
+  "chat_assistant_picker_menu_title_general": "Plus d’assistants",
   "chat_assistant_picker_name_unknown": "<inconnu>",
   "chat_history_action_delete": "Supprimer",
   "chat_history_action_edit": "Modifier",

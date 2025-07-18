@@ -2,6 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit'
 import { m } from '$lib/paraglide/messages.js'
 import type { IAssistantMenu, IBackendAssistant } from '$lib/types.ts'
 import { fetchAllAssistants, getAssistantFavs } from '$lib/utils/assistant.js'
+import { createAssistantMenu } from '$lib/type-factory.js'
 
 export async function getAssistantPickerData(
   event: RequestEvent,
@@ -27,10 +28,10 @@ export async function getAssistantPickerData(
     }))
 
     result = [
-      {
+      createAssistantMenu({
         menuTitle: m.chat_assistant_picker_menu_title_favorites(),
         menuItems: favItems,
-      },
+      }),
     ]
   }
 
@@ -49,10 +50,32 @@ export async function getAssistantPickerData(
     }))
 
   if (vanillaItems.length > 0) {
-    result.push({
-      menuTitle: m.chat_assistant_picker_menu_title_vanilla(),
-      menuItems: vanillaItems,
-    })
+    result.push(
+      createAssistantMenu({
+        menuTitle: m.chat_assistant_picker_menu_title_vanilla(),
+        menuItems: vanillaItems,
+      }),
+    )
+  }
+
+  const generalAssistants = allAssistantsData.filter(
+    (assistant) => !vanillaAssistants.includes(assistant),
+  )
+  const moreItems = generalAssistants.map((assistant: IBackendAssistant) => ({
+    id: assistant.id,
+    name: assistant.meta.name?.toString() ?? m.chat_assistant_picker_name_unknown(),
+    allowSearch: Boolean(assistant.meta?.enable_search),
+    allowReasoning: Boolean(assistant.meta?.enable_reasoning),
+  }))
+
+  if (moreItems.length > 0) {
+    result.push(
+      createAssistantMenu({
+        menuTitle: m.chat_assistant_picker_menu_title_general(),
+        hidden: true,
+        menuItems: moreItems,
+      }),
+    )
   }
 
   return result

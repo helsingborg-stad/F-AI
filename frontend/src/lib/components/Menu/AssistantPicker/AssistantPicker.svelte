@@ -86,7 +86,7 @@
       class:hidden={!isOpen}
       role="menu"
     >
-      {#each assistants as item}
+      {#each assistants.filter(item => !item.hidden) as item}
         {#if item.menuTitle}
           <div class="pt-1">{item.menuTitle}</div>
         {/if}
