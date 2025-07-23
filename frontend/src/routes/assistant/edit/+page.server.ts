@@ -2,7 +2,6 @@ import type { PageServerLoad } from './$types.js'
 import type { IAssistant, IBackendAssistant, ICollection } from '$lib/types.js'
 import {
   canCreateAssistant,
-  canReadAssistants,
   canReadCollections,
 } from '$lib/state/user.svelte.js'
 import { error, redirect } from '@sveltejs/kit'
@@ -22,6 +21,7 @@ import {
   getCollections,
   replaceContextCollection,
 } from '$lib/utils/collection.js'
+import { createUserScopeFactory } from '$lib/utils/scope-factory.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
   const id = formData.get('assistant_id') as string
@@ -60,7 +60,8 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
 }
 
 export const load: PageServerLoad = async (event) => {
-  const userCanListAssistants = canReadAssistants()
+  const scopeFactory = createUserScopeFactory(event)
+  const userCanListAssistants = await scopeFactory.canReadAssistants()
   const userCanCreateAssistant = canCreateAssistant()
   const userCanEditAssistant = canCreateAssistant()
   const userCanReadCollections = canReadCollections()
