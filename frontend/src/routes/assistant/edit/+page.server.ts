@@ -21,7 +21,7 @@ import {
   getCollections,
   replaceContextCollection,
 } from '$lib/utils/collection.js'
-import { createUserScopeFactory } from '$lib/utils/scope-factory.js'
+import { userCanReadAssistants } from '$lib/utils/scopes.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
   const id = formData.get('assistant_id') as string
@@ -60,8 +60,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
 }
 
 export const load: PageServerLoad = async (event) => {
-  const scopeFactory = createUserScopeFactory(event)
-  const userCanListAssistants = await scopeFactory.canReadAssistants()
+  const userCanListAssistants = await userCanReadAssistants(event)
   const userCanCreateAssistant = canCreateAssistant()
   const userCanEditAssistant = canCreateAssistant()
   const userCanReadCollections = canReadCollections()
