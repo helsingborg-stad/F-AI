@@ -104,8 +104,6 @@ export class BackendApiService {
         // this should update the access token (and refresh token)
         this.#setCookiesFromResponse(refreshResponse)
 
-        console.log('refreshed token, attempting request again')
-
         // retry the API call again, with refreshed credentials
         response = await this.#fetchFunc(url, {
           method,
@@ -123,7 +121,7 @@ export class BackendApiService {
 
       try {
         const responseData = await response.json()
-        console.log('response data', responseData)
+
         return [
           responseData?.detail ?? response.statusText,
           undefined,
