@@ -37,3 +37,8 @@ export async function userCanReadSettings(event: RequestEvent): Promise<boolean>
   const userScopes = await fetchUserScopes(event)
   return hasScope('settings.read', userScopes)
 }
+
+export async function userCanReadCollections(event: RequestEvent): Promise<boolean> {
+  const userScopes = await fetchUserScopes(event)
+  return hasScope('collection.read', userScopes)
+}
