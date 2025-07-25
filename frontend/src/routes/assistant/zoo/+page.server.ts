@@ -1,6 +1,5 @@
 import { m } from '$lib/paraglide/messages.js'
 import type { PageServerLoad } from '../../../../.svelte-kit/types/src/routes/$types.js'
-import { canReadAssistants } from '$lib/state/user.svelte.js'
 import type { IAssistantCard } from '$lib/types.js'
 import {
   addAssistantFav,
@@ -9,9 +8,10 @@ import {
   getAssistantFavs,
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
+import { userCanReadAssistants } from '$lib/utils/scopes.js'
 
 export const load: PageServerLoad = async (event) => {
-  const userCanListAssistants = canReadAssistants()
+  const userCanListAssistants = await userCanReadAssistants(event)
 
   let assistantCards: IAssistantCard[] = []
 

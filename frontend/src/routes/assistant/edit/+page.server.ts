@@ -1,9 +1,5 @@
 import type { PageServerLoad } from './$types.js'
 import type { IAssistant, IBackendAssistant, ICollection } from '$lib/types.js'
-import {
-  canCreateAssistant,
-  canReadCollections,
-} from '$lib/state/user.svelte.js'
 import { error, redirect } from '@sveltejs/kit'
 import {
   createAssistant,
@@ -21,7 +17,7 @@ import {
   getCollections,
   replaceContextCollection,
 } from '$lib/utils/collection.js'
-import { userCanReadAssistants } from '$lib/utils/scopes.js'
+import { userCanReadAssistants, userCanReadCollections, userCanWriteAssistant } from '$lib/utils/scopes.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
   const id = formData.get('assistant_id') as string
@@ -60,16 +56,16 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
 }
 
 export const load: PageServerLoad = async (event) => {
-  const userCanListAssistants = await userCanReadAssistants(event)
-  const userCanCreateAssistant = canCreateAssistant()
-  const userCanEditAssistant = canCreateAssistant()
-  const userCanReadCollections = canReadCollections()
+  const canListAssistants = await userCanReadAssistants(event)
+  const canCreateAssistant =  await userCanWriteAssistant(event)
+  const canEditAssistant = await userCanWriteAssistant(event)
+  const canReadCollections = await userCanReadCollections(event)
   const activeAssistantID = event.url.searchParams.get('assistant_id') || ''
 
   let assistants: IAssistant[] = []
   let activeAssistant: IAssistant = {} as IAssistant
 
-  if (userCanListAssistants) {
+  if (canListAssistants) {
     assistants = (await getUserAssistants(event)).map((assistant) => ({
       id: assistant.id,
       name: assistant.meta?.name?.toString() ?? '',
@@ -101,7 +97,7 @@ export const load: PageServerLoad = async (event) => {
       enableReasoning: assistantData.meta?.enable_reasoning === true,
     }
 
-    if (userCanReadCollections && assistantData.collection_id) {
+    if (canReadCollections && assistantData.collection_id) {
       try {
         const collections = (await getCollections(event)).collections
         activeAssistant.collection = collections.find(
@@ -119,8 +115,8 @@ export const load: PageServerLoad = async (event) => {
     assistants,
     activeAssistant,
     models,
-    canCreateAssistant: userCanCreateAssistant,
-    canEditActiveAssistant: userCanEditAssistant,
+    canCreateAssistant: canCreateAssistant,
+    canEditActiveAssistant: canEditAssistant,
   }
 }
 
