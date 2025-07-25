@@ -39,7 +39,6 @@ export class BackendApiService {
   #setCookiesFromResponse(response: Response) {
     const cookies = response.headers.getSetCookie()
     cookies.forEach((cookie) => {
-      // TODO: there has to be a better way to parse the cookie string
       const [cookiePair, ...attributes] = cookie.split(';')
       const [cookieName, cookieValue] = cookiePair.split('=')
       const kvp: Record<string, string> = attributes
