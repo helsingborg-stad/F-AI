@@ -23,6 +23,11 @@ export async function userCanReadAssistants(event: RequestEvent): Promise<boolea
   return hasScope('assistant.read', userScopes)
 }
 
+export async function userCanWriteAssistant(event: RequestEvent): Promise<boolean> {
+  const userScopes = await fetchUserScopes(event)
+  return hasScope('assistant.write', userScopes)
+}
+
 export async function userCanChat(event: RequestEvent): Promise<boolean> {
   const userScopes = await fetchUserScopes(event)
   return hasScope('chat', userScopes)
