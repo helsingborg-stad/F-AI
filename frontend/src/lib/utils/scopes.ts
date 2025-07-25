@@ -1,0 +1,24 @@
+import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.ts'
+import type { UserScopeType } from '$lib/types.js'
+import type { RequestEvent } from '@sveltejs/kit'
+
+function hasScope(scope: UserScopeType, userScopes: UserScopeType[]): boolean {
+  return userScopes ? userScopes.includes(scope) : false
+}
+
+async function fetchUserScopes(event: RequestEvent): Promise<UserScopeType[]> {
+  const api = new BackendApiServiceFactory().get(event)
+  const [error, scopes] = await api.getScopes()
+
+  if (error) {
+    console.error('Failed to fetch scopes', error)
+    return []
+  }
+
+  return scopes || []
+}
+
+export async function userCanReadAssistants(event: RequestEvent): Promise<boolean> {
+  const userScopes = await fetchUserScopes(event)
+  return hasScope('assistant.read', userScopes)
+}

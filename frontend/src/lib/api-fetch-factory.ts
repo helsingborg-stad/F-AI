@@ -74,7 +74,7 @@ class ApiFetchFactory {
         const kvp: Record<string, string> = pairs.reduce((acc, [k, v]) => ({ ...acc, [k.trim().toLowerCase()]: v }), {})
 
         const cookieName = pairs[0][0]
-        event.cookies.set(cookieName, kvp[cookieName], {
+        event.cookies.set(cookieName.toLowerCase(), kvp[cookieName.toLowerCase()], {
           path: '/',
           sameSite: 'lax',
           httpOnly: true,
