@@ -1,26 +1,28 @@
-import { hasScope, setUser } from '$lib/state/user.svelte.js'
+import { setUser } from '$lib/state/user.svelte.js'
 import { m } from '$lib/paraglide/messages.js'
+import type { RequestEvent } from '@sveltejs/kit'
+import { userCanChat, userCanReadAssistants, userCanReadSettings } from '$lib/utils/scopes.js'
 
-export function load({ locals }) {
-  const user = locals.user || { scopes: [], email: '' }
+export async function load(event: RequestEvent) {
+  const user = event.locals.user || { scopes: [], email: '' }
   setUser(user)
 
   const navbarMenu = []
 
-  if (hasScope('chat')) {
+  if (await userCanChat(event)) {
     navbarMenu.push({ label: m.nav_menu_chat(), path: '/chat' })
   }
 
-  if (hasScope('assistant.read')) {
+  if (await userCanReadAssistants(event)) {
     navbarMenu.push({ label: m.nav_menu_assistants(), path: '/assistant' })
   }
 
-  if (hasScope('settings.read')) {
+  if (await userCanReadSettings(event)) {
     navbarMenu.push({ label: m.nav_menu_settings(), path: '/settings' })
   }
 
   return {
-    user: locals.user || { scopes: [], email: '' },
+    user: event.locals.user || { scopes: [], email: '' },
     avatarMenu: [
       {
         title: m.nav_avatar_menu_logout(),
