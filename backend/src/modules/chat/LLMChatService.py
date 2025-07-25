@@ -9,22 +9,22 @@ from src.modules.chat.models.ChatEvent import ChatEvent
 from src.modules.chat.protocols.IChatService import IChatService
 from src.modules.collections.protocols.ICollectionService import ICollectionService
 from src.modules.conversations.protocols.IConversationService import IConversationService
-from src.modules.llm.factory import LLMServiceFactory
-from src.modules.llm.helpers.collect_streamed import collect_streamed
-from src.modules.llm.models.Feature import Feature
-from src.modules.llm.models.Message import Message
-from src.modules.llm.protocols.ILLMService import ILLMService
+from src.modules.ai.completions.factory import CompletionsServiceFactory
+from src.modules.ai.completions.helpers.collect_streamed import collect_streamed
+from src.modules.ai.completions.models.Feature import Feature
+from src.modules.ai.completions.models.Message import Message
+from src.modules.ai.completions.protocols.ICompletionsService import ICompletionsService
 
 
 class LLMChatService(IChatService):
     def __init__(
             self,
-            llm_factory: LLMServiceFactory,
+            completions_factory: CompletionsServiceFactory,
             assistant_service: IAssistantService,
             conversation_service: IConversationService,
             collection_service: ICollectionService
     ):
-        self._llm_factory = llm_factory
+        self._completions_factory = completions_factory
         self._assistant_service = assistant_service
         self._conversation_service = conversation_service
         self._collection_service = collection_service
@@ -94,7 +94,8 @@ class LLMChatService(IChatService):
                 yield ChatEvent(event='error', message='rag scoring assistant not found')
                 return
 
-            rag_llm_service: ILLMService = self._llm_factory.get()
+            rag_service: ICompletionsService = self._completions_factory.get(model=rag_scoring_assistant.model,
+                                                                             api_key=rag_scoring_assistant.llm_api_key)
 
             rag_results = await self._collection_service.query_collection(assistant.collection_id, message,
                                                                           max_results=assistant.max_collection_results)
@@ -102,13 +103,11 @@ class LLMChatService(IChatService):
             formatted_results = [f"(source:{r.source}, page: {r.page_number})\n{r.content}" for r in rag_results]
 
             async def _score_result(result: str) -> int:
-                response = await collect_streamed(rag_llm_service.run(
-                    model=rag_scoring_assistant.model,
+                response = await collect_streamed(rag_service.run_completions(
                     messages=[
                         Message(role='system', content=rag_scoring_assistant.instructions),
                         Message(role='user', content=result)
                     ],
-                    api_key=rag_scoring_assistant.llm_api_key,
                     enabled_features=[],
                     extra_params=rag_scoring_assistant.extra_llm_params
                 ))
@@ -122,16 +121,8 @@ class LLMChatService(IChatService):
 
             rag_message = "Here are the results of the search:\n\n" + "\n\n".join([r[0] for r in accurate_results])
 
-        await self._conversation_service.add_message_to_conversation(
-            as_uid=as_uid,
-            conversation_id=conversation_id,
-            timestamp=get_timestamp(),
-            role='',
-            message=''
-        )
-
         try:
-            llm_service = self._llm_factory.get()
+            completions_service = self._completions_factory.get(model=assistant.model, api_key=assistant.llm_api_key)
         except ValueError as e:
             yield ChatEvent(event='error', source='error',
                             message=str(e))
@@ -143,9 +134,7 @@ class LLMChatService(IChatService):
             Message(role='user', content=rag_message) if rag_message else None
         ]
 
-        async for delta in llm_service.run(
-                model=assistant.model,
-                api_key=assistant.llm_api_key,
+        async for delta in completions_service.run_completions(
                 messages=[m for m in messages if m],
                 enabled_features=enabled_features,
                 extra_params=assistant.extra_llm_params

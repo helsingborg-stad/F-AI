@@ -3,6 +3,7 @@ import os
 from pymongo import AsyncMongoClient
 
 from src.common.services.models.Services import Services
+from src.modules.ai.completions.tools.CompletionsToolsFactory import CompletionsToolsFactory
 from src.modules.api_key.factory import ApiKeyServiceFactory
 from src.modules.assistants.factory import AssistantServiceFactory
 from src.modules.auth.authentication.factory import AuthenticationServiceFactory
@@ -13,7 +14,7 @@ from src.modules.collections.factory import CollectionServiceFactory
 from src.modules.conversations.factory import ConversationServiceFactory
 from src.modules.document_chunker.factory import DocumentChunkerFactory
 from src.modules.groups.factory import GroupServiceFactory
-from src.modules.llm.factory import LLMServiceFactory
+from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.login.factory import LoginServiceFactory
 from src.modules.notification.factory import NotificationServiceFactory
 from src.modules.resources.factory import ResourceServiceFactory
@@ -39,7 +40,7 @@ async def create_services() -> Services:
     resource_service = ResourceServiceFactory(group_service=group_service).get()
     assistant_service = AssistantServiceFactory(mongo_database=mongo_database, resource_service=resource_service).get()
     conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
-    llm_factory = LLMServiceFactory(setting_service=settings_service)
+    completions_factory = CompletionsServiceFactory(setting_service=settings_service)
     collection_service = CollectionServiceFactory(
         mongo_database=mongo_database,
         vector_service=vector_service,
@@ -58,7 +59,7 @@ async def create_services() -> Services:
         ),
         authorization_service=authorization_service,
         api_key_service=api_key_service,
-        llm_factory=llm_factory,
+        completions_factory=completions_factory,
         document_chunker_factory=document_chunker_factory,
         vector_service=vector_service,
         collection_service=collection_service,
@@ -74,7 +75,7 @@ async def create_services() -> Services:
         assistant_service=assistant_service,
         conversation_service=conversation_service,
         chat_service=ChatServiceFactory(
-            llm_factory=llm_factory,
+            completions_factory=completions_factory,
             assistant_service=assistant_service,
             conversation_service=conversation_service,
             collection_service=collection_service,

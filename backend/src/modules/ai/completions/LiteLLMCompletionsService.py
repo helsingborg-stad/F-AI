@@ -1,3 +1,4 @@
+import json
 import os
 from collections.abc import AsyncGenerator
 
@@ -5,18 +6,22 @@ import litellm
 from litellm import acompletion
 from litellm.types.llms.openai import OpenAIWebSearchOptions, OpenAIWebSearchUserLocation, \
     OpenAIWebSearchUserLocationApproximate
+from litellm.types.utils import ChatCompletionDeltaToolCall
 
-from src.modules.llm.models.Delta import Delta
-from src.modules.llm.models.Feature import Feature
-from src.modules.llm.models.Message import Message
-from src.modules.llm.protocols.ILLMService import ILLMService
+from src.modules.ai.completions.models.Delta import Delta
+from src.modules.ai.completions.models.Feature import Feature
+from src.modules.ai.completions.models.Message import Message
+from src.modules.ai.completions.protocols.ICompletionsService import ICompletionsService
+from src.modules.ai.completions.tools.CompletionsToolsFactory import CompletionsToolsFactory
 from src.modules.settings.protocols.ISettingsService import ISettingsService
 from src.modules.settings.settings import SettingKey
 
 
-class LiteLLMService(ILLMService):
-    def __init__(self, settings_service: ISettingsService):
+class LiteLLMCompletionsService(ICompletionsService):
+    def __init__(self, settings_service: ISettingsService, model: str, api_key: str = ''):
         self._settings_service = settings_service
+        self._model = model
+        self._api_key = api_key
 
     async def _set_api_keys(self):
         os.environ['OPENAI_API_KEY'] = await self._settings_service.get_setting(SettingKey.OPENAI_API_KEY.key)
@@ -28,17 +33,15 @@ class LiteLLMService(ILLMService):
         os.environ.pop('MISTRAL_API_KEY', None)
         os.environ.pop('ANTHROPIC_API_KEY', None)
 
-    async def run(
+    async def run_completions(
             self,
-            model: str,
-            api_key: str,
             messages: list[Message],
             enabled_features: list[Feature],
             extra_params: dict | None = None
     ) -> AsyncGenerator[Delta, None]:
         try:
             await self._set_api_keys()
-            model = model.replace(':', '/')  # patch for old model format
+            model = self._model.replace(':', '/')  # patch for old model format
 
             web_search_requested = Feature.WEB_SEARCH in enabled_features
             web_search_enabled = web_search_requested and litellm.supports_web_search(model)
@@ -72,7 +75,7 @@ class LiteLLMService(ILLMService):
                 model=model,
                 messages=messages,
                 stream=True,
-                api_key=api_key,
+                api_key=self._api_key,
                 reasoning_effort="medium" if reasoning_enabled else None,
 
                 # workaround for a bug in tool_call_cost_tracking.py:_get_web_search_options(kwargs) when explicitly setting value to None
@@ -82,6 +85,7 @@ class LiteLLMService(ILLMService):
             )
 
             role: str | None = None
+
             async for output in response:
                 if not output or len(output.choices) == 0:
                     continue
@@ -101,5 +105,6 @@ class LiteLLMService(ILLMService):
                         role=role,
                         content=delta.content,
                     )
+
         finally:
             await self._clear_api_keys()
