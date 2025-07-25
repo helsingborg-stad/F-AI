@@ -7,11 +7,17 @@ from src.modules.ai.image_gen.factory import ImageGeneratorServiceFactory
 class CompletionsToolsFactory:
     _tools: dict[str, ITool]
 
-    def __init__(self):
+    def __init__(self, image_generator_factory: ImageGeneratorServiceFactory):
         self._tools = {}
+        # Add more tools here
+        self._add_tool('imagegen', ImageGenTool(image_generator_factory))
 
     def get_tools(self, enabled_features: list[Feature]) -> list[dict]:
         tools: list[dict] = []
+
+        # Enable more tools here
+        if Feature.IMAGE_GEN in enabled_features:
+            tools.append(self._tools['imagegen'].get_tool_definition())
 
         return tools
 

@@ -41,7 +41,8 @@ async def create_services() -> Services:
     resource_service = ResourceServiceFactory(group_service=group_service).get()
     assistant_service = AssistantServiceFactory(mongo_database=mongo_database, resource_service=resource_service).get()
     conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
-    completions_tools_factory = CompletionsToolsFactory()
+    image_generator_factory = ImageGeneratorServiceFactory()
+    completions_tools_factory = CompletionsToolsFactory(image_generator_factory=image_generator_factory)
     completions_factory = CompletionsServiceFactory(setting_service=settings_service,
                                                     completions_tools_factory=completions_tools_factory)
     collection_service = CollectionServiceFactory(
