@@ -5,13 +5,14 @@ from src.modules.settings.protocols.ISettingsService import ISettingsService
 
 
 class CompletionsServiceFactory:
-    def __init__(self, setting_service: ISettingsService):
+    def __init__(self, setting_service: ISettingsService, completions_tools_factory: CompletionsToolsFactory):
         self._setting_service = setting_service
         self._completions_tools_factory = completions_tools_factory
 
     def get(self, model: str, api_key: str) -> ICompletionsService:
         return LiteLLMCompletionsService(
             settings_service=self._setting_service,
+            tool_factory=self._completions_tools_factory,
             model=model,
             api_key=api_key
         )

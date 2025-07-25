@@ -4,6 +4,7 @@ from pymongo import AsyncMongoClient
 
 from src.common.services.models.Services import Services
 from src.modules.ai.completions.tools.CompletionsToolsFactory import CompletionsToolsFactory
+from src.modules.ai.image_gen.factory import ImageGeneratorServiceFactory
 from src.modules.api_key.factory import ApiKeyServiceFactory
 from src.modules.assistants.factory import AssistantServiceFactory
 from src.modules.auth.authentication.factory import AuthenticationServiceFactory
@@ -40,7 +41,9 @@ async def create_services() -> Services:
     resource_service = ResourceServiceFactory(group_service=group_service).get()
     assistant_service = AssistantServiceFactory(mongo_database=mongo_database, resource_service=resource_service).get()
     conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
-    completions_factory = CompletionsServiceFactory(setting_service=settings_service)
+    completions_tools_factory = CompletionsToolsFactory()
+    completions_factory = CompletionsServiceFactory(setting_service=settings_service,
+                                                    completions_tools_factory=completions_tools_factory)
     collection_service = CollectionServiceFactory(
         mongo_database=mongo_database,
         vector_service=vector_service,

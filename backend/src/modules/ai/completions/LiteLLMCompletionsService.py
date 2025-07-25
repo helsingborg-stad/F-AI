@@ -18,8 +18,10 @@ from src.modules.settings.settings import SettingKey
 
 
 class LiteLLMCompletionsService(ICompletionsService):
-    def __init__(self, settings_service: ISettingsService, model: str, api_key: str = ''):
+    def __init__(self, settings_service: ISettingsService, tool_factory: CompletionsToolsFactory, model: str,
+                 api_key: str = ''):
         self._settings_service = settings_service
+        self._tool_factory = tool_factory
         self._model = model
         self._api_key = api_key
 
@@ -71,12 +73,15 @@ class LiteLLMCompletionsService(ICompletionsService):
                 {'content': m.content, 'role': m.role} for m in messages if m.content and len(m.content) > 0
             ]
 
+            tools = self._tool_factory.get_tools(enabled_features=enabled_features)
+
             response = await acompletion(
                 model=model,
                 messages=messages,
                 stream=True,
                 api_key=self._api_key,
                 reasoning_effort="medium" if reasoning_enabled else None,
+                tools=tools,
 
                 # workaround for a bug in tool_call_cost_tracking.py:_get_web_search_options(kwargs) when explicitly setting value to None
                 **{'web_search_options': web_search_options} if web_search_enabled else {},
@@ -85,6 +90,9 @@ class LiteLLMCompletionsService(ICompletionsService):
             )
 
             role: str | None = None
+            tool_call_id: str | None = None
+            tool_call_function_name: str | None = None
+            tool_call_function_arguments: str = ''
 
             async for output in response:
                 if not output or len(output.choices) == 0:
@@ -92,6 +100,19 @@ class LiteLLMCompletionsService(ICompletionsService):
 
                 delta = output.choices[0].delta
                 role = delta.role or role
+
+                tool_calls: list[ChatCompletionDeltaToolCall] = delta.tool_calls
+                if tool_calls is not None and len(tool_calls) > 0:
+                    tool_call_delta = tool_calls[0]
+                    if tool_call_delta.id is not None:
+                        tool_call_id = tool_call_delta.id
+                    if tool_call_delta.function.name is not None:
+                        tool_call_function_name = tool_call_delta.function.name
+                        yield Delta(
+                            role='assistant',
+                            reasoning_content=f'(calling tool {tool_call_function_name})'
+                        )
+                    tool_call_function_arguments += tool_call_delta.function.arguments
 
                 if hasattr(delta, 'reasoning_content') and delta.reasoning_content is not None and len(
                         delta.reasoning_content) > 0:
@@ -104,6 +125,25 @@ class LiteLLMCompletionsService(ICompletionsService):
                     yield Delta(
                         role=role,
                         content=delta.content,
+                    )
+
+            if tool_call_id is not None:
+                tool = self._tool_factory.get_tool_by_name(function_name=tool_call_function_name)
+                if tool is not None:
+                    print(f'Calling tool "{tool_call_function_name}" with args: {tool_call_function_arguments}...')
+                    args = json.loads(tool_call_function_arguments) if len(tool_call_function_arguments) > 0 else {}
+                    tool_result = await tool.call_tool(args=args)
+                    yield Delta(
+                        role='tool',
+                        tool_call_id=tool_call_id,
+                        content=tool_result,
+                    )
+
+                    # TODO: handle tool.get_should_feedback_into_llm()
+                else:
+                    yield Delta(
+                        role='error',
+                        content=f'Call to tool "{tool_call_function_name}" requested but not found.'
                     )
 
         finally:
