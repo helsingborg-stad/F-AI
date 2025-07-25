@@ -1,7 +1,7 @@
 from typing import AsyncGenerator
 
-from src.modules.llm.models.Delta import Delta
-from src.modules.llm.models.Message import Message
+from src.modules.ai.completions.models.Delta import Delta
+from src.modules.ai.completions.models.Message import Message
 
 
 async def collect_streamed(generator: AsyncGenerator[Delta, None]):

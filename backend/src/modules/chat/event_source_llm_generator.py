@@ -5,7 +5,7 @@ from sse_starlette import ServerSentEvent, EventSourceResponse
 
 from src.common.get_timestamp import get_timestamp
 from src.modules.chat.protocols.IChatService import IChatService
-from src.modules.llm.models.Feature import Feature
+from src.modules.ai.completions.models.Feature import Feature
 
 
 async def event_source_llm_generator(
