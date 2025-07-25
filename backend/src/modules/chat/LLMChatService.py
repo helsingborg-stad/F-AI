@@ -134,12 +134,24 @@ class LLMChatService(IChatService):
             Message(role='user', content=rag_message) if rag_message else None
         ]
 
+        last_role = ''
+
         async for delta in completions_service.run_completions(
                 messages=[m for m in messages if m],
                 enabled_features=enabled_features,
                 extra_params=assistant.extra_llm_params
         ):
-            if delta.role != 'error' and delta.content is not None:
+            if delta.role != last_role:
+                last_role = delta.role
+                await self._conversation_service.add_message_to_conversation(
+                    as_uid=as_uid,
+                    conversation_id=conversation_id,
+                    timestamp=get_timestamp(),
+                    role=delta.role,
+                    message=''
+                )
+
+            if delta.content is not None:
                 await self._conversation_service.add_to_conversation_last_message(
                     as_uid=as_uid,
                     conversation_id=conversation_id,
