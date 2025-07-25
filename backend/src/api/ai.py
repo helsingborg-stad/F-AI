@@ -25,6 +25,7 @@ class RunRequest(BaseModel):
     ])
     api_key: str | None = Field(default=None, examples=['my-api-key'])
     extra_params: dict | None = Field(default=None, examples=[{'temperature': 0.5}])
+    enabled_features: list[str] | None = Field(default=None, examples=[['IMAGE_GEN']])
 
 
 class RunResponse(BaseModel):
@@ -51,8 +52,8 @@ async def completions(request: RunRequest, services: ServicesDependency):
                 )
                 for message in request.messages
             ],
-            api_key=request.api_key if request.api_key else "",
-            enabled_features=[],
+            enabled_features=features_from_string(
+                ",".join(request.enabled_features)) if request.enabled_features else [],
             extra_params=request.extra_params if request.extra_params else {}
         ))
 
