@@ -1,15 +1,16 @@
 import type { RequestHandler } from './$types.js'
-import { api } from '$lib/api-fetch-factory.js'
-import { error, text } from '@sveltejs/kit'
+import { json } from '@sveltejs/kit'
+import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
 
 export const POST: RequestHandler = async (event) => {
   const { id }: { id: string } = await event.request.json()
 
-  const response = await api.delete(`/api/conversation/${id}`, { event })
+  const api = new BackendApiServiceFactory().get(event);
+  const [error] = await api.deleteConversation(id);
 
-  if (!response.ok) {
-    error(response.status, await response.text())
+  if (error) {
+    return json({ success: false, error }, { status: 500 });
   }
 
-  return text('')
+  return json({ success: true });
 }

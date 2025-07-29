@@ -5,7 +5,7 @@ import type {
   IAssistantModels,
   IBackendApiSettings,
   IBackendAssistant,
-  ICollection,
+  ICollection, IConversation, IConversations,
   IFavAssistant,
 } from '$lib/types.js'
 
@@ -363,6 +363,31 @@ export class BackendApiService {
       body: formData,
     })
 
+    return [error, undefined] as ApiResult<never>
+  }
+
+  /** Conversations */
+
+  async getConversations(): Promise<ApiResult<IConversations>> {
+    const [error, { conversations }] = await this.get<{ conversations: IConversations }>(
+      '/api/conversation',
+    )
+    return [error, conversations] as ApiResult<IConversations>
+  }
+
+  async getConversation(
+    conversationId: string,
+  ): Promise<ApiResult<IConversation>> {
+    const [error, { conversation }] = await this.get<{ conversation: IConversation }>(
+      `/api/conversation/${conversationId}`,
+    )
+    return [error, conversation] as ApiResult<IConversation>
+  }
+
+  async deleteConversation(
+    conversationId: string,
+  ): Promise<ApiResult<never>> {
+    const [error] = await this.delete(`/api/conversation/${conversationId}`)
     return [error, undefined] as ApiResult<never>
   }
 }
