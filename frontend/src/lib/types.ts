@@ -80,6 +80,11 @@ export interface IAssistant {
   enableReasoning: boolean
 }
 
+export interface IFavAssistant {
+  id: string
+  meta: JsonObject
+}
+
 export interface IAssistantCard {
   id: string
   avatar: string | null

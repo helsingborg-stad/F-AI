@@ -1,30 +1,6 @@
 import { sequence } from '@sveltejs/kit/hooks'
 import { paraglideMiddleware } from '$lib/paraglide/server.js'
-import { type Handle, redirect } from '@sveltejs/kit'
-import { setupScopes } from '$lib/server/hooks/setup-scopes.js'
-
-const handleScopes: Handle = async ({ event, resolve }) => {
-  try {
-    event = await setupScopes(event)
-
-    const response = await resolve(event)
-
-    if (response.status === 401) {
-      return redirect(303, '/login')
-    }
-
-    return response
-  } catch (error) {
-    console.log('Hook error:', error)
-
-    if (error instanceof Response && error.status === 401) {
-      return redirect(303, '/login')
-    }
-
-    // TODO: Implement error page for other type of errors.
-    return redirect(303, '/login')
-  }
-}
+import { type Handle } from '@sveltejs/kit'
 
 const handleParaglide: Handle = ({ event, resolve }) =>
   paraglideMiddleware(event.request, ({ request, locale }) => {
@@ -35,4 +11,4 @@ const handleParaglide: Handle = ({ event, resolve }) =>
     })
   })
 
-export const handle = sequence(handleScopes, handleParaglide)
+export const handle = sequence(handleParaglide)
