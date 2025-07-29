@@ -1,66 +1,89 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import type { IAssistantModels, IBackendAssistant } from '$lib/types.js'
 import { api } from '$lib/api-fetch-factory.js'
+import {
+  type ApiResult,
+  BackendApiService,
+  BackendApiServiceFactory,
+} from '$lib/backendApi/backendApi.js'
+
+async function handleApiCall<T>(
+  event: RequestEvent,
+  apiMethod: (api: BackendApiService) => Promise<ApiResult<T>>,
+  errorMessage: string,
+  defaultValue: T,
+): Promise<T> {
+  const api = new BackendApiServiceFactory().get(event)
+  const [error, result] = await apiMethod(api)
+
+  if (error) {
+    console.error(errorMessage, error)
+    return defaultValue
+  }
+
+  return result || defaultValue
+}
 
 export async function fetchAllAssistants(
   event: RequestEvent,
 ): Promise<IBackendAssistant[]> {
-  const response = await api.get('/api/assistant', { event, withAuth: true })
-  if (response.ok) {
-    const data = await response.json()
-    return data.assistants
-  }
-  return []
+  return handleApiCall(
+    event,
+    (api) => api.getAssistants(),
+    'Failed to fetch assistants',
+    [],
+  )
 }
 
-export async function getUserAssistants(event: RequestEvent): Promise<IBackendAssistant[]> {
-  const response = await api.get('/api/assistant/me', { event, withAuth: true })
-  if (response.ok) {
-    const data = await response.json()
-    return data.assistants
-  }
-  return []
+export async function getUserAssistants(
+  event: RequestEvent,
+): Promise<IBackendAssistant[]> {
+  return handleApiCall(
+    event,
+    (api) => api.getMyAssistants(),
+    'Failed to fetch assistants',
+    [],
+  )
 }
 
 export async function fetchAssistantModels(
   event: RequestEvent,
 ): Promise<IAssistantModels[]> {
-  const response = await api.get('/api/assistant/models', { event, withAuth: true })
-  if (response.ok) {
-    const data = await response.json()
-    return data.models
-  }
-  return []
+  return handleApiCall(
+    event,
+    (api) => api.getAssistantModels(),
+    'Failed to fetch assistant models',
+    [],
+  )
 }
 
 export async function fetchAssistantById(
   event: RequestEvent,
   assistantId: string,
 ): Promise<IBackendAssistant> {
-  const response = await api.get(`/api/assistant/${assistantId}`, {
+  return handleApiCall(
     event,
-    withAuth: true,
-  })
-
-  if (response.ok) {
-    const data = await response.json()
-    if (data.assistant) {
-      return data.assistant as IBackendAssistant
-    }
-  }
-
-  throw new Response('Assistant not found', { status: 404 })
+    (api) => api.getAssistant(assistantId),
+    'Failed to fetch assistant',
+    {
+      id: '',
+      model: '',
+      model_key: '',
+      instructions: '',
+      meta: {},
+      collection_id: null,
+      max_collection_results: '0',
+    },
+  )
 }
 
 export async function createAssistant(event: RequestEvent): Promise<string> {
-  const response = await api.post('/api/assistant', { event, withAuth: true })
-
-  if (!response.ok) {
-    throw new Response('Failed to create assistant', { status: response.status })
-  }
-
-  const data = await response.json()
-  return data.assistant_id
+  return handleApiCall(
+    event,
+    (api) => api.createAssistant(),
+    'Failed to create assistant',
+    '',
+  )
 }
 
 export async function updateAssistant(
@@ -75,26 +98,25 @@ export async function updateAssistant(
     max_collection_results?: string
   },
   event: RequestEvent,
-) {
-
-  const response = await api.put(`/api/assistant/${assistantId}`, {
+): Promise<void> {
+  await handleApiCall(
     event,
-    body: updates,
-  })
-
-  if (!response.ok) {
-    throw new Response('Failed to update assistant', { status: response.status })
-  }
+    (api) => api.updateAssistant(assistantId, updates),
+    'Failed to update assistant',
+    undefined,
+  )
 }
 
-export async function deleteAssistant(event: RequestEvent, assistantId: string) {
-  const response = await api.delete(`/api/assistant/${assistantId}`, {
+export async function deleteAssistant(
+  event: RequestEvent,
+  assistantId: string,
+): Promise<void> {
+  await handleApiCall(
     event,
-  })
-
-  if (!response.ok) {
-    throw new Response('Failed to delete assistant', { status: response.status })
-  }
+    (api) => api.deleteAssistant(assistantId),
+    'Failed to delete assistant',
+    undefined,
+  )
 }
 
 export async function updateAssistantAvatar(
