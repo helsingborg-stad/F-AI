@@ -1,6 +1,7 @@
 import { error, json } from '@sveltejs/kit'
 import { api } from '$lib/api-fetch-factory.js'
 import type { RequestHandler } from './$types.js'
+import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
 
 /** Store Message handler */
 export const POST: RequestHandler = async (event) => {

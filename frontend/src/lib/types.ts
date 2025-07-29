@@ -1,8 +1,8 @@
 import type { icons } from '$lib/components/Icon/icons.js'
 
-export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-export type JsonObject = { [key: string]: JsonValue };
-export type JsonArray = JsonValue[];
+export type JsonValue = string | number | boolean | null | JsonObject | JsonArray
+export type JsonObject = { [key: string]: JsonValue }
+export type JsonArray = JsonValue[]
 
 export interface IMenuItem {
   label: string
@@ -102,8 +102,8 @@ export interface IAssistantCard {
 }
 
 export interface IAssistantMenu {
-  menuTitle: string,
-  hidden: boolean,
+  menuTitle: string
+  hidden: boolean
   menuItems: {
     allowSearch: boolean
     allowReasoning: boolean
@@ -152,4 +152,14 @@ export interface ICollection {
 
 export interface ICollectionFiles {
   name: string
+}
+
+export interface IConversation {
+    assistant_id: string
+    messages: {
+      timestamp: string
+      role: string
+      content: string
+      reasoning: string
+    }[]
 }
