@@ -133,6 +133,7 @@ export interface IBackendApiSettings {
   settings: {
     'login.fixed_otp'?: string
     'jwt.user_secret'?: string
+    'jwt.expire_minutes'?: string
     'brevo.url'?: string
     'brevo.api_key'?: string
     'openai.api_key'?: string

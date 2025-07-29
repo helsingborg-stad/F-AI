@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private'
 import { type Cookies, redirect, type RequestEvent } from '@sveltejs/kit'
 import dayjs from 'dayjs'
-import type { IAssistantModels, IBackendAssistant, IFavAssistant } from '$lib/types.js'
+import type { IAssistantModels, IBackendApiSettings, IBackendAssistant, IFavAssistant } from '$lib/types.js'
 
 export interface CallOptions {
   body?: string | FormData
@@ -325,6 +325,15 @@ export class BackendApiService {
   async getFavoriteAssistants(): Promise<ApiResult<IFavAssistant[]>> {
     const [error, { assistants }] = await this.get('/api/assistant/me/favorite')
     return [error, assistants] as ApiResult<IFavAssistant[]>
+  }
+
+  /** Settings */
+  
+  async getSettings(): Promise<ApiResult<IBackendApiSettings>> {
+    const [error, { settings }] = await this.get<{ settings: IBackendApiSettings }>(
+      '/api/settings',
+    )
+    return [error, { settings }] as ApiResult<IBackendApiSettings>
   }
 }
 
