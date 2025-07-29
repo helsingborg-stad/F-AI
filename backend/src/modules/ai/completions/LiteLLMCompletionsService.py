@@ -70,7 +70,8 @@ class LiteLLMCompletionsService(ICompletionsService):
                 print(f'WARNING: Reasoning was requested but is not supported by this model ({model}).')
 
             messages = [
-                {'content': m.content, 'role': m.role} for m in messages if m.content and len(m.content) > 0
+                m.model_dump(include={'role', 'content', 'tool_calls', 'tool_call_id'}, exclude_none=True)
+                for m in messages
             ]
 
             tools = self._tool_factory.get_tools(enabled_features=enabled_features)
@@ -82,6 +83,7 @@ class LiteLLMCompletionsService(ICompletionsService):
                 api_key=self._api_key,
                 reasoning_effort="medium" if reasoning_enabled else None,
                 tools=tools,
+                parallel_tool_calls=False,
 
                 # workaround for a bug in tool_call_cost_tracking.py:_get_web_search_options(kwargs) when explicitly setting value to None
                 **{'web_search_options': web_search_options} if web_search_enabled else {},
@@ -101,10 +103,14 @@ class LiteLLMCompletionsService(ICompletionsService):
                 delta = output.choices[0].delta
                 role = delta.role or role
 
+                # Handle accumulating tool call
                 tool_calls: list[ChatCompletionDeltaToolCall] = delta.tool_calls
                 if tool_calls is not None and len(tool_calls) > 0:
                     tool_call_delta = tool_calls[0]
                     if tool_call_delta.id is not None:
+                        if tool_call_delta.id != tool_call_id:
+                            tool_call_function_name = None
+                            tool_call_function_arguments = ''
                         tool_call_id = tool_call_delta.id
                     if tool_call_delta.function.name is not None:
                         tool_call_function_name = tool_call_delta.function.name
@@ -114,6 +120,7 @@ class LiteLLMCompletionsService(ICompletionsService):
                         )
                     tool_call_function_arguments += tool_call_delta.function.arguments
 
+                # Handle reasoning
                 if hasattr(delta, 'reasoning_content') and delta.reasoning_content is not None and len(
                         delta.reasoning_content) > 0:
                     yield Delta(
@@ -121,25 +128,49 @@ class LiteLLMCompletionsService(ICompletionsService):
                         reasoning_content=delta.reasoning_content
                     )
 
+                # Handle normal content
                 if delta.content is not None and len(delta.content) > 0:
                     yield Delta(
                         role=role,
                         content=delta.content,
                     )
 
+            # Handle calling tool
             if tool_call_id is not None:
+                yield Delta(
+                    role=role,
+                    tool_calls=[{
+                        'id': tool_call_id,
+                        'type': 'function',
+                        'function': {
+                            'name': tool_call_function_name,
+                            'arguments': tool_call_function_arguments,
+                        }
+                    }]
+                )
                 tool = self._tool_factory.get_tool_by_name(function_name=tool_call_function_name)
                 if tool is not None:
                     print(f'Calling tool "{tool_call_function_name}" with args: {tool_call_function_arguments}...')
                     args = json.loads(tool_call_function_arguments) if len(tool_call_function_arguments) > 0 else {}
                     tool_result = await tool.call_tool(args=args)
-                    yield Delta(
-                        role='tool',
-                        tool_call_id=tool_call_id,
-                        content=tool_result,
-                    )
 
-                    # TODO: handle tool.get_should_feedback_into_llm()
+                    if tool.get_should_feedback_into_llm():
+                        yield Delta(
+                            role='tool',
+                            tool_call_id=tool_call_id,
+                            content=tool_result.result,
+                            context_message_override=tool_result.context_message_override
+                        )
+                        # TODO: call run_completions again with tool result as the last message
+
+                    else:
+                        yield Delta(
+                            role='tool',
+                            tool_call_id=tool_call_id,
+                            content=tool_result.result,
+                            context_message_override=tool_result.context_message_override
+                        )
+
                 else:
                     yield Delta(
                         role='error',

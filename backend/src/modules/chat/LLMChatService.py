@@ -5,14 +5,15 @@ from typing import AsyncGenerator
 from src.common.get_timestamp import get_timestamp
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
 from src.modules.assistants.reserved_ids import RAG_SCORING_ID
-from src.modules.chat.models.ChatEvent import ChatEvent
+from src.modules.chat.models.ChatEvent import ChatEvent, ChatErrorEvent, ChatConversationIdEvent, ChatMessageEvent
 from src.modules.chat.protocols.IChatService import IChatService
 from src.modules.collections.protocols.ICollectionService import ICollectionService
+from src.modules.conversations.models.Message import Message as ConversationMessage
 from src.modules.conversations.protocols.IConversationService import IConversationService
 from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.ai.completions.helpers.collect_streamed import collect_streamed
 from src.modules.ai.completions.models.Feature import Feature
-from src.modules.ai.completions.models.Message import Message
+from src.modules.ai.completions.models.Message import Message as CompletionMessage
 from src.modules.ai.completions.protocols.ICompletionsService import ICompletionsService
 
 
@@ -38,19 +39,21 @@ class LLMChatService(IChatService):
         )
 
         if not assistant:
-            yield ChatEvent(event='error', message='invalid assistant')
+            yield ChatErrorEvent(message='invalid assistant')
             return
 
         conversation_id = await self._conversation_service.create_conversation(as_uid=as_uid, assistant_id=assistant_id)
 
-        yield ChatEvent(event='conversation_id', conversation_id=conversation_id)
+        yield ChatConversationIdEvent(conversation_id=conversation_id)
 
         await self._conversation_service.add_message_to_conversation(
             as_uid=as_uid,
             conversation_id=conversation_id,
-            timestamp=get_timestamp(),
-            role='system',
-            message=assistant.instructions
+            message=ConversationMessage(
+                timestamp=get_timestamp(),
+                role='system',
+                content=assistant.instructions
+            )
         )
 
         async for m in self.continue_chat(as_uid=as_uid, conversation_id=conversation_id, message=message,
@@ -62,7 +65,7 @@ class LLMChatService(IChatService):
         conversation = await self._conversation_service.get_conversation(as_uid=as_uid, conversation_id=conversation_id)
 
         if not conversation:
-            yield ChatEvent(event='error', message='invalid conversation')
+            yield ChatErrorEvent(message='invalid conversation')
             return
 
         assistant = await self._assistant_service.get_assistant(
@@ -72,15 +75,17 @@ class LLMChatService(IChatService):
         )
 
         if not assistant:
-            yield ChatEvent(event='error', message='invalid assistant')
+            yield ChatErrorEvent(message='invalid assistant')
             return
 
         await self._conversation_service.add_message_to_conversation(
             as_uid=as_uid,
             conversation_id=conversation_id,
-            timestamp=get_timestamp(),
-            role='user',
-            message=message
+            message=ConversationMessage(
+                timestamp=get_timestamp(),
+                role='user',
+                content=message
+            )
         )
 
         rag_message: str | None = None
@@ -91,7 +96,7 @@ class LLMChatService(IChatService):
                 assistant_id=RAG_SCORING_ID)
 
             if rag_scoring_assistant is None:
-                yield ChatEvent(event='error', message='rag scoring assistant not found')
+                yield ChatErrorEvent(message='rag scoring assistant not found')
                 return
 
             rag_service: ICompletionsService = self._completions_factory.get(model=rag_scoring_assistant.model,
@@ -105,8 +110,8 @@ class LLMChatService(IChatService):
             async def _score_result(result: str) -> int:
                 response = await collect_streamed(rag_service.run_completions(
                     messages=[
-                        Message(role='system', content=rag_scoring_assistant.instructions),
-                        Message(role='user', content=result)
+                        CompletionMessage(role='system', content=rag_scoring_assistant.instructions),
+                        CompletionMessage(role='user', content=result)
                     ],
                     enabled_features=[],
                     extra_params=rag_scoring_assistant.extra_llm_params
@@ -124,14 +129,19 @@ class LLMChatService(IChatService):
         try:
             completions_service = self._completions_factory.get(model=assistant.model, api_key=assistant.llm_api_key)
         except ValueError as e:
-            yield ChatEvent(event='error', source='error',
-                            message=str(e))
+            yield ChatErrorEvent(message=str(e))
             return
 
         messages = [
-            *[Message(role=m.role, content=m.content) for m in conversation.messages],
-            Message(role='user', content=message),
-            Message(role='user', content=rag_message) if rag_message else None
+            *[CompletionMessage(
+                role=m.role,
+                content=m.context_message_override if m.context_message_override else m.content,
+                reasoning_content=m.reasoning_content,
+                tool_call_id=m.tool_call_id,
+                tool_calls=m.tool_calls,
+            ) for m in conversation.messages],
+            CompletionMessage(role='user', content=message),
+            CompletionMessage(role='user', content=rag_message) if rag_message else None
         ]
 
         last_role = ''
@@ -146,19 +156,43 @@ class LLMChatService(IChatService):
                 await self._conversation_service.add_message_to_conversation(
                     as_uid=as_uid,
                     conversation_id=conversation_id,
-                    timestamp=get_timestamp(),
-                    role=delta.role,
-                    message=''
+                    message=ConversationMessage(
+                        timestamp=get_timestamp(),
+                        role=delta.role,
+                        content=delta.content,
+                        reasoning_content=delta.reasoning_content,
+                        tool_call_id=delta.tool_call_id,
+                        tool_calls=delta.tool_calls,
+                        context_message_override=delta.context_message_override
+                    )
                 )
+            else:
+                conversation = await self._conversation_service.get_conversation(as_uid=as_uid,
+                                                                                 conversation_id=conversation_id)
+                last_message = conversation.messages[-1]
+                if delta.content is not None:
+                    last_message.content = last_message.content + delta.content if last_message.content is not None else delta.content
 
-            if delta.content is not None:
-                await self._conversation_service.add_to_conversation_last_message(
+                if delta.reasoning_content is not None:
+                    last_message.reasoning_content = last_message.reasoning_content + delta.reasoning_content if last_message.reasoning_content is not None else delta.reasoning_content
+
+                if delta.context_message_override is not None:
+                    last_message.context_message_override = delta.context_message_override
+
+                if delta.tool_calls is not None:
+                    last_message.tool_calls = delta.tool_calls
+
+                if delta.tool_call_id is not None:
+                    last_message.tool_call_id = delta.tool_call_id
+
+                await self._conversation_service.replace_conversation_last_message(
                     as_uid=as_uid,
                     conversation_id=conversation_id,
-                    timestamp=get_timestamp(),
-                    role=delta.role,
-                    additional_message=delta.content
+                    message=last_message
                 )
 
-            yield ChatEvent(event='error' if delta.role == 'error' else 'message', source=delta.role,
-                            message=delta.content, reasoning=delta.reasoning_content)
+            if delta.role == 'error':
+                yield ChatErrorEvent(message=delta.content)
+                return
+
+            yield ChatMessageEvent(source=delta.role, message=delta.content, reasoning=delta.reasoning_content)

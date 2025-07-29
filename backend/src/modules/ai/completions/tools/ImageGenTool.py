@@ -1,3 +1,6 @@
+import json
+
+from src.modules.ai.completions.models.ToolCallResult import ToolCallResult
 from src.modules.ai.completions.protocols.ITool import ITool
 from src.modules.ai.image_gen.factory import ImageGeneratorServiceFactory
 
@@ -27,10 +30,13 @@ class ImageGenTool(ITool):
             }
         }
 
-    async def call_tool(self, args: dict) -> str:
+    async def call_tool(self, args: dict) -> ToolCallResult:
         generator = self.image_generator_factory.get(model='openai/dall-e-3')
         b64 = await generator.generate_by_text(args['prompt'])
-        return f'<img src="data:image/png;base64,{b64}" />'
+        return ToolCallResult(
+            result=f'![{args["prompt"][0:15]}](data:image/png;base64,{b64})',
+            context_message_override='{"message": "generated an image", "generation_args":' + json.dumps(args) + '}'
+        )
 
     def get_should_feedback_into_llm(self) -> bool:
         return False

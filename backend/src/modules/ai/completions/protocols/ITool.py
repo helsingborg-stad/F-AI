@@ -1,11 +1,13 @@
 from typing import Protocol
 
+from src.modules.ai.completions.models.ToolCallResult import ToolCallResult
+
 
 class ITool(Protocol):
     def get_tool_definition(self) -> dict:
         ...
 
-    async def call_tool(self, args: dict) -> str:
+    async def call_tool(self, args: dict) -> ToolCallResult:
         ...
 
     def get_should_feedback_into_llm(self) -> bool:
