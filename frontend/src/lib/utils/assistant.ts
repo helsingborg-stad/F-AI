@@ -1,27 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import type { IAssistantModels, IBackendAssistant, IFavAssistant } from '$lib/types.js'
-import {
-  type ApiResult,
-  BackendApiService,
-  BackendApiServiceFactory,
-} from '$lib/backendApi/backendApi.js'
-
-async function handleApiCall<T>(
-  event: RequestEvent,
-  apiMethod: (api: BackendApiService) => Promise<ApiResult<T>>,
-  errorMessage: string,
-  defaultValue: T,
-): Promise<T> {
-  const api = new BackendApiServiceFactory().get(event)
-  const [error, result] = await apiMethod(api)
-
-  if (error) {
-    console.error(errorMessage, error)
-    return defaultValue
-  }
-
-  return result || defaultValue
-}
+import { handleApiCall } from '$lib/utils/handle-api-calls.js'
 
 export async function fetchAllAssistants(
   event: RequestEvent,
