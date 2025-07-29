@@ -99,7 +99,7 @@ export const load: PageServerLoad = async (event) => {
 
     if (canReadCollections && assistantData.collection_id) {
       try {
-        const collections = (await getCollections(event)).collections
+        const collections: ICollection[] = await getCollections(event)
         activeAssistant.collection = collections.find(
           (c: ICollection) => c.id === assistantData.collection_id,
         )
