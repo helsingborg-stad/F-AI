@@ -1,5 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { api } from '$lib/api-fetch-factory.js'
+import { handleApiCall } from '$lib/utils/handle-api-calls.js'
+import type { ICollection } from '$lib/types.js'
 
 export async function createCollection(
   event: RequestEvent,
@@ -14,14 +16,15 @@ export async function createCollection(
   throw new Response('Failed to create collection', { status: response.status })
 }
 
-export async function getCollections(event: RequestEvent) {
-  const response = await api.get('/api/collection', { event })
-
-  if (response.ok) {
-    return await response.json()
-  }
-
-  throw new Response('Failed to fetch collections', { status: response.status })
+export async function getCollections(
+  event: RequestEvent
+): Promise<ICollection[]> {
+  return handleApiCall(
+    event,
+    (api) => api.getCollections(),
+    'Failed to get collections',
+    [],
+  )
 }
 
 export async function replaceContextCollection(
@@ -29,22 +32,13 @@ export async function replaceContextCollection(
   collectionId: string,
   files: File[],
 ) {
-  const formData = new FormData()
-
-  for (const file of files) {
-    formData.append('files', file)
-  }
-
-  formData.append('urls', '')
-
-  const response = await api.put(`/api/collection/${collectionId}/content`, {
+  return handleApiCall(
     event,
-    body: formData,
-  })
-
-  if (response.ok) {
-    return await response.json()
-  }
-
-  throw new Response('Failed to replace context collection', { status: response.status })
+    (api) => api.updateCollection(
+      collectionId,
+      files
+    ),
+    'Failed to replace context collection',
+    undefined,
+  )
 }

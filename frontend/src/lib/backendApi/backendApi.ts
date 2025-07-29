@@ -1,7 +1,13 @@
 import { env } from '$env/dynamic/private'
 import { type Cookies, redirect, type RequestEvent } from '@sveltejs/kit'
 import dayjs from 'dayjs'
-import type { IAssistantModels, IBackendApiSettings, IBackendAssistant, IFavAssistant } from '$lib/types.js'
+import type {
+  IAssistantModels,
+  IBackendApiSettings,
+  IBackendAssistant,
+  ICollection,
+  IFavAssistant,
+} from '$lib/types.js'
 
 export interface CallOptions {
   body?: string | FormData
@@ -328,12 +334,36 @@ export class BackendApiService {
   }
 
   /** Settings */
-  
+
   async getSettings(): Promise<ApiResult<IBackendApiSettings>> {
     const [error, { settings }] = await this.get<{ settings: IBackendApiSettings }>(
       '/api/settings',
     )
     return [error, { settings }] as ApiResult<IBackendApiSettings>
+  }
+
+  /** Collections */
+
+  async getCollections(): Promise<ApiResult<ICollection[]>> {
+    const [error, { collections }] = await this.get<{ collections: string[] }>(
+      '/api/collection',
+    )
+    return [error, collections] as ApiResult<ICollection[]>
+  }
+
+  async updateCollection(
+    collectionId: string,
+    files: File[],
+  ): Promise<ApiResult<never>> {
+    const formData = new FormData()
+    files.forEach((file) => formData.append('files', file))
+    formData.append('urls', '')
+
+    const [error] = await this.put(`/api/collection/${collectionId}`, {
+      body: formData,
+    })
+
+    return [error, undefined] as ApiResult<never>
   }
 }
 
