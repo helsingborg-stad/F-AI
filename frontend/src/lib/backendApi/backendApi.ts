@@ -1,6 +1,7 @@
 import { env } from '$env/dynamic/private'
 import { type Cookies, redirect, type RequestEvent } from '@sveltejs/kit'
 import dayjs from 'dayjs'
+import type { IAssistantModels, IBackendAssistant } from '$lib/types.js'
 
 export interface CallOptions {
   body?: string
@@ -213,6 +214,67 @@ export class BackendApiService {
     const [error] = await this.post('/api/login/logout')
     return [error, undefined] as ApiResult<never>
   }
+
+  /** Assistant */
+
+  async getAssistants(): Promise<ApiResult<IBackendAssistant[]>> {
+    const [error, { assistants }] = await this.get<{ assistants: string[] }>(
+      '/api/assistant',
+    )
+    return [error, assistants] as ApiResult<IBackendAssistant[]>
+  }
+
+  async getMyAssistants(): Promise<ApiResult<IBackendAssistant[]>> {
+    const [error, { assistants }] = await this.get<{ assistants: string[] }>(
+      '/api/assistant/me',
+    )
+    return [error, assistants] as ApiResult<IBackendAssistant[]>
+  }
+
+  async getAssistantModels(): Promise<ApiResult<IAssistantModels[]>> {
+    const [error, { models }] = await this.get<{ models: IAssistantModels[] }>(
+      '/api/assistant/models',
+    )
+    return [error, models] as ApiResult<IAssistantModels[]>
+  }
+
+  async getAssistant(assistantId: string): Promise<ApiResult<IBackendAssistant>> {
+    const [error, { assistant }] = await this.get<{ assistant: IBackendAssistant }>(
+      `/api/assistant/${assistantId}`,
+    )
+    return [error, assistant] as ApiResult<IBackendAssistant>
+  }
+
+  async createAssistant(): Promise<ApiResult<string>> {
+    const [error, { assistant_id }] = await this.post<{ assistant_id: string }>(
+      '/api/assistant',
+    )
+    return [error, assistant_id] as ApiResult<string>
+  }
+
+  async updateAssistant(
+    assistantId: string,
+    updates: {
+      name?: string
+      description?: string
+      model?: string
+      instructions?: string
+      model_key?: string
+      collection_id?: string | null
+      max_collection_results?: string
+    },
+  ): Promise<ApiResult<never>> {
+    const [error] = await this.put(`/api/assistant/${assistantId}`, {
+      body: JSON.stringify(updates),
+    })
+    return [error, undefined] as ApiResult<never>
+  }
+
+  async deleteAssistant(assistantId: string): Promise<ApiResult<never>> {
+    const [error] = await this.delete(`/api/assistant/${assistantId}`)
+    return [error, undefined] as ApiResult<never>
+  }
+
 }
 
 export class BackendApiServiceFactory {
