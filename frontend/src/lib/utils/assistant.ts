@@ -1,6 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import type { IAssistantModels, IBackendAssistant } from '$lib/types.js'
-import { api } from '$lib/api-fetch-factory.js'
+import type { IAssistantModels, IBackendAssistant, IFavAssistant } from '$lib/types.js'
 import {
   type ApiResult,
   BackendApiService,
@@ -123,54 +122,56 @@ export async function updateAssistantAvatar(
   assistantId: string,
   avatar: File,
   event: RequestEvent,
-) {
-  const formData = new FormData()
-  formData.append('file', avatar)
-
-  const response = await api.put(`/api/assistant/${assistantId}/avatar`, {
+): Promise<void> {
+  await handleApiCall(
     event,
-    body: formData,
-  })
-
-  if (!response.ok) {
-    throw new Response('Failed to update assistant avatar', { status: response.status })
-  }
+    (api) => api.updateAssistantAvatar(assistantId, avatar),
+    'Failed to update assistant avatar',
+    undefined,
+  )
 }
 
-export async function deleteAssistantAvatar(assistantId: string, event: RequestEvent) {
-  const response = await api.delete(`/api/assistant/${assistantId}/avatar`, {
+export async function deleteAssistantAvatar(
+  assistantId: string,
+  event: RequestEvent,
+): Promise<void> {
+  await handleApiCall(
     event,
-  })
-
-  if (!response.ok) {
-    throw new Response('Failed to delete assistant avatar', { status: response.status })
-  }
+    (api) => api.deleteAssistantAvatar(assistantId),
+    'Failed to delete assistant avatar',
+    undefined,
+  )
 }
 
-export async function addAssistantFav(assistantId: string, event: RequestEvent) {
-  const response = await api.post(`/api/assistant/me/favorite/${assistantId}`, { event })
-
-  if (!response.ok) {
-    throw new Response('Failed to favorite assistant', { status: response.status })
-  }
-}
-
-export async function deleteAssistantFav(assistantId: string, event: RequestEvent) {
-  const response = await api.delete(`/api/assistant/me/favorite/${assistantId}`, {
+export async function addFavoriteAssistant(
+  assistantId: string,
+  event: RequestEvent,
+): Promise<void> {
+  await handleApiCall(
     event,
-  })
-
-  if (!response.ok) {
-    throw new Response('Failed to favorite assistant', { status: response.status })
-  }
+    (api) => api.addFavoriteAssistant(assistantId),
+    'Failed to favorite assistant',
+    undefined,
+  )
 }
 
-export async function getAssistantFavs(event: RequestEvent) {
-  const response = await api.get('/api/assistant/me/favorite', { event })
+export async function deleteFavoriteAssistant(
+  assistantId: string,
+  event: RequestEvent,
+): Promise<void> {
+  await handleApiCall(
+    event,
+    (api) => api.deleteFavoriteAssistant(assistantId),
+    'Failed to unfavorite assistant',
+    undefined,
+  )
+}
 
-  if (!response.ok) {
-    throw new Response('Failed to fetch favorite assistants', { status: response.status })
-  }
-
-  return response
+export async function getFavoriteAssistants(event: RequestEvent): Promise<IFavAssistant[]> {
+  return await handleApiCall(
+    event,
+    (api) => api.getFavoriteAssistants(),
+    'Failed to fetch favorite assistants',
+    [],
+  )
 }

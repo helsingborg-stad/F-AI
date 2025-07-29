@@ -1,10 +1,10 @@
 import { env } from '$env/dynamic/private'
 import { type Cookies, redirect, type RequestEvent } from '@sveltejs/kit'
 import dayjs from 'dayjs'
-import type { IAssistantModels, IBackendAssistant } from '$lib/types.js'
+import type { IAssistantModels, IBackendAssistant, IFavAssistant } from '$lib/types.js'
 
 export interface CallOptions {
-  body?: string
+  body?: string | FormData
 }
 
 export type SetCookieDelegate = (
@@ -58,9 +58,10 @@ export class BackendApiService {
     })
   }
 
-  #makeHeaders(withContent: boolean): HeadersInit {
+  #makeHeaders(body?: string | FormData): HeadersInit {
     const headers = new Headers()
-    if (withContent) {
+
+    if (body !== undefined && !(body instanceof FormData)) {
       headers.append('Content-Type', 'application/json')
     }
 
@@ -86,8 +87,8 @@ export class BackendApiService {
 
     let response = await this.#fetchFunc(url, {
       method,
-      headers: this.#makeHeaders(opt?.body !== undefined),
-      body: opt?.body,
+      headers: this.#makeHeaders(opt?.body),
+      body: opt?.body instanceof FormData ? opt.body : opt?.body,
     })
 
     if (response.status === 401) {
@@ -96,7 +97,7 @@ export class BackendApiService {
         `${this.#baseUrl}/api/login/refresh`,
         {
           method: 'POST',
-          headers: this.#makeHeaders(false),
+          headers: this.#makeHeaders(),
         },
       )
 
@@ -107,8 +108,8 @@ export class BackendApiService {
         // retry the API call again, with refreshed credentials
         response = await this.#fetchFunc(url, {
           method,
-          headers: this.#makeHeaders(opt?.body !== undefined),
-          body: opt?.body,
+          headers: this.#makeHeaders(opt?.body),
+          body: opt?.body instanceof FormData ? opt.body : opt?.body,
         })
       }
     }
@@ -120,22 +121,40 @@ export class BackendApiService {
       }
 
       try {
-        const responseData = await response.json()
-
-        return [
-          responseData?.detail ?? response.statusText,
-          undefined,
-        ] as ApiResult<TResponseData>
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          const responseData = await response.json()
+          return [
+            responseData?.detail ?? response.statusText,
+            undefined,
+          ] as ApiResult<TResponseData>
+        } else {
+          return [response.statusText, undefined] as ApiResult<TResponseData>
+        }
       } catch {
-        // in case the response body is not legible JSON (for example 500 error)
         return [response.statusText, undefined] as ApiResult<TResponseData>
       }
     }
 
     this.#setCookiesFromResponse(response)
 
-    const data = await response.json()
-    return [null, data as TResponseData]
+    const contentType = response.headers.get('content-type')
+    if (
+      response.status === 204 ||
+      !contentType ||
+      !contentType.includes('application/json')
+    ) {
+      return [null, undefined as unknown as TResponseData]
+    }
+
+    try {
+      const data = await response.json()
+      return [null, data as TResponseData]
+    } catch (error) {
+      // If JSON parsing fails, return undefined as data
+      console.warn('Failed to parse JSON response', error)
+      return [null, undefined as unknown as TResponseData]
+    }
   }
 
   async get<TResponseData = never>(
@@ -275,6 +294,38 @@ export class BackendApiService {
     return [error, undefined] as ApiResult<never>
   }
 
+  async updateAssistantAvatar(
+    assistantId: string,
+    avatar: File,
+  ): Promise<ApiResult<never>> {
+    const formData = new FormData()
+    formData.append('file', avatar)
+
+    const [error] = await this.put(`/api/assistant/${assistantId}/avatar`, {
+      body: formData,
+    })
+    return [error, undefined] as ApiResult<never>
+  }
+
+  async deleteAssistantAvatar(assistantId: string): Promise<ApiResult<never>> {
+    const [error] = await this.delete(`/api/assistant/${assistantId}/avatar`)
+    return [error, undefined] as ApiResult<never>
+  }
+
+  async addFavoriteAssistant(assistantId: string): Promise<ApiResult<never>> {
+    const [error] = await this.post(`/api/assistant/me/favorite/${assistantId}`)
+    return [error, undefined] as ApiResult<never>
+  }
+
+  async deleteFavoriteAssistant(assistantId: string): Promise<ApiResult<never>> {
+    const [error] = await this.delete(`/api/assistant/me/favorite/${assistantId}`)
+    return [error, undefined] as ApiResult<never>
+  }
+
+  async getFavoriteAssistants(): Promise<ApiResult<IFavAssistant[]>> {
+    const [error, { assistants }] = await this.get('/api/assistant/me/favorite')
+    return [error, assistants] as ApiResult<IFavAssistant[]>
+  }
 }
 
 export class BackendApiServiceFactory {
