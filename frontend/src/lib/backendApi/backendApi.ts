@@ -84,6 +84,55 @@ export class BackendApiService {
     return headers
   }
 
+  /**
+   * Call API and return raw Response object (for SSE, streaming, etc.)
+   */
+  async callApiRaw(
+    method: string,
+    endpoint: string,
+    opt?: CallOptions,
+  ): Promise<Response> {
+    const url = `${this.#baseUrl}${endpoint}`
+
+    let response = await this.#fetchFunc(url, {
+      method,
+      headers: this.#makeHeaders(opt?.body),
+      body: opt?.body instanceof FormData ? opt.body : opt?.body,
+    })
+
+    if (response.status === 401) {
+      // access token could've expired, but refresh token might be valid - try refreshing
+      const refreshResponse = await this.#fetchFunc(
+        `${this.#baseUrl}/api/login/refresh`,
+        {
+          method: 'POST',
+          headers: this.#makeHeaders(),
+        },
+      )
+
+      if (refreshResponse.ok) {
+        // this should update the access token (and refresh token)
+        this.#setCookiesFromResponse(refreshResponse)
+
+        // retry the API call again, with refreshed credentials
+        response = await this.#fetchFunc(url, {
+          method,
+          headers: this.#makeHeaders(opt?.body),
+          body: opt?.body instanceof FormData ? opt.body : opt?.body,
+        })
+      }
+    }
+
+    if (response.status === 401) {
+      // User is still logged out and unable to re-log automatically - send back to login
+      redirect(303, '/login')
+    }
+
+    // For raw responses, we don't process cookies here since the response
+    // will be streamed directly to the client
+    return response
+  }
+
   async callApi<TResponseData = never>(
     method: string,
     endpoint: string,
@@ -170,6 +219,13 @@ export class BackendApiService {
     return this.callApi<TResponseData>('GET', endpoint, opt)
   }
 
+  async getRaw(
+    endpoint: string,
+    opt?: CallOptions,
+  ): Promise<Response> {
+    return this.callApiRaw('GET', endpoint, opt)
+  }
+
   async post<TResponseData = never>(
     endpoint: string,
     opt?: CallOptions,
@@ -200,8 +256,24 @@ export class BackendApiService {
 
   /***************************************************/
   /* high-level API function mappings                */
-
   /***************************************************/
+
+  /** SSE Chat */
+
+  async getChatSSE(params: {
+    messageId: string
+    conversationId?: string
+    assistantId?: string
+    features?: string
+  }): Promise<Response> {
+    const { messageId, conversationId, assistantId, features = '' } = params
+
+    const url = conversationId
+      ? `/api/chat/sse/${conversationId}?stored_message_id=${messageId}&features=${features}`
+      : `/api/chat/sse?assistant_id=${assistantId}&stored_message_id=${messageId}&features=${features}`
+
+    return this.getRaw(url)
+  }
 
   /** Auth */
 

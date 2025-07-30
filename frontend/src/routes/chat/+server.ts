@@ -29,6 +29,7 @@ export const GET: RequestHandler = async (event) => {
   const conversationId = event.url.searchParams.get('conversation')
   const assistantId = event.url.searchParams.get('assistant')
   const features = event.url.searchParams.get('features') ?? ''
+  const apiServiceFactory = new BackendApiServiceFactory()
 
   if (!messageId) {
     error(400, 'message parameter is required')
@@ -38,9 +39,12 @@ export const GET: RequestHandler = async (event) => {
     error(400, 'conversation or assistant parameter is required')
   }
 
-  const url = conversationId
-    ? `/api/chat/sse/${conversationId}?stored_message_id=${messageId}&features=${features}`
-    : `/api/chat/sse?assistant_id=${assistantId}&stored_message_id=${messageId}&features=${features}`
+  const apiService = apiServiceFactory.get(event)
 
-  return api.get(url, { withAuth: true, event })
+  return apiService.getChatSSE({
+    messageId,
+    conversationId: conversationId || undefined,
+    assistantId: assistantId || undefined,
+    features
+  })
 }

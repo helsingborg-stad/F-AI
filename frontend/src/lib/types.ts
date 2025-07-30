@@ -155,11 +155,19 @@ export interface ICollectionFiles {
 }
 
 export interface IConversation {
-    assistant_id: string
-    messages: {
-      timestamp: string
-      role: string
-      content: string
-      reasoning: string
-    }[]
+  assistant_id: string
+  messages: {
+    timestamp: string
+    role: string
+    content: string
+    reasoning: string
+  }[]
+}
+
+export interface IConversations {
+  conversations: {
+    id: string
+    timestamp: string
+    title: string
+  }[]
 }
