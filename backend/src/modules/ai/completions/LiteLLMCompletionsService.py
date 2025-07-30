@@ -72,6 +72,9 @@ class LiteLLMCompletionsService(ICompletionsService):
             messages = [
                 m.model_dump(include={'role', 'content', 'tool_calls', 'tool_call_id'}, exclude_none=True)
                 for m in messages
+
+                # system content has to be non-empty for some models like Claude
+                if m.role != 'system' or (m.content is not None and len(m.content) > 0)
             ]
 
             tools = self._tool_factory.get_tools(enabled_features=enabled_features)
@@ -82,9 +85,12 @@ class LiteLLMCompletionsService(ICompletionsService):
                 stream=True,
                 api_key=self._api_key,
                 reasoning_effort='medium' if reasoning_enabled else None,
-                tools=tools,
-                parallel_tool_calls=False,
-                tool_choice='required' if len(tools) > 0 else 'none',
+
+                **{
+                    'tools': tools,
+                    'parallel_tool_calls': False,
+                    'tool_choice': 'required'
+                } if len(tools) > 0 else {},
 
                 # workaround for a bug in tool_call_cost_tracking.py:_get_web_search_options(kwargs) when explicitly setting value to None
                 **{'web_search_options': web_search_options} if web_search_enabled else {},
