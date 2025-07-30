@@ -1,6 +1,7 @@
 from typing import Protocol
 
 from src.modules.conversations.models.Conversation import Conversation
+from src.modules.conversations.models.Message import Message
 
 
 class IConversationService(Protocol):
@@ -13,17 +14,10 @@ class IConversationService(Protocol):
     async def get_conversations(self, as_uid: str) -> list[Conversation]:
         ...
 
-    async def add_message_to_conversation(self, as_uid: str, conversation_id: str, timestamp: str, role: str,
-                                          message: str) -> bool:
+    async def add_message_to_conversation(self, as_uid: str, conversation_id: str, message: Message) -> bool:
         ...
 
-    async def add_to_conversation_last_message(
-            self, as_uid: str,
-            conversation_id: str,
-            timestamp: str,
-            role: str,
-            additional_message: str
-    ) -> bool:
+    async def replace_conversation_last_message(self, as_uid: str, conversation_id: str, message: Message) -> bool:
         ...
 
     async def set_conversation_title(self, as_uid: str, conversation_id: str, title: str) -> bool:

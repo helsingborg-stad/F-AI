@@ -25,6 +25,7 @@ export async function getAssistantPickerData(
       name: assistant.meta.name?.toString() ?? m.chat_assistant_picker_name_unknown(),
       allowSearch: Boolean(assistant.meta?.enable_search),
       allowReasoning: Boolean(assistant.meta?.enable_reasoning),
+      allowImageGeneration: Boolean(assistant.meta?.enable_image_generation),
     }))
 
     result = [
@@ -47,6 +48,7 @@ export async function getAssistantPickerData(
       name: assistant.meta.name?.toString() ?? m.chat_assistant_picker_name_unknown(),
       allowSearch: Boolean(assistant.meta?.enable_search),
       allowReasoning: Boolean(assistant.meta?.enable_reasoning),
+      allowImageGeneration: Boolean(assistant.meta?.enable_image_generation),
     }))
 
   if (vanillaItems.length > 0) {
@@ -66,6 +68,7 @@ export async function getAssistantPickerData(
     name: assistant.meta.name?.toString() ?? m.chat_assistant_picker_name_unknown(),
     allowSearch: Boolean(assistant.meta?.enable_search),
     allowReasoning: Boolean(assistant.meta?.enable_reasoning),
+    allowImageGeneration: Boolean(assistant.meta?.enable_image_generation),
   }))
 
   if (moreItems.length > 0) {

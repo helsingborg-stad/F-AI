@@ -17,6 +17,7 @@
     maxCollectionResult: string
     enableSearch: boolean
     enableReasoning: boolean
+    enableImageGeneration: boolean
   }
 
   let {
@@ -27,6 +28,7 @@
     maxCollectionResult,
     enableSearch,
     enableReasoning,
+    enableImageGeneration,
   }: Props = $props()
   let fileModal: FileUploadModal
   let currentCollectionId = $state(collectionId)
@@ -39,26 +41,25 @@
   let attachingFiles = $state(false)
   let enableSearchValue = $state(enableSearch)
   let enableReasoningValue = $state(enableReasoning)
+  let enableImageGenerationValue = $state(enableImageGeneration)
 </script>
 
-<input
-  type="hidden"
-  name="enable_search"
-  bind:value={enableSearchValue}
->
+<input type="hidden" name="enable_search" bind:value={enableSearchValue} />
+
+<input type="hidden" name="enable_reasoning" bind:value={enableReasoningValue} />
 
 <input
   type="hidden"
-  name="enable_reasoning"
-  bind:value={enableReasoningValue}
->
+  name="enable_image_generation"
+  bind:value={enableImageGenerationValue}
+/>
 
 <Section title={m.assistant_edit_tools_section_title()}>
   <div class="flex flex-row place-content-between items-center">
     <div class="flex items-center gap-2">
       {#if collectionId}
         <button type="button" class="btn btn-xs" disabled={!canEdit}>
-          <Icon icon={icons["database"]} width={16} height={16} />
+          <Icon icon={icons['database']} width={16} height={16} />
         </button>
       {/if}
       {#if attachingFiles}
@@ -70,8 +71,13 @@
     </div>
     <div>
       <FilesSettings maxCollection={maxCollectionResult} />
-      <button type="button" class="btn btn-sm" disabled={!canEdit} onclick={openFilesModal}>
-        <Icon icon={icons["plus"]} width={16} height={16} />
+      <button
+        type="button"
+        class="btn btn-sm"
+        disabled={!canEdit}
+        onclick={openFilesModal}
+      >
+        <Icon icon={icons['plus']} width={16} height={16} />
         <span class="text-s">Files</span>
       </button>
     </div>
@@ -80,11 +86,11 @@
     <div class="overflow-x-auto">
       <table class="table table-xs">
         <tbody>
-        {#each currentFiles as file}
-          <tr>
-            <td>{file.name}</td>
-          </tr>
-        {/each}
+          {#each currentFiles as file}
+            <tr>
+              <td>{file.name}</td>
+            </tr>
+          {/each}
         </tbody>
       </table>
     </div>
@@ -93,13 +99,14 @@
   <div class="flex flex-row place-content-between items-center">
     <div>
       <InfoTooltip
-        toolTip="Function calling lets you describe custom functions of your app or external APIs to the assistant.">
-        <div class="text-sm font-medium select-none">Functions</div>
+        toolTip="Function calling lets you describe custom functions of your app or external APIs to the assistant."
+      >
+        <div class="select-none text-sm font-medium">Functions</div>
       </InfoTooltip>
     </div>
     <div>
       <button type="button" class="btn btn-sm" disabled={!canEdit}>
-        <Icon icon={icons["plus"]} width={16} height={16} />
+        <Icon icon={icons['plus']} width={16} height={16} />
         <span class="text-s">Functions</span>
       </button>
     </div>
@@ -107,19 +114,38 @@
   <HorizontalDivider />
   <div class="flex flex-row place-content-between items-center">
     <div class="items-start">
-      <InfoTooltip
-        toolTip={m.assistant_edit_tools_capabilities_tooltip()}>
-        <div class="text-sm font-medium select-none">{m.assistant_edit_tools_capabilities()}</div>
+      <InfoTooltip toolTip={m.assistant_edit_tools_capabilities_tooltip()}>
+        <div class="select-none text-sm font-medium">
+          {m.assistant_edit_tools_capabilities()}
+        </div>
       </InfoTooltip>
     </div>
     <div class="form-control">
       <label class="label cursor-pointer">
-        <span class="label-text me-2">{m.assistant_edit_tools_capabilities_web_search()}</span>
-        <input type="checkbox" class="toggle toggle-sm" bind:checked={enableSearchValue} />
+        <span class="label-text me-2"
+          >{m.assistant_edit_tools_capabilities_web_search()}</span
+        >
+        <input
+          type="checkbox"
+          class="toggle toggle-sm"
+          bind:checked={enableSearchValue}
+        />
       </label>
       <label class="label cursor-pointer">
         <span class="label-text me-2">Reasoning</span>
-        <input type="checkbox" class="toggle toggle-sm" bind:checked={enableReasoningValue} />
+        <input
+          type="checkbox"
+          class="toggle toggle-sm"
+          bind:checked={enableReasoningValue}
+        />
+      </label>
+      <label class="label cursor-pointer">
+        <span class="label-text me-2">Image Generation</span>
+        <input
+          type="checkbox"
+          class="toggle toggle-sm"
+          bind:checked={enableImageGenerationValue}
+        />
       </label>
     </div>
   </div>
@@ -127,7 +153,8 @@
 </Section>
 
 <FileUploadModal
-  bind:this={fileModal} {assistantId}
+  bind:this={fileModal}
+  {assistantId}
   bind:uploadingFiles={attachingFiles}
   bind:collectionId={currentCollectionId}
   bind:files={currentFiles}

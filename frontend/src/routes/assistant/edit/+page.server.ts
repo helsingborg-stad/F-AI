@@ -33,6 +33,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
   const maxCollectionResults = formData.get('max_collection_results') as string
   const enableSearch = formData.get('enable_search') === 'true'
   const enableReasoning = formData.get('enable_reasoning') === 'true'
+  const enableImageGeneration = formData.get('enable_image_generation') === 'true'
 
   return {
     id: id,
@@ -46,6 +47,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
       sample_questions: [],
       enable_search: enableSearch,
       enable_reasoning: enableReasoning,
+      enable_image_generation: enableImageGeneration,
     },
     model: model,
     collection_id: collectionId === '' ? null : collectionId,
@@ -78,6 +80,7 @@ export const load: PageServerLoad = async (event) => {
       primaryColor: assistant.meta?.primary_color?.toString() ?? '#ffffff',
       enableSearch: assistant.meta?.enable_search === true,
       enableReasoning: assistant.meta?.enable_reasoning === true,
+      enableImageGeneration: assistant.meta?.enable_image_generation === true,
     }))
   }
 
@@ -95,6 +98,7 @@ export const load: PageServerLoad = async (event) => {
       primaryColor: assistantData.meta?.primary_color?.toString() ?? '#ffffff',
       enableSearch: assistantData.meta?.enable_search === true,
       enableReasoning: assistantData.meta?.enable_reasoning === true,
+      enableImageGeneration: assistantData.meta?.enable_image_generation === true,
     }
 
     if (canReadCollections && assistantData.collection_id) {

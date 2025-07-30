@@ -5,7 +5,7 @@ from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
 from src.modules.auth.authentication.models.AuthenticatedIdentity import AuthenticatedIdentity
 from src.modules.chat.event_source_llm_generator import event_source_llm_generator
-from src.modules.llm.models.Feature import features_from_string
+from src.modules.ai.completions.models.Feature import features_from_string
 
 chat_router = APIRouter(
     prefix='/chat',

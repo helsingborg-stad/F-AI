@@ -8,6 +8,7 @@ export function createAssistantMenu(data: {
     name: string
     allowSearch?: boolean
     allowReasoning?: boolean
+    allowImageGeneration?: boolean
     hidden?: boolean
   }[]
 }): IAssistantMenu {
@@ -18,6 +19,7 @@ export function createAssistantMenu(data: {
       ...item,
       allowSearch: item.allowSearch ?? false,
       allowReasoning: item.allowReasoning ?? false,
+      allowImageGeneration: item.allowImageGeneration ?? false,
     })),
   }
 }

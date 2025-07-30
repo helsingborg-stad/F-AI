@@ -22,8 +22,7 @@
     canCreate = false,
     canEdit = false,
     loading = false,
-    onReady = () => {
-    },
+    onReady = () => {},
   }: Props = $props()
 
   let formAction = $state('update')
@@ -121,28 +120,16 @@
     <span class="loading loading-spinner loading-lg text-primary"></span>
   </div>
 {:else if assistant && Object.keys(assistant).length > 0}
-  <div class="h-full px-1 relative" bind:this={containerRef}>
+  <div class="relative h-full px-1" bind:this={containerRef}>
     <form
       method="POST"
       action="?/{formAction}"
       enctype="multipart/form-data"
       class="space-y-4 pb-8"
     >
-      <input
-        type="hidden"
-        name="assistant_id"
-        value={assistant.id}
-      />
-      <input
-        type="hidden"
-        name="model_key"
-        bind:value={selectedModelKey}
-      >
-      <input
-        type="hidden"
-        name="collection_id"
-        value={collectionId}
-      >
+      <input type="hidden" name="assistant_id" value={assistant.id} />
+      <input type="hidden" name="model_key" bind:value={selectedModelKey} />
+      <input type="hidden" name="collection_id" value={collectionId} />
 
       <AvatarSection
         avatarBase64={assistant.avatarBase64}
@@ -158,7 +145,7 @@
           type="text"
           name="name"
           placeholder={m.assistant_edit_name_placeholder()}
-          class="input input-bordered input-sm w-full"
+          class="input input-sm input-bordered w-full"
           required
           bind:value={assistantName}
           readonly={!canEdit}
@@ -175,8 +162,8 @@
           name="description"
           class="textarea textarea-bordered h-24"
           placeholder={m.assistant_edit_description_placeholder()}
-          readonly={!canEdit}
-        >{assistant.description}</textarea>
+          readonly={!canEdit}>{assistant.description}</textarea
+        >
       </label>
 
       <label class="form-control">
@@ -187,8 +174,8 @@
           name="instructions"
           class="textarea textarea-bordered h-24"
           placeholder={m.assistant_edit_system_instruction_placeholder()}
-          readonly={!canEdit}
-        >{assistant.instructions}</textarea>
+          readonly={!canEdit}>{assistant.instructions}</textarea
+        >
       </label>
 
       <label class="form-control w-full">
@@ -202,9 +189,13 @@
           required
           disabled={!canEdit}
         >
-          <option value="" disabled selected>{m.assistant_edit_model_select_placeholder()}</option>
+          <option value="" disabled selected
+            >{m.assistant_edit_model_select_placeholder()}</option
+          >
           {#each models as model}
-            <option value={model.key} selected={assistant.model === model.key}>{model.name}</option>
+            <option value={model.key} selected={assistant.model === model.key}
+              >{model.name}</option
+            >
           {/each}
         </select>
       </label>
@@ -214,11 +205,12 @@
         <ToolsSection
           {canEdit}
           assistantId={assistant.id}
-          collectionId={collectionId}
+          {collectionId}
           collection={assistant.collection}
           maxCollectionResult={assistant.maxCollectionResults}
           enableSearch={assistant.enableSearch}
           enableReasoning={assistant.enableReasoning}
+          enableImageGeneration={assistant.enableImageGeneration}
         />
         <ModelConfigSection {canEdit} />
       </div>
@@ -227,8 +219,12 @@
 
       <div bind:this={buttonsWrapper} class="relative">
         <div
-          class="transition-all duration-200 {shouldStick ? 'fixed bottom-0 z-50 bg-base-100 border-t  px-2 py-3 mb-2 rounded-md' : ''}"
-          style="{shouldStick ? `left: ${containerBounds.left}px; width: ${containerBounds.width}px;` : ''}"
+          class="transition-all duration-200 {shouldStick
+            ? 'fixed bottom-0 z-50 mb-2 rounded-md  border-t bg-base-100 px-2 py-3'
+            : ''}"
+          style={shouldStick
+            ? `left: ${containerBounds.left}px; width: ${containerBounds.width}px;`
+            : ''}
         >
           <ActionButtons
             {canEdit}

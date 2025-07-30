@@ -8,6 +8,9 @@ class Feature(Enum):
 
     WEB_SEARCH = auto()
     REASONING = auto()
+    IMAGE_GEN = auto()
+    # VISION = auto()
+    # IMG2IMG = auto()
 
 
 def features_from_string(in_str: str) -> list[Feature]:

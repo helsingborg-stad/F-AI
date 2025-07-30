@@ -75,7 +75,7 @@ async def get_conversation(conversation_id: str, services: ServicesDependency, a
         messages=[GetConversationResponseConversationMessage(
             timestamp=message.timestamp,
             role=message.role,
-            content=message.content
+            content=message.content if message.content else ''
         ) for message in result.messages]
     ))
 

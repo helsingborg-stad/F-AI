@@ -1,9 +1,8 @@
 <script lang="ts">
   import dayjs from 'dayjs'
-  import MarkdownIt from 'markdown-it'
-  import DOMPurify from 'isomorphic-dompurify'
   import { icons } from '$lib/components/Icon/icons.js'
   import Icon from '$lib/components/Icon/Icon.svelte'
+  import Markdown from '$lib/components/Markdown/Markdown.svelte'
 
   interface Props {
     sender?: string
@@ -13,22 +12,7 @@
     showLoader: boolean
   }
 
-  const {
-    sender,
-    details = '',
-    text = '',
-    time = '',
-    showLoader,
-  }: Props = $props()
-
-  const md = new MarkdownIt({
-    html: false,        // Disable HTML tags in source
-    breaks: true,       // Convert '\n' in paragraphs into <br>
-    linkify: true,      // Autoconvert URL-like text to links
-    typographer: true,  // Enable smartquotes and other typographic replacements
-  })
-
-  const renderedMarkdown = $derived(DOMPurify.sanitize(md.render(text)))
+  const { sender, details = '', text = '', time = '', showLoader }: Props = $props()
 
   const layoutJustifyCenter = 'flex w-full justify-center'
   const layoutMaxWidth = 'flex w-full px-2 md:w-[50rem]'
@@ -57,30 +41,33 @@
 
 {#if sender === 'user'}
   <div class="{layoutJustifyCenter} py-1">
-    <div class="{innerContentClasses}">
-      <time class="text-xs opacity-50 mr-1" datetime={time}>{parsedTime}</time>
+    <div class={innerContentClasses}>
+      <time class="mr-1 text-xs opacity-50" datetime={time}>{parsedTime}</time>
     </div>
   </div>
 {/if}
 
-<div class="{layoutJustifyCenter}">
-  <div class="{innerContentClasses}">
-    <div class="{containerClasses}">
+<div class={layoutJustifyCenter}>
+  <div class={innerContentClasses}>
+    <div class={containerClasses}>
       <div class="prose prose-sm max-w-none">
         {#if details}
-          <details class="group w-full mb-2">
-            <summary class="cursor-pointer list-none bg-gray-100 hover:bg-gray-200 p-2 rounded-t">
-              <span class="group-open:rotate-90 inline-block transition-transform">▶</span>
+          <details class="group mb-2 w-full">
+            <summary
+              class="cursor-pointer list-none rounded-t bg-gray-100 p-2 hover:bg-gray-200"
+            >
+              <span class="inline-block transition-transform group-open:rotate-90"
+                >▶</span
+              >
               <span class="ml-2">Show reasoning</span>
             </summary>
-            <div class="p-2 border rounded-b">
+            <div class="rounded-b border p-2">
               <span>{details}</span>
             </div>
           </details>
         {/if}
 
-        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-        {@html renderedMarkdown}
+        <Markdown source={text} />
         {#if showLoader}
           <Icon icon={icons.loading} />
         {/if}

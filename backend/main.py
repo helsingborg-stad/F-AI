@@ -11,7 +11,7 @@ from src.api.chat import chat_router
 from src.api.conversation import conversation_router
 from src.api.document_chunker import document_chunker_router
 from src.api.group import group_router
-from src.api.llm import llm_router
+from src.api.ai import ai_router
 from src.api.collection import collection_router
 from src.api.login import login_router
 from src.api.settings import settings_router
@@ -48,7 +48,7 @@ def create_app():
     api_router.include_router(conversation_router)
     api_router.include_router(document_chunker_router)
     api_router.include_router(group_router)
-    api_router.include_router(llm_router)
+    api_router.include_router(ai_router)
     api_router.include_router(login_router)
     api_router.include_router(settings_router)
 

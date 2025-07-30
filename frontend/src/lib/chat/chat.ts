@@ -17,7 +17,12 @@ export interface ChatMachine {
   conversationId: Readable<string | null>
   lastMessage: Readable<ChatMessage>
   lastError: Readable<string | null>
-  sendMessage: (message: string, assistantId: string | null, conversationId: string | null, extraOptions?: SendMessageOptions) => Promise<void>
+  sendMessage: (
+    message: string,
+    assistantId: string | null,
+    conversationId: string | null,
+    extraOptions?: SendMessageOptions,
+  ) => Promise<void>
   stop: () => void
 }
 
@@ -26,7 +31,11 @@ export function useChatMachine(): ChatMachine {
 
   const state: Writable<ChatMachineState> = writable('idle')
   const lastConversationId: Writable<string | null> = writable(null)
-  const lastMessage: Writable<ChatMessage> = writable({ source: '', message: '', reasoning: '' })
+  const lastMessage: Writable<ChatMessage> = writable({
+    source: '',
+    message: '',
+    reasoning: '',
+  })
   const lastError: Writable<string | null> = writable(null)
   let cancelAnyInProgressCalls: boolean = false
 
@@ -45,7 +54,12 @@ export function useChatMachine(): ChatMachine {
     lastMessage,
     lastError,
 
-    async sendMessage(message: string, assistantId: string | null, conversationId: string | null, extraOptions?: SendMessageOptions) {
+    async sendMessage(
+      message: string,
+      assistantId: string | null,
+      conversationId: string | null,
+      extraOptions?: SendMessageOptions,
+    ) {
       if (es) {
         return
       }
@@ -64,7 +78,9 @@ export function useChatMachine(): ChatMachine {
 
       if (!storeMessageResponse.ok) {
         console.error('Error storing message', storeMessageResponse)
-        lastError.set(`Error storing message (${storeMessageResponse.status}). Try again or contact support.`)
+        lastError.set(
+          `Error storing message (${storeMessageResponse.status}). Try again or contact support.`,
+        )
       }
 
       const { messageId } = await storeMessageResponse.json()
@@ -92,7 +108,8 @@ export function useChatMachine(): ChatMachine {
 
       es.addEventListener('chat.conversation_id', (e) => {
         console.log('chat conversation_id', e)
-        lastConversationId.set(e.data)
+        const { conversation_id } = JSON.parse(e.data)
+        lastConversationId.set(conversation_id)
         state.set('responding')
       })
 
@@ -107,7 +124,11 @@ export function useChatMachine(): ChatMachine {
         }
 
         console.log('es message', e, accumulatedResponseMessage)
-        lastMessage.set({ source, message: accumulatedResponseMessage, reasoning: accumulatedReasoning })
+        lastMessage.set({
+          source,
+          message: accumulatedResponseMessage,
+          reasoning: accumulatedReasoning,
+        })
         state.set('responding')
       })
 
