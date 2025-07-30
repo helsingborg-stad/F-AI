@@ -3,8 +3,8 @@ import { browser } from '$app/environment'
 
 // Initialize state from localStorage if available, otherwise use default
 const initialState: IUserInfo = browser
-  ? JSON.parse(localStorage.getItem('userState') || '{"email":"","scopes":[]}')
-  : { email: '', scopes: [] }
+  ? JSON.parse(localStorage.getItem('userState') || '{"email":""}')
+  : { email: '' }
 
 export const userState = $state<IUserInfo>(initialState)
 
@@ -20,15 +20,10 @@ export function setUser(userData: IUserInfo) {
     userState.email = userData.email
   }
 
-  if ('scopes' in userData) {
-    userState.scopes = userData.scopes
-  }
-
   persistState()
 }
 
 export function clearUser() {
   userState.email = ''
-  userState.scopes = []
   persistState()
 }

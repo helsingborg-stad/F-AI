@@ -4,7 +4,7 @@ import type { RequestEvent } from '@sveltejs/kit'
 import { userCanChat, userCanReadAssistants, userCanReadSettings } from '$lib/utils/scopes.js'
 
 export async function load(event: RequestEvent) {
-  const user = event.locals.user || { scopes: [], email: '' }
+  const user = event.locals.user || { email: '' }
   setUser(user)
 
   const navbarMenu = []
@@ -22,7 +22,7 @@ export async function load(event: RequestEvent) {
   }
 
   return {
-    user: event.locals.user || { scopes: [], email: '' },
+    user: event.locals.user || { email: '' },
     avatarMenu: [
       {
         title: m.nav_avatar_menu_logout(),
