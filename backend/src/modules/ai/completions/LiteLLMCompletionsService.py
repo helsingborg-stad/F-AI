@@ -81,9 +81,10 @@ class LiteLLMCompletionsService(ICompletionsService):
                 messages=messages,
                 stream=True,
                 api_key=self._api_key,
-                reasoning_effort="medium" if reasoning_enabled else None,
+                reasoning_effort='medium' if reasoning_enabled else None,
                 tools=tools,
                 parallel_tool_calls=False,
+                tool_choice='required' if len(tools) > 0 else 'none',
 
                 # workaround for a bug in tool_call_cost_tracking.py:_get_web_search_options(kwargs) when explicitly setting value to None
                 **{'web_search_options': web_search_options} if web_search_enabled else {},
