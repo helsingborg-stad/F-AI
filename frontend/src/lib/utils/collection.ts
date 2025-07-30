@@ -1,19 +1,18 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import { api } from '$lib/api-fetch-factory.js'
 import { handleApiCall } from '$lib/utils/handle-api-calls.js'
 import type { ICollection } from '$lib/types.js'
 
 export async function createCollection(
   event: RequestEvent,
-  body: { label: string; embedding_model: string },
+  label: string,
+  embeddingModel: string,
 ) {
-  const response = await api.post('/api/collection', { event, body })
-
-  if (response.ok) {
-    return await response.json()
-  }
-
-  throw new Response('Failed to create collection', { status: response.status })
+  return handleApiCall(
+    event,
+    (api) => api.createCollection(label, embeddingModel),
+    'Failed to create collection',
+    '',
+  )
 }
 
 export async function getCollections(

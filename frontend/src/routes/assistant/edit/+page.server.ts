@@ -17,7 +17,11 @@ import {
   getCollections,
   replaceContextCollection,
 } from '$lib/utils/collection.js'
-import { userCanReadAssistants, userCanReadCollections, userCanWriteAssistant } from '$lib/utils/scopes.js'
+import {
+  userCanReadAssistants,
+  userCanReadCollections,
+  userCanWriteAssistant,
+} from '$lib/utils/scopes.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
   const id = formData.get('assistant_id') as string
@@ -57,7 +61,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
 
 export const load: PageServerLoad = async (event) => {
   const canListAssistants = await userCanReadAssistants(event)
-  const canCreateAssistant =  await userCanWriteAssistant(event)
+  const canCreateAssistant = await userCanWriteAssistant(event)
   const canEditAssistant = await userCanWriteAssistant(event)
   const canReadCollections = await userCanReadCollections(event)
   const activeAssistantID = event.url.searchParams.get('assistant_id') || ''
@@ -200,13 +204,7 @@ export const actions = {
     let collectionId = ''
 
     try {
-      const body = {
-        label: label,
-        embedding_model: embeddingModel,
-      }
-
-      const collectionResponse = await createCollection(event, body)
-      collectionId = collectionResponse.collection_id
+      collectionId = await createCollection(event, label, embeddingModel)
     } catch (error) {
       return handleApiError(error)
     }

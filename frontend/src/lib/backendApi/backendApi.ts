@@ -5,7 +5,9 @@ import type {
   IAssistantModels,
   IBackendApiSettings,
   IBackendAssistant,
-  ICollection, IConversation, IConversations,
+  ICollection,
+  IConversation,
+  IConversations,
   IFavAssistant,
 } from '$lib/types.js'
 
@@ -219,10 +221,7 @@ export class BackendApiService {
     return this.callApi<TResponseData>('GET', endpoint, opt)
   }
 
-  async getRaw(
-    endpoint: string,
-    opt?: CallOptions,
-  ): Promise<Response> {
+  async getRaw(endpoint: string, opt?: CallOptions): Promise<Response> {
     return this.callApiRaw('GET', endpoint, opt)
   }
 
@@ -274,6 +273,17 @@ export class BackendApiService {
 
     return this.getRaw(url)
   }
+
+    async storeChatSSE(message: string): Promise<ApiResult<string>> {
+    const [error, { stored_message_id }] = await this.post<{ stored_message_id: string }>(
+      '/api/chat/store',
+      {
+        body: JSON.stringify({ message }),
+      },
+    )
+    return [error, stored_message_id] as ApiResult<string>
+  }
+
 
   /** Auth */
 
@@ -414,9 +424,7 @@ export class BackendApiService {
     return [error, { settings }] as ApiResult<IBackendApiSettings>
   }
 
-  async updateSettings(
-    settings: IBackendApiSettings
-  ) : Promise<ApiResult<never>> {
+  async updateSettings(settings: IBackendApiSettings): Promise<ApiResult<never>> {
     const [error] = await this.patch('/api/settings', {
       body: JSON.stringify(settings),
     })
@@ -425,6 +433,16 @@ export class BackendApiService {
 
   /** Collections */
 
+  async createCollection(
+    label: string,
+    embeddingModel: string,
+  ): Promise<ApiResult<string>> {
+    const [error, { collection_id }] = await this.post('/api/collection', {
+      body: JSON.stringify({ label, embedding_model: embeddingModel }),
+    })
+    return [error, collection_id] as ApiResult<string>
+  }
+
   async getCollections(): Promise<ApiResult<ICollection[]>> {
     const [error, { collections }] = await this.get<{ collections: string[] }>(
       '/api/collection',
@@ -432,15 +450,12 @@ export class BackendApiService {
     return [error, collections] as ApiResult<ICollection[]>
   }
 
-  async updateCollection(
-    collectionId: string,
-    files: File[],
-  ): Promise<ApiResult<never>> {
+  async updateCollection(collectionId: string, files: File[]): Promise<ApiResult<never>> {
     const formData = new FormData()
     files.forEach((file) => formData.append('files', file))
     formData.append('urls', '')
 
-    const [error] = await this.put(`/api/collection/${collectionId}`, {
+    const [error] = await this.put(`/api/collection/${collectionId}/content`, {
       body: formData,
     })
 
@@ -456,25 +471,21 @@ export class BackendApiService {
     return [error, conversations] as ApiResult<IConversations>
   }
 
-  async getConversation(
-    conversationId: string,
-  ): Promise<ApiResult<IConversation>> {
+  async getConversation(conversationId: string): Promise<ApiResult<IConversation>> {
     const [error, { conversation }] = await this.get<{ conversation: IConversation }>(
       `/api/conversation/${conversationId}`,
     )
     return [error, conversation] as ApiResult<IConversation>
   }
 
-  async deleteConversation(
-    conversationId: string,
-  ): Promise<ApiResult<never>> {
+  async deleteConversation(conversationId: string): Promise<ApiResult<never>> {
     const [error] = await this.delete(`/api/conversation/${conversationId}`)
     return [error, undefined] as ApiResult<never>
   }
 
   updateConversationTitle(
     conversationId: string,
-    title: string
+    title: string,
   ): Promise<ApiResult<never>> {
     return this.patch(`/api/conversation/${conversationId}/title`, {
       body: JSON.stringify({ title }),

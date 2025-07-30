@@ -1,26 +1,20 @@
 import { error, json } from '@sveltejs/kit'
-import { api } from '$lib/api-fetch-factory.js'
 import type { RequestHandler } from './$types.js'
 import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
 
 /** Store Message handler */
 export const POST: RequestHandler = async (event) => {
   const { message }: { message: string } = await event.request.json()
+  const apiServiceFactory = new BackendApiServiceFactory()
+  const apiService = apiServiceFactory.get(event)
 
-  const response = await api.post('/api/chat/store',
-    {
-      body: { message },
-      event,
-    },
-  )
+  const [err, messageId] = await apiService.storeChatSSE(message)
 
-  if (!response.ok) {
-    error(response.status, await response.text())
+  if (err) {
+    error(500, err)
   }
 
-  const { stored_message_id } = await response.json()
-
-  return json({ messageId: stored_message_id })
+  return json({ messageId })
 }
 
 /** SSE chat handler */
