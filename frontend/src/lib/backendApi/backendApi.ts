@@ -414,6 +414,15 @@ export class BackendApiService {
     return [error, { settings }] as ApiResult<IBackendApiSettings>
   }
 
+  async updateSettings(
+    settings: IBackendApiSettings
+  ) : Promise<ApiResult<never>> {
+    const [error] = await this.patch('/api/settings', {
+      body: JSON.stringify(settings),
+    })
+    return [error, undefined] as ApiResult<never>
+  }
+
   /** Collections */
 
   async getCollections(): Promise<ApiResult<ICollection[]>> {
@@ -461,6 +470,15 @@ export class BackendApiService {
   ): Promise<ApiResult<never>> {
     const [error] = await this.delete(`/api/conversation/${conversationId}`)
     return [error, undefined] as ApiResult<never>
+  }
+
+  updateConversationTitle(
+    conversationId: string,
+    title: string
+  ): Promise<ApiResult<never>> {
+    return this.patch(`/api/conversation/${conversationId}/title`, {
+      body: JSON.stringify({ title }),
+    })
   }
 }
 
