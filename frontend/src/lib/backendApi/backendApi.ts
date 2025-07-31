@@ -87,20 +87,21 @@ export class BackendApiService {
   }
 
   /**
-   * Call API and return raw Response object (for SSE, streaming, etc.)
+   * Executes an API call with automatic token refresh on 401 responses
    */
-  async callApiRaw(
+  async #executeWithAuth(
     method: string,
     endpoint: string,
     opt?: CallOptions,
   ): Promise<Response> {
     const url = `${this.#baseUrl}${endpoint}`
-
-    let response = await this.#fetchFunc(url, {
+    const requestOptions = {
       method,
       headers: this.#makeHeaders(opt?.body),
       body: opt?.body instanceof FormData ? opt.body : opt?.body,
-    })
+    }
+
+    let response = await this.#fetchFunc(url, requestOptions)
 
     if (response.status === 401) {
       // access token could've expired, but refresh token might be valid - try refreshing
@@ -118,9 +119,8 @@ export class BackendApiService {
 
         // retry the API call again, with refreshed credentials
         response = await this.#fetchFunc(url, {
-          method,
-          headers: this.#makeHeaders(opt?.body),
-          body: opt?.body instanceof FormData ? opt.body : opt?.body,
+          ...requestOptions,
+          headers: this.#makeHeaders(opt?.body), // remake headers with new tokens
         })
       }
     }
@@ -130,9 +130,19 @@ export class BackendApiService {
       redirect(303, '/login')
     }
 
-    // For raw responses, we don't process cookies here since the response
-    // will be streamed directly to the client
     return response
+  }
+
+  /**
+   * Call API and return raw Response object (for SSE, streaming, etc.)
+   */
+  async callApiRaw(
+    method: string,
+    endpoint: string,
+    opt?: CallOptions,
+  ): Promise<Response> {
+    // Don't process cookies here since the response is streamed directly to the client
+    return this.#executeWithAuth(method, endpoint, opt)
   }
 
   async callApi<TResponseData = never>(
@@ -140,43 +150,9 @@ export class BackendApiService {
     endpoint: string,
     opt?: CallOptions,
   ): Promise<ApiResult<TResponseData>> {
-    const url = `${this.#baseUrl}${endpoint}`
-
-    let response = await this.#fetchFunc(url, {
-      method,
-      headers: this.#makeHeaders(opt?.body),
-      body: opt?.body instanceof FormData ? opt.body : opt?.body,
-    })
-
-    if (response.status === 401) {
-      // access token could've expired, but refresh token might be valid - try refreshing
-      const refreshResponse = await this.#fetchFunc(
-        `${this.#baseUrl}/api/login/refresh`,
-        {
-          method: 'POST',
-          headers: this.#makeHeaders(),
-        },
-      )
-
-      if (refreshResponse.ok) {
-        // this should update the access token (and refresh token)
-        this.#setCookiesFromResponse(refreshResponse)
-
-        // retry the API call again, with refreshed credentials
-        response = await this.#fetchFunc(url, {
-          method,
-          headers: this.#makeHeaders(opt?.body),
-          body: opt?.body instanceof FormData ? opt.body : opt?.body,
-        })
-      }
-    }
+    const response = await this.#executeWithAuth(method, endpoint, opt)
 
     if (!response.ok) {
-      if (response.status === 401) {
-        // User is still logged out and unable to re-log automatically - send back to login
-        redirect(303, '/login')
-      }
-
       try {
         const contentType = response.headers.get('content-type')
         if (contentType && contentType.includes('application/json')) {
