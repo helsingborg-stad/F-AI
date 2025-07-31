@@ -38,7 +38,6 @@ export type UserScopeType =
 
 export interface IUserInfo {
   email?: string
-  scopes?: UserScopeType[]
 }
 
 export interface IScopesResponse {
