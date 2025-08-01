@@ -171,7 +171,7 @@
   onDeleteConversation={deleteConversation}
   onStartNewChat={startNewChat}
   onStopChat={chatMachine.stop}
-  chatStateIdle={$chatState === 'idle'}
+  chatStateIdle={$chatState === 'idle' || $chatState === 'error'}
   bind:enabledFeatures
 >
 </ChatLayout>
