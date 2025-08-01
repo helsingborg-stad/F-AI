@@ -1,12 +1,14 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import { api } from '$lib/api-fetch-factory.js'
+import type { IBackendApiSettings } from '$lib/types.js'
+import { handleApiCall } from '$lib/utils/handle-api-calls.js'
 
-export async function getSettings(event: RequestEvent) {
-  const response = await api.get('/api/settings', { event })
-
-  if (!response.ok) {
-    throw new Response('Failed to fetch settings', { status: response.status })
-  }
-
-  return await response.json()
+export async function getSettings(event: RequestEvent): Promise<IBackendApiSettings> {
+  return handleApiCall(
+    event,
+    (api) => api.getSettings(),
+    'Failed to fetch settings',
+    {
+      settings: {},
+    },
+  )
 }

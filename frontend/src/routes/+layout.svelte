@@ -8,8 +8,6 @@
 
   let { children, data } = $props()
 
-  const navbarData = data.navbar
-
   let showNavbar = $derived(!page.url.pathname.startsWith('/login'))
 
   let avatarPlaceholder = $derived.by(() => {
@@ -27,8 +25,8 @@ and providing the main content area for child components.
     {#if showNavbar}
       <header class="w-full bg-base-200 md:px-4">
         <Navbar
-          navbarTitle={navbarData.title}
-          navbarMenu={navbarData.navbarMenu}
+          navbarTitle={data.navbar.title}
+          navbarMenu={data.navbar.navbarMenu}
           currentUrlPath={page.url.pathname}
           {avatarPlaceholder}
           avatarMenu={data.avatarMenu}

@@ -1,6 +1,6 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import type { IApiSettings, IBackendApiSettings } from '$lib/types.js'
-import { api } from '$lib/api-fetch-factory.js'
+import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
 
 export async function updateApiSettings(updates: IApiSettings, event: RequestEvent) {
   const mapApiKeys: IBackendApiSettings = {
@@ -15,9 +15,10 @@ export async function updateApiSettings(updates: IApiSettings, event: RequestEve
     },
   }
 
-  const response = await api.patch('/api/settings', { event, body: mapApiKeys })
+  const api = new BackendApiServiceFactory().get(event)
+  const [error] = await api.updateSettings(mapApiKeys)
 
-  if (!response.ok) {
-    throw new Response('Failed to update settings', { status: response.status })
+  if (error) {
+    throw new Response('Failed to update settings', { status: 500 })
   }
 }

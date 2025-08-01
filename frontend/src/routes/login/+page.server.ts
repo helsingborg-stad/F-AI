@@ -1,6 +1,5 @@
 import { redirect } from '@sveltejs/kit'
-import { api } from '$lib/api-fetch-factory.ts'
-import dayjs from 'dayjs'
+import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
 
 export const actions = {
   initiateOTP: async (event) => {
@@ -8,62 +7,40 @@ export const actions = {
     const email = data?.get('email') || ''
     const redirectTo = data?.get('redirectTo') || '/'
 
-    const response = await api.post('/api/login/initiate', {
-      body: { user_id: email },
-      withAuth: false,
-      event,
-    })
+    const api = new BackendApiServiceFactory().get(event)
+    const [error, request_id] = await api.loginInit(email.toString())
 
-    if (response.ok) {
-      const responseData = await response.json()
-
-      return {
-        email,
-        request_id: responseData.request_id,
-        isIdSubmitted: true,
-        redirectTo,
-      }
-    } else {
+    if (error) {
       return {
         email,
         isIdSubmitted: false,
-        error: `Error: ${response.status} ${response.statusText}`,
+        error: `Error: ${error}`,
         redirectTo,
       }
+    }
+
+    return {
+      email,
+      request_id: request_id,
+      isIdSubmitted: true,
+      redirectTo,
     }
   },
 
   confirmOTP: async (event) => {
     const data = await event.request.formData()
     const email = data?.get('email')
-    const requestId = data.get('request_id')
-    const confirmationCode = data.get('OTPCode')
+    const requestId = data.get('request_id') || ''
+    const confirmationCode = data.get('OTPCode') || ''
     const redirectTo = data.get('redirectTo') || '/'
 
-    const response = await api.post('/api/login/confirm', {
-      body: { request_id: requestId, confirmation_code: confirmationCode },
-      withAuth: false,
-      event,
-    })
+    const api = new BackendApiServiceFactory().get(event)
+    const [error] = await api.loginConfirm(
+      requestId.toString(),
+      confirmationCode.toString(),
+    )
 
-    const cookies = response.headers.getSetCookie()
-    cookies.forEach(cookie => {
-      const pairs = cookie.split(';').map(v => v.split('='))
-      const kvp: Record<string, string> = pairs.reduce((acc, [k, v]) => ({ ...acc, [k.trim().toLowerCase()]: v }), {})
-
-      const cookieName = pairs[0][0]
-      event.cookies.set(cookieName, kvp[cookieName], {
-        path: '/',
-        sameSite: 'lax',
-        httpOnly: true,
-        secure: true,
-        expires: dayjs(kvp['expires']).toDate(),
-      })
-    })
-
-    if (response.ok) {
-      redirect(303, redirectTo.toString())
-    } else {
+    if (error) {
       return {
         email,
         request_id: requestId,
@@ -73,5 +50,7 @@ export const actions = {
         redirectTo,
       }
     }
+
+    redirect(303, redirectTo.toString())
   },
 }

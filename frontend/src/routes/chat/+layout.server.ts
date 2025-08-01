@@ -1,51 +1,26 @@
 import { redirect } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types.js'
-import { api } from '$lib/api-fetch-factory.js'
 import { getAssistantPickerData } from './utils.js'
 import { userCanChat } from '$lib/utils/scopes.js'
+import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
 
 export const load: LayoutServerLoad = async (event) => {
+  const api = new BackendApiServiceFactory().get(event)
   const canChat = await userCanChat(event)
 
   const assistants = await getAssistantPickerData(event)
 
-  const conversationsResponse = await api.get('/api/conversation', { event })
-  if (!conversationsResponse.ok) {
+  const [error, conversations] = await api.getConversations()
+  if (error) {
     redirect(307, '/chat')
   }
 
-  const {
-    conversations,
-  }: {
-    conversations: {
-      id: string
-      timestamp: string
-      title: string
-    }[]
-  } = await conversationsResponse.json()
-
   if (event.params.conversationId) {
-    const response = await api.get(`/api/conversation/${event.params.conversationId}`, {
-      event,
-    })
+    const [error, conversation] = await api.getConversation(event.params.conversationId)
 
-    if (!response.ok) {
+    if (error) {
       redirect(307, '/chat')
     }
-
-    const {
-      conversation,
-    }: {
-      conversation: {
-        assistant_id: string
-        messages: {
-          timestamp: string
-          role: string
-          content: string
-          reasoning: string
-        }[]
-      }
-    } = await response.json()
 
     const messages = conversation.messages
       .filter((msg) => msg.role != 'system')
@@ -53,7 +28,7 @@ export const load: LayoutServerLoad = async (event) => {
         timestamp: msg.timestamp,
         source: msg.role,
         message: msg.content,
-        reasoning: ''
+        reasoning: '',
       }))
 
     const conversationContext = {
