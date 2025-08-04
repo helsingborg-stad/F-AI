@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types.js'
 import type { IAssistant, IBackendAssistant, ICollection } from '$lib/types.js'
 import { error, redirect } from '@sveltejs/kit'
 import {
+  addAssistantFav,
   createAssistant,
   deleteAssistant,
   deleteAssistantAvatar,
@@ -126,6 +127,7 @@ export const actions = {
 
     try {
       assistantId = await createAssistant(event)
+      await addAssistantFav(assistantId, event)
     } catch (error) {
       return handleApiError(error)
     }
