@@ -52,7 +52,7 @@
 >
   {#if !avatar}
     <div
-      class="relative flex w-20 items-center justify-center overflow-hidden rounded text-center"
+      class="relative flex items-center justify-center overflow-hidden rounded text-center"
       style="background-color: {primaryColor}"
     >
       <span
@@ -63,8 +63,8 @@
       </span>
     </div>
   {:else}
-    <figure>
-      <img class="{maxHeight} w-20" src={avatar} alt="avatar" />
+    <figure class="w-20 h-20 flex-shrink-0 self-center">
+      <img class="{maxHeight}" src={avatar} alt="avatar" />
     </figure>
   {/if}
   <div class="card-body">
