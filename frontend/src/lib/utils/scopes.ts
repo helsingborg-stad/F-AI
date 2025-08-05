@@ -7,18 +7,11 @@ function hasScope(scope: UserScopeType, userScopes: UserScopeType[]): boolean {
 }
 
 async function fetchUserScopes(event: RequestEvent): Promise<UserScopeType[]> {
-  // TODO: Temporary fix only used while migrating from `api-fetch-factory.ts` to `backendApi.ts`
-  const accessToken = event.cookies.get('access_token')
-
-  if (!accessToken) {
-    return []
-  }
-
   const api = new BackendApiServiceFactory().get(event)
+
   const [error, scopes] = await api.getScopes()
 
   if (error) {
-    console.error('Failed to fetch scopes', error)
     return []
   }
 

@@ -125,11 +125,6 @@ export class BackendApiService {
       }
     }
 
-    if (response.status === 401) {
-      // User is still logged out and unable to re-log automatically - send back to login
-      redirect(303, '/login')
-    }
-
     return response
   }
 
@@ -264,8 +259,8 @@ export class BackendApiService {
   /** Auth */
 
   async getScopes(): Promise<ApiResult<string[]>> {
-    const [error, { scopes }] = await this.get<{ scopes: string[] }>('/api/auth/scopes')
-    return [error, scopes] as ApiResult<string[]>
+    const [error, result] = await this.get<{ scopes: string[] }>('/api/auth/scopes')
+    return [error, result?.scopes ?? []] as ApiResult<string[]>
   }
 
   /** Login */
