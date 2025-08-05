@@ -1,7 +1,11 @@
 import { setUser } from '$lib/state/user.svelte.js'
 import { m } from '$lib/paraglide/messages.js'
-import type { RequestEvent } from '@sveltejs/kit'
-import { userCanChat, userCanReadAssistants, userCanReadSettings } from '$lib/utils/scopes.js'
+import { type RequestEvent } from '@sveltejs/kit'
+import {
+  userCanChat,
+  userCanReadAssistants,
+  userCanReadSettings,
+} from '$lib/utils/scopes.js'
 
 export async function load(event: RequestEvent) {
   const user = event.locals.user || { email: '' }
@@ -9,20 +13,26 @@ export async function load(event: RequestEvent) {
 
   const navbarMenu = []
 
-  if (await userCanChat(event)) {
+  const canChat = await userCanChat(event)
+
+  if (canChat) {
     navbarMenu.push({ label: m.nav_menu_chat(), path: '/chat' })
   }
 
-  if (await userCanReadAssistants(event)) {
+  const canReadAssistants = await userCanReadAssistants(event)
+
+  if (canReadAssistants) {
     navbarMenu.push({ label: m.nav_menu_assistants(), path: '/assistant' })
   }
 
-  if (await userCanReadSettings(event)) {
+  const canReadSettings = await userCanReadSettings(event)
+
+  if (canReadSettings) {
     navbarMenu.push({ label: m.nav_menu_settings(), path: '/settings' })
   }
 
   return {
-    user: event.locals.user || { email: '' },
+    user,
     avatarMenu: [
       {
         title: m.nav_avatar_menu_logout(),
