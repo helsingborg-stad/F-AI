@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types.js'
 import type { IAssistant, IBackendAssistant, ICollection } from '$lib/types.js'
 import { error, redirect } from '@sveltejs/kit'
 import {
-  addAssistantFav,
+  addFavoriteAssistant,
   createAssistant,
   deleteAssistant,
   deleteAssistantAvatar,
@@ -18,7 +18,11 @@ import {
   getCollections,
   replaceContextCollection,
 } from '$lib/utils/collection.js'
-import { userCanReadAssistants, userCanReadCollections, userCanWriteAssistant } from '$lib/utils/scopes.js'
+import {
+  userCanReadAssistants,
+  userCanReadCollections,
+  userCanWriteAssistant,
+} from '$lib/utils/scopes.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
   const id = formData.get('assistant_id') as string
@@ -58,7 +62,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
 
 export const load: PageServerLoad = async (event) => {
   const canListAssistants = await userCanReadAssistants(event)
-  const canCreateAssistant =  await userCanWriteAssistant(event)
+  const canCreateAssistant = await userCanWriteAssistant(event)
   const canEditAssistant = await userCanWriteAssistant(event)
   const canReadCollections = await userCanReadCollections(event)
   const activeAssistantID = event.url.searchParams.get('assistant_id') || ''
@@ -100,7 +104,7 @@ export const load: PageServerLoad = async (event) => {
 
     if (canReadCollections && assistantData.collection_id) {
       try {
-        const collections = (await getCollections(event)).collections
+        const collections: ICollection[] = await getCollections(event)
         activeAssistant.collection = collections.find(
           (c: ICollection) => c.id === assistantData.collection_id,
         )
@@ -127,7 +131,7 @@ export const actions = {
 
     try {
       assistantId = await createAssistant(event)
-      await addAssistantFav(assistantId, event)
+      await addFavoriteAssistant(assistantId, event)
     } catch (error) {
       return handleApiError(error)
     }
@@ -202,13 +206,7 @@ export const actions = {
     let collectionId = ''
 
     try {
-      const body = {
-        label: label,
-        embedding_model: embeddingModel,
-      }
-
-      const collectionResponse = await createCollection(event, body)
-      collectionId = collectionResponse.collection_id
+      collectionId = await createCollection(event, label, embeddingModel)
     } catch (error) {
       return handleApiError(error)
     }

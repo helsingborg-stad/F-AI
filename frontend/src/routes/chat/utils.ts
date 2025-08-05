@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import { m } from '$lib/paraglide/messages.js'
 import type { IAssistantMenu, IBackendAssistant } from '$lib/types.ts'
-import { fetchAllAssistants, getAssistantFavs } from '$lib/utils/assistant.js'
+import { fetchAllAssistants, getFavoriteAssistants } from '$lib/utils/assistant.js'
 import { createAssistantMenu } from '$lib/type-factory.js'
 
 export async function getAssistantPickerData(
@@ -9,18 +9,13 @@ export async function getAssistantPickerData(
 ): Promise<IAssistantMenu[]> {
   let result: IAssistantMenu[] = []
 
-  const favAssistantResponse = await getAssistantFavs(event)
-  if (!favAssistantResponse.ok) {
-    throw new Error(`Failed to get fav assistant`)
-  }
-
-  const favAssistantData = await favAssistantResponse.json()
+  const favAssistants = await getFavoriteAssistants(event)
   const favIds = new Set(
-    favAssistantData.assistants.map((assistant: IBackendAssistant) => assistant.id),
+    favAssistants.map((assistant) => assistant.id),
   )
 
-  if (favAssistantData.assistants.length > 0) {
-    const favItems = favAssistantData.assistants.map((assistant: IBackendAssistant) => ({
+  if (favAssistants.length > 0) {
+    const favItems = favAssistants.map((assistant) => ({
       id: assistant.id,
       name: assistant.meta.name?.toString() ?? m.chat_assistant_picker_name_unknown(),
       allowSearch: Boolean(assistant.meta?.enable_search),

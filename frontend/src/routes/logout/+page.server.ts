@@ -1,11 +1,15 @@
 import { redirect } from '@sveltejs/kit'
-import { api } from '$lib/api-fetch-factory.js'
 import { clearUser } from '$lib/state/user.svelte.js'
+import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
 
 export const actions = {
   default: async (event) => {
-    api.post('/api/login/logout', { withAuth: true, event }).catch(() => {
-    })
+    const api = new BackendApiServiceFactory().get(event)
+    const [error] = await api.logout()
+
+    if (error) {
+      console.error('Failed to logout', error)
+    }
 
     clearUser()
 

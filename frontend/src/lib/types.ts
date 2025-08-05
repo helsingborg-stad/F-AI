@@ -1,8 +1,8 @@
 import type { icons } from '$lib/components/Icon/icons.js'
 
-export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-export type JsonObject = { [key: string]: JsonValue };
-export type JsonArray = JsonValue[];
+export type JsonValue = string | number | boolean | null | JsonObject | JsonArray
+export type JsonObject = { [key: string]: JsonValue }
+export type JsonArray = JsonValue[]
 
 export interface IMenuItem {
   label: string
@@ -38,7 +38,6 @@ export type UserScopeType =
 
 export interface IUserInfo {
   email?: string
-  scopes?: UserScopeType[]
 }
 
 export interface IScopesResponse {
@@ -80,6 +79,11 @@ export interface IAssistant {
   enableReasoning: boolean
 }
 
+export interface IFavAssistant {
+  id: string
+  meta: JsonObject
+}
+
 export interface IAssistantCard {
   id: string
   avatar: string | null
@@ -97,8 +101,8 @@ export interface IAssistantCard {
 }
 
 export interface IAssistantMenu {
-  menuTitle: string,
-  hidden: boolean,
+  menuTitle: string
+  hidden: boolean
   menuItems: {
     allowSearch: boolean
     allowReasoning: boolean
@@ -128,6 +132,7 @@ export interface IBackendApiSettings {
   settings: {
     'login.fixed_otp'?: string
     'jwt.user_secret'?: string
+    'jwt.expire_minutes'?: string
     'brevo.url'?: string
     'brevo.api_key'?: string
     'openai.api_key'?: string
@@ -146,4 +151,22 @@ export interface ICollection {
 
 export interface ICollectionFiles {
   name: string
+}
+
+export interface IConversation {
+  assistant_id: string
+  messages: {
+    timestamp: string
+    role: string
+    content: string
+    reasoning: string
+  }[]
+}
+
+export interface IConversations {
+  conversations: {
+    id: string
+    timestamp: string
+    title: string
+  }[]
 }

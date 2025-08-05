@@ -1,29 +1,35 @@
 import { sequence } from '@sveltejs/kit/hooks'
 import { paraglideMiddleware } from '$lib/paraglide/server.js'
 import { type Handle, redirect } from '@sveltejs/kit'
-import { setupScopes } from '$lib/server/hooks/setup-scopes.js'
+import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
 
-const handleScopes: Handle = async ({ event, resolve }) => {
-  try {
-    event = await setupScopes(event)
+/**
+ * Check if the user is authenticated, and if not redirect to login page.
+ * This hook is needed as an early entrypoint to potentially refresh the
+ * login token, since consequent load functions are run in parallel and
+ * the login cannot be refreshed properly if needed.
+ * See https://svelte.dev/docs/kit/load#Implications-for-authentication
+ */
+const checkAuthentication: Handle = async ({ event, resolve }): Promise<Response> => {
+  const isLoginPath = event.url.pathname === '/login'
 
-    const response = await resolve(event)
-
-    if (response.status === 401) {
-      return redirect(303, '/login')
-    }
-
-    return response
-  } catch (error) {
-    console.log('Hook error:', error)
-
-    if (error instanceof Response && error.status === 401) {
-      return redirect(303, '/login')
-    }
-
-    // TODO: Implement error page for other type of errors.
-    return redirect(303, '/login')
+  if (isLoginPath) {
+    // Authenticated user is not required for login paths
+    return resolve(event)
   }
+
+  const api = new BackendApiServiceFactory().get(event)
+  const [error] = await api.getScopes()
+
+  if (error) {
+    /**
+     * If we're unable to get scopes, it most likely means the user is not logged in,
+     * either from being completely logged out or unable to refresh login.
+     */
+    redirect(301, '/login')
+  }
+
+  return resolve(event)
 }
 
 const handleParaglide: Handle = ({ event, resolve }) =>
@@ -35,4 +41,4 @@ const handleParaglide: Handle = ({ event, resolve }) =>
     })
   })
 
-export const handle = sequence(handleScopes, handleParaglide)
+export const handle = sequence(checkAuthentication, handleParaglide)
