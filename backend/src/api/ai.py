@@ -2,13 +2,14 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 
 from src.common.services.fastapi_get_services import ServicesDependency
+from src.modules.ai.completions.models.Feature import features_from_string
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
-from src.modules.llm.helpers.collect_streamed import collect_streamed
-from src.modules.llm.models.Message import Message
-from src.modules.llm.protocols.ILLMService import ILLMService
+from src.modules.ai.completions.helpers.collect_streamed import collect_streamed
+from src.modules.ai.completions.models.Message import Message
+from src.modules.ai.completions.protocols.ICompletionsService import ICompletionsService
 
-llm_router = APIRouter(prefix='/llm', tags=['LLM'])
-auth = AuthRouterDecorator(llm_router)
+ai_router = APIRouter(prefix='/ai', tags=['AI'])
+auth = AuthRouterDecorator(ai_router)
 
 
 class RunRequestMessage(BaseModel):
@@ -24,6 +25,7 @@ class RunRequest(BaseModel):
     ])
     api_key: str | None = Field(default=None, examples=['my-api-key'])
     extra_params: dict | None = Field(default=None, examples=[{'temperature': 0.5}])
+    enabled_features: list[str] | None = Field(default=None, examples=[['IMAGE_GEN']])
 
 
 class RunResponse(BaseModel):
@@ -33,16 +35,16 @@ class RunResponse(BaseModel):
 
 
 @auth.post(
-    '/run',
-    required_scopes=['llm.run'],
-    summary='Run LLM inference',
+    '/completions',
+    required_scopes=['ai.run'],
+    summary='Run LLM completions',
     response_model=RunResponse,
 )
-async def run(request: RunRequest, services: ServicesDependency):
+async def completions(request: RunRequest, services: ServicesDependency):
     try:
-        service: ILLMService = services.llm_factory.get()
-        message = await collect_streamed(service.run(
-            model=request.model,
+        service: ICompletionsService = services.completions_factory.get(model=request.model,
+                                                                        api_key=request.api_key if request.api_key else "")
+        message = await collect_streamed(service.run_completions(
             messages=[
                 Message(
                     role=message.role,
@@ -50,8 +52,8 @@ async def run(request: RunRequest, services: ServicesDependency):
                 )
                 for message in request.messages
             ],
-            api_key=request.api_key if request.api_key else "",
-            enabled_features=[],
+            enabled_features=features_from_string(
+                ",".join(request.enabled_features)) if request.enabled_features else [],
             extra_params=request.extra_params if request.extra_params else {}
         ))
 

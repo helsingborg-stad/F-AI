@@ -48,44 +48,27 @@ class MongoConversationService(IConversationService):
 
         return [self._doc_to_conversation(doc) async for doc in cursor]
 
-    async def add_message_to_conversation(self, as_uid: str, conversation_id: str, timestamp: str, role: str,
-                                          message: str) -> bool:
+    async def add_message_to_conversation(self, as_uid: str, conversation_id: str, message: Message) -> bool:
         conversation = await self.get_conversation(as_uid, conversation_id)
         if conversation:
-            conversation.messages.append(Message(
-                timestamp=timestamp,
-                role=role,
-                content=message
-            ))
+            conversation.messages.append(message)
 
             result = await self._database['conversations'].update_one(
                 {'_id': ObjectId(conversation_id), 'owner': as_uid},
-                {'$set': {**conversation.model_dump(exclude={'id'})}})
+                {'$set': {'messages': [m.model_dump() for m in conversation.messages]}})
 
             return result.modified_count == 1
 
         return False
 
-    async def add_to_conversation_last_message(
-            self,
-            as_uid: str,
-            conversation_id: str,
-            timestamp: str,
-            role: str,
-            additional_message: str
-    ) -> bool:
+    async def replace_conversation_last_message(self, as_uid: str, conversation_id: str, message: Message) -> bool:
         conversation = await self.get_conversation(as_uid, conversation_id)
 
-        if not conversation:
+        if not conversation or len(conversation.messages) == 0:
             return False
 
-        if len(conversation.messages) == 0:
-            await self.add_message_to_conversation(as_uid, conversation_id, timestamp, role, additional_message)
-            return True
+        conversation.messages[-1] = message
 
-        conversation.messages[-1].timestamp = timestamp
-        conversation.messages[-1].role = role
-        conversation.messages[-1].content = conversation.messages[-1].content + additional_message
         result = await self._database['conversations'].update_one(
             {'_id': ObjectId(conversation_id), 'owner': as_uid},
             {"$set": {'messages': conversation.model_dump(include={'messages'})['messages']}}
@@ -121,6 +104,6 @@ class MongoConversationService(IConversationService):
             assistant_id=doc['assistant_id'],
             title=title,
             messages=[
-                Message(timestamp=m['timestamp'], role=m['role'], content=m['content'])
+                Message(**m)
                 for m in doc['messages']
             ])

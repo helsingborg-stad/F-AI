@@ -36,7 +36,7 @@ async def setup_default_groups(group_service: IGroupService):
             'document.chunk',
             'group.read',
             'group.write',
-            'llm.run',
+            'ai.run',
             'settings.read',
             'settings.write',
             'test'

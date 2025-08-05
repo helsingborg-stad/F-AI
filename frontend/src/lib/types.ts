@@ -77,6 +77,7 @@ export interface IAssistant {
   primaryColor: string
   enableSearch: boolean
   enableReasoning: boolean
+  enableImageGeneration: boolean
 }
 
 export interface IFavAssistant {
@@ -106,6 +107,7 @@ export interface IAssistantMenu {
   menuItems: {
     allowSearch: boolean
     allowReasoning: boolean
+    allowImageGeneration: boolean
     id: string
     name: string
   }[]

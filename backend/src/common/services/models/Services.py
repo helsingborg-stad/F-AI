@@ -10,7 +10,7 @@ from src.modules.collections.protocols.ICollectionService import ICollectionServ
 from src.modules.conversations.protocols.IConversationService import IConversationService
 from src.modules.document_chunker.factory import DocumentChunkerFactory
 from src.modules.groups.protocols.IGroupService import IGroupService
-from src.modules.llm.factory import LLMServiceFactory
+from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.login.protocols.ILoginService import ILoginService
 from src.modules.notification.protocols.INotificationService import INotificationService
 from src.modules.resources.protocols.IResourceService import IResourceService
@@ -24,7 +24,7 @@ class Services:
     authentication_factory: AuthenticationServiceFactory
     authorization_service: IAuthorizationService
     api_key_service: IApiKeyService
-    llm_factory: LLMServiceFactory
+    completions_factory: CompletionsServiceFactory
     document_chunker_factory: DocumentChunkerFactory
     vector_service: IVectorService
     collection_service: ICollectionService
