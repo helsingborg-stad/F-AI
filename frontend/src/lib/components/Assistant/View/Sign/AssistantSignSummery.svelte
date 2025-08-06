@@ -50,23 +50,21 @@
   role="button"
   tabindex="0"
 >
-  {#if !avatar}
-    <div
-      class="relative flex items-center justify-center overflow-hidden rounded text-center"
-      style="background-color: {primaryColor}"
-    >
+  <div
+    class="relative flex items-center justify-center overflow-hidden rounded text-center w-20 shrink-0 {maxHeight}"
+    style="background-color: {primaryColor}"
+  >
+    {#if avatar}
+      <img class="w-full h-full object-cover" src={avatar} alt="avatar" />
+    {:else}
       <span
-        class="{maxHeight} w-20 text-3xl {primaryColor === 'transparent'
+        class="text-3xl {primaryColor === 'transparent'
           ? 'text-gray-600'
           : 'text-white'}"
       >{title.toUpperCase().charAt(0)}
       </span>
-    </div>
-  {:else}
-    <figure class="w-20 h-20 flex-shrink-0 self-center">
-      <img class="{maxHeight}" src={avatar} alt="avatar" />
-    </figure>
-  {/if}
+    {/if}
+  </div>
   <div class="card-body">
     <div class="card-title font-semibold md:text-lg">{title}</div>
     <p>{description}</p>
