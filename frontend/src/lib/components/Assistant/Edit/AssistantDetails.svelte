@@ -146,7 +146,6 @@
           name="name"
           placeholder={m.assistant_edit_name_placeholder()}
           class="input input-sm input-bordered w-full"
-          required
           bind:value={assistantName}
           readonly={!canEdit}
           autocomplete="off"
@@ -186,7 +185,6 @@
           name="model"
           bind:value={selectedModelKey}
           class="select select-bordered select-sm text-sm"
-          required
           disabled={!canEdit}
         >
           <option value="" disabled selected
