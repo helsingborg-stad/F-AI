@@ -27,6 +27,10 @@
     dialogOpen = true
   }
 
+  let onDialogClose = () => {
+    dialogOpen = false
+  }
+
   $effect(() => {
     if (dialogOpen !== dialog.open) {
       if (dialogOpen) {
@@ -71,7 +75,7 @@
   </div>
 </div>
 
-<dialog bind:this={dialog} class="modal">
+<dialog bind:this={dialog} class="modal" onclose={onDialogClose}>
   <div class="modal-box w-11/12 max-w-xl">
     <AssistantSign
       {id}
