@@ -1,6 +1,8 @@
 <script lang="ts">
   import SvelteMarkdown from '@humanspeak/svelte-markdown'
   import Image from './renderers/Image.svelte'
+  import Code from './renderers/Code.svelte'
+  import CodeSpan from './renderers/CodeSpan.svelte'
 
   interface Props {
     source: string
@@ -13,5 +15,7 @@
   {source}
   renderers={{
     image: Image,
+    code: Code,
+    codespan: CodeSpan
   }}
 />

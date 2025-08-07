@@ -37,6 +37,21 @@ Paragraph
 Code Block => Hey
 \`\`\`
 
+Syntax highlighting:
+
+\`\`\`python
+@requires_authorization(roles=["ADMIN"])
+def somefunc(param1='asdf', param2=0):
+    some_var = param2 + 5
+    r'''A docstring'''
+    if len(param1) >= some_var: # interesting
+        print("hello")
+    return (param2 - param1 + 1 + 0b10l) or None
+
+class SomeClass:
+    pass
+\`\`\`
+
 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eius repellat illum maxime expedita! Voluptate rerum, facilis recusandae minus hic quibusdam porro architecto maxime dignissimos ratione eos natus ullam saepe amet!
 
 Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut, sed at nemo ipsum fugit nobis iusto harum reiciendis eius rerum molestias totam nesciunt corporis animi provident quia nostrum magni sit?
