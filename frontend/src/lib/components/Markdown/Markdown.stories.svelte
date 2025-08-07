@@ -2,12 +2,6 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import Markdown from './Markdown.svelte'
 
-  const { Story } = defineMeta({
-    title: 'Components/Markdown',
-    component: Markdown,
-    tags: ['autodocs'],
-  })
-
   const source = `
 # Header level 1
 
@@ -78,6 +72,7 @@ Some code: \`export let myInt = 1;\`. Very good.
 | Column A       | And B        |
 | -------------- | ------------ |
 | One value here | Another here |
+| Row 2 Col 1    | Row 2 Col 2  |
 
 Line below ⬇️
 
@@ -103,8 +98,6 @@ Named link: [DuckDuckGo](https://duckduckgo.com/)
 
 ![Cool Mountains](https://unsplash.com/photos/4_Vii0UoMmI/download?ixid=M3wxMjA3fDB8MXxhbGx8fHx8fHx8fHwxNzI1ODc3MjYwfA&force=true&w=640)
 
-[![Cool Motorcycle](https://unsplash.com/photos/03Emav97044/download?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8Y2I3NTB8ZW58MHx8fHwxNzI1ODc4MDc3fDA&force=true&w=640 "Vintage Honda Cb750 by Sam Carter")](https://unsplash.com/photos/a-motorcycle-parked-next-to-a-pile-of-wood-03Emav97044)
-
 <div id="raw-html-div" style="color: blue; background-color: cyan">
 
 <!--Comment-->
@@ -122,6 +115,19 @@ Named link: [DuckDuckGo](https://duckduckgo.com/)
 
 Peace ✌️
 `
+
+  const { Story } = defineMeta({
+    title: 'Components/Markdown',
+    tags: ['autodocs'],
+  })
 </script>
 
-<Story name="Default" args={{ source }} />
+<Story name="Default" args={{ source }}>
+  <Markdown {source} />
+</Story>
+
+<Story name="Prose style" args={{ source }}>
+  <div class="prose prose-sm">
+    <Markdown {source} />
+  </div>
+</Story>
