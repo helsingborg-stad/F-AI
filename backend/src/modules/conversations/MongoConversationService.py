@@ -48,10 +48,16 @@ class MongoConversationService(IConversationService):
 
         return [self._doc_to_conversation(doc) async for doc in cursor]
 
-    async def add_message_to_conversation(self, as_uid: str, conversation_id: str, message: Message) -> bool:
+    async def add_message_to_conversation(self, as_uid: str, conversation_id: str, message: Message,
+                                          continue_from_index: int | None = None) -> bool:
         conversation = await self.get_conversation(as_uid, conversation_id)
         if conversation:
-            conversation.messages.append(message)
+            if continue_from_index is not None:
+                if continue_from_index < 0 or continue_from_index >= len(conversation.messages):
+                    return False
+                conversation.messages = conversation.messages[0:continue_from_index + 1] + [message]
+            else:
+                conversation.messages.append(message)
 
             result = await self._database['conversations'].update_one(
                 {'_id': ObjectId(conversation_id), 'owner': as_uid},
