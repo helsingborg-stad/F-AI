@@ -60,7 +60,8 @@ class LLMChatService(IChatService):
                                           enabled_features=enabled_features):
             yield m
 
-    async def continue_chat(self, as_uid: str, conversation_id: str, message: str, enabled_features: list[Feature]) -> \
+    async def continue_chat(self, as_uid: str, conversation_id: str, message: str, enabled_features: list[Feature],
+                            continue_from_index: int | None = None) -> \
             AsyncGenerator[ChatEvent, None]:
         conversation = await self._conversation_service.get_conversation(as_uid=as_uid, conversation_id=conversation_id)
 
@@ -85,7 +86,8 @@ class LLMChatService(IChatService):
                 timestamp=get_timestamp(),
                 role='user',
                 content=message
-            )
+            ),
+            continue_from_index=continue_from_index,
         )
 
         rag_message: str | None = None

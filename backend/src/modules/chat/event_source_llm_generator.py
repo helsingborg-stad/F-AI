@@ -15,6 +15,7 @@ async def event_source_llm_generator(
         user_message: str,
         chat_service: IChatService,
         features: list[Feature],
+        continue_from_index: int | None,
 ):
     async def sse_generator():
         try:
@@ -30,7 +31,8 @@ async def event_source_llm_generator(
                     as_uid=calling_uid,
                     conversation_id=assistant_or_conversation_id,
                     message=user_message,
-                    enabled_features=features
+                    enabled_features=features,
+                    continue_from_index=continue_from_index
                 )
 
             async for chat_event in chat_generator:

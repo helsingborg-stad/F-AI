@@ -195,6 +195,62 @@ class BaseConversationServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
+    async def test_add_message_continue_from_index(service: IConversationService):
+        cid = await service.create_conversation(as_uid='john', assistant_id='a')
+        timestamp = get_timestamp()
+        await service.add_message_to_conversation('john', cid,
+                                                  message=Message(timestamp='', role='system', content='A'))
+        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='user', content='B'))
+        await service.add_message_to_conversation('john', cid,
+                                                  message=Message(timestamp='', role='assistant', content='C'))
+        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='user', content='D'))
+        await service.add_message_to_conversation('john', cid,
+                                                  message=Message(timestamp='', role='assistant', content='E'))
+
+        success = await service.add_message_to_conversation(
+            'john',
+            cid,
+            message=Message(timestamp=timestamp, role='user', content='X'),
+            continue_from_index=2
+        )
+
+        conversation = await service.get_conversation('john', cid)
+
+        assert success is True
+        assert len(conversation.messages) == 4
+        assert conversation.messages[0].content == 'A'
+        assert conversation.messages[1].content == 'B'
+        assert conversation.messages[2].content == 'C'
+        assert conversation.messages[3].timestamp == timestamp
+        assert conversation.messages[3].role == 'user'
+        assert conversation.messages[3].content == 'X'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
+    async def test_add_message_continue_from_index_invalid(service: IConversationService):
+        cid = await service.create_conversation(as_uid='john', assistant_id='a')
+        await service.add_message_to_conversation('john', cid,
+                                                  message=Message(timestamp='', role='system', content='A'))
+
+        success = await service.add_message_to_conversation(
+            'john',
+            cid,
+            message=Message(timestamp='', role='user', content='B'),
+            continue_from_index=1
+        )
+
+        conversation = await service.get_conversation('john', cid)
+
+        assert success is False
+        assert len(conversation.messages) == 1
+        assert conversation.messages[0].content == 'A'
+        assert conversation.messages[0].timestamp == ''
+        assert conversation.messages[0].role == 'system'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_replace_last_conversation_message(service: IConversationService):
         cid = await service.create_conversation(as_uid='john', assistant_id='a')
 
