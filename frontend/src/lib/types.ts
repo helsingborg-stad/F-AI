@@ -87,6 +87,7 @@ export interface IFavAssistant {
 
 export interface IAssistantCard {
   id: string
+  avatarThumbnail: string | null
   avatar: string | null
   title: string
   description: string

@@ -19,6 +19,7 @@
       {#each cards as card}
         <AssistantSignSummery
           id={card.id}
+          avatarThumbnail={card.avatarThumbnail}
           avatar={card.avatar}
           primaryColor={card.primaryColor}
           title={card.title}

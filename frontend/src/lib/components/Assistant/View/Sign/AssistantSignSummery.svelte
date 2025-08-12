@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { IAssistantCard } from '$lib/types.js'
   import AssistantSign from '$lib/components/Assistant/View/Sign/AssistantSign.svelte'
+  import Avatar from '$lib/components/Assistant/View/Sign/Avatar.svelte'
 
   type Props = IAssistantCard & {
     dialogOpen: boolean
@@ -8,6 +9,7 @@
 
   let {
     id,
+    avatarThumbnail,
     avatar,
     primaryColor,
     title,
@@ -40,6 +42,8 @@
       }
     }
   })
+
+
 </script>
 
 <div
@@ -54,21 +58,13 @@
   role="button"
   tabindex="0"
 >
-  <div
-    class="relative flex items-center justify-center overflow-hidden rounded text-center w-20 shrink-0 {maxHeight}"
-    style="background-color: {primaryColor}"
-  >
-    {#if avatar}
-      <img class="w-full h-full object-cover" src={avatar} alt="avatar" />
-    {:else}
-      <span
-        class="text-3xl {primaryColor === 'transparent'
-          ? 'text-gray-600'
-          : 'text-white'}"
-      >{title.toUpperCase().charAt(0)}
-      </span>
-    {/if}
-  </div>
+  <Avatar
+    {avatar}
+    {avatarThumbnail}
+    {title}
+    {primaryColor}
+    class="w-20 shrink-0 {maxHeight}"
+  />
   <div class="card-body">
     <div class="card-title font-semibold md:text-lg">{title}</div>
     <p>{description}</p>

@@ -9,6 +9,7 @@ import {
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
 import { userCanReadAssistants } from '$lib/utils/scopes.js'
+import { processAssistantAvatars } from '$lib/utils/image/image.js'
 
 export const load: PageServerLoad = async (event) => {
   const userCanListAssistants = await userCanReadAssistants(event)
@@ -24,23 +25,28 @@ export const load: PageServerLoad = async (event) => {
       favoriteAssistants.map((fav: { id: string }) => [fav.id, fav]),
     )
 
-    assistantCards = allAssistants.map((assistant) => ({
-      id: assistant.id,
-      avatar: assistant.meta.avatar_base64
-        ? `data:image/png;base64, ${assistant.meta.avatar_base64}`
-        : null,
-      title: assistant.meta.name?.toString() ?? '',
-      description: assistant.meta.description?.toString() ?? '',
-      owner: 'Helsingborg',
-      starters: (assistant.meta.sample_questions as string[]) ?? [],
-      isFavorite: favoriteAssistantsMap.has(assistant.id),
-      primaryColor: (assistant.meta.primary_color as string) ?? 'transparent',
-      metadata: {
-        category: 'Demo',
-        conversationCount: '<100',
-        likes: '0',
-      },
-    }))
+    assistantCards = await Promise.all(
+      allAssistants.map(async (assistant) => {
+        const processedAvatar = await processAssistantAvatars(assistant)
+
+        return {
+          id: assistant.id,
+          avatarThumbnail: processedAvatar.avatarThumbnail,
+          avatar: processedAvatar.avatarMedium,
+          title: assistant.meta.name?.toString() ?? '',
+          description: assistant.meta.description?.toString() ?? '',
+          owner: 'Helsingborg',
+          starters: (assistant.meta.sample_questions as string[]) ?? [],
+          isFavorite: favoriteAssistantsMap.has(assistant.id),
+          primaryColor: (assistant.meta.primary_color as string) ?? 'transparent',
+          metadata: {
+            category: 'Demo',
+            conversationCount: '<100',
+            likes: '0',
+          },
+        }
+      }),
+    )
   }
 
   const favExhibit = {
