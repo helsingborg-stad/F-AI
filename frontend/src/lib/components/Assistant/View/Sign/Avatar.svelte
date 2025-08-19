@@ -1,6 +1,8 @@
 <script lang="ts">
   type Props = {
+    id: string
     avatar?: string | null
+    getAssistantAvatar: (assistantId: string) => Promise<string>
     avatarThumbnail?: string | null
     title: string
     primaryColor: string
@@ -8,11 +10,13 @@
   }
 
   let {
+    id,
     avatar,
     avatarThumbnail,
     title,
     primaryColor,
-    class: className = ""
+    class: className = '',
+    getAssistantAvatar,
   }: Props = $props()
 
   let isShowingThumbnail = $state(true)
@@ -20,23 +24,26 @@
 
   // Only run this effect when avatar prop changes
   $effect(() => {
-    if (avatar && avatar !== avatarThumbnail) {
+    if (avatarThumbnail) {
       // Start with thumbnail and blur
       isShowingThumbnail = true
       displaySrc = avatarThumbnail
 
-      // Preload the full avatar
+      // Preload the full avatar using getAssistantAvatar
       const img = new Image()
-      img.src = avatar
-      img.onload = () => {
-        // Switch to full avatar and remove blur
-        displaySrc = avatar
-        isShowingThumbnail = false
-      }
-      img.onerror = () => {
+
+      // Using getAssistantAvatar instead of directly setting src
+      getAssistantAvatar(id).then(avatarUrl => {
+        img.src = avatarUrl
+        img.onload = () => {
+          // Switch to full avatar and remove blur
+          displaySrc = avatarUrl
+          isShowingThumbnail = false
+        }
+      }).catch(() => {
         // If avatar fails to load, remove blur anyway
         isShowingThumbnail = false
-      }
+      })
     } else {
       // No avatar or avatar is same as thumbnail
       isShowingThumbnail = false
