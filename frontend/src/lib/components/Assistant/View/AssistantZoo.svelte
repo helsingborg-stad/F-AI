@@ -5,9 +5,10 @@
 
   interface Props {
     exhibits: IExhibit[]
+    getAssistantAvatar: (assistantId: string) => Promise<string>
   }
 
-  let { exhibits }: Props = $props()
+  let { exhibits, getAssistantAvatar }: Props = $props()
 
   let filter = $state('')
 
@@ -17,10 +18,10 @@
         ...exhibit,
         cards: exhibit.cards.filter(card =>
           card.title.toLowerCase().includes(filter.toLowerCase()) ||
-          card.description.toLowerCase().includes(filter.toLowerCase())
-        )
+          card.description.toLowerCase().includes(filter.toLowerCase()),
+        ),
       }))
-      .filter(exhibit => exhibit.cards.length > 0)
+      .filter(exhibit => exhibit.cards.length > 0),
   )
 </script>
 
@@ -34,6 +35,7 @@
         title={exhibit.title}
         description={exhibit.description}
         cards={exhibit.cards}
+        {getAssistantAvatar}
       />
     {/each}
   </div>

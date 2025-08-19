@@ -1,6 +1,7 @@
 <script lang="ts">
-  import {m } from '$lib/paraglide/messages.js'
+  import { m } from '$lib/paraglide/messages.js'
   import AssistantZoo from '$lib/components/Assistant/View/AssistantZoo.svelte'
+  import { getAssistantAvatar } from '$lib/utils/avatar.js'
 
   let { data } = $props()
 
@@ -16,5 +17,5 @@
       {m.assistant_zoo_page_description()}
     </div>
   </div>
-  <AssistantZoo {exhibits} />
+  <AssistantZoo {exhibits} {getAssistantAvatar} />
 </div>

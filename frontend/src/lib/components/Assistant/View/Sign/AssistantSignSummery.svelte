@@ -4,7 +4,8 @@
   import Avatar from '$lib/components/Assistant/View/Sign/Avatar.svelte'
 
   type Props = IAssistantCard & {
-    dialogOpen: boolean
+    dialogOpen: boolean,
+    getAssistantAvatar: (assistantId: string) => Promise<string>
   }
 
   let {
@@ -19,6 +20,7 @@
     isFavorite,
     metadata,
     dialogOpen = $bindable(),
+    getAssistantAvatar,
   }: Props = $props()
   let dialog: HTMLDialogElement
 
@@ -59,7 +61,9 @@
   tabindex="0"
 >
   <Avatar
+    {id}
     {avatar}
+    {getAssistantAvatar}
     {avatarThumbnail}
     {title}
     {primaryColor}
@@ -75,13 +79,16 @@
   <div class="modal-box w-11/12 max-w-xl">
     <AssistantSign
       {id}
-      {avatar}
+      avatar={avatar || ''}
+      {avatarThumbnail}
+      {primaryColor}
       {title}
       {owner}
       {description}
       {isFavorite}
       {metadata}
       {starters}
+      {getAssistantAvatar}
     />
   </div>
   <form method="dialog" class="modal-backdrop">

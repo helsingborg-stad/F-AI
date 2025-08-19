@@ -18,6 +18,11 @@ export default defineConfig({
       $stories: fileURLToPath(new URL('./src/stories', import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      external: ['sharp'],
+    },
+  },
   test: {
     environment: 'node',
     globals: true,
