@@ -9,7 +9,7 @@ import {
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
 import { userCanReadAssistants } from '$lib/utils/scopes.js'
-import { processAssistantAvatars } from '$lib/utils/image/image.js'
+import { getAvatarProcessor } from '$lib/utils/image/factory.js'
 
 export const load: PageServerLoad = async (event) => {
   const userCanListAssistants = await userCanReadAssistants(event)
@@ -27,12 +27,16 @@ export const load: PageServerLoad = async (event) => {
 
     assistantCards = await Promise.all(
       allAssistants.map(async (assistant) => {
-        const processedAvatar = await processAssistantAvatars(assistant)
+        const avatarProcessor = await getAvatarProcessor()
+        const processedAvatar = await avatarProcessor.process(
+          assistant.id,
+          assistant.meta.avatar_base64 as string | undefined,
+        )
 
         return {
           id: assistant.id,
           avatarThumbnail: processedAvatar.avatarThumbnail,
-          avatar: processedAvatar.avatarMedium,
+          avatar: '',
           title: assistant.meta.name?.toString() ?? '',
           description: assistant.meta.description?.toString() ?? '',
           owner: 'Helsingborg',
