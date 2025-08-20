@@ -15,7 +15,7 @@ class IConversationService(Protocol):
         ...
 
     async def add_message_to_conversation(self, as_uid: str, conversation_id: str, message: Message,
-                                          continue_from_index: int | None = None) -> bool:
+                                          restart_from: str | None = None) -> str | None:
         ...
 
     async def replace_conversation_last_message(self, as_uid: str, conversation_id: str, message: Message) -> bool:

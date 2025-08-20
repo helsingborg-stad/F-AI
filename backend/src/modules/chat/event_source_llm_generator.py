@@ -15,7 +15,7 @@ async def event_source_llm_generator(
         user_message: str,
         chat_service: IChatService,
         features: list[Feature],
-        continue_from_index: int | None,
+        restart_from_id: str | None,
 ):
     async def sse_generator():
         try:
@@ -32,7 +32,7 @@ async def event_source_llm_generator(
                     conversation_id=assistant_or_conversation_id,
                     message=user_message,
                     enabled_features=features,
-                    continue_from_index=continue_from_index
+                    restart_from_id=restart_from_id
                 )
 
             async for chat_event in chat_generator:
@@ -40,7 +40,7 @@ async def event_source_llm_generator(
                     event=f'chat.{chat_event.event}',
                     data=json.dumps({
                         'timestamp': get_timestamp(),
-                        **chat_event.model_dump()
+                        **chat_event.model_dump(exclude_none=True)
                     })
                 )
         except asyncio.CancelledError as e:

@@ -49,23 +49,27 @@ class MongoConversationService(IConversationService):
         return [self._doc_to_conversation(doc) async for doc in cursor]
 
     async def add_message_to_conversation(self, as_uid: str, conversation_id: str, message: Message,
-                                          continue_from_index: int | None = None) -> bool:
+                                          restart_from: str | None = None) -> str | None:
+        new_message = Message(**message.model_dump(exclude={'id'}), id=str(ObjectId()))
+
         conversation = await self.get_conversation(as_uid, conversation_id)
         if conversation:
-            if continue_from_index is not None:
-                if continue_from_index < 0 or continue_from_index >= len(conversation.messages):
-                    return False
-                conversation.messages = conversation.messages[0:continue_from_index + 1] + [message]
+            if restart_from is not None:
+                index = next((i for i, m in enumerate(conversation.messages) if m.id == restart_from), None)
+                if index is None:
+                    return None
+
+                conversation.messages = conversation.messages[0:index] + [new_message]
             else:
-                conversation.messages.append(message)
+                conversation.messages.append(new_message)
 
             result = await self._database['conversations'].update_one(
                 {'_id': ObjectId(conversation_id), 'owner': as_uid},
                 {'$set': {'messages': [m.model_dump() for m in conversation.messages]}})
 
-            return result.modified_count == 1
+            return new_message.id if result.modified_count == 1 else None
 
-        return False
+        return None
 
     async def replace_conversation_last_message(self, as_uid: str, conversation_id: str, message: Message) -> bool:
         conversation = await self.get_conversation(as_uid, conversation_id)

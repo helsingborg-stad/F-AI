@@ -61,12 +61,17 @@ class LLMChatService(IChatService):
             yield m
 
     async def continue_chat(self, as_uid: str, conversation_id: str, message: str, enabled_features: list[Feature],
-                            continue_from_index: int | None = None) -> \
+                            restart_from_id: str | None = None) -> \
             AsyncGenerator[ChatEvent, None]:
         conversation = await self._conversation_service.get_conversation(as_uid=as_uid, conversation_id=conversation_id)
 
         if not conversation:
             yield ChatErrorEvent(message='invalid conversation')
+            return
+
+        if restart_from_id is not None and next((m for m in conversation.messages if m.id == restart_from_id),
+                                                None) is None:
+            yield ChatErrorEvent(message='message to restart from not found')
             return
 
         assistant = await self._assistant_service.get_assistant(
@@ -87,7 +92,7 @@ class LLMChatService(IChatService):
                 role='user',
                 content=message
             ),
-            continue_from_index=continue_from_index,
+            restart_from=restart_from_id,
         )
 
         rag_message: str | None = None
