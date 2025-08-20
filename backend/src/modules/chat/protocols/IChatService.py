@@ -11,7 +11,7 @@ class IChatService(Protocol):
         ...
 
     def continue_chat(self, as_uid: str, conversation_id: str, message: str, enabled_features: list[Feature],
-                      continue_from_index: int | None = None) -> \
+                      restart_from_id: str | None = None) -> \
             AsyncGenerator[
                 ChatEvent, None]:
         ...

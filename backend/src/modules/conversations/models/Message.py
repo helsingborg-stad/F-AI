@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class Message(BaseModel):
+    id: str | None = None
     timestamp: str
     role: str
     content: str | None = None

@@ -89,7 +89,7 @@ class BaseConversationServiceTestClass:
         conversation_id = await service.create_conversation(as_uid='john', assistant_id='a')
         timestamp = get_timestamp()
 
-        success1 = await service.add_message_to_conversation(
+        mid1 = await service.add_message_to_conversation(
             as_uid='john',
             conversation_id=conversation_id,
             message=Message(
@@ -98,12 +98,12 @@ class BaseConversationServiceTestClass:
                 content='Answer truthfully'
             )
         )
-        success2 = await service.add_message_to_conversation(
+        mid2 = await service.add_message_to_conversation(
             as_uid='john',
             conversation_id=conversation_id,
             message=Message(timestamp=timestamp, role='user', content='What is 2+2')
         )
-        success3 = await service.add_message_to_conversation(
+        mid3 = await service.add_message_to_conversation(
             as_uid='john',
             conversation_id=conversation_id,
             message=Message(timestamp=timestamp, role='assistant', content='4')
@@ -111,9 +111,9 @@ class BaseConversationServiceTestClass:
 
         conversation = await service.get_conversation(as_uid='john', conversation_id=conversation_id)
         assert conversation
-        assert success1 is True
-        assert success2 is True
-        assert success3 is True
+        assert mid1 is not None and len(mid1) > 0
+        assert mid2 is not None and len(mid2) > 0
+        assert mid3 is not None and len(mid3) > 0
         assert len(conversation.messages) == 3
         assert conversation.messages[0].timestamp == timestamp
         assert conversation.messages[0].role == 'system'
@@ -126,10 +126,29 @@ class BaseConversationServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
+    async def test_add_message_ignores_supplied_id(service: IConversationService):
+        cid = await service.create_conversation(as_uid='john', assistant_id='a')
+
+        mid = await service.add_message_to_conversation(
+            as_uid='john',
+            conversation_id=cid,
+            message=Message(
+                id='bad id',
+                timestamp='',
+                role='system',
+                content='Answer truthfully',
+            )
+        )
+
+        assert mid is not None and mid != 'bad id'
+
+    @staticmethod
+    @pytest.mark.asyncio
+    @pytest.mark.mongo
     async def test_add_message_full(service: IConversationService):
         conversation_id = await service.create_conversation(as_uid='john', assistant_id='a')
         timestamp = get_timestamp()
-        success1 = await service.add_message_to_conversation(
+        mid = await service.add_message_to_conversation(
             as_uid='john',
             conversation_id=conversation_id,
             message=Message(
@@ -153,7 +172,7 @@ class BaseConversationServiceTestClass:
         conversation = await service.get_conversation(as_uid='john', conversation_id=conversation_id)
         message = conversation.messages[0]
 
-        assert success1 is True
+        assert mid is not None and len(mid) > 0
         assert message.timestamp == timestamp
         assert message.role == 'system'
         assert message.content == 'some content'
@@ -171,14 +190,14 @@ class BaseConversationServiceTestClass:
     async def test_add_message_invalid_uid(service: IConversationService):
         cid = await service.create_conversation(as_uid='john', assistant_id='a')
 
-        success = await service.add_message_to_conversation(
+        mid = await service.add_message_to_conversation(
             as_uid='jane',
             conversation_id=cid,
             message=Message(timestamp=get_timestamp(), role='user', content='hello')
         )
         result = await service.get_conversation(as_uid='john', conversation_id=cid)
 
-        assert success is False
+        assert mid is None
         assert len(result.messages) == 0
 
     @staticmethod
@@ -190,33 +209,35 @@ class BaseConversationServiceTestClass:
             'does not exist',
             message=Message(timestamp='', role='', content='')
         )
-        assert result is False
+        assert result is None
 
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_add_message_continue_from_index(service: IConversationService):
+    async def test_add_message_restart_from(service: IConversationService):
         cid = await service.create_conversation(as_uid='john', assistant_id='a')
         timestamp = get_timestamp()
-        await service.add_message_to_conversation('john', cid,
-                                                  message=Message(timestamp='', role='system', content='A'))
-        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='user', content='B'))
-        await service.add_message_to_conversation('john', cid,
-                                                  message=Message(timestamp='', role='assistant', content='C'))
-        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='user', content='D'))
-        await service.add_message_to_conversation('john', cid,
-                                                  message=Message(timestamp='', role='assistant', content='E'))
 
-        success = await service.add_message_to_conversation(
+        # @formatter:off
+        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='system', content='A'))
+        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='user', content='B'))
+        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='assistant', content='C'))
+        mid = await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='user', content='D'))
+        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='assistant', content='E'))
+        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='user', content='F'))
+        await service.add_message_to_conversation('john', cid, message=Message(timestamp='', role='assistant', content='G'))
+        # @formatter:on
+
+        nmid = await service.add_message_to_conversation(
             'john',
             cid,
             message=Message(timestamp=timestamp, role='user', content='X'),
-            continue_from_index=2
+            restart_from=mid
         )
 
         conversation = await service.get_conversation('john', cid)
 
-        assert success is True
+        assert nmid is not None and len(nmid) > 0
         assert len(conversation.messages) == 4
         assert conversation.messages[0].content == 'A'
         assert conversation.messages[1].content == 'B'
@@ -228,21 +249,21 @@ class BaseConversationServiceTestClass:
     @staticmethod
     @pytest.mark.asyncio
     @pytest.mark.mongo
-    async def test_add_message_continue_from_index_invalid(service: IConversationService):
+    async def test_add_message_restart_from_invalid(service: IConversationService):
         cid = await service.create_conversation(as_uid='john', assistant_id='a')
         await service.add_message_to_conversation('john', cid,
                                                   message=Message(timestamp='', role='system', content='A'))
 
-        success = await service.add_message_to_conversation(
+        mid = await service.add_message_to_conversation(
             'john',
             cid,
             message=Message(timestamp='', role='user', content='B'),
-            continue_from_index=1
+            restart_from='invalid message id'
         )
 
         conversation = await service.get_conversation('john', cid)
 
-        assert success is False
+        assert mid is None
         assert len(conversation.messages) == 1
         assert conversation.messages[0].content == 'A'
         assert conversation.messages[0].timestamp == ''
