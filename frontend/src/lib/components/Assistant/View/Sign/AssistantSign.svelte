@@ -2,15 +2,19 @@
   import { goto } from '$app/navigation'
   import FavCheckbox from '$lib/components/Assistant/View/Sign/FavCheckbox.svelte'
   import ShareButton from '$lib/components/Assistant/View/Sign/ShareButton.svelte'
+  import Avatar from '$lib/components/Assistant/View/Sign/Avatar.svelte'
 
   interface Props {
     id: string
     avatar: string
+    avatarThumbnail?: string | null
+    primaryColor?: string
     title: string
     owner: string
     description: string
     starters: string[]
     isFavorite: boolean
+    getAssistantAvatar?: (assistantId: string) => Promise<string>
     metadata: {
       category: string
       conversationCount: string
@@ -18,7 +22,19 @@
     }
   }
 
-  let { id, avatar, title, owner, description, starters, isFavorite, metadata }: Props = $props()
+  let { 
+    id, 
+    avatar, 
+    avatarThumbnail, 
+    primaryColor = '#6366f1', 
+    title, 
+    owner, 
+    description, 
+    starters, 
+    isFavorite, 
+    getAssistantAvatar,
+    metadata 
+  }: Props = $props()
 
   function chatWithAssistant() {
     goto(`/chat/?assistant_id=${id}`)
@@ -46,12 +62,23 @@
       <div class="flex h-full flex-col items-center">
         <div class="avatar relative mb-3">
           <div class="rounded">
-            <img
-              src={avatar}
-              alt="avatar"
-              class="block"
-              style="max-width: 128px; max-height: 188px; width: auto; height: auto;"
-            />
+            {#if getAssistantAvatar}
+              <Avatar
+                {id}
+                {avatar}
+                {avatarThumbnail}
+                {title}
+                {primaryColor}
+                {getAssistantAvatar}
+                class="block max-w-32 max-h-47 w-auto h-auto"
+              />
+            {:else}
+              <img
+                src={avatar}
+                alt="avatar"
+                class="block max-w-32 max-h-47 w-auto h-auto"
+              />
+            {/if}
           </div>
         </div>
         <div class="flex flex-col items-center gap-2">

@@ -2,7 +2,11 @@
   import AssistantSignSummery from '$lib/components/Assistant/View/Sign/AssistantSignSummery.svelte'
   import type { IExhibit } from '$lib/types.js'
 
-  let { title, description, cards }: IExhibit = $props()
+  type Props = IExhibit & {
+    getAssistantAvatar: (assistantId: string) => Promise<string>
+  }
+
+  let { title, description, cards, getAssistantAvatar }: Props = $props()
 
   let openedId = $state('')
 
@@ -19,7 +23,9 @@
       {#each cards as card}
         <AssistantSignSummery
           id={card.id}
-          avatar={card.avatar}
+          avatarThumbnail={card.avatarThumbnail}
+          {getAssistantAvatar}
+          avatar=""
           primaryColor={card.primaryColor}
           title={card.title}
           description={card.description}
