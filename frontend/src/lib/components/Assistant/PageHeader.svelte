@@ -4,22 +4,22 @@
   import { icons } from '$lib/components/Icon/icons.js'
 
   interface Props {
-    title?: string;
-    canCreateAssistant?: boolean;
+    title?: string
+    canCreateAssistant?: boolean
   }
 
   const { canCreateAssistant = false }: Props = $props()
 </script>
 
-<div class="py-2 px-8">
+<div class="px-8 py-2">
   <div class="flex flex-row justify-between">
     <p class="text-xl font-medium">{m.assistant_edit_page_header_title()}</p>
     {#if canCreateAssistant}
       <form method="POST" action="?/create">
-        <button type="submit" class="btn btn-sm btn-success text-white">
-        <Icon icon={icons["userPlus"]} width={20} height={20} />
-        <span class="text-s">{m.assistant_edit_page_header_create()}</span>
-      </button>
+        <button type="submit" class="btn btn-success btn-sm text-white">
+          <Icon icon={icons['userPlus']} width={20} height={20} />
+          <span class="text-s">{m.assistant_edit_page_header_create()}</span>
+        </button>
       </form>
     {/if}
   </div>

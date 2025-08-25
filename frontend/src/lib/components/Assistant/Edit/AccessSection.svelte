@@ -12,18 +12,21 @@
 </script>
 
 <Section title={m.assistant_edit_access_section_title()}>
-  <div class="flex flex-row place-content-between items-center mt-2">
+  <div class="mt-2 flex flex-row place-content-between items-center">
     <div class="flex flex-row gap-2">
       <input
         type="checkbox"
         name="public"
-        class="toggle toggle-sm toggle-success"
+        class="toggle toggle-success toggle-sm"
         checked={isPublic}
         disabled={!canEdit}
       />
       <InfoTooltip
-        toolTip="Public access allows other users to see and use, but not edit this assistant.">
-        <div class="text-sm font-medium select-none">{m.assistant_edit_access_section_public()}</div>
+        toolTip="Public access allows other users to see and use, but not edit this assistant."
+      >
+        <div class="select-none text-sm font-medium">
+          {m.assistant_edit_access_section_public()}
+        </div>
       </InfoTooltip>
     </div>
   </div>

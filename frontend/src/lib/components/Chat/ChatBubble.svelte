@@ -2,13 +2,13 @@
   import dayjs from 'dayjs'
 
   interface Props {
-    sender?: string;
-    text?: string;
-    name?: string;
-    time?: string;
-    avatar?: string;
-    status?: string;
-    bubbleColor?: string; // e.g., 'primary', 'secondary', 'accent', etc.
+    sender?: string
+    text?: string
+    name?: string
+    time?: string
+    avatar?: string
+    status?: string
+    bubbleColor?: string // e.g., 'primary', 'secondary', 'accent', etc.
   }
 
   const {
@@ -36,9 +36,9 @@
 
 <div class="chat {alignmentClass}">
   {#if avatar}
-    <div class="chat-image avatar">
+    <div class="avatar chat-image">
       <div class="w-10 rounded-full">
-        <img src="{avatar}" alt="{name}" />
+        <img src={avatar} alt={name} />
       </div>
     </div>
   {/if}
@@ -46,7 +46,7 @@
     <div class="chat-header">
       {#if name}{name}{/if}
       {#if parsedTime}
-        <time class="text-xs opacity-50 ml-2" datetime={time}>{parsedTime}</time>
+        <time class="ml-2 text-xs opacity-50" datetime={time}>{parsedTime}</time>
       {/if}
     </div>
   {/if}

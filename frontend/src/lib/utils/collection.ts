@@ -15,9 +15,7 @@ export async function createCollection(
   )
 }
 
-export async function getCollections(
-  event: RequestEvent
-): Promise<ICollection[]> {
+export async function getCollections(event: RequestEvent): Promise<ICollection[]> {
   return handleApiCall(
     event,
     (api) => api.getCollections(),
@@ -33,10 +31,7 @@ export async function replaceContextCollection(
 ) {
   return handleApiCall(
     event,
-    (api) => api.updateCollection(
-      collectionId,
-      files
-    ),
+    (api) => api.updateCollection(collectionId, files),
     'Failed to replace context collection',
     undefined,
   )

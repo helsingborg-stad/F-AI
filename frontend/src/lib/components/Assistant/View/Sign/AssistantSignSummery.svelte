@@ -55,17 +55,15 @@
   tabindex="0"
 >
   <div
-    class="relative flex items-center justify-center overflow-hidden rounded text-center w-20 shrink-0 {maxHeight}"
+    class="relative flex w-20 shrink-0 items-center justify-center overflow-hidden rounded text-center {maxHeight}"
     style="background-color: {primaryColor}"
   >
     {#if avatar}
-      <img class="w-full h-full object-cover" src={avatar} alt="avatar" />
+      <img class="h-full w-full object-cover" src={avatar} alt="avatar" />
     {:else}
       <span
-        class="text-3xl {primaryColor === 'transparent'
-          ? 'text-gray-600'
-          : 'text-white'}"
-      >{title.toUpperCase().charAt(0)}
+        class="text-3xl {primaryColor === 'transparent' ? 'text-gray-600' : 'text-white'}"
+        >{title.toUpperCase().charAt(0)}
       </span>
     {/if}
   </div>

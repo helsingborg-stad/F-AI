@@ -8,8 +8,8 @@
     tags: ['autodocs'],
     parameters: {
       layout: 'centered',
-    }
+    },
   })
 </script>
 
-<Story name="Default" args="{{maxCollection: '12'}}" />
+<Story name="Default" args={{ maxCollection: '12' }} />

@@ -3,29 +3,20 @@
   import type { ItemOptionsType } from '$lib/types.js'
 
   interface Props {
-    title: string,
-    highlighted: boolean,
-    options: ItemOptionsType[],
-    onClick: () => void,
+    title: string
+    highlighted: boolean
+    options: ItemOptionsType[]
+    onClick: () => void
   }
 
-  let {
-    title,
-    highlighted,
-    options,
-    onClick,
-  }: Props = $props()
+  let { title, highlighted, options, onClick }: Props = $props()
 </script>
 
 <div
-  class="group/item w-full max-w-full flex px-2 py-1 rounded-md hover:bg-gray-200 active:bg-gray-300"
+  class="group/item flex w-full max-w-full rounded-md px-2 py-1 hover:bg-gray-200 active:bg-gray-300"
   class:bg-gray-300={highlighted}
 >
-  <button
-    class="grow truncate text-left pr-2"
-    title={title}
-    onclick={onClick}
-  >
+  <button class="grow truncate pr-2 text-left" {title} onclick={onClick}>
     <span>{title}</span>
   </button>
   {#if options.length > 0}
@@ -45,13 +36,8 @@
         >
           <circle cx="12" cy="12" r="1" />
           <circle cx="19" cy="12" r="1" />
-          <circle
-            cx="5"
-            cy="12"
-            r="1"
-          />
-        </svg
-        >
+          <circle cx="5" cy="12" r="1" />
+        </svg>
       </button>
       <ul class="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow">
         {#each options as option}

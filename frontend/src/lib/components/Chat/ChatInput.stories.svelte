@@ -11,13 +11,25 @@
 </script>
 
 <Story name="Default">
-  <ChatInput placeholder='' value='' onSubmit={() => {console.log('Send message!')}}>
+  <ChatInput
+    placeholder=""
+    value=""
+    onSubmit={() => {
+      console.log('Send message!')
+    }}
+  >
     <div></div>
   </ChatInput>
 </Story>
 
 <Story name="With action button model picker">
-  <ChatInput placeholder='' value='' onSubmit={() => {console.log('Send message!')}}>
+  <ChatInput
+    placeholder=""
+    value=""
+    onSubmit={() => {
+      console.log('Send message!')
+    }}
+  >
     <ActionButtons
       assistants={mockOnlyAssistants}
       selectedAssistantId={mockOnlyAssistants[0].menuItems[0].id}

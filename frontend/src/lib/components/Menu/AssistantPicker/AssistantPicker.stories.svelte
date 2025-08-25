@@ -18,8 +18,8 @@
 
 <Story name="Default" />
 
-<Story name="With no titles" args={{assistants: mockOnlyAssistants}} />
+<Story name="With no titles" args={{ assistants: mockOnlyAssistants }} />
 
-<Story name="With title and assistants" args={{assistants: mockTitleAndAssistants}} />
+<Story name="With title and assistants" args={{ assistants: mockTitleAndAssistants }} />
 
-<Story name="With hidden assistants" args={{assistants: mockWithHiddenAssistants}} />
+<Story name="With hidden assistants" args={{ assistants: mockWithHiddenAssistants }} />

@@ -59,14 +59,11 @@
   }
 </script>
 
-<div class="flex flex-col h-full">
+<div class="flex h-full flex-col">
   <PageHeader title="Assistants" {canCreateAssistant} />
   <HorizontalDivider />
-  <div class="flex flex-1 w-full justify-center gap-4 overflow-hidden">
-    <div
-      class="flex-1 overflow-auto pb-4 px-4"
-      style="max-height: calc(100vh - 120px);"
-    >
+  <div class="flex w-full flex-1 justify-center gap-4 overflow-hidden">
+    <div class="flex-1 overflow-auto px-4 pb-4" style="max-height: calc(100vh - 120px);">
       <AssistantTable {assistants} {activeAssistant} />
     </div>
     <VerticalDivider />

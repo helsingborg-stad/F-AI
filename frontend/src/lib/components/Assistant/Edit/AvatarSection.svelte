@@ -21,9 +21,15 @@
     '#e0bd91',
   ]
 
-  let selectedColor = $state(primaryColor && primaryColor !== '#ffffff' ? primaryColor : colors[Math.floor(Math.random() * (colors.length - 1)) + 1])
+  let selectedColor = $state(
+    primaryColor && primaryColor !== '#ffffff'
+      ? primaryColor
+      : colors[Math.floor(Math.random() * (colors.length - 1)) + 1],
+  )
   let enableImagePlaceholder = $state(!avatarBase64)
-  let imagePreviewUrl = $state(avatarBase64 ? `data:image/png;base64,${avatarBase64}` : '')
+  let imagePreviewUrl = $state(
+    avatarBase64 ? `data:image/png;base64,${avatarBase64}` : '',
+  )
   let deleteAvatar = $state(false)
   let fileInput: HTMLInputElement
   let currentAvatarBase64 = $state(avatarBase64)
@@ -63,11 +69,15 @@
   <div class="flex gap-2">
     <div class="relative flex-shrink-0" style="width: 128px; height: 188px;">
       <div
-        class="w-full h-full rounded transition duration-500 overflow-hidden flex items-center justify-center"
+        class="flex h-full w-full items-center justify-center overflow-hidden rounded transition duration-500"
         style="background-color: {selectedColor};"
       >
         {#if enableImagePlaceholder}
-          <span class="text-3xl {selectedColor === 'transparent' ? 'text-gray-600' : 'text-white'}">{altImagePlaceholder.charAt(0)}</span>
+          <span
+            class="text-3xl {selectedColor === 'transparent'
+              ? 'text-gray-600'
+              : 'text-white'}">{altImagePlaceholder.charAt(0)}</span
+          >
         {:else}
           <img
             src={imagePreviewUrl}
@@ -80,12 +90,21 @@
       {#if !enableImagePlaceholder}
         <button
           type="button"
-          class="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs hover:bg-opacity-70 transition-all z-10"
+          class="absolute bottom-2 left-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black bg-opacity-50 p-1 text-xs text-white transition-all hover:bg-opacity-70"
           onclick={resetAvatar}
           aria-label="Reset avatar"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <path d="M3 6h18"></path>
             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
             <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
@@ -97,34 +116,22 @@
       <div class="prose prose-sm">{m.assistant_edit_avatar_description()}</div>
 
       <!-- Color picker -->
-      <input
-        type="hidden"
-        name="primary_color"
-        value={selectedColor}
-      >
-      <input
-        type="hidden"
-        name="delete_avatar"
-        value={deleteAvatar ? 'true' : 'false'}
-      >
+      <input type="hidden" name="primary_color" value={selectedColor} />
+      <input type="hidden" name="delete_avatar" value={deleteAvatar ? 'true' : 'false'} />
       {#if currentAvatarBase64 && !deleteAvatar}
-        <input
-          type="hidden"
-          name="avatar_base64"
-          value={currentAvatarBase64}
-        >
+        <input type="hidden" name="avatar_base64" value={currentAvatarBase64} />
       {/if}
-      <div class="flex mt-3 ml-1">
+      <div class="ml-1 mt-3 flex">
         {#each colors as color, i}
           <button
             type="button"
-            class="w-10 h-10 rounded-full outline outline-white transition-all relative ml-[-8px] first:ml-0 cursor-pointer hover:z-10 hover:scale-110 overflow-hidden"
-            style="{color === 'transparent' ?
-              'background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 5px, white 5px, white 10px);' :
-              `background-color: ${color};`}
-                    {selectedColor === color ?
-                      'border: 2px solid white; outline: 2px solid gold; z-index: 5;' :
-                      ''}"
+            class="relative ml-[-8px] h-10 w-10 cursor-pointer overflow-hidden rounded-full outline outline-white transition-all first:ml-0 hover:z-10 hover:scale-110"
+            style="{color === 'transparent'
+              ? 'background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 5px, white 5px, white 10px);'
+              : `background-color: ${color};`}
+                    {selectedColor === color
+              ? 'border: 2px solid white; outline: 2px solid gold; z-index: 5;'
+              : ''}"
             onclick={() => selectColor(color)}
             aria-label={`Select ${color === 'transparent' ? 'transparent' : `color ${i}`}`}
             aria-pressed={selectedColor === color}

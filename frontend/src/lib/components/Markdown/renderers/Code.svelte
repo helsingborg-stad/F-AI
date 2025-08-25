@@ -17,12 +17,13 @@
   }
 </script>
 
-<div class="flex flex-col bg-gray-800 rounded">
-  <div class="pl-3 pr-1 pt-1 flex justify-between items-center text-gray-400">
+<div class="flex flex-col rounded bg-gray-800">
+  <div class="flex items-center justify-between pl-3 pr-1 pt-1 text-gray-400">
     <span class="">{lang}</span>
     <button class="btn btn-circle btn-ghost btn-sm" onclick={copyToClipboard}>
       <Icon icon={icons['copy']} width={16} height={16} />
     </button>
   </div>
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
   <pre class="m-0 bg-gray-800"><code class="language-{lang}">{@html html}</code></pre>
 </div>

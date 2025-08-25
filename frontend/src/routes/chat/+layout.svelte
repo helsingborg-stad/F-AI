@@ -35,7 +35,10 @@
 
   // Clear state when manually changing assistant
   $effect(() => {
-    if (selectedAssistantId !== '' && selectedAssistantId !== data.conversationContext?.assistantId) {
+    if (
+      selectedAssistantId !== '' &&
+      selectedAssistantId !== data.conversationContext?.assistantId
+    ) {
       startNewChat()
     }
   })
@@ -52,7 +55,11 @@
     const currentConversationId = page.params.conversationId
 
     // Stop chat machine when switching between different existing conversations
-    if (previousConversationId && currentConversationId && previousConversationId !== currentConversationId) {
+    if (
+      previousConversationId &&
+      currentConversationId &&
+      previousConversationId !== currentConversationId
+    ) {
       chatMachine.stop()
     }
 
@@ -80,8 +87,8 @@
         noScroll: true,
         keepFocus: true,
       })
-        .then(() => messages = cachedMessages)
-        .catch(e => console.error('goto failed', e))
+        .then(() => (messages = cachedMessages))
+        .catch((e) => console.error('goto failed', e))
     }
   })
 
@@ -103,22 +110,26 @@
     messages = [
       ...messages,
       { timestamp: dayjs().toISOString(), source: 'user', message, reasoning: '' },
-      { timestamp: dayjs().toISOString(), source: 'assistant', message: '', reasoning: '' },
+      {
+        timestamp: dayjs().toISOString(),
+        source: 'assistant',
+        message: '',
+        reasoning: '',
+      },
     ]
 
-    chatMachine.sendMessage(message, selectedAssistantId, conversationId ?? null, {
-      withFeatures: enabledFeatures,
-    })
-      .catch(e => console.error('chatMachine.sendMessage failed', e))
+    chatMachine
+      .sendMessage(message, selectedAssistantId, conversationId ?? null, {
+        withFeatures: enabledFeatures,
+      })
+      .catch((e) => console.error('chatMachine.sendMessage failed', e))
   }
 
   function deleteConversation(id: string) {
-    fetch(`/api/conversation/delete`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ id }),
-      },
-    )
+    fetch(`/api/conversation/delete`, {
+      method: 'POST',
+      body: JSON.stringify({ id }),
+    })
       .then(() => {
         if (id === conversationId) {
           return goto(`/chat/`, {})
@@ -128,15 +139,13 @@
   }
 
   function renameConversation(conversationId: string, title: string) {
-    fetch(`/api/conversation/${conversationId}/title`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title }),
+    fetch(`/api/conversation/${conversationId}/title`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+      body: JSON.stringify({ title }),
+    })
       .then(() => {
         if (conversationId === conversationId) {
           return goto(`/chat/`, {})
@@ -163,7 +172,7 @@
   }))}
   assistants={data.assistants}
   conversations={data.conversations}
-  inputPlaceholder={m.chat_input_placeholder({ applicationName: 'Folkets AI'})}
+  inputPlaceholder={m.chat_input_placeholder({ applicationName: 'Folkets AI' })}
   onSubmitMessage={sendMessage}
   bind:selectedAssistantId
   {conversationId}
@@ -173,6 +182,4 @@
   onStopChat={chatMachine.stop}
   chatStateIdle={$chatState === 'idle' || $chatState === 'error'}
   bind:enabledFeatures
->
-</ChatLayout>
-
+></ChatLayout>

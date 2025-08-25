@@ -12,7 +12,7 @@
     initialIsIdSubmitted,
     errorMessage,
     requestId,
-    redirectTo = '/'
+    redirectTo = '/',
   }: Props = $props()
 
   let id = $state(initialId)
@@ -21,7 +21,8 @@
   let processingForm = $state(false)
 
   let isIdValidEmail = $derived.by(() => {
-    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+    const emailRegex =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
 
     return emailRegex.test(id)
   })
@@ -47,9 +48,9 @@
   <div class="card-body">
     {#if !isIdSubmitted}
       <form method="POST" action="?/initiateOTP" onsubmit={handleForm}>
-        <input type="hidden" name="redirectTo" value={redirectTo}>
+        <input type="hidden" name="redirectTo" value={redirectTo} />
         <h2 class="text-3xl font-bold">Login to your account</h2>
-        <p class="mt-4 mb-2 text-sm text-gray-500">Enter your email address</p>
+        <p class="mb-2 mt-4 text-sm text-gray-500">Enter your email address</p>
         <label class="form-control w-full max-w-xs">
           <input
             type="email"
@@ -77,11 +78,13 @@
       </form>
     {:else}
       <form method="POST" action="?/confirmOTP" onsubmit={handleForm}>
-        <input type="hidden" name="request_id" value={requestId}>
-        <input type="hidden" name="email" value={id}>
-        <input type="hidden" name="redirectTo" value={redirectTo}>
+        <input type="hidden" name="request_id" value={requestId} />
+        <input type="hidden" name="email" value={id} />
+        <input type="hidden" name="redirectTo" value={redirectTo} />
         <h2 class="text-3xl font-bold">Enter verification code</h2>
-        <p class="mt-4 mb-2 text-sm text-gray-500">Enter the code sent to your email {id}</p>
+        <p class="mb-2 mt-4 text-sm text-gray-500">
+          Enter the code sent to your email {id}
+        </p>
         <label class="form-control w-full max-w-xs">
           <input
             type="text"

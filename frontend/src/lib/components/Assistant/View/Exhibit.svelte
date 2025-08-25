@@ -14,8 +14,10 @@
 <div class="pb-8">
   <div class="text-xl font-semibold md:text-2xl">{title}</div>
   <div class="text-sm text-gray-500">{description}</div>
-  <div class="mt-4 mb-10">
-    <div class="grid grid-cols-1 gap-x-1.5 gap-y-1 lg:grid-cols-2 lg:gap-x-3 lg:gap-y-2.5">
+  <div class="mb-10 mt-4">
+    <div
+      class="grid grid-cols-1 gap-x-1.5 gap-y-1 lg:grid-cols-2 lg:gap-x-3 lg:gap-y-2.5"
+    >
       {#each cards as card}
         <AssistantSignSummery
           id={card.id}

@@ -14,27 +14,36 @@
   })
 </script>
 
-<Story name="Default" args={{
-  title: 'Hello World',
-  options: [],
-  onClick: fn()
-}} />
+<Story
+  name="Default"
+  args={{
+    title: 'Hello World',
+    options: [],
+    onClick: fn(),
+  }}
+/>
 
-<Story name="With Options" args={{
-  title: 'Hello World',
-  options: [
-    { iconName: 'copy', title: 'Copy', onClick: action('copy option') },
-    { iconName: 'trash', title: 'Delete', onClick: action('delete option') },
-  ],
-  onClick: action('click')
-}} />
+<Story
+  name="With Options"
+  args={{
+    title: 'Hello World',
+    options: [
+      { iconName: 'copy', title: 'Copy', onClick: action('copy option') },
+      { iconName: 'trash', title: 'Delete', onClick: action('delete option') },
+    ],
+    onClick: action('click'),
+  }}
+/>
 
-
-<Story name="With Long Title" args={{
-  title: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi, consequatur debitis dicta!',
-  options: [
-    { iconName: 'copy', title: 'Copy', onClick: action('copy option') },
-    { iconName: 'trash', title: 'Delete', onClick: action('delete option') },
-  ],
-  onClick: action('click')
-}} />
+<Story
+  name="With Long Title"
+  args={{
+    title:
+      'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi, consequatur debitis dicta!',
+    options: [
+      { iconName: 'copy', title: 'Copy', onClick: action('copy option') },
+      { iconName: 'trash', title: 'Delete', onClick: action('delete option') },
+    ],
+    onClick: action('click'),
+  }}
+/>

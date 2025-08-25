@@ -10,7 +10,7 @@
 </script>
 
 <Story name="Default">
-  <div class="flex items-center h-32 gap-4">
+  <div class="flex h-32 items-center gap-4">
     <p>Left content</p>
     <VerticalDivider />
     <p>Right content</p>

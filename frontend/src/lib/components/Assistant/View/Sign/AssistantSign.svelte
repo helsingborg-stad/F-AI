@@ -18,7 +18,8 @@
     }
   }
 
-  let { id, avatar, title, owner, description, starters, isFavorite, metadata }: Props = $props()
+  let { id, avatar, title, owner, description, starters, isFavorite, metadata }: Props =
+    $props()
 
   function chatWithAssistant() {
     goto(`/chat/?assistant_id=${id}`)
@@ -27,7 +28,7 @@
 
 <div class="grow overflow-y-auto">
   <div class="flex h-full px-2 py-4">
-    <div class="relative flex grow flex-col gap-4 overflow-y-auto px-8 pt-16 pb-20">
+    <div class="relative flex grow flex-col gap-4 overflow-y-auto px-8 pb-20 pt-16">
       <div class="absolute top-0">
         <div class="fixed end-4 z-10 flex items-center justify-center gap-1">
           <ShareButton link={`/assistant/zoo?id=${id}`} />
@@ -36,8 +37,13 @@
       </div>
 
       <div class="absolute bottom-[64px]">
-        <div class="fixed start-4 end-4 z-10 flex items-end px-2">
-          <button class="btn btn-neutral w-full" onclick={() => {chatWithAssistant()}}>
+        <div class="fixed end-4 start-4 z-10 flex items-end px-2">
+          <button
+            class="btn btn-neutral w-full"
+            onclick={() => {
+              chatWithAssistant()
+            }}
+          >
             Chat with assistant
           </button>
         </div>
@@ -63,7 +69,7 @@
               By {owner}
             {/if}
           </div>
-          <div class="text-center max-w-md text-sm font-normal">
+          <div class="max-w-md text-center text-sm font-normal">
             {description}
           </div>
         </div>
@@ -90,10 +96,8 @@
       <!--      Conversation starters-->
       {#if starters}
         <div class="flex flex-col">
-          <div class="font-bold mt-6">
-            Conversation starters
-          </div>
-          <div class="mt-4 grid grid-cols-2 grid-x-1.5 gap-y-2">
+          <div class="mt-6 font-bold">Conversation starters</div>
+          <div class="grid-x-1.5 mt-4 grid grid-cols-2 gap-y-2">
             {#each starters as starter}
               <div class="chat chat-end">
                 <div class="chat-bubble">
@@ -108,11 +112,10 @@
       <!--      Ratings-->
       <div class="flex flex-col">
         <div class="mb-2">
-          <div class="font-bold mt-6">Ratings</div>
+          <div class="mt-6 font-bold">Ratings</div>
         </div>
         <div class="text-sm text-gray-400">Not enough ratings yet</div>
       </div>
-
     </div>
   </div>
 </div>

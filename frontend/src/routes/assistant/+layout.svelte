@@ -11,10 +11,10 @@
   const isActive = (path: string) => path === page.url.pathname
 </script>
 
-<div class="flex bg-base-200 h-full overflow-hidden relative">
+<div class="relative flex h-full overflow-hidden bg-base-200">
   <ResponsiveSidebar>
     <SidebarMenu>
-      <div class="flex flex-col h-full gap-2">
+      <div class="flex h-full flex-col gap-2">
         {#each sidebarMenu as item}
           <button
             type="button"
@@ -27,7 +27,7 @@
       </div>
     </SidebarMenu>
   </ResponsiveSidebar>
-  <main class="m-2 flex-grow rounded-lg border bg-stone-50 overflow-auto">
+  <main class="m-2 flex-grow overflow-auto rounded-lg border bg-stone-50">
     {@render children()}
   </main>
 </div>

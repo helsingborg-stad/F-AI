@@ -12,8 +12,8 @@
   interface Props {
     allowedFeatures: AllowedFeature[]
     enabledFeatureIds: string[]
-    assistants: IAssistantMenu[],
-    selectedAssistantId: string,
+    assistants: IAssistantMenu[]
+    selectedAssistantId: string
     disableAssistantPicker: boolean
   }
 
@@ -27,27 +27,31 @@
 
   const isFeatureEnabled = (featureId: string) => enabledFeatureIds.includes(featureId)
   const setFeatureEnabled = (featureId: string, enabled: boolean) => {
-    enabledFeatureIds = enabled ? [...enabledFeatureIds, featureId] : enabledFeatureIds.filter(id => id !== featureId)
+    enabledFeatureIds = enabled
+      ? [...enabledFeatureIds, featureId]
+      : enabledFeatureIds.filter((id) => id !== featureId)
   }
 
   $effect(() => {
-    const filteredEnabledFeatures = enabledFeatureIds.filter(id => allowedFeatures.map(f => f.id).includes(id))
-    const isDifferent = enabledFeatureIds.some((id, i) => id !== filteredEnabledFeatures[i])
+    const filteredEnabledFeatures = enabledFeatureIds.filter((id) =>
+      allowedFeatures.map((f) => f.id).includes(id),
+    )
+    const isDifferent = enabledFeatureIds.some(
+      (id, i) => id !== filteredEnabledFeatures[i],
+    )
     if (isDifferent) {
       enabledFeatureIds = filteredEnabledFeatures
     }
   })
 </script>
 
-<div class="flex flex-row pr-3 gap-1">
+<div class="flex flex-row gap-1 pr-3">
   {#each allowedFeatures as feature}
     <IconToggleButton
       title={feature.title}
       icon={feature.icon}
-      bind:value={
-        () => isFeatureEnabled(feature.id),
-        (v) => setFeatureEnabled(feature.id, v)
-      }
+      bind:value={() => isFeatureEnabled(feature.id),
+      (v) => setFeatureEnabled(feature.id, v)}
     />
   {/each}
   <div class="ml-auto">

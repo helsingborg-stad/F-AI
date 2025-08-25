@@ -9,11 +9,14 @@
   })
 </script>
 
-<Story name="Default" args={{
-  items: [
-    { label: 'Cool Link A', path: '/A'},
-    { label: 'Cool Link B', path: '/B'},
-    { label: 'Cool Link C', path: '/C'},
-  ],
-  activePath: '/A'
-}} />
+<Story
+  name="Default"
+  args={{
+    items: [
+      { label: 'Cool Link A', path: '/A' },
+      { label: 'Cool Link B', path: '/B' },
+      { label: 'Cool Link C', path: '/C' },
+    ],
+    activePath: '/A',
+  }}
+/>

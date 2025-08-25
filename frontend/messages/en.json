@@ -57,7 +57,7 @@
   "assistant_edit_name_placeholder": "Enter a user friendly name",
   "assistant_edit_description_label": "Description",
   "assistant_edit_description_placeholder": "Provide a clear description of your assistant's purpose, capabilities, and goals. This description will be visible to users if you share this assistant.",
-   "assistant_edit_system_instruction_label": "System instructions",
+  "assistant_edit_system_instruction_label": "System instructions",
   "assistant_edit_system_instruction_placeholder": "You are a helpful assistant...",
   "assistant_edit_model_placeholder": "Model",
   "assistant_edit_model_label": "Description",

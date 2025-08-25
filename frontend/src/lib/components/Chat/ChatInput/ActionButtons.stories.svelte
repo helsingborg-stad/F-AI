@@ -12,5 +12,4 @@
   })
 </script>
 
-<Story name="Default" args={{ assistants: mockOnlyAssistants }}
-/>
+<Story name="Default" args={{ assistants: mockOnlyAssistants }} />

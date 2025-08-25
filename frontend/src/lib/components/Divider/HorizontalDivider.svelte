@@ -1,9 +1,9 @@
 <script lang="ts">
   interface Props {
-    height?: string;
-    marginY?: string;
-    bgColor?: string;
-    borderWidth?: string;
+    height?: string
+    marginY?: string
+    bgColor?: string
+    borderWidth?: string
   }
 
   const {

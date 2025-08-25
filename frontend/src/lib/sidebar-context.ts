@@ -18,7 +18,9 @@ export function setSidebarContext(state: SidebarState) {
 export function getSidebarContext() {
   const context = getContext<SidebarState>(SIDEBAR_CONTEXT_KEY)
   if (!context) {
-    throw new Error('Sidebar context not found. Did you forget to wrap your component in SidebarProvider?')
+    throw new Error(
+      'Sidebar context not found. Did you forget to wrap your component in SidebarProvider?',
+    )
   }
 
   return context

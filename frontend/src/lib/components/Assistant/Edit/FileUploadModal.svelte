@@ -51,21 +51,9 @@
       use:enhance={handleEnhance}
     >
       <div class="space-y-2">
-        <input
-          type="hidden"
-          name="assistant_id"
-          value={assistantId}
-        >
-        <input
-          type="hidden"
-          name="label"
-          value="collection"
-        >
-        <input
-          type="hidden"
-          name="embedding_model"
-          value="default"
-        >
+        <input type="hidden" name="assistant_id" value={assistantId} />
+        <input type="hidden" name="label" value="collection" />
+        <input type="hidden" name="embedding_model" value="default" />
         <input
           name="files"
           type="file"
@@ -77,8 +65,8 @@
         <div>
           <button
             type="submit"
-            class="btn btn-sm
-            btn-success
+            class="btn btn-success
+            btn-sm
             text-white"
             disabled={uploadingFiles}
           >

@@ -30,4 +30,7 @@ const hiddenAssistants = createAssistantMenu({
 
 export const mockOnlyAssistants: IAssistantMenu[] = [assistantMenuWithoutTitle]
 export const mockTitleAndAssistants: IAssistantMenu[] = [favAssistants, generalAssistants]
-export const mockWithHiddenAssistants: IAssistantMenu[] = [favAssistants, hiddenAssistants]
+export const mockWithHiddenAssistants: IAssistantMenu[] = [
+  favAssistants,
+  hiddenAssistants,
+]

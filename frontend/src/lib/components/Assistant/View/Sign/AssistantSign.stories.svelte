@@ -10,6 +10,9 @@
   })
 </script>
 
-<Story name="Default" args={{
-  ...mockAssistantCards[0],
-}} />
+<Story
+  name="Default"
+  args={{
+    ...mockAssistantCards[0],
+  }}
+/>

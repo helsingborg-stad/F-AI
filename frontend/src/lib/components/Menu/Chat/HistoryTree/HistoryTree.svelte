@@ -8,9 +8,9 @@
   } from '$lib/components/Menu/Chat/HistoryTree/historyUtils.js'
 
   interface Props {
-    items: HistoryItemType[],
-    highlightedIds: string[],
-    onClick: (id: string) => void,
+    items: HistoryItemType[]
+    highlightedIds: string[]
+    onClick: (id: string) => void
     dateRangeConfig?: IDateRangeConfig
   }
 
@@ -32,13 +32,13 @@
   let categorizedItems = $derived(categorizeHistoryItems(items, dateRangeConfig))
 </script>
 
-<div class="rounded-box flex flex-col gap-1">
+<div class="flex flex-col gap-1 rounded-box">
   {#each Object.keys(categorizedItems) as category}
     {#if categorizedItems[category].length > 0}
       <p class="font-bold">
         {categoryTitles[category] || category}
       </p>
-      {#each categorizedItems[category] as item(item.id)}
+      {#each categorizedItems[category] as item (item.id)}
         <HistoryItem
           title={item.title}
           highlighted={highlightedIds.includes(item.id)}

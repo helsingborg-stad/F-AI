@@ -5,9 +5,9 @@
   let { children } = $props()
 </script>
 
-<div class="flex bg-base-200 h-full overflow-hidden relative">
+<div class="relative flex h-full overflow-hidden bg-base-200">
   <ResponsiveSidebar>
-    <SidebarMenu/>
+    <SidebarMenu />
   </ResponsiveSidebar>
   <main class="m-2 flex-grow rounded-lg border bg-stone-50">
     {@render children()}

@@ -39,6 +39,6 @@ export const GET: RequestHandler = async (event) => {
     messageId,
     conversationId: conversationId || undefined,
     assistantId: assistantId || undefined,
-    features
+    features,
   })
 }

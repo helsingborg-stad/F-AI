@@ -15,8 +15,8 @@
     canChat: boolean
     assistants: IAssistantMenu[]
     conversations: {
-      id: string,
-      timestamp: string,
+      id: string
+      timestamp: string
       title: string
     }[]
     selectedAssistantId: string
@@ -53,25 +53,38 @@
   }
 </script>
 
-<div class="flex bg-base-200 h-full overflow-hidden relative">
+<div class="relative flex h-full overflow-hidden bg-base-200">
   <ResponsiveSidebar>
     <SidebarMenu>
-      <div class="flex flex-col h-full gap-2">
-        <button type="button" class="btn btn-neutral btn-sm" disabled={!canChat} onclick={onStartNewChat}>
-          <Icon icon={icons["plus"]} width={16} height={16} />
+      <div class="flex h-full flex-col gap-2">
+        <button
+          type="button"
+          class="btn btn-neutral btn-sm"
+          disabled={!canChat}
+          onclick={onStartNewChat}
+        >
+          <Icon icon={icons['plus']} width={16} height={16} />
           <span class="text-s">{m.chat_action_start_new()}</span>
         </button>
-        <div class="pl-2 overflow-y-auto h-full">
+        <div class="h-full overflow-y-auto pl-2">
           <HistoryTree
-            items={conversations.map(c => ({
-          id: c.id,
-          title: c.title || c.id,
-          options: [
-            { iconName: 'trash', title: m.chat_history_action_delete(), onClick: () => onDeleteConversation(c.id) },
-            { iconName: 'pencil', title: m.chat_history_action_edit(), onClick: () => openRenameModal(c.id, c.title) },
-          ],
-          createdTimestamp: c.timestamp
-        }))}
+            items={conversations.map((c) => ({
+              id: c.id,
+              title: c.title || c.id,
+              options: [
+                {
+                  iconName: 'trash',
+                  title: m.chat_history_action_delete(),
+                  onClick: () => onDeleteConversation(c.id),
+                },
+                {
+                  iconName: 'pencil',
+                  title: m.chat_history_action_edit(),
+                  onClick: () => openRenameModal(c.id, c.title),
+                },
+              ],
+              createdTimestamp: c.timestamp,
+            }))}
             highlightedIds={[conversationId]}
             onClick={(id) => goto(`/chat/${id}`)}
           />
@@ -79,13 +92,13 @@
       </div>
     </SidebarMenu>
   </ResponsiveSidebar>
-  <div class="flex flex-col w-full h-full gap-2 p-2 pt-0 overflow-hidden">
-    <main class="flex-grow h-full rounded-lg border bg-stone-50 overflow-hidden">
+  <div class="flex h-full w-full flex-col gap-2 overflow-hidden p-2 pt-0">
+    <main class="h-full flex-grow overflow-hidden rounded-lg border bg-stone-50">
       <Chat
         {assistants}
         bind:selectedAssistantId
-        messages={messages}
-        inputPlaceholder={inputPlaceholder}
+        {messages}
+        {inputPlaceholder}
         {onSubmitMessage}
         {chatStateIdle}
         {onStopChat}
@@ -95,7 +108,4 @@
   </div>
 </div>
 
-<RenameConversationModal
-  onSave={onRenameConversation}
-  bind:this={renameModal}
-/>
+<RenameConversationModal onSave={onRenameConversation} bind:this={renameModal} />

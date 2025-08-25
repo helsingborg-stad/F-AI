@@ -21,7 +21,7 @@ This layout file is responsible for setting the Navbar for the application
 and providing the main content area for child components.
 -->
 <SidebarProvider>
-  <div class="flex flex-col min-h-screen h-screen max-h-screen overflow-hidden">
+  <div class="flex h-screen max-h-screen min-h-screen flex-col overflow-hidden">
     {#if showNavbar}
       <header class="w-full bg-base-200 md:px-4">
         <Navbar

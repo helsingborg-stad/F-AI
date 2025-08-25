@@ -6,4 +6,4 @@
   const { text }: Props = $props()
 </script>
 
-<code class="px-1 font-mono rounded-sm">{text}</code>
+<code class="rounded-sm px-1 font-mono">{text}</code>

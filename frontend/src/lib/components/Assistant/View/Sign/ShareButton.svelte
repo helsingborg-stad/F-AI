@@ -24,10 +24,10 @@
 <div class="tooltip z-40" data-tip={copyText}>
   <button
     type="submit"
-    class="btn btn-sm btn-circle btn-ghost"
+    class="btn btn-circle btn-ghost btn-sm"
     onclick={onClick}
-    onmouseenter={() => copyText = defaultCopyText}
+    onmouseenter={() => (copyText = defaultCopyText)}
   >
-    <Icon icon={icons["share"]} width={20} height={20} />
+    <Icon icon={icons['share']} width={20} height={20} />
   </button>
 </div>

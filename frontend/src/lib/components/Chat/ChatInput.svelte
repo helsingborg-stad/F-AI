@@ -12,7 +12,15 @@
     onStopChat: () => void
   }
 
-  let { placeholder, value = $bindable(), onSubmit, children, disabled, receivingMessage, onStopChat }: Props = $props()
+  let {
+    placeholder,
+    value = $bindable(),
+    onSubmit,
+    children,
+    disabled,
+    receivingMessage,
+    onStopChat,
+  }: Props = $props()
 
   let disableSend = $derived.by(() => {
     return disabled || value === ''
@@ -32,7 +40,6 @@
       target.style.overflowY = 'hidden'
     }
   }
-
 
   function resetTextareaHeight() {
     if (textareaElement) {
@@ -80,18 +87,18 @@
   })
 </script>
 
-<div class="flex flex-col rounded-2xl p-3 gap-2">
+<div class="flex flex-col gap-2 rounded-2xl p-3">
   <div>
-      <textarea
-        bind:this={textareaElement}
-        rows="1"
-        bind:value
-        {placeholder}
-        class="textarea w-full px-1 resize-none focus:outline-none border-none min-h-[20px] max-h-40 overflow-y-hidden"
-        disabled={disabled}
-        oninput={autoResize}
-        onkeydown={handleTextareaKeyDown}
-      ></textarea>
+    <textarea
+      bind:this={textareaElement}
+      rows="1"
+      bind:value
+      {placeholder}
+      class="textarea max-h-40 min-h-[20px] w-full resize-none overflow-y-hidden border-none px-1 focus:outline-none"
+      {disabled}
+      oninput={autoResize}
+      onkeydown={handleTextareaKeyDown}
+    ></textarea>
   </div>
   <div
     role="toolbar"
@@ -106,13 +113,19 @@
     <div class="flex-shrink-0">
       {#if !receivingMessage}
         <div
-          class={disableSend ? "tooltip" : ""}
-          data-tip={value === '' ? m.chat_input_tooltip_empty_message() : m.chat_input_tooltip_select_assistant()}
+          class={disableSend ? 'tooltip' : ''}
+          data-tip={value === ''
+            ? m.chat_input_tooltip_empty_message()
+            : m.chat_input_tooltip_select_assistant()}
         >
-          <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}>{m.chat_input_action_send()}</button>
+          <button class="btn btn-sm" onclick={handleSend} disabled={disableSend}
+            >{m.chat_input_action_send()}</button
+          >
         </div>
-      {:else }
-        <button class="btn btn-sm" onclick={onStopChat}>{m.chat_input_action_abort()}</button>
+      {:else}
+        <button class="btn btn-sm" onclick={onStopChat}
+          >{m.chat_input_action_abort()}</button
+        >
       {/if}
     </div>
   </div>

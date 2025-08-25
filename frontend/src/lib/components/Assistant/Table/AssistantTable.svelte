@@ -18,25 +18,30 @@
 <div class="overflow-x-auto pt-4">
   <table class="table">
     <tbody>
-    {#each assistants as assistant}
-      <tr
-        class="hover"
-        class:bg-base-200={activeAssistant.id === assistant.id}
-        onclick={() => handleAssistantClick(assistant)}
-        role="button"
-        tabindex="0"
-      >
-        <td>
-          <div class="flex flex-col">
-            {#if assistant.avatarBase64}
-              <img src={`data:image/png;base64,${assistant.avatarBase64}`} alt="avatar"
-                   class="w-10 h-10 bg-white object-contain p-2" />
-            {/if}
-            <div class="text-base">{assistant.name ? assistant.name : 'Untitled assistant'}</div>
-          </div>
-        </td>
-      </tr>
-    {/each}
+      {#each assistants as assistant}
+        <tr
+          class="hover"
+          class:bg-base-200={activeAssistant.id === assistant.id}
+          onclick={() => handleAssistantClick(assistant)}
+          role="button"
+          tabindex="0"
+        >
+          <td>
+            <div class="flex flex-col">
+              {#if assistant.avatarBase64}
+                <img
+                  src={`data:image/png;base64,${assistant.avatarBase64}`}
+                  alt="avatar"
+                  class="h-10 w-10 bg-white object-contain p-2"
+                />
+              {/if}
+              <div class="text-base">
+                {assistant.name ? assistant.name : 'Untitled assistant'}
+              </div>
+            </div>
+          </td>
+        </tr>
+      {/each}
     </tbody>
   </table>
 </div>

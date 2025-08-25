@@ -1,6 +1,6 @@
 <script module>
-  import { defineMeta } from '@storybook/addon-svelte-csf';
-  import ChatBubble from '$lib/components/Chat/ChatBubble.svelte';
+  import { defineMeta } from '@storybook/addon-svelte-csf'
+  import ChatBubble from '$lib/components/Chat/ChatBubble.svelte'
 
   const { Story } = defineMeta({
     title: 'Components/Chat/ChatBubble',
@@ -15,15 +15,24 @@
       text: { control: 'text', description: 'The message text.' },
       name: { control: 'text', description: 'Name of the sender.' },
       time: { control: 'text', description: 'Timestamp of the message.' },
-      avatar: { control: 'text', description: 'URL of the sender\'s avatar image.' },
+      avatar: { control: 'text', description: "URL of the sender's avatar image." },
       status: { control: 'text', description: 'Status text (e.g., "Delivered").' },
       bubbleColor: {
         control: { type: 'select' },
-        options: ['', 'primary', 'secondary', 'accent', 'info', 'success', 'warning', 'error'],
+        options: [
+          '',
+          'primary',
+          'secondary',
+          'accent',
+          'info',
+          'success',
+          'warning',
+          'error',
+        ],
         description: 'Color of the chat bubble.',
       },
     },
-  });
+  })
 </script>
 
 <Story

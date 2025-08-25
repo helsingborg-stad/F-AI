@@ -30,14 +30,14 @@
   <img class="m-0 max-w-96" src={href} alt={text} />
 </button>
 
-<dialog bind:this={dialog} class="modal prose" onclick={handleBackdropClick}>
-  <div class="modal-box w-11/12 h-5/6 max-w-5xl flex pt-12 justify-center items-center">
-    <div class="absolute right-2 top-2 flex gap-1 justify-end">
+<dialog bind:this={dialog} class="prose modal" onclick={handleBackdropClick}>
+  <div class="modal-box flex h-5/6 w-11/12 max-w-5xl items-center justify-center pt-12">
+    <div class="absolute right-2 top-2 flex justify-end gap-1">
       <a
         bind:this={downloadAnchor}
         class="hidden"
         target="_blank"
-        href={href}
+        {href}
         download
         aria-label="hidden downloader anchor"
       ></a>
@@ -48,8 +48,12 @@
         <button class="btn btn-circle btn-ghost btn-sm">✕</button>
       </form>
     </div>
-    <div class="max-w-full max-h-full shrink flex flex-col justify-center items-center">
-      <img class="m-0 p-0 h-full w-full max-w-fit max-h-fit object-contain" src={href} alt={text} />
+    <div class="flex max-h-full max-w-full shrink flex-col items-center justify-center">
+      <img
+        class="m-0 h-full max-h-fit w-full max-w-fit object-contain p-0"
+        src={href}
+        alt={text}
+      />
       <span>{text}</span>
     </div>
   </div>

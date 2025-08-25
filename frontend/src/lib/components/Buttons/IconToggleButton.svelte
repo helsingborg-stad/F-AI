@@ -15,8 +15,8 @@
   class:btn-active={value}
   class:text-[#3b82f6]={value}
   class:bg-gray-200={value}
-  onclick={() => value = !value}
+  onclick={() => (value = !value)}
 >
-  <Icon icon={icon} width={16} height={16} />
+  <Icon {icon} width={16} height={16} />
   {title}
 </button>

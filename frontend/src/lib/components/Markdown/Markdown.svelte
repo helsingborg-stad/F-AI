@@ -16,6 +16,6 @@
   renderers={{
     image: Image,
     code: Code,
-    codespan: CodeSpan
+    codespan: CodeSpan,
   }}
 />

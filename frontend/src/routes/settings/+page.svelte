@@ -8,10 +8,7 @@
   const backendSettings = data.settings
 </script>
 
-<div
-  class="flex-1 overflow-auto"
-  style="max-height: calc(100vh - 64px);"
->
+<div class="flex-1 overflow-auto" style="max-height: calc(100vh - 64px);">
   <div class="p-4">
     <h1>{m.settings_page_title()}</h1>
     <p>{m.settings_page_description()}</p>
@@ -51,7 +48,9 @@
         value={backendSettings.brevoApiKey}
         placeholder="xkeysib-..."
       />
-      <button type="submit" class="btn btn-sm btn-primary mt-16">{m.common_action_save()}</button>
+      <button type="submit" class="btn btn-primary btn-sm mt-16"
+        >{m.common_action_save()}</button
+      >
     </form>
   </div>
 </div>

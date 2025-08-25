@@ -13,14 +13,15 @@
 
   let filteredExhibits = $derived(
     exhibits
-      .map(exhibit => ({
+      .map((exhibit) => ({
         ...exhibit,
-        cards: exhibit.cards.filter(card =>
-          card.title.toLowerCase().includes(filter.toLowerCase()) ||
-          card.description.toLowerCase().includes(filter.toLowerCase())
-        )
+        cards: exhibit.cards.filter(
+          (card) =>
+            card.title.toLowerCase().includes(filter.toLowerCase()) ||
+            card.description.toLowerCase().includes(filter.toLowerCase()),
+        ),
       }))
-      .filter(exhibit => exhibit.cards.length > 0)
+      .filter((exhibit) => exhibit.cards.length > 0),
   )
 </script>
 
@@ -28,7 +29,7 @@
   <div class="mb-24">
     <SearchBar bind:value={filter} />
   </div>
-  <div class="w-full mx-auto max-w-3xl px-4">
+  <div class="mx-auto w-full max-w-3xl px-4">
     {#each filteredExhibits as exhibit}
       <Exhibit
         title={exhibit.title}

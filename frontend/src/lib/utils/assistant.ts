@@ -146,7 +146,9 @@ export async function deleteFavoriteAssistant(
   )
 }
 
-export async function getFavoriteAssistants(event: RequestEvent): Promise<IFavAssistant[]> {
+export async function getFavoriteAssistants(
+  event: RequestEvent,
+): Promise<IFavAssistant[]> {
   return await handleApiCall(
     event,
     (api) => api.getFavoriteAssistants(),

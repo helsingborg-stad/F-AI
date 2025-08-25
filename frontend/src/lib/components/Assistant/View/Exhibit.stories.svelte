@@ -10,7 +10,4 @@
   })
 </script>
 
-<Story
-  name="Default"
-  args={mockExhibits[0]}
-/>
+<Story name="Default" args={mockExhibits[0]} />

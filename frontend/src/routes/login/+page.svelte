@@ -1,7 +1,7 @@
 <script lang="ts">
   import Login from '$lib/components/Login/Login.svelte'
   import { setUser } from '$lib/state/user.svelte.js'
-  import { page } from '$app/state';
+  import { page } from '$app/state'
 
   let { form } = $props()
 
@@ -15,12 +15,12 @@
   const redirectTo = redirectParam ? redirectParam.toString() : '/'
 </script>
 
-<div class="min-h-screen bg-base-200 flex items-center justify-center p-4">
+<div class="flex min-h-screen items-center justify-center bg-base-200 p-4">
   <Login
     initialId={id}
     initialIsIdSubmitted={isIdSubmitted}
-    errorMessage={errorMessage}
-    requestId={requestId}
+    {errorMessage}
+    {requestId}
     {redirectTo}
   />
 </div>

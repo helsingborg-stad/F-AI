@@ -10,17 +10,8 @@
   })
 </script>
 
-<Story
-  name="Default"
-  args={{...mockAssistantCards[0]}}
-/>
+<Story name="Default" args={{ ...mockAssistantCards[0] }} />
 
-<Story
-  name="With primary color and no avatar'"
-  args={{...mockAssistantCards[2]}}
-/>
+<Story name="With primary color and no avatar'" args={{ ...mockAssistantCards[2] }} />
 
-<Story
-  name="With transparent color and no avatar'"
-  args={{...mockAssistantCards[3]}}
-/>
+<Story name="With transparent color and no avatar'" args={{ ...mockAssistantCards[3] }} />

@@ -17,4 +17,4 @@
   })
 </script>
 
-<Story name="Default" args={{ title: "Chat", iconName: "panelLeft", onClick: fn() }} />
+<Story name="Default" args={{ title: 'Chat', iconName: 'panelLeft', onClick: fn() }} />

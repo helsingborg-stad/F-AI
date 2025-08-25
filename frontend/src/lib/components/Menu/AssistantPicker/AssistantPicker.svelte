@@ -14,7 +14,7 @@
   let isOpen = $state(false)
   let dropdownRef: HTMLDivElement = $state(undefined as unknown as HTMLDivElement)
 
-  function selectAssistant(assistant: { id: string, name: string }) {
+  function selectAssistant(assistant: { id: string; name: string }) {
     selectedAssistantId = assistant.id
     isOpen = false
   }
@@ -27,9 +27,11 @@
     !selectedAssistantId
       ? m.chat_assistant_picker_select()
       : assistants
-        .flatMap(group => group.menuItems)
-        .find(item => item.id === selectedAssistantId)?.name ||
-      (disabled ? m.chat_assistant_picker_unknown() : m.chat_assistant_picker_select()),
+          .flatMap((group) => group.menuItems)
+          .find((item) => item.id === selectedAssistantId)?.name ||
+          (disabled
+            ? m.chat_assistant_picker_unknown()
+            : m.chat_assistant_picker_select()),
   )
 
   function handleClickOutside(event: MouseEvent) {
@@ -48,19 +50,19 @@
 </script>
 
 {#if disabled}
-  <button class="btn btn-sm btn-ghost m-1 pointer-events-none cursor-not-allowed">
+  <button class="btn btn-ghost btn-sm pointer-events-none m-1 cursor-not-allowed">
     {selectedAssistantName}
   </button>
 {:else}
-  <div class="dropdown dropdown-top dropdown-end dropdown-open" bind:this={dropdownRef}>
+  <div class="dropdown dropdown-end dropdown-top dropdown-open" bind:this={dropdownRef}>
     <button
-      class="btn btn-sm btn-ghost m-1"
+      class="btn btn-ghost btn-sm m-1"
       aria-haspopup="true"
       aria-expanded={isOpen}
       aria-controls="dropdown-menu"
       onclick={(e) => {
-        e.stopPropagation();
-        toggleDropdown();
+        e.stopPropagation()
+        toggleDropdown()
       }}
       onkeydown={(e) => e.key === 'Enter' && toggleDropdown()}
     >
@@ -82,11 +84,11 @@
     </button>
     <ul
       id="dropdown-menu"
-      class="dropdown-content menu bg-base-100 rounded-md z-[999] w-52 p-2 shadow"
+      class="menu dropdown-content z-[999] w-52 rounded-md bg-base-100 p-2 shadow"
       class:hidden={!isOpen}
       role="menu"
     >
-      {#each assistants.filter(item => !item.hidden) as item}
+      {#each assistants.filter((item) => !item.hidden) as item}
         {#if item.menuTitle}
           <div class="pt-1">{item.menuTitle}</div>
         {/if}
@@ -95,8 +97,8 @@
             <button
               class={selectedAssistantId === menuItem.id ? 'active' : ''}
               onclick={(e) => {
-                e.stopPropagation();
-                selectAssistant(menuItem);
+                e.stopPropagation()
+                selectAssistant(menuItem)
               }}
             >
               {menuItem.name}

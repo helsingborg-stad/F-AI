@@ -15,10 +15,7 @@
 </script>
 
 <Story name="Default">
-  <RenameConversationModal
-    bind:this={defaultComponentRef}
-    onSave={handleSave}
-  />
+  <RenameConversationModal bind:this={defaultComponentRef} onSave={handleSave} />
   <button
     class="btn btn-primary mt-4"
     onclick={() => defaultComponentRef?.showModal('chat-123', 'Current Chat Title')}

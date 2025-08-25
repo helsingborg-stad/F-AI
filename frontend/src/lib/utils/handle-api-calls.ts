@@ -1,5 +1,9 @@
 import type { RequestEvent } from '@sveltejs/kit'
-import { type ApiResult, BackendApiService, BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
+import {
+  type ApiResult,
+  BackendApiService,
+  BackendApiServiceFactory,
+} from '$lib/backendApi/backendApi.js'
 
 export async function handleApiCall<T>(
   event: RequestEvent,

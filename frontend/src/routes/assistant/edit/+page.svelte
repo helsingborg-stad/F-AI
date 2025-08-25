@@ -2,7 +2,7 @@
   import type { IAssistant, IAssistantModel } from '$lib/types.js'
   import MainPage from '$lib/components/Assistant/MainPage.svelte'
 
-  let { data } = $props<{ assistants: IAssistant[], models: IAssistantModel[] }>()
+  let { data } = $props<{ assistants: IAssistant[]; models: IAssistantModel[] }>()
 
   const assistants = data.assistants
   const activeAssistant = data.activeAssistant

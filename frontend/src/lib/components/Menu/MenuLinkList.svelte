@@ -2,7 +2,7 @@
   import type { IMenuItem } from '$lib/types.js'
 
   interface Props {
-    items: IMenuItem[],
+    items: IMenuItem[]
     activePath: string
   }
 

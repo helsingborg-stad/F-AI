@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private'
-import { type Cookies, redirect, type RequestEvent } from '@sveltejs/kit'
+import { type Cookies, type RequestEvent } from '@sveltejs/kit'
 import dayjs from 'dayjs'
 import type {
   IAssistantModels,
@@ -245,7 +245,7 @@ export class BackendApiService {
     return this.getRaw(url)
   }
 
-    async storeChatSSE(message: string): Promise<ApiResult<string>> {
+  async storeChatSSE(message: string): Promise<ApiResult<string>> {
     const [error, { stored_message_id }] = await this.post<{ stored_message_id: string }>(
       '/api/chat/store',
       {
@@ -254,7 +254,6 @@ export class BackendApiService {
     )
     return [error, stored_message_id] as ApiResult<string>
   }
-
 
   /** Auth */
 

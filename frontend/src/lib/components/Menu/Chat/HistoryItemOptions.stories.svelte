@@ -3,7 +3,6 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import HistoryItemOptions from '$lib/components/Menu/Chat/HistoryItemOptions.svelte'
 
-
   const { Story } = defineMeta({
     title: 'Components/Menu/HistoryItemOptions',
     component: HistoryItemOptions,
@@ -17,4 +16,4 @@
   })
 </script>
 
-<Story name="Default" args={{ iconName: "trash", title: "Delete", onClick: fn() }} />
+<Story name="Default" args={{ iconName: 'trash', title: 'Delete', onClick: fn() }} />

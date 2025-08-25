@@ -30,11 +30,14 @@
       <input
         type="text"
         bind:value={title}
-        class="input input-bordered w-full mt-3 px-3 py-2"
-        onkeydown={e => e.key === 'Enter' && handleSave(conversationId, title)}
+        class="input input-bordered mt-3 w-full px-3 py-2"
+        onkeydown={(e) => e.key === 'Enter' && handleSave(conversationId, title)}
       />
-      <div class="flex flex-row-reverse gap-2 mt-4">
-        <button class="btn btn-outline min-w-24" onclick={() => handleSave(conversationId, title)}>Save</button>
+      <div class="mt-4 flex flex-row-reverse gap-2">
+        <button
+          class="btn btn-outline min-w-24"
+          onclick={() => handleSave(conversationId, title)}>Save</button
+        >
         <button class="btn min-w-24" onclick={() => dialog.close()}>Cancel</button>
       </div>
     </div>

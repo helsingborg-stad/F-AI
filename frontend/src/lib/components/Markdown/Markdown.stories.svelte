@@ -99,7 +99,7 @@ Normal link: https://duckduckgo.com/
 
 Named link: [DuckDuckGo](https://duckduckgo.com/)
 
-\*\*\*\* Escaped character \*\*\*\*
+**** Escaped character ****
 
 ~~Strikethrough~~
 

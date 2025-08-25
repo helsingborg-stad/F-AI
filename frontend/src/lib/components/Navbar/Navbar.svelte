@@ -13,12 +13,19 @@
     currentUrlPath: string
     avatarPlaceholder: string
     avatarMenu: {
-      title: string,
+      title: string
       action: string
     }[]
   }
 
-  let { navbarTitle, avatarUrl, navbarMenu, currentUrlPath, avatarPlaceholder, avatarMenu }: Props = $props()
+  let {
+    navbarTitle,
+    avatarUrl,
+    navbarMenu,
+    currentUrlPath,
+    avatarPlaceholder,
+    avatarMenu,
+  }: Props = $props()
 
   const sidebarState = getSidebarContext()
 
@@ -33,19 +40,25 @@
 
   let currentIcon = $derived.by(() => {
     if (isHovering) {
-      return sidebarState.showSidebar ? icons["arrowLeftToLine"] : icons["arrowRightToLine"]
+      return sidebarState.showSidebar
+        ? icons['arrowLeftToLine']
+        : icons['arrowRightToLine']
     }
-    return icons["panelLeft"]
+    return icons['panelLeft']
   })
 </script>
 
-<nav class="navbar py-0 min-h-0">
+<nav class="navbar min-h-0 py-0">
   <button
-    class="btn btn-ghost btn-sm btn-square min-w-2 {sidebarState.showSidebar ? 'max-md:z-[40] max-md:relative' : ''}"
+    class="btn btn-square btn-ghost btn-sm min-w-2 {sidebarState.showSidebar
+      ? 'max-md:relative max-md:z-[40]'
+      : ''}"
     onclick={sidebarState.toggleSidebar}
-    onmouseenter={() => isHovering = true}
-    onmouseleave={() => isHovering = false}
-    aria-label={sidebarState.showSidebar ? m.nav_sidebar_hide_aria_label() : m.nav_sidebar_show_aria_label()}
+    onmouseenter={() => (isHovering = true)}
+    onmouseleave={() => (isHovering = false)}
+    aria-label={sidebarState.showSidebar
+      ? m.nav_sidebar_hide_aria_label()
+      : m.nav_sidebar_show_aria_label()}
   >
     <Icon icon={currentIcon} width={24} height={24} />
   </button>
@@ -56,7 +69,7 @@
     {/if}
   </div>
 
-  <div class="grow justify-end flex">
+  <div class="flex grow justify-end">
     <ul class="menu menu-horizontal gap-1">
       {#each navbarMenu as { label, path }}
         <li><a href={path} class:active={isActive(path)}>{label}</a></li>

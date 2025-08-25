@@ -12,12 +12,12 @@
 </script>
 
 <div class="tooltip tooltip-right" data-tip={toolTip}>
-  <div class="flex flex-row gap-2 items-center">
+  <div class="flex flex-row items-center gap-2">
     {#if children}
       {@render children()}
     {/if}
     <div class="flex-shrink-0">
-      <Icon icon={icons["info"]} width={14} height={14} />
+      <Icon icon={icons['info']} width={14} height={14} />
     </div>
   </div>
 </div>

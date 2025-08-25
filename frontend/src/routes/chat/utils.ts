@@ -10,9 +10,7 @@ export async function getAssistantPickerData(
   let result: IAssistantMenu[] = []
 
   const favAssistants = await getFavoriteAssistants(event)
-  const favIds = new Set(
-    favAssistants.map((assistant) => assistant.id),
-  )
+  const favIds = new Set(favAssistants.map((assistant) => assistant.id))
 
   if (favAssistants.length > 0) {
     const favItems = favAssistants.map((assistant) => ({

@@ -21,16 +21,19 @@
 
 <div class="dropdown dropdown-end">
   <div tabindex="0" role="button" class="btn btn-sm">
-    <Icon icon={icons["settings"]} width={16} height={16} />
+    <Icon icon={icons['settings']} width={16} height={16} />
   </div>
 
   <div
     role="dialog"
     aria-label={m.assistant_edit_tools_arial_label_file()}
-    class="dropdown-content card card-compact bg-white z-[1] w-64 p-2 shadow">
+    class="card dropdown-content card-compact z-[1] w-64 bg-white p-2 shadow"
+  >
     <div class="card-body">
       <div class="flex flex-row place-content-between items-center">
-        <div class="text-sm font-medium select-none">{m.assistant_edit_tools_file_max_result()}</div>
+        <div class="select-none text-sm font-medium">
+          {m.assistant_edit_tools_file_max_result()}
+        </div>
         <div class="flex flex-row items-center gap-1">
           {#if maxCollectionResults !== DEFAULT_RESULTS}
             <button
@@ -40,12 +43,16 @@
               onmousedown={(e) => {
                 e.preventDefault()
                 reset()
-              }}>
-              <Icon icon={icons["rotateCcw"]} width={16} height={16} />
+              }}
+            >
+              <Icon icon={icons['rotateCcw']} width={16} height={16} />
             </button>
           {/if}
           <div
-            class="text-sm select-none w-8 h-8 font-mono flex items-center justify-center">{maxCollectionResults}</div>
+            class="flex h-8 w-8 select-none items-center justify-center font-mono text-sm"
+          >
+            {maxCollectionResults}
+          </div>
         </div>
       </div>
       <input
@@ -56,7 +63,9 @@
         bind:value={maxCollectionResults}
         class="range range-xs"
       />
-      <div class="pt-2 text-xs opacity-50 select-none">{m.assistant_edit_tools_file_user_info()}</div>
+      <div class="select-none pt-2 text-xs opacity-50">
+        {m.assistant_edit_tools_file_user_info()}
+      </div>
     </div>
   </div>
 </div>
