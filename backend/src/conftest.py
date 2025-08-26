@@ -8,7 +8,7 @@ from pymongo import AsyncMongoClient
 
 from src.common.get_timestamp import get_timestamp
 from src.common.mock_services import MockSettingsService
-from src.modules.vector.ChromaDBVectorService import ChromaDBVectorService
+from src.modules.vector.ChromaDBLocalVectorService import ChromaDBLocalVectorService
 
 TEST_DB_PATH = './__test_chromadb'
 
@@ -17,7 +17,7 @@ TEST_DB_PATH = './__test_chromadb'
 def vector_service():
     path = TEST_DB_PATH + uuid.uuid4().hex
     shutil.rmtree(path, ignore_errors=True)
-    yield ChromaDBVectorService(settings_service=MockSettingsService(), db_path=path)
+    yield ChromaDBLocalVectorService(settings_service=MockSettingsService())
     shutil.rmtree(path, ignore_errors=True)
 
 
