@@ -70,7 +70,7 @@ class MongoCollectionService(ICollectionService):
             {
                 '$set': {'label': label}
             })
-        return result.modified_count == 1
+        return result.matched_count == 1
 
     async def set_collection_documents(self, collection_id: str, paths_and_urls: list[str]) -> bool:
         await self._vector_service.delete_vector_space(collection_id)
