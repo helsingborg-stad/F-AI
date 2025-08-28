@@ -42,3 +42,8 @@ export async function userCanReadCollections(event: RequestEvent): Promise<boole
   const userScopes = await fetchUserScopes(event)
   return hasScope('collection.read', userScopes)
 }
+
+export async function userCanWriteCollections(event: RequestEvent): Promise<boolean> {
+  const userScopes = await fetchUserScopes(event)
+  return hasScope('collection.write', userScopes)
+}

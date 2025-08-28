@@ -18,6 +18,7 @@
     enableSearch: boolean
     enableReasoning: boolean
     enableImageGeneration: boolean
+    enableFileUpload: boolean
   }
 
   let {
@@ -29,6 +30,7 @@
     enableSearch,
     enableReasoning,
     enableImageGeneration,
+    enableFileUpload
   }: Props = $props()
   let fileModal: FileUploadModal
   let currentCollectionId = $state(collectionId)
@@ -58,7 +60,7 @@
   <div class="flex flex-row place-content-between items-center">
     <div class="flex items-center gap-2">
       {#if collectionId}
-        <button type="button" class="btn btn-xs" disabled={!canEdit}>
+        <button type="button" class="btn btn-xs" disabled={!canEdit || !enableFileUpload}>
           <Icon icon={icons['database']} width={16} height={16} />
         </button>
       {/if}
@@ -74,7 +76,7 @@
       <button
         type="button"
         class="btn btn-sm"
-        disabled={!canEdit}
+        disabled={!canEdit || !enableFileUpload}
         onclick={openFilesModal}
       >
         <Icon icon={icons['plus']} width={16} height={16} />

@@ -78,6 +78,7 @@ export interface IAssistant {
   enableSearch: boolean
   enableReasoning: boolean
   enableImageGeneration: boolean
+  enableFileUpload: boolean
 }
 
 export interface IFavAssistant {

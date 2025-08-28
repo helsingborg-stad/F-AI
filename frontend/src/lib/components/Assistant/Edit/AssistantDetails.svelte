@@ -209,6 +209,7 @@
           enableSearch={assistant.enableSearch}
           enableReasoning={assistant.enableReasoning}
           enableImageGeneration={assistant.enableImageGeneration}
+          enableFileUpload={assistant.enableFileUpload}
         />
         <ModelConfigSection {canEdit} />
       </div>

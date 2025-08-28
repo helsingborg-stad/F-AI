@@ -22,6 +22,7 @@ import {
   userCanReadAssistants,
   userCanReadCollections,
   userCanWriteAssistant,
+  userCanWriteCollections,
 } from '$lib/utils/scopes.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
@@ -67,6 +68,7 @@ export const load: PageServerLoad = async (event) => {
   const canCreateAssistant = await userCanWriteAssistant(event)
   const canEditAssistant = await userCanWriteAssistant(event)
   const canReadCollections = await userCanReadCollections(event)
+  const canWriteCollections = await userCanWriteCollections(event)
   const activeAssistantID = event.url.searchParams.get('assistant_id') || ''
 
   let assistants: IAssistant[] = []
@@ -86,6 +88,7 @@ export const load: PageServerLoad = async (event) => {
       enableSearch: assistant.meta?.enable_search === true,
       enableReasoning: assistant.meta?.enable_reasoning === true,
       enableImageGeneration: assistant.meta?.enable_image_generation === true,
+      enableFileUpload: false
     }))
   }
 
@@ -104,6 +107,7 @@ export const load: PageServerLoad = async (event) => {
       enableSearch: assistantData.meta?.enable_search === true,
       enableReasoning: assistantData.meta?.enable_reasoning === true,
       enableImageGeneration: assistantData.meta?.enable_image_generation === true,
+      enableFileUpload: canWriteCollections
     }
 
     if (canReadCollections && assistantData.collection_id) {
