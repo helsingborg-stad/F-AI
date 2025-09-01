@@ -55,7 +55,7 @@ The `model.key` should be used as an assistant's `model` value.
     response_model=GetAvailableModelsResponse,
 )
 async def get_available_models(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
-    result = await services.assistant_service.get_available_models(as_uid=auth_identity.uid)
+    result = await services.model_service.get_available_models(as_uid=auth_identity.uid)
     return GetAvailableModelsResponse(models=[
         GetAvailableModelsResponseModel(
             key=model.key,

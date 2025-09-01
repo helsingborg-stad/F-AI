@@ -6,6 +6,7 @@
   import ToolsSection from '$lib/components/Assistant/Edit/ToolsSection/ToolsSection.svelte'
   import ModelConfigSection from '$lib/components/Assistant/Edit/ModelConfigSection.svelte'
   import AvatarSection from '$lib/components/Assistant/Edit/AvatarSection.svelte'
+  import ModelSelector from '$lib/components/Model/ModelSelector.svelte'
 
   interface Props {
     assistant?: IAssistant
@@ -128,7 +129,6 @@
       class="space-y-4 pb-8"
     >
       <input type="hidden" name="assistant_id" value={assistant.id} />
-      <input type="hidden" name="model_key" bind:value={selectedModelKey} />
       <input type="hidden" name="collection_id" value={collectionId} />
 
       <AvatarSection
@@ -177,26 +177,17 @@
         >
       </label>
 
-      <label class="form-control w-full">
+      <div class="form-control w-full">
         <div class="label">
           <span class="label-text">{m.assistant_edit_model_placeholder()}</span>
         </div>
-        <select
+        <ModelSelector
+          {models}
+          bind:selectedKey={selectedModelKey}
+          {canEdit}
           name="model"
-          bind:value={selectedModelKey}
-          class="select select-bordered select-sm text-sm"
-          disabled={!canEdit}
-        >
-          <option value="" disabled selected
-            >{m.assistant_edit_model_select_placeholder()}</option
-          >
-          {#each models as model}
-            <option value={model.key} selected={assistant.model === model.key}
-              >{model.name}</option
-            >
-          {/each}
-        </select>
-      </label>
+        />
+      </div>
 
       <div class="space-y-2 pt-5">
         <AccessSection {canEdit} isPublic={assistant.isPublic} />

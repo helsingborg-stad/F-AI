@@ -8,15 +8,16 @@ from pymongo.asynchronous.database import AsyncDatabase
 from src.common.mongo import is_valid_mongo_id
 from src.modules.assistants.models.Assistant import Assistant
 from src.modules.assistants.models.AssistantInfo import AssistantInfo
-from src.modules.assistants.models.Model import Model
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
+from src.modules.models.protocols.IModelService import IModelService
 from src.modules.resources.protocols.IResourceService import IResourceService
 
 
 class MongoAssistantService(IAssistantService):
-    def __init__(self, database: AsyncDatabase, resource_service: IResourceService):
+    def __init__(self, database: AsyncDatabase, resource_service: IResourceService, model_service: IModelService):
         self._database = database
         self._resource_service = resource_service
+        self._model_service = model_service
 
     async def create_assistant(self, as_uid: str, force_id: str | None = None) -> str:
         if force_id and await self._database['assistants'].find_one({'_id': ObjectId(force_id)}) is not None:
@@ -38,30 +39,6 @@ class MongoAssistantService(IAssistantService):
             '_id': ObjectId(assistant.id)
         })
         return str(result.inserted_id)
-
-    async def get_available_models(self, as_uid: str) -> list[Model]:
-        cursor = self._database['chat_models'].find(projection=['key', 'provider', 'display_name', 'description'])
-        return [Model(
-            key=doc['key'],
-            provider=doc['provider'],
-            display_name=doc['display_name'],
-            description=doc['description']
-        ) async for doc in cursor]
-
-    async def set_available_models(self, models: list[Model]) -> bool:
-        await self._database['chat_models'].drop()
-        if len(models) == 0:
-            return True
-        result = await self._database['chat_models'].insert_many([
-            {
-                'key': model.key,
-                'provider': model.provider,
-                'display_name': model.display_name,
-                'description': model.description
-            }
-            for model in models
-        ])
-        return len(result.inserted_ids) == len(models)
 
     async def get_assistant(self, as_uid: str, assistant_id: str, redact_key: bool = True) -> Assistant | None:
         if not is_valid_mongo_id(assistant_id):

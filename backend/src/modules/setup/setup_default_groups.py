@@ -13,7 +13,8 @@ async def setup_default_groups(group_service: IGroupService):
             'assistant.read',
             'conversation.read',
             'conversation.write',
-            'chat'
+            'chat',
+            'model.read'
         ],
         resources=[]
     )
@@ -37,8 +38,13 @@ async def setup_default_groups(group_service: IGroupService):
             'group.read',
             'group.write',
             'ai.run',
+            'model.read',
+            'model.write',
+            'model.delete',
+            'model.admin',
             'settings.read',
             'settings.write',
+            'settings.models',
             'test'
         ],
         resources=[]
