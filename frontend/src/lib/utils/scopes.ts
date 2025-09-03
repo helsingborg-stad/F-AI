@@ -43,6 +43,31 @@ export async function userCanReadCollections(event: RequestEvent): Promise<boole
   return hasScope('collection.read', userScopes)
 }
 
+export async function userCanReadModels(event: RequestEvent): Promise<boolean> {
+  const userScopes = await fetchUserScopes(event)
+  return hasScope('model.read', userScopes) || hasScope('assistant.read', userScopes)
+}
+
+export async function userCanWriteModels(event: RequestEvent): Promise<boolean> {
+  const userScopes = await fetchUserScopes(event)
+  return hasScope('model.write', userScopes)
+}
+
+export async function userCanDeleteModels(event: RequestEvent): Promise<boolean> {
+  const userScopes = await fetchUserScopes(event)
+  return hasScope('model.delete', userScopes)
+}
+
+export async function userCanAccessModelSettings(event: RequestEvent): Promise<boolean> {
+  const userScopes = await fetchUserScopes(event)
+  return hasScope('settings.models', userScopes)
+}
+
+export async function userIsModelAdmin(event: RequestEvent): Promise<boolean> {
+  const userScopes = await fetchUserScopes(event)
+  return hasScope('model.admin', userScopes)
+}
+
 export async function userCanWriteCollections(event: RequestEvent): Promise<boolean> {
   const userScopes = await fetchUserScopes(event)
   return hasScope('collection.write', userScopes)

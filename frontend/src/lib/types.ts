@@ -34,6 +34,11 @@ export type UserScopeType =
   | 'group.read'
   | 'test'
   | 'llm.run'
+  | 'model.read'
+  | 'model.write'
+  | 'model.delete'
+  | 'model.admin'
+  | 'settings.models'
   | string // Allow for future scopes
 
 export interface IUserInfo {
@@ -47,7 +52,19 @@ export interface IScopesResponse {
 export interface IAssistantModel {
   key: string
   provider: string
-  name: string
+  display_name: string
+  description?: string | null
+  meta?: {
+    description?: string
+    avatar_base64?: string
+    [key: string]: JsonValue | undefined
+  }
+  created_at?: string
+  updated_at?: string
+  status?: 'active' | 'deprecated' | 'disabled'
+  visibility?: 'public' | 'internal'
+  version?: number
+  name?: string
 }
 
 export interface IAssistantModels {

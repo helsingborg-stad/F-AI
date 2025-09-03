@@ -2,6 +2,7 @@ import { env } from '$env/dynamic/private'
 import { type Cookies, type RequestEvent } from '@sveltejs/kit'
 import dayjs from 'dayjs'
 import type {
+  IAssistantModel,
   IAssistantModels,
   IBackendApiSettings,
   IBackendAssistant,
@@ -9,6 +10,7 @@ import type {
   IConversation,
   IConversations,
   IFavAssistant,
+  JsonObject,
 } from '$lib/types.js'
 
 export interface CallOptions {
@@ -460,6 +462,61 @@ export class BackendApiService {
     return this.patch(`/api/conversation/${conversationId}/title`, {
       body: JSON.stringify({ title }),
     })
+  }
+
+  async createModel(modelData: {
+    key: string
+    provider: string
+    display_name: string
+    description?: string | null
+    meta?: JsonObject | null
+    status?: string
+    visibility?: string
+  }): Promise<ApiResult<IAssistantModel>> {
+    const [error, response] = await this.post<IAssistantModel>('/api/model/models', {
+      body: JSON.stringify(modelData),
+    })
+    return [error, response] as ApiResult<IAssistantModel>
+  }
+
+  async updateModel(
+    key: string,
+    modelData: {
+      provider: string
+      display_name: string
+      description?: string | null
+      meta?: JsonObject | null
+      status?: string
+      visibility?: string
+      version: number
+    },
+  ): Promise<ApiResult<IAssistantModel>> {
+    const [error, response] = await this.put<IAssistantModel>(
+      `/api/model/models/${encodeURIComponent(key)}`,
+      {
+        body: JSON.stringify(modelData),
+      },
+    )
+    return [error, response] as ApiResult<IAssistantModel>
+  }
+
+  async deleteModel(key: string): Promise<ApiResult<never>> {
+    const [error] = await this.delete(`/api/model/models/${encodeURIComponent(key)}`)
+    return [error, undefined] as ApiResult<never>
+  }
+
+  async getModel(key: string): Promise<ApiResult<IAssistantModel>> {
+    const [error, response] = await this.get<IAssistantModel>(
+      `/api/model/models/${encodeURIComponent(key)}`,
+    )
+    return [error, response] as ApiResult<IAssistantModel>
+  }
+
+  async getAllModels(): Promise<ApiResult<{ models: IAssistantModel[] }>> {
+    const [error, response] = await this.get<{ models: IAssistantModel[] }>(
+      '/api/model/models',
+    )
+    return [error, response] as ApiResult<{ models: IAssistantModel[] }>
   }
 }
 
