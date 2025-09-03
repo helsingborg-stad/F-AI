@@ -12,23 +12,17 @@
     onUpdate: () => void
   }
 
-  let { canEdit, canDelete, canCreate, onDelete, onCopy, onUpdate }: Props = $props()
+  let { canEdit, canCreate, onDelete, onCopy, onUpdate }: Props = $props()
 </script>
 
 {#if canEdit}
   <div class="flex justify-between">
     <div class="flex flex-row gap-2">
-      {#if canDelete}
-        <div>
-          <button
-            type="submit"
-            class="btn btn-error btn-sm text-white"
-            onclick={onDelete}
-          >
-            <Icon icon={icons['trash']} width={20} height={20} />
-          </button>
-        </div>
-      {/if}
+      <div>
+        <button type="submit" class="btn btn-error btn-sm text-white" onclick={onDelete}>
+          <Icon icon={icons['trash']} width={20} height={20} />
+        </button>
+      </div>
       {#if canCreate}
         <div>
           <button
