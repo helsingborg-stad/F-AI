@@ -12,6 +12,8 @@
   "settings_mistral_api_key_label": "Clé API Mistral",
   "settings_brevo_api_url_label": "URL API Brevo",
   "settings_brevo_api_key_label": "Clé API Brevo",
+  "settings_general_label": "Général",
+  "settings_models_label": "Modèles",
   "nav_sidebar_hide_aria_label": "Masquer la barre latérale",
   "nav_sidebar_show_aria_label": "Afficher la barre latérale",
   "nav_menu_chat": "Chat",

@@ -12,6 +12,8 @@
   "settings_mistral_api_key_label": "Mistral API-nyckel",
   "settings_brevo_api_url_label": "Brevo API-URL",
   "settings_brevo_api_key_label": "Brevo API-nyckel",
+  "settings_general_label": "Allmänt",
+  "settings_models_label": "Modeller",
   "nav_sidebar_hide_aria_label": "Dölj sidbar",
   "nav_sidebar_show_aria_label": "Visa sidbar",
   "nav_menu_chat": "Chatt",
