@@ -3,7 +3,6 @@ import { type Cookies, type RequestEvent } from '@sveltejs/kit'
 import dayjs from 'dayjs'
 import type {
   IAssistantModel,
-  IAssistantModels,
   IBackendApiSettings,
   IBackendAssistant,
   ICollection,
@@ -310,11 +309,11 @@ export class BackendApiService {
     return [error, assistants] as ApiResult<IBackendAssistant[]>
   }
 
-  async getAssistantModels(): Promise<ApiResult<IAssistantModels[]>> {
-    const [error, { models }] = await this.get<{ models: IAssistantModels[] }>(
-      '/api/assistant/models',
+  async getAssistantModels(): Promise<ApiResult<IAssistantModel[]>> {
+    const [error, { models }] = await this.get<{ models: IAssistantModel[] }>(
+      '/api/model/models',
     )
-    return [error, models] as ApiResult<IAssistantModels[]>
+    return [error, models] as ApiResult<IAssistantModel[]>
   }
 
   async getAssistant(assistantId: string): Promise<ApiResult<IBackendAssistant>> {

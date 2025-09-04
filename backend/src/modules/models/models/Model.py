@@ -8,7 +8,7 @@ class Model(BaseModel):
     provider: str = Field(..., min_length=1)
     display_name: str = Field(..., min_length=1, max_length=100)
     description: str | None = None
-    meta: dict[str, Any] | None = None
+    meta: dict[str, Any] = Field(default_factory=dict)
     
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

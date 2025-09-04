@@ -85,7 +85,7 @@ function generateTextAvatar(text: string, bgColor: string, size: number = 64): s
 }
 
 export function getModelAvatar(model: IAssistantModel): string {
-  if (model.meta?.avatar_base64) {
+  if (model.meta.avatar_base64) {
     return model.meta.avatar_base64
   }
 
@@ -110,7 +110,7 @@ export function getModelPrimaryColor(model: IAssistantModel): string {
 }
 
 export function getModelDescription(model: IAssistantModel): string {
-  if (model.meta?.description?.trim()) {
+  if (model.meta.description?.trim()) {
     return model.meta.description
   }
 
@@ -130,7 +130,7 @@ export function getModelDescription(model: IAssistantModel): string {
 }
 
 export function getModelCapabilities(model: IAssistantModel) {
-  if (model.meta?.capabilities) {
+  if (model.meta.capabilities) {
     return model.meta.capabilities
   }
 

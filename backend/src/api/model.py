@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.common.services.fastapi_get_services import ServicesDependency
 from src.modules.auth.auth_router_decorator import AuthRouterDecorator
@@ -19,7 +19,7 @@ class CreateModelRequest(BaseModel):
     provider: str
     display_name: str
     description: str | None = None
-    meta: dict | None = None
+    meta: dict = Field(default_factory=dict)
     status: str = 'active'
     visibility: str = 'public'
 
@@ -28,7 +28,7 @@ class UpdateModelRequest(BaseModel):
     provider: str
     display_name: str
     description: str | None = None
-    meta: dict | None = None
+    meta: dict = Field(default_factory=dict)
     status: str = 'active'
     visibility: str = 'public'
     version: int
@@ -39,7 +39,7 @@ class ModelResponse(BaseModel):
     provider: str
     display_name: str
     description: str | None = None
-    meta: dict | None = None
+    meta: dict = Field(default_factory=dict)
     status: str
     visibility: str
     version: int
@@ -60,9 +60,9 @@ class GetModelsResponse(BaseModel):
     status_code=status.HTTP_201_CREATED
 )
 async def create_model(
-    request: CreateModelRequest,
-    services: ServicesDependency,
-    auth_identity: AuthenticatedIdentity
+        request: CreateModelRequest,
+        services: ServicesDependency,
+        auth_identity: AuthenticatedIdentity
 ):
     model = Model(
         key=request.key,
@@ -73,22 +73,22 @@ async def create_model(
         status=request.status,
         visibility=request.visibility
     )
-    
+
     success = await services.model_service.create_model(model, auth_identity.uid)
-    
+
     if not success:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Model with key '{request.key}' already exists or creation failed"
         )
-    
+
     created_model = await services.model_service.get_model(request.key, auth_identity.uid)
     if not created_model:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Model was created but could not be retrieved"
         )
-    
+
     return ModelResponse(
         key=created_model.key,
         provider=created_model.provider,
@@ -112,7 +112,7 @@ async def create_model(
 )
 async def list_models(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
     models = await services.model_service.get_available_models(auth_identity.uid)
-    
+
     return GetModelsResponse(
         models=[
             ModelResponse(
@@ -140,18 +140,18 @@ async def list_models(services: ServicesDependency, auth_identity: Authenticated
     response_model=ModelResponse
 )
 async def get_model(
-    key: str,
-    services: ServicesDependency,
-    auth_identity: AuthenticatedIdentity
+        key: str,
+        services: ServicesDependency,
+        auth_identity: AuthenticatedIdentity
 ):
     model = await services.model_service.get_model(key, auth_identity.uid)
-    
+
     if not model:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Model with key '{key}' not found"
         )
-    
+
     return ModelResponse(
         key=model.key,
         provider=model.provider,
@@ -174,10 +174,10 @@ async def get_model(
     response_model=ModelResponse
 )
 async def update_model(
-    key: str,
-    request: UpdateModelRequest,
-    services: ServicesDependency,
-    auth_identity: AuthenticatedIdentity
+        key: str,
+        request: UpdateModelRequest,
+        services: ServicesDependency,
+        auth_identity: AuthenticatedIdentity
 ):
     model = Model(
         key=key,
@@ -189,22 +189,22 @@ async def update_model(
         visibility=request.visibility,
         version=request.version
     )
-    
+
     success = await services.model_service.update_model(key, model, auth_identity.uid)
-    
+
     if not success:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Model with key '{key}' not found or version mismatch (concurrent update)"
         )
-    
+
     updated_model = await services.model_service.get_model(key, auth_identity.uid)
     if not updated_model:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Model was updated but could not be retrieved"
         )
-    
+
     return ModelResponse(
         key=updated_model.key,
         provider=updated_model.provider,
@@ -227,12 +227,12 @@ async def update_model(
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_model(
-    key: str,
-    services: ServicesDependency,
-    auth_identity: AuthenticatedIdentity
+        key: str,
+        services: ServicesDependency,
+        auth_identity: AuthenticatedIdentity
 ):
     success = await services.model_service.delete_model(key, auth_identity.uid)
-    
+
     if not success:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

@@ -15,7 +15,7 @@ class MongoModelService:
             provider=doc['provider'],
             display_name=doc['display_name'],
             description=doc.get('description'),
-            meta=doc.get('meta'),
+            meta=doc.get('meta', {}),
             created_at=doc.get('created_at', datetime.utcnow()),
             updated_at=doc.get('updated_at', datetime.utcnow()),
             status=doc.get('status', 'active'),
@@ -49,7 +49,7 @@ class MongoModelService:
             existing = await self._database['chat_models'].find_one({'key': model.key})
             if existing:
                 return False
-            
+
             model_dict = {
                 'key': model.key,
                 'provider': model.provider,
@@ -62,7 +62,7 @@ class MongoModelService:
                 'visibility': model.visibility,
                 'version': model.version
             }
-            
+
             result = await self._database['chat_models'].insert_one(model_dict)
             return result.acknowledged
         except Exception:
@@ -73,13 +73,13 @@ class MongoModelService:
         doc = await self._database['chat_models'].find_one({'key': key})
         if not doc:
             return None
-        
+
         return Model(
             key=doc['key'],
             provider=doc['provider'],
             display_name=doc['display_name'],
             description=doc.get('description'),
-            meta=doc.get('meta'),
+            meta=doc.get('meta', {}),
             created_at=doc.get('created_at', datetime.utcnow()),
             updated_at=doc.get('updated_at', datetime.utcnow()),
             status=doc.get('status', 'active'),
@@ -93,10 +93,10 @@ class MongoModelService:
             existing = await self._database['chat_models'].find_one({'key': key})
             if not existing:
                 return False
-            
+
             if existing.get('version', 1) != model.version:
                 return False
-            
+
             update_dict = {
                 'provider': model.provider,
                 'display_name': model.display_name,
@@ -107,7 +107,7 @@ class MongoModelService:
                 'visibility': model.visibility,
                 'version': model.version + 1
             }
-            
+
             result = await self._database['chat_models'].update_one(
                 {'key': key},
                 {'$set': update_dict}
@@ -122,11 +122,11 @@ class MongoModelService:
             model = await self._database['chat_models'].find_one({'key': key})
             if not model:
                 return False
-            
+
             assistant_count = await self._database['assistants'].count_documents({'model': key})
             if assistant_count > 0:
                 return False
-            
+
             result = await self._database['chat_models'].delete_one({'key': key})
             return result.deleted_count == 1
         except Exception:

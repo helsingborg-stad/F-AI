@@ -54,7 +54,7 @@ export interface IAssistantModel {
   provider: string
   display_name: string
   description?: string | null
-  meta?: {
+  meta: {
     description?: string
     avatar_base64?: string
     capabilities?: {
