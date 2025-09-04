@@ -13,7 +13,6 @@ import {
 export async function load(event: RequestEvent) {
   const sidebarMenu: IMenuItem[] = []
 
-  // General settings - always show if user can read settings
   if (await userCanReadSettings(event)) {
     sidebarMenu.push({
       label: m.settings_general_label(),
@@ -21,7 +20,6 @@ export async function load(event: RequestEvent) {
     })
   }
 
-  // Model management - show if user has model settings access
   if (await userCanAccessModelSettings(event)) {
     sidebarMenu.push({
       label: m.settings_models_label(),
@@ -29,7 +27,6 @@ export async function load(event: RequestEvent) {
     })
   }
 
-  // Calculate model permissions for the pages that need them
   const modelPermissions = {
     canRead: await userCanReadModels(event),
     canWrite: await userCanWriteModels(event),

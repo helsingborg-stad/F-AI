@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { m } from '$lib/paraglide/messages.js'
   import type { IAssistantModel } from '$lib/types.js'
   import PageHeader from '$lib/components/ModelSettings/PageHeader.svelte'
   import ModelList from '$lib/components/ModelSettings/ModelList.svelte'

@@ -58,7 +58,6 @@
       { threshold: 0 },
     )
 
-    // Observer for bottom sentinel - detects when at form bottom
     const bottomObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -77,7 +76,6 @@
     }
   })
 
-  // Track container bounds for sticky positioning
   $effect(() => {
     if (!containerRef) return
 
