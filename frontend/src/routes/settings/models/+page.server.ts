@@ -1,5 +1,6 @@
 import type { PageServerLoad, Actions } from './$types.js'
 import type { RequestEvent } from '@sveltejs/kit'
+import type { JsonObject } from '$lib/types.js'
 import {
   userCanAccessModelSettings,
   userCanReadModels,
@@ -11,13 +12,33 @@ import { redirect } from '@sveltejs/kit'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
 import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.ts'
 
+function extractCapabilities(formData: FormData) {
+  return {
+    supportsImages: formData.get('supportsImages') === 'true',
+    supportsReasoning: formData.get('supportsReasoning') === 'true',
+    supportsCodeExecution: formData.get('supportsCodeExecution') === 'true',
+    supportsFunctionCalling: formData.get('supportsFunctionCalling') === 'true',
+    maxTokens: parseInt(formData.get('maxTokens') as string) || 4096,
+  }
+}
+
+function buildMetaObject(formData: FormData): JsonObject {
+  const capabilities = extractCapabilities(formData)
+  const meta: JsonObject = { capabilities }
+  const metaDescription = formData.get('meta_description') as string
+  const avatarBase64 = formData.get('avatar_base64') as string
+
+  if (metaDescription) meta.description = metaDescription
+  if (avatarBase64) meta.avatar_base64 = avatarBase64
+
+  return meta
+}
+
 export const load: PageServerLoad = async (event: RequestEvent) => {
-  // Check if user has access to model settings
   if (!(await userCanAccessModelSettings(event))) {
     throw redirect(403, '/settings')
   }
 
-  // Get model permissions
   const modelPermissions = {
     canRead: await userCanReadModels(event),
     canWrite: await userCanWriteModels(event),
@@ -25,13 +46,11 @@ export const load: PageServerLoad = async (event: RequestEvent) => {
     isAdmin: await userIsModelAdmin(event),
   }
 
-  // If user can't read models, redirect
   if (!modelPermissions.canRead) {
     throw redirect(403, '/settings')
   }
 
   try {
-    // Fetch available models using admin endpoint
     const api = new BackendApiServiceFactory().get(event)
     const [error, modelsResponse] = await api.getAllModels()
 
@@ -39,7 +58,6 @@ export const load: PageServerLoad = async (event: RequestEvent) => {
       return handleApiError(error)
     }
 
-    // Admin endpoint returns { models: IAssistantModel[] } directly
     const models = modelsResponse?.models || []
 
     return {
@@ -59,27 +77,13 @@ export const actions: Actions = {
 
     const formData = await event.request.formData()
 
-    const capabilities = {
-      supportsImages: formData.get('supportsImages') === 'true',
-      supportsReasoning: formData.get('supportsReasoning') === 'true',
-      supportsCodeExecution: formData.get('supportsCodeExecution') === 'true',
-      supportsFunctionCalling: formData.get('supportsFunctionCalling') === 'true',
-      maxTokens: parseInt(formData.get('maxTokens') as string) || 4096,
-    }
-
-    const meta: any = { capabilities }
-    const metaDescription = formData.get('meta_description') as string
-    const avatarBase64 = formData.get('avatar_base64') as string
-    
-    if (metaDescription) meta.description = metaDescription
-    if (avatarBase64) meta.avatar_base64 = avatarBase64
+    const meta = buildMetaObject(formData)
 
     const modelData = {
       key: (formData.get('key') as string) || '',
       provider: (formData.get('provider') as string) || '',
       display_name: (formData.get('display_name') as string) || '',
       description: (formData.get('description') as string) || null,
-      capabilities,
       meta,
     }
 
@@ -105,27 +109,13 @@ export const actions: Actions = {
     const key = formData.get('key') as string
     const version = parseInt(formData.get('version') as string) || 1
 
-    const capabilities = {
-      supportsImages: formData.get('supportsImages') === 'true',
-      supportsReasoning: formData.get('supportsReasoning') === 'true',
-      supportsCodeExecution: formData.get('supportsCodeExecution') === 'true',
-      supportsFunctionCalling: formData.get('supportsFunctionCalling') === 'true',
-      maxTokens: parseInt(formData.get('maxTokens') as string) || 4096,
-    }
-
-    const meta: any = { capabilities }
-    const metaDescription = formData.get('meta_description') as string
-    const avatarBase64 = formData.get('avatar_base64') as string
-    
-    if (metaDescription) meta.description = metaDescription
-    if (avatarBase64) meta.avatar_base64 = avatarBase64
+    const meta = buildMetaObject(formData)
 
     const modelData = {
       provider: (formData.get('provider') as string) || '',
       display_name: (formData.get('display_name') as string) || '',
       description: (formData.get('description') as string) || null,
       version: version,
-      capabilities,
       meta,
     }
 
