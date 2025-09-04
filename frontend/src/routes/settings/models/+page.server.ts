@@ -59,15 +59,28 @@ export const actions: Actions = {
 
     const formData = await event.request.formData()
 
+    const capabilities = {
+      supportsImages: formData.get('supportsImages') === 'true',
+      supportsReasoning: formData.get('supportsReasoning') === 'true',
+      supportsCodeExecution: formData.get('supportsCodeExecution') === 'true',
+      supportsFunctionCalling: formData.get('supportsFunctionCalling') === 'true',
+      maxTokens: parseInt(formData.get('maxTokens') as string) || 4096,
+    }
+
+    const meta: any = { capabilities }
+    const metaDescription = formData.get('meta_description') as string
+    const avatarBase64 = formData.get('avatar_base64') as string
+    
+    if (metaDescription) meta.description = metaDescription
+    if (avatarBase64) meta.avatar_base64 = avatarBase64
+
     const modelData = {
       key: (formData.get('key') as string) || '',
       provider: (formData.get('provider') as string) || '',
       display_name: (formData.get('display_name') as string) || '',
       description: (formData.get('description') as string) || null,
-      meta: {
-        description: (formData.get('meta_description') as string) || undefined,
-        avatar_base64: (formData.get('avatar_base64') as string) || undefined,
-      },
+      capabilities,
+      meta,
     }
 
     try {
@@ -92,15 +105,28 @@ export const actions: Actions = {
     const key = formData.get('key') as string
     const version = parseInt(formData.get('version') as string) || 1
 
+    const capabilities = {
+      supportsImages: formData.get('supportsImages') === 'true',
+      supportsReasoning: formData.get('supportsReasoning') === 'true',
+      supportsCodeExecution: formData.get('supportsCodeExecution') === 'true',
+      supportsFunctionCalling: formData.get('supportsFunctionCalling') === 'true',
+      maxTokens: parseInt(formData.get('maxTokens') as string) || 4096,
+    }
+
+    const meta: any = { capabilities }
+    const metaDescription = formData.get('meta_description') as string
+    const avatarBase64 = formData.get('avatar_base64') as string
+    
+    if (metaDescription) meta.description = metaDescription
+    if (avatarBase64) meta.avatar_base64 = avatarBase64
+
     const modelData = {
       provider: (formData.get('provider') as string) || '',
       display_name: (formData.get('display_name') as string) || '',
       description: (formData.get('description') as string) || null,
       version: version,
-      meta: {
-        description: (formData.get('meta_description') as string) || undefined,
-        avatar_base64: (formData.get('avatar_base64') as string) || undefined,
-      },
+      capabilities,
+      meta,
     }
 
     try {

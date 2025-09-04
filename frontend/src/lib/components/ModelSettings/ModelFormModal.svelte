@@ -2,6 +2,7 @@
   import type { IAssistantModel } from '$lib/types.js'
   import { enhance, applyAction } from '$app/forms'
   import { invalidateAll } from '$app/navigation'
+  import CapabilitiesSection from './CapabilitiesSection.svelte'
   
   interface Props {
     isOpen: boolean
@@ -25,10 +26,25 @@
     meta_description: '',
     avatar_base64: '',
     version: 1,
+    capabilities: {
+      supportsImages: false,
+      supportsReasoning: false,
+      supportsCodeExecution: false,
+      supportsFunctionCalling: true,
+      maxTokens: 4096,
+    },
   })
 
   $effect(() => {
     if (mode === 'edit' && model) {
+      const capabilities = {
+        supportsImages: model.meta?.capabilities?.supportsImages ?? false,
+        supportsReasoning: model.meta?.capabilities?.supportsReasoning ?? false,
+        supportsCodeExecution: model.meta?.capabilities?.supportsCodeExecution ?? false,
+        supportsFunctionCalling: model.meta?.capabilities?.supportsFunctionCalling ?? true,
+        maxTokens: model.meta?.capabilities?.maxTokens ?? 4096,
+      }
+      
       formData = {
         key: model.key,
         provider: model.provider,
@@ -37,6 +53,7 @@
         meta_description: model.meta?.description || '',
         avatar_base64: model.meta?.avatar_base64 || '',
         version: (model as unknown as { version?: number }).version || 1,
+        capabilities,
       }
     } else if (mode === 'create') {
       formData = {
@@ -47,6 +64,13 @@
         meta_description: '',
         avatar_base64: '',
         version: 1,
+        capabilities: {
+          supportsImages: false,
+          supportsReasoning: false,
+          supportsCodeExecution: false,
+          supportsFunctionCalling: true,
+          maxTokens: 4096,
+        },
       }
     }
   })
@@ -78,6 +102,13 @@
           <input type="hidden" name="key" value={model.key} />
           <input type="hidden" name="version" value={formData.version} />
         {/if}
+        
+        <!-- Hidden inputs for capabilities -->
+        <input type="hidden" name="supportsImages" value={formData.capabilities.supportsImages} />
+        <input type="hidden" name="supportsReasoning" value={formData.capabilities.supportsReasoning} />
+        <input type="hidden" name="supportsCodeExecution" value={formData.capabilities.supportsCodeExecution} />
+        <input type="hidden" name="supportsFunctionCalling" value={formData.capabilities.supportsFunctionCalling} />
+        <input type="hidden" name="maxTokens" value={formData.capabilities.maxTokens} />
 
         <div class="p-6">
           <div class="mb-4 flex items-center justify-between">
@@ -192,6 +223,11 @@
                 This will be displayed in the model accordion selector
               </p>
             </div>
+
+            <CapabilitiesSection
+              bind:capabilities={formData.capabilities}
+              disabled={false}
+            />
           </div>
         </div>
 

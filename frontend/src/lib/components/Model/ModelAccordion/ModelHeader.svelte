@@ -17,10 +17,10 @@
     </h3>
     <div class="mt-1 flex items-center gap-2">
       <Badge type="provider" size="sm" variant="outline" label={model.provider} {isSelected} />
-      {#if model.capabilities?.supportsImages}
+      {#if model.meta?.capabilities?.supportsImages}
         <Badge type="image" size="sm" />
       {/if}
-      {#if model.capabilities?.supportsReasoning}
+      {#if model.meta?.capabilities?.supportsReasoning}
         <Badge type="reasoning" size="sm" />
       {/if}
     </div>

@@ -102,10 +102,10 @@
                 </h3>
                 {#if !isPlaceholder}
                   <Badge type="provider" size="sm" variant="outline" label={model.provider} />
-                  {#if model.capabilities?.supportsImages}
+                  {#if model.meta?.capabilities?.supportsImages}
                     <Badge type="image" size="xs" />
                   {/if}
-                  {#if model.capabilities?.supportsReasoning}
+                  {#if model.meta?.capabilities?.supportsReasoning}
                     <Badge type="reasoning" size="xs" />
                   {/if}
                 {/if}

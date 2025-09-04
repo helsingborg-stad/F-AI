@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { IAssistantModel } from '$lib/types.js'
+  import CapabilityBadges from './CapabilityBadges.svelte'
 
   interface Props {
     model: IAssistantModel
@@ -43,6 +44,7 @@
         {#if model.meta?.description}
           <p class="mt-1 text-xs text-base-content/60">{model.meta.description}</p>
         {/if}
+        <CapabilityBadges capabilities={model.meta?.capabilities} />
       </div>
     </div>
   </div>

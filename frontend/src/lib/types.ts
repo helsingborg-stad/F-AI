@@ -57,6 +57,13 @@ export interface IAssistantModel {
   meta?: {
     description?: string
     avatar_base64?: string
+    capabilities?: {
+      supportsImages?: boolean
+      supportsReasoning?: boolean
+      supportsCodeExecution?: boolean
+      supportsFunctionCalling?: boolean
+      maxTokens?: number
+    }
     [key: string]: JsonValue | undefined
   }
   created_at?: string
