@@ -41,7 +41,7 @@
       primaryColor = typeof model.meta?.primaryColor === 'string' 
         ? model.meta.primaryColor 
         : DEFAULT_MODEL_COLOR
-      version = (model as unknown as { version?: number }).version || 1
+      version = model.version || 1
       capabilities = {
         supportsImages: model.meta?.capabilities?.supportsImages ?? false,
         supportsReasoning: model.meta?.capabilities?.supportsReasoning ?? false,

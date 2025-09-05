@@ -57,6 +57,7 @@ export interface IAssistantModel {
   meta: {
     description?: string
     avatar_base64?: string
+    primaryColor?: string
     capabilities?: {
       supportsImages?: boolean
       supportsReasoning?: boolean
@@ -72,6 +73,8 @@ export interface IAssistantModel {
   visibility?: 'public' | 'internal'
   version?: number
   name?: string
+  displayName: string
+  enhancedDescription: string
 }
 
 export interface IAssistantModels {

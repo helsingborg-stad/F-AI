@@ -1,6 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit'
 import type { IAssistantModel, IBackendAssistant, IFavAssistant } from '$lib/types.js'
 import { handleApiCall } from '$lib/utils/handle-api-calls.js'
+import type { ApiResult } from '$lib/backendApi/backendApi.js'
 
 export async function fetchAllAssistants(
   event: RequestEvent,
@@ -29,7 +30,14 @@ export async function fetchAssistantModels(
 ): Promise<IAssistantModel[]> {
   return handleApiCall(
     event,
-    (api) => api.getAssistantModels(),
+    async (api) => {
+      const modelRepository = api.createModelRepository()
+      const [error, models] = await modelRepository.getAll()
+      if (error) {
+        return [error, undefined] as ApiResult<IAssistantModel[]>
+      }
+      return [null, models || []] as ApiResult<IAssistantModel[]>
+    },
     'Failed to fetch assistant models',
     [],
   )

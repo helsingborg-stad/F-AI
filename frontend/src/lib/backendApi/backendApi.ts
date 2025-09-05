@@ -11,6 +11,7 @@ import type {
   IFavAssistant,
   JsonObject,
 } from '$lib/types.js'
+import { ModelRepository } from '$lib/repositories/ModelRepository.js'
 
 export interface CallOptions {
   body?: string | FormData
@@ -516,6 +517,10 @@ export class BackendApiService {
       '/api/model/models',
     )
     return [error, response] as ApiResult<{ models: IAssistantModel[] }>
+  }
+
+  createModelRepository(): ModelRepository {
+    return ModelRepository.fromApi(this)
   }
 }
 

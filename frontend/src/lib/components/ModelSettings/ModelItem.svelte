@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { IAssistantModel } from '$lib/types.js'
   import CapabilityBadges from './CapabilityBadges.svelte'
+  import ModelAvatar from '$lib/components/Model/ModelAccordion/ModelAvatar.svelte'
 
   interface Props {
     model: IAssistantModel
@@ -25,16 +26,19 @@
   function handleDelete() {
     if (onDelete) onDelete(model)
   }
+
 </script>
 
 <div class="flex items-center justify-between px-6 py-4">
   <div class="flex-1">
     <div class="flex items-center space-x-3">
-      <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-base-200">
-        <span class="text-xs font-medium text-base-content/70">
-          {model.provider.substring(0, 2).toUpperCase()}
-        </span>
-      </div>
+      <ModelAvatar
+        avatar={model.meta?.avatar_base64}
+        provider={model.provider}
+        primaryColor={model.meta?.primaryColor || 'transparent'}
+        isSelected={false}
+        size="sm"
+      />
       <div>
         <h3 class="text-sm font-medium text-base-content">
           {model.display_name || model.name}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { IAssistantModel } from '$lib/types.js'
-  import { getEnhancedModelInfo } from '$lib/utils/modelHelpers.js'
   import ModelSelectorModal from './ModelSelectorModal/ModelSelectorModal.svelte'
+  import ModelAvatar from './ModelAccordion/ModelAvatar.svelte'
   import Badge from '$lib/components/Badge/Badge.svelte'
 
   interface Props {
@@ -22,14 +22,12 @@
 
   let modalRef: ModelSelectorModal
 
-  const selectedModel = $derived(
-    selectedKey && models.find((m) => m.key === selectedKey) 
-      ? getEnhancedModelInfo(models.find((m) => m.key === selectedKey)!) 
-      : null
+  const selectedModel = $derived.by(() =>
+    selectedKey ? models.find((m) => m.key === selectedKey) : null
   )
 
-  const placeholderModel = $derived(
-    models.length > 0 ? getEnhancedModelInfo(models[0]) : null
+  const placeholderModel = $derived.by(() =>
+    models.length > 0 ? models[0] : null
   )
 
   function openModal() {
@@ -69,30 +67,18 @@
     {#if selectedModel || placeholderModel}
       {@const model = selectedModel || placeholderModel}
       {@const isPlaceholder = !selectedModel}
-      
+
       {#if model}
         <div class="flex items-center justify-between gap-4">
-          <!-- Model Info Section -->
           <div class="flex items-center gap-3 min-w-0 flex-1">
-            <div class="avatar flex-shrink-0">
-              <div class="h-10 w-10 rounded-lg shadow-sm {isPlaceholder ? 'opacity-50' : ''}">
-                {#if model.avatar}
-                  <img
-                    src={model.avatar}
-                    alt=""
-                    class="h-full w-full rounded-lg object-cover"
-                    role="presentation"
-                  />
-                {:else}
-                  <div
-                    class="flex h-full w-full items-center justify-center rounded-lg text-xs font-semibold text-white shadow-inner"
-                    style="background-color: {model.primaryColor}"
-                    role="presentation"
-                  >
-                    {model.provider.substring(0, 2).toUpperCase()}
-                  </div>
-                {/if}
-              </div>
+            <div class="{isPlaceholder ? 'opacity-50' : ''}">
+              <ModelAvatar
+                avatar={model.meta?.avatar_base64}
+                provider={model.provider}
+                primaryColor={model.meta?.primaryColor || 'transparent'}
+                isSelected={false}
+                size="sm"
+              />
             </div>
 
             <div class="min-w-0 flex-1">

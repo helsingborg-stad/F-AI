@@ -1,7 +1,15 @@
 import type { IAssistantModel } from '$lib/types.js'
 
+function enhanceModel(model: Partial<IAssistantModel>): IAssistantModel {
+  return {
+    ...model,
+    displayName: model.display_name || model.name || model.key?.split('/')[1] || model.key || '',
+    enhancedDescription: model.meta?.description?.trim() || model.description?.trim() || '',
+  } as IAssistantModel
+}
+
 export const mockModels: IAssistantModel[] = [
-  {
+  enhanceModel({
     key: 'openai/gpt-4o',
     provider: 'OpenAI',
     display_name: 'GPT-4o',
@@ -22,8 +30,8 @@ export const mockModels: IAssistantModel[] = [
     version: 1,
     created_at: '2024-01-15T10:30:00Z',
     updated_at: '2024-01-15T10:30:00Z',
-  },
-  {
+  }),
+  enhanceModel({
     key: 'openai/gpt-3.5-turbo',
     provider: 'OpenAI',
     display_name: 'GPT-3.5 Turbo',
@@ -43,8 +51,8 @@ export const mockModels: IAssistantModel[] = [
     version: 1,
     created_at: '2024-01-10T08:15:00Z',
     updated_at: '2024-01-10T08:15:00Z',
-  },
-  {
+  }),
+  enhanceModel({
     key: 'anthropic/claude-3-5-sonnet-latest',
     provider: 'Anthropic',
     display_name: 'Claude 3.5 Sonnet',
@@ -67,8 +75,8 @@ export const mockModels: IAssistantModel[] = [
     version: 2,
     created_at: '2024-01-20T14:45:00Z',
     updated_at: '2024-02-01T09:20:00Z',
-  },
-  {
+  }),
+  enhanceModel({
     key: 'mistral/mistral-large-latest',
     provider: 'Mistral',
     display_name: 'Mistral Large',
@@ -88,8 +96,8 @@ export const mockModels: IAssistantModel[] = [
     version: 1,
     created_at: '2024-01-25T11:00:00Z',
     updated_at: '2024-01-25T11:00:00Z',
-  },
-  {
+  }),
+  enhanceModel({
     key: 'openai/gpt-4-turbo',
     provider: 'OpenAI',
     display_name: 'GPT-4 Turbo (Deprecated)',
@@ -108,18 +116,18 @@ export const mockModels: IAssistantModel[] = [
     version: 1,
     created_at: '2023-11-06T16:30:00Z',
     updated_at: '2024-01-15T10:30:00Z',
-  },
+  }),
 ]
 
-export const mockModelMinimal: IAssistantModel = {
+export const mockModelMinimal: IAssistantModel = enhanceModel({
   key: 'custom/basic-model',
   provider: 'Custom',
   display_name: 'Basic Model',
   name: 'Basic Model',
   meta: {},
-}
+})
 
-export const mockModelWithAvatar: IAssistantModel = {
+export const mockModelWithAvatar: IAssistantModel = enhanceModel({
   key: 'anthropic/claude-3-opus',
   provider: 'Anthropic',
   display_name: 'Claude 3 Opus',
@@ -141,7 +149,7 @@ export const mockModelWithAvatar: IAssistantModel = {
   version: 1,
   created_at: '2024-01-18T12:00:00Z',
   updated_at: '2024-01-18T12:00:00Z',
-}
+})
 
 export const mockModelPermissionsFull = {
   canRead: true,

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { getEnhancedModelInfo } from '$lib/utils/modelHelpers.js'
+  import type { IAssistantModel } from '$lib/types.js'
   import Badge from '$lib/components/Badge/Badge.svelte'
 
   interface Props {
-    model: ReturnType<typeof getEnhancedModelInfo>
+    model: IAssistantModel
     isSelected: boolean
   }
 

@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { IAssistantModel } from '$lib/types.js'
-  import { getEnhancedModelInfo } from '$lib/utils/modelHelpers.js'
   import ModelAvatar from './ModelAvatar.svelte'
   import ModelHeader from './ModelHeader.svelte'
   import ModelCapabilities from './ModelCapabilities.svelte'
@@ -17,13 +16,12 @@
 
   let { model, index, selectedKey, canEdit, name, onSelection }: Props = $props()
 
-  const enhancedModel = $derived(getEnhancedModelInfo(model))
-  const isSelected = $derived(selectedKey === enhancedModel.key)
+  const isSelected = $derived(selectedKey === model.key)
   const modelId = $derived(`${name}-model-${index}`)
 
   function handleSelection() {
     if (!canEdit) return
-    onSelection(enhancedModel.key)
+    onSelection(model.key)
   }
 
   function handleKeyDown(event: KeyboardEvent) {
@@ -37,7 +35,7 @@
 
   function getModelAriaLabel(): string {
     const status = isSelected ? 'selected' : 'not selected'
-    return `${enhancedModel.displayName} by ${enhancedModel.provider}, ${status}. ${enhancedModel.enhancedDescription}`
+    return `${model.displayName} by ${model.provider}, ${status}. ${model.enhancedDescription}`
   }
 </script>
 
@@ -56,7 +54,7 @@
     type="radio"
     id={modelId}
     name="model-accordion-{name}"
-    value={enhancedModel.key}
+    value={model.key}
     checked={isSelected}
     disabled={!canEdit}
     onchange={handleSelection}
@@ -77,22 +75,24 @@
       class="collapse-title card-body p-4"
     >
       <div class="flex items-start gap-4">
-        <ModelAvatar
-          avatar={enhancedModel.avatar}
-          provider={enhancedModel.provider}
-          primaryColor={enhancedModel.primaryColor}
-          {isSelected}
-        />
+        <div class="mt-1">
+          <ModelAvatar
+            avatar={model.meta?.avatar_base64}
+            provider={model.provider}
+            primaryColor={model.meta?.primaryColor || 'transparent'}
+            {isSelected}
+          />
+        </div>
 
         <div class="min-w-0 flex-1">
-          <ModelHeader model={enhancedModel} {isSelected} />
+          <ModelHeader model={model} {isSelected} />
 
           <p class="line-clamp-2 text-sm leading-relaxed text-base-content/80">
-            {enhancedModel.enhancedDescription}
+            {model.enhancedDescription}
           </p>
 
           <p class="mt-1 truncate font-mono text-xs text-base-content/60">
-            {enhancedModel.key}
+            {model.key}
           </p>
         </div>
       </div>
@@ -101,11 +101,11 @@
 
   <div class="collapse-content">
     <div class="card-body pt-0" id="{modelId}-description">
-      <ModelCapabilities capabilities={enhancedModel.capabilities} />
+      <ModelCapabilities capabilities={model.meta?.capabilities} />
 
       <ModelTechnicalDetails
-        modelKey={enhancedModel.key}
-        provider={enhancedModel.provider}
+        modelKey={model.key}
+        provider={model.provider}
       />
     </div>
   </div>
