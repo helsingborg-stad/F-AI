@@ -3,6 +3,8 @@
   import { enhance, applyAction } from '$app/forms'
   import { invalidateAll } from '$app/navigation'
   import CapabilitiesSection from './CapabilitiesSection.svelte'
+  import ColorPicker from '../ColorPicker/ColorPicker.svelte'
+  import { getRandomModelColor, DEFAULT_MODEL_COLOR } from '$lib/constants/colors.js'
   import X from 'lucide-svelte/icons/x'
 
   interface Props {
@@ -19,6 +21,7 @@
   let displayName = $state('')
   let description = $state('')
   let metaDescription = $state('')
+  let primaryColor = $state(DEFAULT_MODEL_COLOR)
   let version = $state(1)
   let capabilities = $state({
     supportsImages: false,
@@ -35,6 +38,9 @@
       displayName = model.display_name || model.name || ''
       description = model.description || ''
       metaDescription = model.meta?.description || ''
+      primaryColor = typeof model.meta?.primaryColor === 'string' 
+        ? model.meta.primaryColor 
+        : DEFAULT_MODEL_COLOR
       version = (model as unknown as { version?: number }).version || 1
       capabilities = {
         supportsImages: model.meta?.capabilities?.supportsImages ?? false,
@@ -50,6 +56,7 @@
       displayName = ''
       description = ''
       metaDescription = ''
+      primaryColor = getRandomModelColor()
       version = 1
       capabilities = {
         supportsImages: false,
@@ -110,6 +117,7 @@
           value={capabilities.supportsFunctionCalling}
         />
         <input type="hidden" name="maxTokens" value={capabilities.maxTokens} />
+        <input type="hidden" name="primaryColor" value={primaryColor} />
 
         <div class="p-6">
           <div class="mb-4 flex items-center justify-between">
@@ -234,6 +242,22 @@
               ></textarea>
               <p class="mt-1 text-xs text-base-content/60">
                 This will be displayed in the model accordion selector
+              </p>
+            </div>
+
+            <div>
+              <label
+                for="primary_color"
+                class="mb-1 block text-sm font-medium text-base-content"
+              >
+                Primary Color
+              </label>
+              <ColorPicker
+                selectedColor={primaryColor}
+                onColorSelect={(color) => (primaryColor = color)}
+              />
+              <p class="mt-1 text-xs text-base-content/60">
+                Choose a color to represent this model in the UI
               </p>
             </div>
 

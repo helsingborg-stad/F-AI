@@ -27,9 +27,11 @@ function buildMetaObject(formData: FormData): JsonObject {
   const meta: JsonObject = { capabilities }
   const metaDescription = formData.get('meta_description') as string
   const avatarBase64 = formData.get('avatar_base64') as string
+  const primaryColor = formData.get('primaryColor') as string
 
   if (metaDescription) meta.description = metaDescription
   if (avatarBase64) meta.avatar_base64 = avatarBase64
+  if (primaryColor) meta.primaryColor = primaryColor
 
   return meta
 }

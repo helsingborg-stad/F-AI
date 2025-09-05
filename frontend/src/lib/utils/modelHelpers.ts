@@ -24,38 +24,15 @@ export const PROVIDER_CONFIG = {
   },
 } as const
 
-const MODEL_DESCRIPTIONS = {
-  'openai/o3-mini':
-    'Latest OpenAI reasoning model optimized for complex problem-solving with enhanced speed and efficiency.',
-  'openai/gpt-4o':
-    'Advanced multimodal model that can process text, images, and audio with superior reasoning capabilities.',
-  'openai/gpt-3.5-turbo':
-    'Fast and cost-effective model ideal for most conversational AI and text generation tasks.',
-
-  'anthropic/claude-3-7-sonnet-latest':
-    "Anthropic's most capable model with excellent reasoning, coding, and analysis capabilities.",
-  'anthropic/claude-3-5-sonnet-20241022':
-    'High-performance model optimized for complex reasoning and creative tasks.',
-  'anthropic/claude-3-5-haiku-20241022':
-    'Fast, lightweight model perfect for quick responses and simple tasks.',
-
-  'mistral/mistral-large-latest':
-    "Mistral's flagship model with strong performance across diverse language tasks.",
-  'mistral/mistral-medium-latest':
-    'Balanced model offering good performance with efficient resource usage.',
-  'mistral/mistral-small-latest':
-    'Compact model ideal for basic conversational and text processing needs.',
-} as const
-
 const PROVIDER_DESCRIPTION_TEMPLATES = {
   OpenAI: (modelName: string) =>
-    `OpenAI model ${modelName} - Advanced language model for conversation and text generation.`,
+    `${modelName} - Language model by OpenAI`,
   Anthropic: (modelName: string) =>
-    `Anthropic model ${modelName} - Constitutional AI model focused on helpful, harmless, and honest responses.`,
+    `${modelName} - Language model by Anthropic`,
   Mistral: (modelName: string) =>
-    `Mistral model ${modelName} - High-performance European language model for diverse AI tasks.`,
+    `${modelName} - Language model by Mistral`,
   default: (modelName: string) =>
-    `AI language model ${modelName} - General-purpose conversational AI assistant.`,
+    `${modelName} - AI language model`,
 } as const
 
 function generateProviderAvatar(providerName: string, bgColor: string): string {
@@ -116,10 +93,6 @@ export function getModelDescription(model: IAssistantModel): string {
 
   if (model.description?.trim()) {
     return model.description
-  }
-
-  if (model.key in MODEL_DESCRIPTIONS) {
-    return MODEL_DESCRIPTIONS[model.key as keyof typeof MODEL_DESCRIPTIONS]
   }
 
   const template =

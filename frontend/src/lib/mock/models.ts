@@ -16,6 +16,7 @@ export const mockModels: IAssistantModel[] = [
         supportsFunctionCalling: true,
         maxTokens: 128000,
       },
+      primaryColor: '#10A37F',
     },
     status: 'active',
     version: 1,
@@ -58,6 +59,7 @@ export const mockModels: IAssistantModel[] = [
         supportsFunctionCalling: true,
         maxTokens: 200000,
       },
+      primaryColor: '#D97757',
       avatar_base64:
         'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiNGRjgwMDAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAxOGMtNC40MSAwLTgtMy41OS04LThzMy41OS04IDgtOCA4IDMuNTkgOCA4LTMuNTkgOC04IDh6bTAtMTJjLTIuMjEgMC00IDEuNzktNCA0czEuNzkgNCA0IDQgNC0xLjc5IDQtNC0xLjc5LTQtNC00eiIvPjwvc3ZnPg==',
     },
