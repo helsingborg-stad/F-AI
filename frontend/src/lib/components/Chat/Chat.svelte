@@ -3,10 +3,9 @@
   import { icons } from '$lib/components/Icon/icons.js'
   import ChatMessage from '$lib/components/Chat/ChatMessage.svelte'
   import ChatInput from '$lib/components/Chat/ChatInput.svelte'
-  import ActionButtons, {
-    type AllowedFeature,
-  } from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
+  import { type AllowedFeature } from '$lib/components/Chat/ChatInput/ActionButtons.svelte'
   import type { IAssistantMenu } from '$lib/types.js'
+  import type { FileWithState } from '$lib/files/useInlineFiles.js'
 
   interface Message {
     timestamp: string
@@ -25,6 +24,9 @@
     chatStateIdle: boolean
     onStopChat: () => void
     enabledFeatures: string[]
+    onFilesChanged: (files: File[]) => void
+    inlineFiles: FileWithState[]
+    canChangeFiles: boolean
   }
 
   let {
@@ -36,6 +38,9 @@
     chatStateIdle,
     onStopChat,
     enabledFeatures = $bindable(),
+    onFilesChanged,
+    inlineFiles,
+    canChangeFiles,
   }: Props = $props()
 
   let scrollContainer: HTMLDivElement = undefined as unknown as HTMLDivElement
@@ -143,15 +148,15 @@
         disabled={selectedAssistantId === ''}
         receivingMessage={!chatStateIdle}
         {onStopChat}
-      >
-        <ActionButtons
-          {allowedFeatures}
-          bind:enabledFeatureIds={enabledFeatures}
-          {assistants}
-          bind:selectedAssistantId
-          {disableAssistantPicker}
-        />
-      </ChatInput>
+        {disableAssistantPicker}
+        bind:selectedAssistantId
+        {assistants}
+        {allowedFeatures}
+        bind:enabledFeatures
+        {onFilesChanged}
+        {inlineFiles}
+        {canChangeFiles}
+      />
     </div>
   </div>
 </div>

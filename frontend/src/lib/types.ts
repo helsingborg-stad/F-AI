@@ -173,3 +173,15 @@ export interface IConversations {
     title: string
   }[]
 }
+
+export interface IFrontendConversationMessage {
+  timestamp: string
+  source: string
+  message: string
+  reasoning: string
+}
+
+export interface IFrontendConversationContext {
+  assistantId: string
+  messages: IFrontendConversationMessage[]
+}

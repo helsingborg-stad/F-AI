@@ -6,6 +6,8 @@
   import dayjs from 'dayjs'
   import type { LayoutData } from './$types.js'
   import { useChatMachine } from '$lib/chat/chat.js'
+  import { type FileWithState, useInlineFiles } from '$lib/files/useInlineFiles.js'
+  import type { IFrontendConversationMessage } from '$lib/types.js'
 
   interface Props {
     data: LayoutData
@@ -45,7 +47,9 @@
 
   const conversationId: string | undefined = $derived(page.params.conversationId)
 
-  let messages = $state(data.conversationContext.messages)
+  let messages: IFrontendConversationMessage[] = $state(
+    data.conversationContext.messages.map(redactMessage),
+  )
 
   // Track previous conversation ID to detect actual conversation switches
   let previousConversationId = $state<string | undefined>(undefined)
@@ -64,7 +68,7 @@
     }
 
     previousConversationId = currentConversationId
-    messages = data.conversationContext.messages
+    messages = data.conversationContext.messages.map(redactMessage)
   })
 
   chatMachine.lastMessage.subscribe((message) => {
@@ -76,7 +80,7 @@
         message: message.message,
         reasoning: message.reasoning,
       },
-    ]
+    ].map(redactMessage)
   })
 
   chatMachine.conversationId.subscribe((newConversationId) => {
@@ -102,9 +106,37 @@
           message: error,
           reasoning: '',
         },
-      ]
+      ].map(redactMessage)
     }
   })
+
+  function redactDocumentText(inMessage: string): string {
+    // TODO: move to ChatMachine? For best results requires moving full message state to ChatMachine (see conversation edit wip branch)
+    const beginMatcher = /\[BEGIN (\w+)(?: (.*))?]/
+    const match = beginMatcher.exec(inMessage)
+    if (match) {
+      const tagName = match[1]
+      const endTag = `[END ${tagName}]`
+      const endIndex = inMessage.indexOf(endTag, match.index)
+      if (endIndex !== -1) {
+        const redacted =
+          inMessage.slice(0, match.index) +
+          // `[${match[1]} ${match[2]}]` +
+          inMessage.slice(endIndex + endTag.length)
+        return redactDocumentText(redacted)
+      }
+    }
+    return inMessage
+  }
+
+  function redactMessage(
+    inMessage: IFrontendConversationMessage,
+  ): IFrontendConversationMessage {
+    return {
+      ...inMessage,
+      message: redactDocumentText(inMessage.message),
+    }
+  }
 
   function sendMessage(message: string) {
     messages = [
@@ -116,7 +148,23 @@
         message: '',
         reasoning: '',
       },
-    ]
+    ].map(redactMessage)
+
+    const filteredFiles = inlineFiles.filter((f) => f.state === 'valid')
+
+    if (filteredFiles.length > 0) {
+      message =
+        message +
+        '\n\n[BEGIN INSTRUCTIONS]\n\n(Try to answer the question(s) with the document contents provided below.)\n\n[END INSTRUCTIONS]\n\n' +
+        inlineFiles
+          .map(
+            (f) =>
+              `[BEGIN DOCUMENT ${f.file.name}]\n\n${f.parsedContents ?? ''}\n\n[END DOCUMENT]\n`,
+          )
+          .join('\n\n')
+    }
+
+    inlineFilesHook.setFiles([])
 
     chatMachine
       .sendMessage(message, selectedAssistantId, conversationId ?? null, {
@@ -162,6 +210,30 @@
       selectedAssistantId = data.conversationContext.assistantId
     }
   })
+
+  const inlineFilesHook = useInlineFiles()
+  let inlineFiles: FileWithState[] = $state([])
+  inlineFilesHook.files.subscribe((files) => {
+    inlineFiles = files
+  })
+  let canChangeFiles = $state(true)
+  inlineFilesHook.canChangeFiles.subscribe((canChange) => {
+    canChangeFiles = canChange
+  })
+
+  function changeFiles(newFiles: File[]) {
+    const oldSet = new Set(inlineFiles.map((f) => f.id))
+    const newSet = new Set(newFiles.map((f) => inlineFilesHook.getFileId(f)))
+
+    const removedFiles = [...oldSet].filter((f) => !newSet.has(f))
+    const addedFiles = [...newSet].filter((f) => !oldSet.has(f))
+
+    if (addedFiles.length == 0) {
+      removedFiles.forEach(inlineFilesHook.removeFile)
+    } else {
+      inlineFilesHook.setFiles(newFiles)
+    }
+  }
 </script>
 
 <ChatLayout
@@ -182,4 +254,7 @@
   onStopChat={chatMachine.stop}
   chatStateIdle={$chatState === 'idle' || $chatState === 'error'}
   bind:enabledFeatures
-></ChatLayout>
+  {inlineFiles}
+  {canChangeFiles}
+  onFilesChanged={changeFiles}
+/>

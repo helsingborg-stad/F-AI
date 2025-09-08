@@ -10,6 +10,7 @@
   import type { IAssistantMenu } from '$lib/types.js'
   import RenameConversationModal from '$lib/components/Menu/Chat/RenameConversationModal.svelte'
   import ResponsiveSidebar from '$lib/components/Menu/Chat/ResponsiveSidebar.svelte'
+  import type { FileWithState } from '$lib/files/useInlineFiles.js'
 
   type Props = ChatProps & {
     canChat: boolean
@@ -27,6 +28,9 @@
     chatStateIdle: boolean
     onStopChat: () => void
     enabledFeatures: string[]
+    inlineFiles: FileWithState[]
+    onFilesChanged: (files: File[]) => void
+    canChangeFiles: boolean
   }
 
   let {
@@ -44,6 +48,9 @@
     chatStateIdle,
     onStopChat,
     enabledFeatures = $bindable(),
+    inlineFiles,
+    onFilesChanged,
+    canChangeFiles,
   }: Props = $props()
 
   let renameModal: RenameConversationModal
@@ -103,6 +110,9 @@
         {chatStateIdle}
         {onStopChat}
         bind:enabledFeatures
+        {onFilesChanged}
+        {inlineFiles}
+        {canChangeFiles}
       />
     </main>
   </div>
