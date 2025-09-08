@@ -134,7 +134,7 @@
     <div class="flex max-w-full flex-row gap-2 overflow-x-scroll">
       {#each inlineFiles as file (file.file.name)}
         <AttachedFile
-          title={file.id}
+          title={file.file.name}
           state={file.state}
           onRemove={() => removeFile(file.id)}
         />
