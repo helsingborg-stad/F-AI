@@ -56,7 +56,7 @@
 <div class="model-selector">
   <button
     type="button"
-    class="w-full rounded-lg border-2 border-base-300 bg-base-100 p-4 text-left transition-all duration-200 hover:-translate-y-px hover:border-primary hover:bg-base-200 hover:shadow-md focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:border-base-300 disabled:hover:bg-base-100 disabled:hover:shadow-none"
+    class="w-full rounded-lg border-2 border-base-300 bg-base-100 p-4 text-left"
     onclick={openModal}
     onkeydown={handleKeyDown}
     disabled={!canEdit}

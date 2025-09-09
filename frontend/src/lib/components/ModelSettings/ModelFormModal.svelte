@@ -47,7 +47,7 @@
         supportsReasoning: model.meta?.capabilities?.supportsReasoning ?? false,
         supportsCodeExecution: model.meta?.capabilities?.supportsCodeExecution ?? false,
         supportsFunctionCalling:
-          model.meta?.capabilities?.supportsFunctionCalling ?? true,
+          model.meta?.capabilities?.supportsFunctionCalling ?? false,
         maxTokens: model.meta?.capabilities?.maxTokens ?? 4096,
       }
     } else if (mode === 'create') {
@@ -62,7 +62,7 @@
         supportsImages: false,
         supportsReasoning: false,
         supportsCodeExecution: false,
-        supportsFunctionCalling: true,
+        supportsFunctionCalling: false,
         maxTokens: 4096,
       }
     }
