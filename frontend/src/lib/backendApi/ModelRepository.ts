@@ -4,16 +4,20 @@ import { ModelTransformer, type ModelDTO } from './transformers/ModelTransformer
 
 export interface IModelRepository {
   getAll(): Promise<ApiResult<IAssistantModel[]>>
+
   getById(key: string): Promise<ApiResult<IAssistantModel>>
+
   create(model: IAssistantModel): Promise<ApiResult<IAssistantModel>>
+
   update(key: string, model: IAssistantModel): Promise<ApiResult<IAssistantModel>>
+
   delete(key: string): Promise<ApiResult<never>>
 }
 
 export interface CreateModelInput {
   key: string
   provider: string
-  displayName: string
+  display_name: string
   description?: string | null
   meta?: JsonObject | null
   status?: 'active' | 'deprecated' | 'disabled'
@@ -22,7 +26,7 @@ export interface CreateModelInput {
 
 export interface UpdateModelInput {
   provider: string
-  displayName: string
+  display_name: string
   description?: string | null
   meta?: JsonObject | null
   status?: 'active' | 'deprecated' | 'disabled'
@@ -32,20 +36,20 @@ export interface UpdateModelInput {
 
 export class ModelRepository implements IModelRepository {
   private transformer: ModelTransformer
-  
+
   constructor(private api: BackendApiService) {
     this.transformer = new ModelTransformer()
   }
 
   async getAll(): Promise<ApiResult<IAssistantModel[]>> {
     const [error, response] = await this.api.getAllModels()
-    
+
     if (error) {
       return [error, undefined] as ApiResult<IAssistantModel[]>
     }
 
-    const transformedModels = response.models.map(model => 
-      this.transformer.toFrontend(model as unknown as ModelDTO)
+    const transformedModels = response.models.map((model) =>
+      this.transformer.toFrontend(model as unknown as ModelDTO),
     )
 
     return [null, transformedModels]
@@ -53,7 +57,7 @@ export class ModelRepository implements IModelRepository {
 
   async getById(key: string): Promise<ApiResult<IAssistantModel>> {
     const [error, response] = await this.api.getModel(key)
-    
+
     if (error) {
       return [error, undefined] as ApiResult<IAssistantModel>
     }
@@ -64,8 +68,8 @@ export class ModelRepository implements IModelRepository {
 
   async create(model: IAssistantModel): Promise<ApiResult<IAssistantModel>> {
     const dto = this.transformer.toBackend(model)
-    
-    const [error, response] = await this.api.createModel({
+
+    const createInput: CreateModelInput = {
       key: dto.key,
       provider: dto.provider,
       display_name: dto.display_name,
@@ -73,7 +77,9 @@ export class ModelRepository implements IModelRepository {
       meta: dto.meta,
       status: dto.status,
       visibility: dto.visibility,
-    })
+    }
+
+    const [error, response] = await this.api.createModel(createInput)
 
     if (error) {
       return [error, undefined] as ApiResult<IAssistantModel>
@@ -85,8 +91,8 @@ export class ModelRepository implements IModelRepository {
 
   async update(key: string, model: IAssistantModel): Promise<ApiResult<IAssistantModel>> {
     const dto = this.transformer.toBackend(model)
-    
-    const [error, response] = await this.api.updateModel(key, {
+
+    const updateInput: UpdateModelInput = {
       provider: dto.provider,
       display_name: dto.display_name,
       description: dto.description,
@@ -94,7 +100,9 @@ export class ModelRepository implements IModelRepository {
       status: dto.status,
       visibility: dto.visibility,
       version: dto.version || 0,
-    })
+    }
+
+    const [error, response] = await this.api.updateModel(key, updateInput)
 
     if (error) {
       return [error, undefined] as ApiResult<IAssistantModel>
@@ -112,3 +120,4 @@ export class ModelRepository implements IModelRepository {
     return new ModelRepository(api)
   }
 }
+

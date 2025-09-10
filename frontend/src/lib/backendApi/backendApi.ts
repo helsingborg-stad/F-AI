@@ -11,7 +11,7 @@ import type {
   IFavAssistant,
   JsonObject,
 } from '$lib/types.js'
-import { ModelRepository } from '$lib/repositories/ModelRepository.js'
+import { ModelRepository } from './ModelRepository.js'
 
 export interface CallOptions {
   body?: string | FormData
