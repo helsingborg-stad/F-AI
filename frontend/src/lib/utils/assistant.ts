@@ -30,14 +30,7 @@ export async function fetchAssistantModels(
 ): Promise<IAssistantModel[]> {
   return handleApiCall(
     event,
-    async (api) => {
-      const modelRepository = api.createModelRepository()
-      const [error, models] = await modelRepository.getAll()
-      if (error) {
-        return [error, undefined] as ApiResult<IAssistantModel[]>
-      }
-      return [null, models || []] as ApiResult<IAssistantModel[]>
-    },
+    (api) => api.getAllModels(),
     'Failed to fetch assistant models',
     [],
   )

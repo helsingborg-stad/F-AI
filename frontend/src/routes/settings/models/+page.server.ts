@@ -54,8 +54,7 @@ export const load: PageServerLoad = async (event: RequestEvent) => {
 
   try {
     const api = new BackendApiServiceFactory().get(event)
-    const modelRepository = api.createModelRepository()
-    const [error, models] = await modelRepository.getAll()
+    const [error, models] = await api.getAllModels()
 
     if (error) {
       return handleApiError(error)
@@ -90,13 +89,14 @@ export const actions: Actions = {
 
     try {
       const api = new BackendApiServiceFactory().get(event)
-      const modelRepository = api.createModelRepository()
-      const [error] = await modelRepository.create({
+      const [error] = await api.createModel({
         key: modelData.key,
         provider: modelData.provider,
         display_name: modelData.display_name,
         description: modelData.description,
         meta: modelData.meta,
+        displayName: modelData.display_name || modelData.key,
+        enhancedDescription: (modelData.meta?.description as string) || modelData.description || '',
       })
       if (error) {
         return handleApiError(error)
@@ -129,14 +129,15 @@ export const actions: Actions = {
 
     try {
       const api = new BackendApiServiceFactory().get(event)
-      const modelRepository = api.createModelRepository()
-      const [error] = await modelRepository.update(key, {
+      const [error] = await api.updateModel(key, {
         key: key,
         provider: modelData.provider,
         display_name: modelData.display_name,
         description: modelData.description,
         meta: modelData.meta,
         version: modelData.version,
+        displayName: modelData.display_name || key,
+        enhancedDescription: (modelData.meta?.description as string) || modelData.description || '',
       })
       if (error) {
         return handleApiError(error)
@@ -158,8 +159,7 @@ export const actions: Actions = {
 
     try {
       const api = new BackendApiServiceFactory().get(event)
-      const modelRepository = api.createModelRepository()
-      const [error] = await modelRepository.delete(key)
+      const [error] = await api.deleteModel(key)
       if (error) {
         return handleApiError(error)
       }
