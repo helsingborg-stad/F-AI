@@ -21,6 +21,7 @@ describe('ModelTransformer', () => {
             supports_reasoning: true,
             supports_code_execution: false,
             supports_function_calling: true,
+            supports_web_search: false,
             max_tokens: 128000,
           },
         },
@@ -46,6 +47,7 @@ describe('ModelTransformer', () => {
             supportsReasoning: true,
             supportsCodeExecution: false,
             supportsFunctionCalling: true,
+            supportsWebSearch: false,
             maxTokens: 128000,
           },
         },
@@ -113,6 +115,8 @@ describe('ModelTransformer', () => {
         provider: 'Anthropic',
         display_name: 'Claude 3',
         description: 'Anthropic model',
+        displayName: 'Claude 3',
+        enhancedDescription: 'Anthropic model',
         meta: {
           primaryColor: '#D97757',
           avatar_base64: 'data:image/png;base64,xyz789',
@@ -121,6 +125,7 @@ describe('ModelTransformer', () => {
             supportsReasoning: false,
             supportsCodeExecution: true,
             supportsFunctionCalling: true,
+            supportsWebSearch: true,
             maxTokens: 200000,
           },
         },
@@ -144,6 +149,7 @@ describe('ModelTransformer', () => {
             supports_reasoning: false,
             supports_code_execution: true,
             supports_function_calling: true,
+            supports_web_search: true,
             max_tokens: 200000,
           },
         },
@@ -158,6 +164,8 @@ describe('ModelTransformer', () => {
         key: 'model-1',
         provider: 'Provider',
         display_name: 'Model 1',
+        displayName: 'Model 1',
+        enhancedDescription: '',
         meta: {
           primaryColor: '#000000',
         },
@@ -175,6 +183,8 @@ describe('ModelTransformer', () => {
         key: 'model-1',
         provider: 'Provider',
         display_name: 'Model 1',
+        displayName: 'Model 1',
+        enhancedDescription: '',
         meta: {
           customField: 'value',
           nestedObject: {
@@ -207,6 +217,8 @@ describe('ModelTransformer', () => {
         provider: 'TestProvider',
         display_name: 'Test Model',
         description: 'A test model',
+        displayName: 'Test Model',
+        enhancedDescription: 'A test model',
         meta: {
           primaryColor: '#FF0000',
           avatar_base64: 'data:test',
@@ -215,6 +227,7 @@ describe('ModelTransformer', () => {
             supportsReasoning: false,
             supportsCodeExecution: true,
             supportsFunctionCalling: false,
+            supportsWebSearch: false,
             maxTokens: 8192,
           },
           customData: {

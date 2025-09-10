@@ -23,6 +23,9 @@
       {#if model.meta?.capabilities?.supportsReasoning}
         <Badge type="reasoning" size="sm" />
       {/if}
+      {#if model.meta?.capabilities?.supportsWebSearch}
+        <Badge type="web-search" size="sm" />
+      {/if}
     </div>
   </div>
 

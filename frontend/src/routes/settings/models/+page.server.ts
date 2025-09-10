@@ -18,6 +18,7 @@ function extractCapabilities(formData: FormData) {
     supportsReasoning: formData.get('supportsReasoning') === 'true',
     supportsCodeExecution: formData.get('supportsCodeExecution') === 'true',
     supportsFunctionCalling: formData.get('supportsFunctionCalling') === 'true',
+    supportsWebSearch: formData.get('supportsWebSearch') === 'true',
     maxTokens: parseInt(formData.get('maxTokens') as string) || 4096,
   }
 }

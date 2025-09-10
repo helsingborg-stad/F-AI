@@ -8,6 +8,7 @@
     supportsReasoning: boolean
     supportsCodeExecution: boolean
     supportsFunctionCalling: boolean
+    supportsWebSearch: boolean
     maxTokens: number
   }
 
@@ -22,6 +23,7 @@
       supportsReasoning: false,
       supportsCodeExecution: false,
       supportsFunctionCalling: true,
+      supportsWebSearch: false,
       maxTokens: 4096,
     }),
     disabled = false,
@@ -32,18 +34,12 @@
     reasoning: "Model supports advanced reasoning and chain-of-thought",
     codeExecution: "Model can execute code and run computations",
     functionCalling: "Model supports function/tool calling for API interactions",
+    webSearch: "Model can search the web to access up-to-date information",
   }
 </script>
 
 <Section title="Model Capabilities">
   <div class="space-y-3">
-    <CapabilityToggle
-      label="Supports Images"
-      description={capabilityDescriptions.images}
-      bind:checked={capabilities.supportsImages}
-      {disabled}
-    />
-    
     <CapabilityToggle
       label="Supports Reasoning"
       description={capabilityDescriptions.reasoning}
@@ -52,19 +48,11 @@
     />
     
     <CapabilityToggle
-      label="Supports Code Execution"
-      description={capabilityDescriptions.codeExecution}
-      bind:checked={capabilities.supportsCodeExecution}
+      label="Supports Web Search"
+      description={capabilityDescriptions.webSearch}
+      bind:checked={capabilities.supportsWebSearch}
       {disabled}
     />
-    
-    <CapabilityToggle
-      label="Supports Function Calling"
-      description={capabilityDescriptions.functionCalling}
-      bind:checked={capabilities.supportsFunctionCalling}
-      {disabled}
-    />
-    
     <div class="pt-2">
       <MaxTokensInput
         bind:value={capabilities.maxTokens}

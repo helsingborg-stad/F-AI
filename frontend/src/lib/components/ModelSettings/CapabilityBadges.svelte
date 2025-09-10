@@ -6,6 +6,7 @@
     supportsReasoning?: boolean
     supportsCodeExecution?: boolean
     supportsFunctionCalling?: boolean
+    supportsWebSearch?: boolean
     maxTokens?: number
   }
 
@@ -26,6 +27,9 @@
     {/if}
     {#if capabilities.supportsFunctionCalling}
       <Badge type="function-calling" size="sm" />
+    {/if}
+    {#if capabilities.supportsWebSearch}
+      <Badge type="web-search" size="sm" label="Web Search" />
     {/if}
     {#if capabilities.maxTokens && capabilities.maxTokens > 4096}
       <Badge type="tokens" size="sm" value={capabilities.maxTokens} />

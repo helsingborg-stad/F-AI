@@ -28,6 +28,7 @@
     supportsReasoning: false,
     supportsCodeExecution: false,
     supportsFunctionCalling: true,
+    supportsWebSearch: false,
     maxTokens: 4096,
   })
 
@@ -48,6 +49,7 @@
         supportsCodeExecution: model.meta?.capabilities?.supportsCodeExecution ?? false,
         supportsFunctionCalling:
           model.meta?.capabilities?.supportsFunctionCalling ?? false,
+        supportsWebSearch: model.meta?.capabilities?.supportsWebSearch ?? false,
         maxTokens: model.meta?.capabilities?.maxTokens ?? 4096,
       }
     } else if (mode === 'create') {
@@ -63,6 +65,7 @@
         supportsReasoning: false,
         supportsCodeExecution: false,
         supportsFunctionCalling: false,
+        supportsWebSearch: false,
         maxTokens: 4096,
       }
     }
@@ -115,6 +118,11 @@
           type="hidden"
           name="supportsFunctionCalling"
           value={capabilities.supportsFunctionCalling}
+        />
+        <input
+          type="hidden"
+          name="supportsWebSearch"
+          value={capabilities.supportsWebSearch}
         />
         <input type="hidden" name="maxTokens" value={capabilities.maxTokens} />
         <input type="hidden" name="primaryColor" value={primaryColor} />

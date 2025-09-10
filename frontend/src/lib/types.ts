@@ -63,6 +63,7 @@ export interface IAssistantModel {
       supportsReasoning?: boolean
       supportsCodeExecution?: boolean
       supportsFunctionCalling?: boolean
+      supportsWebSearch?: boolean
       maxTokens?: number
     }
     [key: string]: JsonValue | undefined

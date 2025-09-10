@@ -89,10 +89,13 @@
                 {#if !isPlaceholder}
                   <Badge type="provider" size="sm" variant="outline" label={model.provider} />
                   {#if model.meta?.capabilities?.supportsImages}
-                    <Badge type="image" size="xs" />
+                    <Badge type="image" size="sm" />
                   {/if}
                   {#if model.meta?.capabilities?.supportsReasoning}
-                    <Badge type="reasoning" size="xs" />
+                    <Badge type="reasoning" size="sm" />
+                  {/if}
+                  {#if model.meta?.capabilities?.supportsWebSearch}
+                    <Badge type="web-search" size="sm" />
                   {/if}
                 {/if}
               </div>

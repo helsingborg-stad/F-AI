@@ -19,6 +19,7 @@ export interface ModelCapabilitiesDTO {
   supports_reasoning?: boolean
   supports_code_execution?: boolean
   supports_function_calling?: boolean
+  supports_web_search?: boolean
   max_tokens?: number
 }
 
@@ -27,6 +28,7 @@ export interface ModelCapabilities {
   supportsReasoning?: boolean
   supportsCodeExecution?: boolean
   supportsFunctionCalling?: boolean
+  supportsWebSearch?: boolean
   maxTokens?: number
 }
 
@@ -119,6 +121,7 @@ export class ModelTransformer {
       supportsReasoning: dto.supports_reasoning,
       supportsCodeExecution: dto.supports_code_execution,
       supportsFunctionCalling: dto.supports_function_calling,
+      supportsWebSearch: dto.supports_web_search,
       maxTokens: dto.max_tokens,
     }
   }
@@ -129,6 +132,7 @@ export class ModelTransformer {
       supports_reasoning: capabilities.supportsReasoning,
       supports_code_execution: capabilities.supportsCodeExecution,
       supports_function_calling: capabilities.supportsFunctionCalling,
+      supports_web_search: capabilities.supportsWebSearch,
       max_tokens: capabilities.maxTokens,
     }
   }

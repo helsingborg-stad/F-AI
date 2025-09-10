@@ -3,8 +3,9 @@
   import Star from 'lucide-svelte/icons/star'
   import Code from 'lucide-svelte/icons/code'
   import LayoutDashboard from 'lucide-svelte/icons/layout-dashboard'
+  import Search from 'lucide-svelte/icons/search'
 
-  type BadgeType = 'image' | 'reasoning' | 'function-calling' | 'tokens' | 'provider'
+  type BadgeType = 'image' | 'reasoning' | 'function-calling' | 'web-search' | 'tokens' | 'provider'
   type BadgeSize = 'xs' | 'sm' | 'md' | 'lg'
   type BadgeVariant = 'filled' | 'outline'
 
@@ -48,6 +49,11 @@
       color: 'badge-accent',
       icon: Code,
       defaultLabel: 'Function Calling',
+    },
+    'web-search': {
+      color: 'badge-info',
+      icon: Search,
+      defaultLabel: 'Web Search',
     },
     tokens: {
       color: 'badge-warning',
