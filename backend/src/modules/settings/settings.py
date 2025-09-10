@@ -22,6 +22,9 @@ class SettingKey(metaclass=SettingKeyMeta):
     BREVO_SENDER_NAME = Setting('brevo.sender_name', 'Folkets AI Helsingborg')
     BREVO_SENDER_EMAIL = Setting('brevo.sender_email', 'no-reply@folkets-ai.helsingborg.io')
 
+    SMTP_SENDER_NAME = Setting('smtp.sender_name', 'Folkets AI Helsingborg')
+    SMTP_SENDER_EMAIL = Setting('smtp.sender_email', 'no-reply@folkets-ai.helsingborg.io')
+
     OPENAI_API_KEY = Setting('openai.api_key', '')
     ANTHROPIC_API_KEY = Setting('anthropic.api_key', '')
     MISTRAL_API_KEY = Setting('mistral.api_key', '')
