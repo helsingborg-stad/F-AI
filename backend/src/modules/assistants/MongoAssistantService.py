@@ -9,15 +9,13 @@ from src.common.mongo import is_valid_mongo_id
 from src.modules.assistants.models.Assistant import Assistant
 from src.modules.assistants.models.AssistantInfo import AssistantInfo
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
-from src.modules.models.protocols.IModelService import IModelService
 from src.modules.resources.protocols.IResourceService import IResourceService
 
 
 class MongoAssistantService(IAssistantService):
-    def __init__(self, database: AsyncDatabase, resource_service: IResourceService, model_service: IModelService):
+    def __init__(self, database: AsyncDatabase, resource_service: IResourceService):
         self._database = database
         self._resource_service = resource_service
-        self._model_service = model_service
 
     async def create_assistant(self, as_uid: str, force_id: str | None = None) -> str:
         if force_id and await self._database['assistants'].find_one({'_id': ObjectId(force_id)}) is not None:

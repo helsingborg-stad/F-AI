@@ -43,8 +43,7 @@ async def create_services() -> Services:
     model_service = ModelServiceFactory(mongo_database=mongo_database).get()
     assistant_service = AssistantServiceFactory(
         mongo_database=mongo_database, 
-        resource_service=resource_service,
-        model_service=model_service
+        resource_service=resource_service
     ).get()
     conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
     image_generator_factory = ImageGeneratorServiceFactory()
