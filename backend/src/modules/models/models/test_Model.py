@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime, timezone
 from pydantic import ValidationError
 
 from src.modules.models.models.Model import Model
@@ -19,6 +20,8 @@ class TestModel:
         assert model.status == 'active'
         assert model.visibility == 'public'
         assert model.version == 1
+        assert model.created_at == datetime.fromtimestamp(0, tz=timezone.utc)
+        assert model.updated_at == datetime.fromtimestamp(0, tz=timezone.utc)
 
     def test_valid_model_with_slash_key(self):
         model = Model(
@@ -121,3 +124,25 @@ class TestModel:
             display_name='A'
         )
         assert model.display_name == 'A'
+
+    def test_explicit_timestamps(self):
+        custom_time = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+        model = Model(
+            key='test-model',
+            provider='test',
+            display_name='Test',
+            created_at=custom_time,
+            updated_at=custom_time
+        )
+        assert model.created_at == custom_time
+        assert model.updated_at == custom_time
+
+    def test_default_timestamps_are_epoch(self):
+        model = Model(
+            key='test-model',
+            provider='test',
+            display_name='Test'
+        )
+        epoch = datetime.fromtimestamp(0, tz=timezone.utc)
+        assert model.created_at == epoch
+        assert model.updated_at == epoch

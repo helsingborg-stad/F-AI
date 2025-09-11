@@ -1,6 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal, Any
 from pydantic import BaseModel, Field
+
+
+def _epoch_datetime() -> datetime:
+    """Return Unix epoch as datetime (1970-01-01 00:00:00 UTC)."""
+    return datetime.fromtimestamp(0, tz=timezone.utc)
 
 
 class Model(BaseModel):
@@ -10,8 +15,8 @@ class Model(BaseModel):
     description: str | None = None
     meta: dict[str, Any] = Field(default_factory=dict)
     
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=_epoch_datetime)
+    updated_at: datetime = Field(default_factory=_epoch_datetime)
     status: Literal['active', 'deprecated', 'disabled'] = 'active'
     visibility: Literal['public', 'internal'] = 'public'
     version: int = 1
