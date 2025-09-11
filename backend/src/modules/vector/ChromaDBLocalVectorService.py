@@ -11,7 +11,7 @@ from src.modules.vector.models.VectorSpace import VectorSpace
 from src.modules.vector.protocols.IVectorService import IVectorService
 
 
-class ChromaDBVectorService(IVectorService):
+class ChromaDBLocalVectorService(IVectorService):
     def __init__(self, settings_service: ISettingsService, db_path='./__chromadb'):
         self._settings_service = settings_service
         self._chroma_client = chromadb.PersistentClient(
