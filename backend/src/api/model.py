@@ -221,7 +221,7 @@ async def update_model(
 
 @auth.delete(
     '/{key:path}',
-    ['model.delete'],
+    ['model.write'],
     summary='Delete Model',
     description='Delete a model (only if not in use by any assistants).',
     status_code=status.HTTP_204_NO_CONTENT
