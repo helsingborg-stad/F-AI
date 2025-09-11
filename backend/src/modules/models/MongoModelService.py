@@ -118,8 +118,9 @@ class MongoModelService:
             display_name=doc['display_name'],
             description=doc.get('description'),
             meta=doc.get('meta', {}),
-            created_at=doc.get('created_at', datetime.utcnow()),
-            updated_at=doc.get('updated_at', datetime.utcnow()),
+            # Unix epoch (1970-01-01) indicates missing/unknown timestamps
+            created_at=doc.get('created_at', datetime.fromtimestamp(0)),
+            updated_at=doc.get('updated_at', datetime.fromtimestamp(0)),
             status=doc.get('status', 'active'),
             visibility=doc.get('visibility', 'public'),
             version=doc.get('version', 1)
