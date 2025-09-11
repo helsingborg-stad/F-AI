@@ -15,7 +15,7 @@ export interface ModelDTO {
 }
 
 export interface ModelCapabilitiesDTO {
-  supports_images?: boolean
+  supports_imagegen?: boolean
   supports_reasoning?: boolean
   supports_code_execution?: boolean
   supports_function_calling?: boolean
@@ -24,7 +24,7 @@ export interface ModelCapabilitiesDTO {
 }
 
 export interface ModelCapabilities {
-  supportsImages?: boolean
+  supportsImagegen?: boolean
   supportsReasoning?: boolean
   supportsCodeExecution?: boolean
   supportsFunctionCalling?: boolean
@@ -117,7 +117,7 @@ export class ModelTransformer {
 
   private transformCapabilitiesToFrontend(dto: ModelCapabilitiesDTO): ModelCapabilities {
     return {
-      supportsImages: dto.supports_images,
+      supportsImagegen: dto.supports_imagegen,
       supportsReasoning: dto.supports_reasoning,
       supportsCodeExecution: dto.supports_code_execution,
       supportsFunctionCalling: dto.supports_function_calling,
@@ -128,7 +128,7 @@ export class ModelTransformer {
 
   private transformCapabilitiesToBackend(capabilities: ModelCapabilities): ModelCapabilitiesDTO {
     return {
-      supports_images: capabilities.supportsImages,
+      supports_imagegen: capabilities.supportsImagegen,
       supports_reasoning: capabilities.supportsReasoning,
       supports_code_execution: capabilities.supportsCodeExecution,
       supports_function_calling: capabilities.supportsFunctionCalling,

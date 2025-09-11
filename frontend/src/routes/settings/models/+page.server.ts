@@ -14,7 +14,7 @@ import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.ts'
 
 function extractCapabilities(formData: FormData) {
   return {
-    supportsImages: formData.get('supportsImages') === 'true',
+    supportsImagegen: formData.get('supportsImagegen') === 'true',
     supportsReasoning: formData.get('supportsReasoning') === 'true',
     supportsCodeExecution: formData.get('supportsCodeExecution') === 'true',
     supportsFunctionCalling: formData.get('supportsFunctionCalling') === 'true',

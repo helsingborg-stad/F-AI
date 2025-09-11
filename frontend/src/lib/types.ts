@@ -59,7 +59,7 @@ export interface IAssistantModel {
     avatar_base64?: string
     primaryColor?: string
     capabilities?: {
-      supportsImages?: boolean
+      supportsImagegen?: boolean
       supportsReasoning?: boolean
       supportsCodeExecution?: boolean
       supportsFunctionCalling?: boolean

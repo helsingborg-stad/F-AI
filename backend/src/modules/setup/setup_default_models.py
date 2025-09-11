@@ -20,7 +20,7 @@ async def setup_default_models(model_service: IModelService):
                 'primaryColor': '#8bd0c6',
                 'context_window': 200000,
                 'max_output_tokens': 100000,
-                'supports_vision': False,
+                'supports_imagegen': False,
                 'supports_function_calling': True
             }
         ),
@@ -33,7 +33,7 @@ async def setup_default_models(model_service: IModelService):
                 'primaryColor': '#8bd0c6',
                 'context_window': 128000,
                 'max_output_tokens': 16384,
-                'supports_vision': True,
+                'supports_imagegen': True,
                 'supports_function_calling': True,
             }
         ),
@@ -46,7 +46,7 @@ async def setup_default_models(model_service: IModelService):
                 'primaryColor': '#8bd0c6',
                 'context_window': 16385,
                 'max_output_tokens': 4096,
-                'supports_vision': False,
+                'supports_imagegen': False,
                 'supports_function_calling': True,
                 'supports_json_mode': True
             }
@@ -61,7 +61,7 @@ async def setup_default_models(model_service: IModelService):
                 'primaryColor': '#b18be0',
                 'context_window': 200000,
                 'max_output_tokens': 8192,
-                'supports_vision': True,
+                'supports_imagegen': True,
                 'supports_function_calling': True,
                 'training_cutoff': '2024-04'
             }
@@ -76,7 +76,7 @@ async def setup_default_models(model_service: IModelService):
                 'primaryColor': '#f0d27a',
                 'context_window': 128000,
                 'max_output_tokens': 8192,
-                'supports_vision': False,
+                'supports_imagegen': False,
                 'supports_function_calling': True,
                 'supports_json_mode': True,
                 'training_cutoff': '2024-07'

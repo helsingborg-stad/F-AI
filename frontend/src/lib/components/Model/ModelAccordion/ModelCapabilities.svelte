@@ -2,7 +2,7 @@
   import Badge from '$lib/components/Badge/Badge.svelte'
   
   interface Capabilities {
-    supportsImages?: boolean
+    supportsImagegen?: boolean
     supportsReasoning?: boolean
     supportsFunctionCalling?: boolean
     supportsWebSearch?: boolean
@@ -22,7 +22,7 @@
       Capabilities
     </h4>
     <div class="flex flex-wrap gap-2">
-      {#if capabilities.supportsImages}
+      {#if capabilities.supportsImagegen}
         <Badge type="image" size="sm" label="Image Processing" />
       {/if}
       {#if capabilities.supportsReasoning}

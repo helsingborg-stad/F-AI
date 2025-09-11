@@ -88,7 +88,7 @@
                 </h3>
                 {#if !isPlaceholder}
                   <Badge type="provider" size="sm" variant="outline" label={model.provider} />
-                  {#if model.meta?.capabilities?.supportsImages}
+                  {#if model.meta?.capabilities?.supportsImagegen}
                     <Badge type="image" size="sm" />
                   {/if}
                   {#if model.meta?.capabilities?.supportsReasoning}

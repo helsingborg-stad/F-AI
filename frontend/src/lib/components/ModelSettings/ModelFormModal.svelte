@@ -24,7 +24,7 @@
   let primaryColor = $state(DEFAULT_MODEL_COLOR)
   let version = $state(1)
   let capabilities = $state({
-    supportsImages: false,
+    supportsImagegen: false,
     supportsReasoning: false,
     supportsCodeExecution: false,
     supportsFunctionCalling: true,
@@ -44,7 +44,7 @@
         : DEFAULT_MODEL_COLOR
       version = model.version || 1
       capabilities = {
-        supportsImages: model.meta?.capabilities?.supportsImages ?? false,
+        supportsImagegen: model.meta?.capabilities?.supportsImagegen ?? false,
         supportsReasoning: model.meta?.capabilities?.supportsReasoning ?? false,
         supportsCodeExecution: model.meta?.capabilities?.supportsCodeExecution ?? false,
         supportsFunctionCalling:
@@ -61,7 +61,7 @@
       primaryColor = getRandomModelColor()
       version = 1
       capabilities = {
-        supportsImages: false,
+        supportsImagegen: false,
         supportsReasoning: false,
         supportsCodeExecution: false,
         supportsFunctionCalling: false,
@@ -103,7 +103,7 @@
           <input type="hidden" name="version" value={version} />
         {/if}
 
-        <input type="hidden" name="supportsImages" value={capabilities.supportsImages} />
+        <input type="hidden" name="supportsImagegen" value={capabilities.supportsImagegen} />
         <input
           type="hidden"
           name="supportsReasoning"

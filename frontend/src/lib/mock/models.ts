@@ -18,7 +18,7 @@ export const mockModels: IAssistantModel[] = [
       description:
         'Advanced multimodal model that can process text, images, and audio with superior reasoning capabilities.',
       capabilities: {
-        supportsImages: true,
+        supportsImagegen: true,
         supportsReasoning: true,
         supportsCodeExecution: false,
         supportsFunctionCalling: true,
@@ -40,7 +40,7 @@ export const mockModels: IAssistantModel[] = [
       description:
         'Fast and cost-effective model ideal for most conversational AI and text generation tasks.',
       capabilities: {
-        supportsImages: false,
+        supportsImagegen: false,
         supportsReasoning: false,
         supportsCodeExecution: false,
         supportsFunctionCalling: true,
@@ -61,7 +61,7 @@ export const mockModels: IAssistantModel[] = [
       description:
         "Anthropic's most capable model with excellent reasoning, coding, and analysis capabilities.",
       capabilities: {
-        supportsImages: true,
+        supportsImagegen: true,
         supportsReasoning: true,
         supportsCodeExecution: true,
         supportsFunctionCalling: true,
@@ -85,7 +85,7 @@ export const mockModels: IAssistantModel[] = [
       description:
         "Mistral's flagship model with strong performance across diverse language tasks.",
       capabilities: {
-        supportsImages: false,
+        supportsImagegen: false,
         supportsReasoning: true,
         supportsCodeExecution: false,
         supportsFunctionCalling: true,
@@ -105,7 +105,7 @@ export const mockModels: IAssistantModel[] = [
     meta: {
       description: 'Previous generation GPT-4 model. Consider upgrading to GPT-4o.',
       capabilities: {
-        supportsImages: true,
+        supportsImagegen: true,
         supportsReasoning: true,
         supportsCodeExecution: false,
         supportsFunctionCalling: true,
@@ -138,7 +138,7 @@ export const mockModelWithAvatar: IAssistantModel = enhanceModel({
     avatar_base64:
       'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiMxMEEzN0YiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAxOGMtNC40MSAwLTgtMy41OS04LThzMy41OS04IDgtOCA4IDMuNTkgOCA4LTMuNTkgOC04IDh6bTAtMTJjLTIuMjEgMC00IDEuNzktNCA0czEuNzkgNCA0IDQgNC0xLjc5IDQtNC0xLjc5LTQtNC00eiIvPjwvc3ZnPg==',
     capabilities: {
-      supportsImages: true,
+      supportsImagegen: true,
       supportsReasoning: true,
       supportsCodeExecution: true,
       supportsFunctionCalling: true,

@@ -4,7 +4,7 @@
   import MaxTokensInput from './MaxTokensInput.svelte'
 
   interface Capabilities {
-    supportsImages: boolean
+    supportsImagegen: boolean
     supportsReasoning: boolean
     supportsCodeExecution: boolean
     supportsFunctionCalling: boolean
@@ -19,7 +19,7 @@
 
   let {
     capabilities = $bindable({
-      supportsImages: false,
+      supportsImagegen: false,
       supportsReasoning: false,
       supportsCodeExecution: false,
       supportsFunctionCalling: true,

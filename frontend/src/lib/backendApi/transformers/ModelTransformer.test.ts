@@ -17,7 +17,7 @@ describe('ModelTransformer', () => {
           primary_color: '#10A37F',
           avatar_base64: 'data:image/png;base64,abc123',
           capabilities: {
-            supports_images: true,
+            supports_imagegen: true,
             supports_reasoning: true,
             supports_code_execution: false,
             supports_function_calling: true,
@@ -39,11 +39,13 @@ describe('ModelTransformer', () => {
         provider: 'OpenAI',
         display_name: 'GPT-4',
         description: 'Advanced model',
+        displayName: 'GPT-4',
+        enhancedDescription: 'Advanced model',
         meta: {
           primaryColor: '#10A37F',
           avatar_base64: 'data:image/png;base64,abc123',
           capabilities: {
-            supportsImages: true,
+            supportsImagegen: true,
             supportsReasoning: true,
             supportsCodeExecution: false,
             supportsFunctionCalling: true,
@@ -74,6 +76,8 @@ describe('ModelTransformer', () => {
         provider: 'Provider',
         display_name: 'Model 1',
         description: undefined,
+        displayName: 'Model 1',
+        enhancedDescription: '',
         meta: {},
       })
     })
@@ -121,7 +125,7 @@ describe('ModelTransformer', () => {
           primaryColor: '#D97757',
           avatar_base64: 'data:image/png;base64,xyz789',
           capabilities: {
-            supportsImages: true,
+            supportsImagegen: true,
             supportsReasoning: false,
             supportsCodeExecution: true,
             supportsFunctionCalling: true,
@@ -145,7 +149,7 @@ describe('ModelTransformer', () => {
           primary_color: '#D97757',
           avatar_base64: 'data:image/png;base64,xyz789',
           capabilities: {
-            supports_images: true,
+            supports_imagegen: true,
             supports_reasoning: false,
             supports_code_execution: true,
             supports_function_calling: true,
@@ -223,7 +227,7 @@ describe('ModelTransformer', () => {
           primaryColor: '#FF0000',
           avatar_base64: 'data:test',
           capabilities: {
-            supportsImages: true,
+            supportsImagegen: true,
             supportsReasoning: false,
             supportsCodeExecution: true,
             supportsFunctionCalling: false,
