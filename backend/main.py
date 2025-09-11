@@ -41,7 +41,6 @@ def create_app():
 
     # Add routes here
     # TODO: move somewhere cooler
-    api_router.include_router(model_router)
     api_router.include_router(api_key_router)
     api_router.include_router(assistant_router)
     api_router.include_router(auth_router)
@@ -52,6 +51,7 @@ def create_app():
     api_router.include_router(group_router)
     api_router.include_router(ai_router)
     api_router.include_router(login_router)
+    api_router.include_router(model_router)
     api_router.include_router(settings_router)
 
     new_app.include_router(api_router)
