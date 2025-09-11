@@ -17,18 +17,7 @@ class MongoModelService:
         if len(models) == 0:
             return True
         result = await self._database['chat_models'].insert_many([
-            {
-                'key': model.key,
-                'provider': model.provider,
-                'display_name': model.display_name,
-                'description': model.description,
-                'meta': model.meta,
-                'created_at': model.created_at,
-                'updated_at': model.updated_at,
-                'status': model.status,
-                'visibility': model.visibility,
-                'version': model.version
-            } for model in models
+            model.model_dump() for model in models
         ])
         return result.acknowledged
 
@@ -39,20 +28,7 @@ class MongoModelService:
             if existing:
                 return False
 
-            model_dict = {
-                'key': model.key,
-                'provider': model.provider,
-                'display_name': model.display_name,
-                'description': model.description,
-                'meta': model.meta,
-                'created_at': model.created_at,
-                'updated_at': model.updated_at,
-                'status': model.status,
-                'visibility': model.visibility,
-                'version': model.version
-            }
-
-            result = await self._database['chat_models'].insert_one(model_dict)
+            result = await self._database['chat_models'].insert_one(model.model_dump())
             return result.acknowledged
         except Exception:
             return False
