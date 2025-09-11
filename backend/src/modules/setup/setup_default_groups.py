@@ -40,10 +40,8 @@ async def setup_default_groups(group_service: IGroupService):
             'ai.run',
             'model.read',
             'model.write',
-            'model.admin',
             'settings.read',
             'settings.write',
-            'settings.models',
             'test'
         ],
         resources=[]
