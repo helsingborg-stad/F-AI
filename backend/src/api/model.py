@@ -14,26 +14,6 @@ model_router = APIRouter(
 auth = AuthRouterDecorator(model_router)
 
 
-class CreateModelRequest(BaseModel):
-    key: str
-    provider: str
-    display_name: str
-    description: str | None = None
-    meta: dict = Field(default_factory=dict)
-    status: str = 'active'
-    visibility: str = 'public'
-
-
-class UpdateModelRequest(BaseModel):
-    provider: str
-    display_name: str
-    description: str | None = None
-    meta: dict = Field(default_factory=dict)
-    status: str = 'active'
-    visibility: str = 'public'
-    version: int
-
-
 class ModelResponse(BaseModel):
     key: str
     provider: str
@@ -47,8 +27,14 @@ class ModelResponse(BaseModel):
     updated_at: str
 
 
-class GetModelsResponse(BaseModel):
-    models: list[ModelResponse]
+class CreateModelRequest(BaseModel):
+    key: str
+    provider: str
+    display_name: str
+    description: str | None = None
+    meta: dict = Field(default_factory=dict)
+    status: str = 'active'
+    visibility: str = 'public'
 
 
 @auth.post(
@@ -101,6 +87,10 @@ async def create_model(
         created_at=created_model.created_at.isoformat(),
         updated_at=created_model.updated_at.isoformat()
     )
+
+
+class GetModelsResponse(BaseModel):
+    models: list[ModelResponse]
 
 
 @auth.get(
@@ -164,6 +154,16 @@ async def get_model(
         created_at=model.created_at.isoformat(),
         updated_at=model.updated_at.isoformat()
     )
+
+
+class UpdateModelRequest(BaseModel):
+    provider: str
+    display_name: str
+    description: str | None = None
+    meta: dict = Field(default_factory=dict)
+    status: str = 'active'
+    visibility: str = 'public'
+    version: int
 
 
 @auth.put(
