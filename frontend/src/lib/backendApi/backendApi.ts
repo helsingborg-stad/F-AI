@@ -473,7 +473,7 @@ export class BackendApiService {
       visibility: dto.visibility,
     }
     
-    const [error, response] = await this.post<IAssistantModel>('/api/model/models', {
+    const [error, response] = await this.post<IAssistantModel>('/api/model', {
       body: JSON.stringify(createInput),
     })
     
@@ -499,7 +499,7 @@ export class BackendApiService {
     }
     
     const [error, response] = await this.put<IAssistantModel>(
-      `/api/model/models/${encodeURIComponent(key)}`,
+      `/api/model/${encodeURIComponent(key)}`,
       {
         body: JSON.stringify(updateInput),
       },
@@ -514,13 +514,13 @@ export class BackendApiService {
   }
 
   async deleteModel(key: string): Promise<ApiResult<never>> {
-    const [error] = await this.delete(`/api/model/models/${encodeURIComponent(key)}`)
+    const [error] = await this.delete(`/api/model/${encodeURIComponent(key)}`)
     return [error, undefined] as ApiResult<never>
   }
 
   async getModel(key: string): Promise<ApiResult<IAssistantModel>> {
     const [error, response] = await this.get<IAssistantModel>(
-      `/api/model/models/${encodeURIComponent(key)}`,
+      `/api/model/${encodeURIComponent(key)}`,
     )
     
     if (error) {
@@ -533,7 +533,7 @@ export class BackendApiService {
 
   async getAllModels(): Promise<ApiResult<IAssistantModel[]>> {
     const [error, response] = await this.get<{ models: IAssistantModel[] }>(
-      '/api/model/models',
+      '/api/model',
     )
     
     if (error) {

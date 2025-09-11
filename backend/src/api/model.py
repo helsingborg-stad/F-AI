@@ -38,7 +38,7 @@ class CreateModelRequest(BaseModel):
 
 
 @auth.post(
-    '/models',
+    '/',
     ['model.write'],
     summary='Create Model',
     description='Create a new AI model for use with assistants.',
@@ -94,7 +94,7 @@ class GetModelsResponse(BaseModel):
 
 
 @auth.get(
-    '/models',
+    '/',
     ['model.read'],
     summary='List All Models',
     description='Get a list of all models (including disabled/deprecated for admins).',
@@ -123,7 +123,7 @@ async def list_models(services: ServicesDependency, auth_identity: Authenticated
 
 
 @auth.get(
-    '/models/{key:path}',
+    '/{key:path}',
     ['model.read'],
     summary='Get Model',
     description='Get a specific model by key.',
@@ -167,7 +167,7 @@ class UpdateModelRequest(BaseModel):
 
 
 @auth.put(
-    '/models/{key:path}',
+    '/{key:path}',
     ['model.write'],
     summary='Update Model',
     description='Update an existing model with optimistic locking.',
@@ -220,7 +220,7 @@ async def update_model(
 
 
 @auth.delete(
-    '/models/{key:path}',
+    '/{key:path}',
     ['model.delete'],
     summary='Delete Model',
     description='Delete a model (only if not in use by any assistants).',
