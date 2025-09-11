@@ -3,6 +3,7 @@ import type { LayoutServerLoad } from './$types.js'
 import { getAssistantPickerData } from './utils.js'
 import { userCanChat } from '$lib/utils/scopes.js'
 import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
+import type { IFrontendConversationContext } from '$lib/types.js'
 
 export const load: LayoutServerLoad = async (event) => {
   const api = new BackendApiServiceFactory().get(event)
@@ -31,7 +32,7 @@ export const load: LayoutServerLoad = async (event) => {
         reasoning: '',
       }))
 
-    const conversationContext = {
+    const conversationContext: IFrontendConversationContext = {
       assistantId: conversation.assistant_id,
       messages: messages,
     }

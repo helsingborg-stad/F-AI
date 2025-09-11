@@ -226,6 +226,7 @@ export class BackendApiService {
 
   /***************************************************/
   /* high-level API function mappings                */
+
   /***************************************************/
 
   /** SSE Chat */
@@ -350,6 +351,20 @@ export class BackendApiService {
   async deleteAssistant(assistantId: string): Promise<ApiResult<never>> {
     const [error] = await this.delete(`/api/assistant/${assistantId}`)
     return [error, undefined] as ApiResult<never>
+  }
+
+  async chunkFile(file: File) {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const [error, result] = await this.post<{
+      chunks: { content: string; source: string; pageNumber: number | null }[]
+    }>('/api/document/chunk/file', {
+      body: formData,
+    })
+    return [error, result] as ApiResult<{
+      chunks: { content: string; source: string; pageNumber: number | null }[]
+    }>
   }
 
   async updateAssistantAvatar(
