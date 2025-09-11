@@ -10,18 +10,7 @@ class MongoModelService:
 
     async def get_available_models(self, as_uid: str) -> list[Model]:
         cursor = self._database['chat_models'].find()
-        return [Model(
-            key=doc['key'],
-            provider=doc['provider'],
-            display_name=doc['display_name'],
-            description=doc.get('description'),
-            meta=doc.get('meta', {}),
-            created_at=doc.get('created_at', datetime.utcnow()),
-            updated_at=doc.get('updated_at', datetime.utcnow()),
-            status=doc.get('status', 'active'),
-            visibility=doc.get('visibility', 'public'),
-            version=doc.get('version', 1)
-        ) async for doc in cursor]
+        return [self._doc_to_model(doc) async for doc in cursor]
 
     async def set_available_models(self, models: list[Model]) -> bool:
         await self._database['chat_models'].drop()
@@ -74,18 +63,7 @@ class MongoModelService:
         if not doc:
             return None
 
-        return Model(
-            key=doc['key'],
-            provider=doc['provider'],
-            display_name=doc['display_name'],
-            description=doc.get('description'),
-            meta=doc.get('meta', {}),
-            created_at=doc.get('created_at', datetime.utcnow()),
-            updated_at=doc.get('updated_at', datetime.utcnow()),
-            status=doc.get('status', 'active'),
-            visibility=doc.get('visibility', 'public'),
-            version=doc.get('version', 1)
-        )
+        return self._doc_to_model(doc)
 
     async def update_model(self, key: str, model: Model, as_uid: str) -> bool:
         """Update an existing model with optimistic locking."""
@@ -131,3 +109,18 @@ class MongoModelService:
             return result.deleted_count == 1
         except Exception:
             return False
+
+    @staticmethod
+    def _doc_to_model(doc) -> Model:
+        return Model(
+            key=doc['key'],
+            provider=doc['provider'],
+            display_name=doc['display_name'],
+            description=doc.get('description'),
+            meta=doc.get('meta', {}),
+            created_at=doc.get('created_at', datetime.utcnow()),
+            updated_at=doc.get('updated_at', datetime.utcnow()),
+            status=doc.get('status', 'active'),
+            visibility=doc.get('visibility', 'public'),
+            version=doc.get('version', 1)
+        )
