@@ -11,4 +11,7 @@ class AssistantServiceFactory:
         self._resource_service = resource_service
 
     def get(self) -> IAssistantService:
-        return MongoAssistantService(database=self._mongo_database, resource_service=self._resource_service)
+        return MongoAssistantService(
+            database=self._mongo_database, 
+            resource_service=self._resource_service
+        )

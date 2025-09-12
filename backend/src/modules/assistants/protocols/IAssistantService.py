@@ -2,17 +2,10 @@ from typing import Protocol, Any
 
 from src.modules.assistants.models.Assistant import Assistant
 from src.modules.assistants.models.AssistantInfo import AssistantInfo
-from src.modules.assistants.models.Model import Model
 
 
 class IAssistantService(Protocol):
     async def create_assistant(self, as_uid: str, force_id: str | None = None) -> str:
-        ...
-
-    async def get_available_models(self, as_uid: str) -> list[Model]:
-        ...
-
-    async def set_available_models(self, models: list[Model]) -> bool:
         ...
 
     async def get_assistant(self, as_uid: str, assistant_id: str, redact_key: bool = True) -> Assistant | None:

@@ -4,6 +4,7 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, APIRouter
 
+from src.api.model import model_router
 from src.api.assistant import assistant_router
 from src.api.auth import auth_router
 from src.api.api_key import api_key_router
@@ -27,7 +28,7 @@ async def lifespan(app: FastAPI):
     app.state.services = await create_services()
     await setup_default_settings(app.state.services.settings_service)
     await setup_default_groups(app.state.services.group_service)
-    await setup_default_models(app.state.services.assistant_service)
+    await setup_default_models(app.state.services.model_service)
     await setup_default_assistants(app.state.services.assistant_service)
     yield
 
@@ -50,6 +51,7 @@ def create_app():
     api_router.include_router(group_router)
     api_router.include_router(ai_router)
     api_router.include_router(login_router)
+    api_router.include_router(model_router)
     api_router.include_router(settings_router)
 
     new_app.include_router(api_router)

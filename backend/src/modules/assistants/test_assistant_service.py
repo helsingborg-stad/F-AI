@@ -1,6 +1,5 @@
 import pytest
 
-from src.modules.assistants.models.Model import Model
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
 from src.modules.groups.protocols.IGroupService import IGroupService
 
@@ -48,59 +47,6 @@ class BaseAssistantServiceTestClass:
         assert isinstance(result.meta, dict)
         assert 'is_public' not in result.meta
 
-    @staticmethod
-    @pytest.mark.asyncio
-    @pytest.mark.mongo
-    async def test_get_available_models(service: IAssistantService):
-        success = await service.set_available_models(models=[
-            Model(key='a', provider='A', display_name='Cool Model A', description='cool model A'),
-            Model(key='b', provider='B', display_name='Cool Model B', description='cool model B'),
-        ])
-
-        result = await service.get_available_models(as_uid='john')
-
-        assert success is True
-        assert len(result) == 2
-        assert result[0].key == 'a'
-        assert result[0].provider == 'A'
-        assert result[0].display_name == 'Cool Model A'
-        assert result[0].description == 'cool model A'
-        assert result[1].key == 'b'
-        assert result[1].provider == 'B'
-        assert result[1].display_name == 'Cool Model B'
-        assert result[1].description == 'cool model B'
-
-    @staticmethod
-    @pytest.mark.asyncio
-    @pytest.mark.mongo
-    async def test_set_available_models_override(service: IAssistantService):
-        success1 = await service.set_available_models(models=[
-            Model(key='a', provider='A', display_name='Cool Model A', description='my cool model A'),
-            Model(key='b', provider='B', display_name='Cool Model B', description='my cool model B'),
-        ])
-        success2 = await service.set_available_models(models=[
-            Model(key='c', provider='C', display_name='Cool Model C', description='my cool model C'),
-        ])
-
-        result = await service.get_available_models(as_uid='john')
-
-        assert success1 is True
-        assert success2 is True
-        assert len(result) == 1
-        assert result[0].key == 'c'
-        assert result[0].provider == 'C'
-        assert result[0].display_name == 'Cool Model C'
-        assert result[0].description == 'my cool model C'
-
-    @staticmethod
-    @pytest.mark.asyncio
-    @pytest.mark.mongo
-    async def test_set_available_models_twice(service: IAssistantService):
-        success1 = await service.set_available_models(models=[])
-        success2 = await service.set_available_models(models=[])
-
-        assert success1 is True
-        assert success2 is True
 
     @staticmethod
     @pytest.mark.asyncio

@@ -1,5 +1,7 @@
 <script lang="ts">
   import { m } from '$lib/paraglide/messages.js'
+  import ColorPicker from '$lib/components/ColorPicker/ColorPicker.svelte'
+  import { MODEL_COLORS } from '$lib/constants/colors.js'
 
   interface Props {
     avatarBase64: string
@@ -9,17 +11,7 @@
 
   let { avatarBase64, altImagePlaceholder, primaryColor }: Props = $props()
 
-  const colors = [
-    'transparent',
-    '#e28a8a',
-    '#d88bb8',
-    '#b18be0',
-    '#8ba6e0',
-    '#8bd0c6',
-    '#9dd990',
-    '#f0d27a',
-    '#e0bd91',
-  ]
+  const colors = MODEL_COLORS
 
   let selectedColor = $state(
     primaryColor && primaryColor !== '#ffffff'
@@ -34,7 +26,7 @@
   let fileInput: HTMLInputElement
   let currentAvatarBase64 = $state(avatarBase64)
 
-  function selectColor(color: string) {
+  function handleColorSelect(color: string) {
     selectedColor = color
   }
 
@@ -121,27 +113,7 @@
       {#if currentAvatarBase64 && !deleteAvatar}
         <input type="hidden" name="avatar_base64" value={currentAvatarBase64} />
       {/if}
-      <div class="ml-1 mt-3 flex">
-        {#each colors as color, i}
-          <button
-            type="button"
-            class="relative ml-[-8px] h-10 w-10 cursor-pointer overflow-hidden rounded-full outline outline-white transition-all first:ml-0 hover:z-10 hover:scale-110"
-            style="{color === 'transparent'
-              ? 'background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 5px, white 5px, white 10px);'
-              : `background-color: ${color};`}
-                    {selectedColor === color
-              ? 'border: 2px solid white; outline: 2px solid gold; z-index: 5;'
-              : ''}"
-            onclick={() => selectColor(color)}
-            aria-label={`Select ${color === 'transparent' ? 'transparent' : `color ${i}`}`}
-            aria-pressed={selectedColor === color}
-          >
-            {#if color === 'transparent'}
-              <span class="sr-only">Transparent</span>
-            {/if}
-          </button>
-        {/each}
-      </div>
+      <ColorPicker {selectedColor} {colors} onColorSelect={handleColorSelect} />
 
       <div class="mt-4">
         <label for="avatar-upload" class="w-full">

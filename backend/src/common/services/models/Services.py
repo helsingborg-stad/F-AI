@@ -12,6 +12,7 @@ from src.modules.document_chunker.factory import DocumentChunkerFactory
 from src.modules.groups.protocols.IGroupService import IGroupService
 from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.login.protocols.ILoginService import ILoginService
+from src.modules.models.protocols.IModelService import IModelService
 from src.modules.notification.protocols.INotificationService import INotificationService
 from src.modules.resources.protocols.IResourceService import IResourceService
 from src.modules.settings.protocols.ISettingsService import ISettingsService
@@ -33,6 +34,7 @@ class Services:
     group_service: IGroupService
     settings_service: ISettingsService
     assistant_service: IAssistantService
+    model_service: IModelService
     conversation_service: IConversationService
     chat_service: IChatService
     message_store_service: IMessageStoreService

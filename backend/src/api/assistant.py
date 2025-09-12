@@ -32,40 +32,6 @@ async def create_assistant(services: ServicesDependency, auth_identity: Authenti
     return CreateAssistantResponse(assistant_id=new_id)
 
 
-class GetAvailableModelsResponseModel(BaseModel):
-    key: str
-    provider: str
-    name: str
-    description: str
-
-
-class GetAvailableModelsResponse(BaseModel):
-    models: list[GetAvailableModelsResponseModel]
-
-
-@auth.get(
-    '/models',
-    ['assistant.read'],
-    summary='Get Available Models',
-    description='''
-Get a list of models that can be used with assistants.
-
-The `model.key` should be used as an assistant's `model` value.
-''',
-    response_model=GetAvailableModelsResponse,
-)
-async def get_available_models(services: ServicesDependency, auth_identity: AuthenticatedIdentity):
-    result = await services.assistant_service.get_available_models(as_uid=auth_identity.uid)
-    return GetAvailableModelsResponse(models=[
-        GetAvailableModelsResponseModel(
-            key=model.key,
-            provider=model.provider,
-            name=model.display_name,
-            description=model.description
-        ) for model in result
-    ])
-
-
 class GetMyAssistantsResponseAssistant(BaseModel):
     id: str
     meta: dict[str, Any]
