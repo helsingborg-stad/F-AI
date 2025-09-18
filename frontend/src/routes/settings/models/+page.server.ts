@@ -2,11 +2,10 @@ import type { PageServerLoad, Actions } from './$types.js'
 import type { RequestEvent } from '@sveltejs/kit'
 import type { JsonObject } from '$lib/types.js'
 import {
-  userCanAccessModelSettings,
   userCanReadModels,
   userCanWriteModels,
-  userCanDeleteModels,
   userIsModelAdmin,
+  userCanReadSettings,
 } from '$lib/utils/scopes.js'
 import { redirect } from '@sveltejs/kit'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
@@ -38,14 +37,14 @@ function buildMetaObject(formData: FormData): JsonObject {
 }
 
 export const load: PageServerLoad = async (event: RequestEvent) => {
-  if (!(await userCanAccessModelSettings(event))) {
+  if (!(await userCanReadSettings(event))) {
     throw redirect(403, '/settings')
   }
 
   const modelPermissions = {
     canRead: await userCanReadModels(event),
     canWrite: await userCanWriteModels(event),
-    canDelete: await userCanDeleteModels(event),
+    canDelete: await userCanWriteModels(event),
     isAdmin: await userIsModelAdmin(event),
   }
 
@@ -151,7 +150,7 @@ export const actions: Actions = {
   },
 
   delete: async (event) => {
-    if (!(await userCanDeleteModels(event))) {
+    if (!(await userCanWriteModels(event))) {
       throw redirect(403, '/settings')
     }
 

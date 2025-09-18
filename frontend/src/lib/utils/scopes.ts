@@ -53,16 +53,6 @@ export async function userCanWriteModels(event: RequestEvent): Promise<boolean> 
   return hasScope('model.write', userScopes)
 }
 
-export async function userCanDeleteModels(event: RequestEvent): Promise<boolean> {
-  const userScopes = await fetchUserScopes(event)
-  return hasScope('model.delete', userScopes)
-}
-
-export async function userCanAccessModelSettings(event: RequestEvent): Promise<boolean> {
-  const userScopes = await fetchUserScopes(event)
-  return hasScope('settings.models', userScopes)
-}
-
 export async function userIsModelAdmin(event: RequestEvent): Promise<boolean> {
   const userScopes = await fetchUserScopes(event)
   return hasScope('model.admin', userScopes)

@@ -3,10 +3,8 @@ import type { IMenuItem } from '$lib/types.js'
 import type { RequestEvent } from '@sveltejs/kit'
 import {
   userCanReadSettings,
-  userCanAccessModelSettings,
   userCanReadModels,
   userCanWriteModels,
-  userCanDeleteModels,
   userIsModelAdmin,
 } from '$lib/utils/scopes.js'
 
@@ -20,7 +18,7 @@ export async function load(event: RequestEvent) {
     })
   }
 
-  if (await userCanAccessModelSettings(event)) {
+  if (await userCanReadModels(event)) {
     sidebarMenu.push({
       label: m.settings_models_label(),
       path: '/settings/models',
@@ -30,7 +28,7 @@ export async function load(event: RequestEvent) {
   const modelPermissions = {
     canRead: await userCanReadModels(event),
     canWrite: await userCanWriteModels(event),
-    canDelete: await userCanDeleteModels(event),
+    canDelete: await userCanWriteModels(event),
     isAdmin: await userIsModelAdmin(event),
   }
 
