@@ -38,7 +38,7 @@ class CreateModelRequest(BaseModel):
 
 
 @auth.post(
-    '/',
+    '',
     ['model.write'],
     summary='Create Model',
     description='Create a new AI model for use with assistants.',
@@ -94,7 +94,7 @@ class GetModelsResponse(BaseModel):
 
 
 @auth.get(
-    '/',
+    '',
     ['model.read'],
     summary='List All Models',
     description='Get a list of all models (including disabled/deprecated for admins).',
