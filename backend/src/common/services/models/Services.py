@@ -9,6 +9,7 @@ from src.modules.chat.protocols.IMessageStoreService import IMessageStoreService
 from src.modules.collections.protocols.ICollectionService import ICollectionService
 from src.modules.conversations.protocols.IConversationService import IConversationService
 from src.modules.document_chunker.factory import DocumentChunkerFactory
+from src.modules.document_queue.protocols.IDocumentQueueService import IDocumentQueueService
 from src.modules.groups.protocols.IGroupService import IGroupService
 from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.login.protocols.ILoginService import ILoginService
@@ -40,3 +41,4 @@ class Services:
     message_store_service: IMessageStoreService
     token_factory: TokenServiceFactory
     resource_service: IResourceService
+    document_queue_service: IDocumentQueueService

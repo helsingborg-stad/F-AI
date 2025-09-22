@@ -1,5 +1,6 @@
 import os
 from tempfile import TemporaryDirectory
+from typing import Literal
 
 from fastapi import APIRouter, status, UploadFile, HTTPException
 from pydantic import BaseModel, Field
@@ -38,16 +39,17 @@ async def create_collection(body: CreateCollectionRequest, services: ServicesDep
     return CreateCollectionResponse(collection_id=collection_id)
 
 
-class GetCollectionResponseCollectionFile(BaseModel):
+class GetCollectionResponseCollectionDocument(BaseModel):
     name: str
+    type: str
+    state: Literal['queued', 'processing', 'ready', 'error']
 
 
 class GetCollectionResponseCollection(BaseModel):
     id: str
     label: str
     embedding_model: str
-    files: list[GetCollectionResponseCollectionFile]
-    urls: list[str]
+    documents: list[GetCollectionResponseCollectionDocument]
 
 
 class GetCollectionsResponse(BaseModel):
@@ -66,10 +68,11 @@ async def get_collections(services: ServicesDependency):
             id=collection.id,
             label=collection.label,
             embedding_model=collection.embedding_model,
-            files=[GetCollectionResponseCollectionFile(
-                name=file.name,
-            ) for file in collection.files],
-            urls=collection.urls
+            documents=[GetCollectionResponseCollectionDocument(
+                name=doc.name,
+                type=doc.type,
+                state=doc.state
+            ) for doc in collection.documents]
         ) for collection in collections
     ])
 
