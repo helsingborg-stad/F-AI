@@ -121,7 +121,7 @@ jobs:
         shell: bash
   deploy-frontend:
     runs-on: ubuntu-latest
-    needs: [build-backend, build-frontend]
+    needs: [build-backend, build-frontend, deploy-backend]
     steps:
       - name: Deploy frontend to Jelastic
         run: |
