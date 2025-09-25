@@ -110,6 +110,7 @@
   }
 
   let selectedModelKey = $state(assistant ? assistant.model : '')
+  let selectedModel = $derived(models.find(m => m.key === selectedModelKey))
 
   let shouldStick = $derived(isSticky && !atBottom)
 </script>
@@ -199,6 +200,7 @@
           enableReasoning={assistant.enableReasoning}
           enableImageGeneration={assistant.enableImageGeneration}
           enableFileUpload={assistant.enableFileUpload}
+          model={selectedModel}
         />
         <ModelConfigSection {canEdit} />
       </div>

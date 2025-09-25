@@ -6,7 +6,7 @@
   import Section from '$lib/components/Form/Section.svelte'
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
   import FileUploadModal from '$lib/components/Assistant/Edit/FileUploadModal.svelte'
-  import type { ICollection } from '$lib/types.js'
+  import type { ICollection, IAssistantModel } from '$lib/types.js'
   import FilesSettings from '$lib/components/Assistant/Edit/ToolsSection/FilesSettings.svelte'
 
   interface Props {
@@ -19,6 +19,7 @@
     enableReasoning: boolean
     enableImageGeneration: boolean
     enableFileUpload: boolean
+    model?: IAssistantModel
   }
 
   let {
@@ -30,7 +31,8 @@
     enableSearch,
     enableReasoning,
     enableImageGeneration,
-    enableFileUpload
+    enableFileUpload,
+    model
   }: Props = $props()
   let fileModal: FileUploadModal
   let currentCollectionId = $state(collectionId)
@@ -44,16 +46,20 @@
   let enableSearchValue = $state(enableSearch)
   let enableReasoningValue = $state(enableReasoning)
   let enableImageGenerationValue = $state(enableImageGeneration)
+
+  let supportsWebSearch = $derived(model?.meta?.capabilities?.supportsWebSearch ?? false)
+  let supportsReasoning = $derived(model?.meta?.capabilities?.supportsReasoning ?? false)
+  let supportsImageGeneration = $derived(model?.meta?.capabilities?.supportsImagegen ?? false)
 </script>
 
-<input type="hidden" name="enable_search" bind:value={enableSearchValue} />
+<input type="hidden" name="enable_search" value={supportsWebSearch ? enableSearchValue : false} />
 
-<input type="hidden" name="enable_reasoning" bind:value={enableReasoningValue} />
+<input type="hidden" name="enable_reasoning" value={supportsReasoning ? enableReasoningValue : false} />
 
 <input
   type="hidden"
   name="enable_image_generation"
-  bind:value={enableImageGenerationValue}
+  value={supportsImageGeneration ? enableImageGenerationValue : false}
 />
 
 <Section title={m.assistant_edit_tools_section_title()}>
@@ -123,32 +129,75 @@
       </InfoTooltip>
     </div>
     <div class="form-control">
-      <label class="label cursor-pointer">
-        <span class="label-text me-2"
-          >{m.assistant_edit_tools_capabilities_web_search()}</span
-        >
-        <input
-          type="checkbox"
-          class="toggle toggle-sm"
-          bind:checked={enableSearchValue}
-        />
-      </label>
-      <label class="label cursor-pointer">
-        <span class="label-text me-2">Reasoning</span>
-        <input
-          type="checkbox"
-          class="toggle toggle-sm"
-          bind:checked={enableReasoningValue}
-        />
-      </label>
-      <label class="label cursor-pointer">
-        <span class="label-text me-2">Image Generation</span>
-        <input
-          type="checkbox"
-          class="toggle toggle-sm"
-          bind:checked={enableImageGenerationValue}
-        />
-      </label>
+      {#if supportsWebSearch}
+        <label class="label cursor-pointer">
+          <span class="label-text me-2"
+            >{m.assistant_edit_tools_capabilities_web_search()}</span
+          >
+          <input
+            type="checkbox"
+            class="toggle toggle-sm"
+            bind:checked={enableSearchValue}
+            disabled={!canEdit}
+          />
+        </label>
+      {:else}
+        <label class="label cursor-not-allowed opacity-50">
+          <span class="label-text me-2"
+            >{m.assistant_edit_tools_capabilities_web_search()}</span
+          >
+          <input
+            type="checkbox"
+            class="toggle toggle-sm"
+            checked={false}
+            disabled={true}
+          />
+        </label>
+      {/if}
+
+      {#if supportsReasoning}
+        <label class="label cursor-pointer">
+          <span class="label-text me-2">Reasoning</span>
+          <input
+            type="checkbox"
+            class="toggle toggle-sm"
+            bind:checked={enableReasoningValue}
+            disabled={!canEdit}
+          />
+        </label>
+      {:else}
+        <label class="label cursor-not-allowed opacity-50">
+          <span class="label-text me-2">Reasoning</span>
+          <input
+            type="checkbox"
+            class="toggle toggle-sm"
+            checked={false}
+            disabled={true}
+          />
+        </label>
+      {/if}
+
+      {#if supportsImageGeneration}
+        <label class="label cursor-pointer">
+          <span class="label-text me-2">Image Generation</span>
+          <input
+            type="checkbox"
+            class="toggle toggle-sm"
+            bind:checked={enableImageGenerationValue}
+            disabled={!canEdit}
+          />
+        </label>
+      {:else}
+        <label class="label cursor-not-allowed opacity-50">
+          <span class="label-text me-2">Image Generation</span>
+          <input
+            type="checkbox"
+            class="toggle toggle-sm"
+            checked={false}
+            disabled={true}
+          />
+        </label>
+      {/if}
     </div>
   </div>
   <HorizontalDivider />
