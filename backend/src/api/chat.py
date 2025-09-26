@@ -245,7 +245,8 @@ async def stream_chat(
         start_new_conversation=True,
         user_message=message,
         chat_service=services.chat_service,
-        features=features_from_string(features)
+        features=features_from_string(features),
+        restart_from_id=None
     )
 
 
@@ -264,6 +265,7 @@ async def stream_chat_continue(
         services: ServicesDependency,
         auth_identity: AuthenticatedIdentity,
         features: str = '',
+        restart_from: str | None = None,
 ):
     message = await services.message_store_service.consume_message(stored_message_id=stored_message_id)
 
@@ -276,5 +278,6 @@ async def stream_chat_continue(
         start_new_conversation=False,
         user_message=message,
         chat_service=services.chat_service,
-        features=features_from_string(features)
+        features=features_from_string(features),
+        restart_from_id=restart_from
     )
