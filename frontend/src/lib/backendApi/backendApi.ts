@@ -443,6 +443,16 @@ export class BackendApiService {
     return [error, undefined] as ApiResult<never>
   }
 
+  async updateCollectionMeta(
+    collectionId: string,
+    label: string,
+  ): Promise<ApiResult<never>> {
+    const [error] = await this.patch(`/api/collection/${collectionId}`, {
+      body: JSON.stringify({ label }),
+    })
+    return [error, undefined] as ApiResult<never>
+  }
+
   /** Conversations */
 
   async getConversations(): Promise<ApiResult<IConversations>> {
@@ -477,7 +487,7 @@ export class BackendApiService {
 
   async createModel(model: IAssistantModel): Promise<ApiResult<IAssistantModel>> {
     const dto = this.#modelTransformer.toBackend(model)
-    
+
     const createInput = {
       key: dto.key,
       provider: dto.provider,
@@ -487,22 +497,27 @@ export class BackendApiService {
       status: dto.status,
       visibility: dto.visibility,
     }
-    
+
     const [error, response] = await this.post<IAssistantModel>('/api/model', {
       body: JSON.stringify(createInput),
     })
-    
+
     if (error) {
       return [error, undefined] as ApiResult<IAssistantModel>
     }
-    
-    const transformedModel = this.#modelTransformer.toFrontend(response as unknown as ModelDTO)
+
+    const transformedModel = this.#modelTransformer.toFrontend(
+      response as unknown as ModelDTO,
+    )
     return [null, transformedModel]
   }
 
-  async updateModel(key: string, model: IAssistantModel): Promise<ApiResult<IAssistantModel>> {
+  async updateModel(
+    key: string,
+    model: IAssistantModel,
+  ): Promise<ApiResult<IAssistantModel>> {
     const dto = this.#modelTransformer.toBackend(model)
-    
+
     const updateInput = {
       provider: dto.provider,
       display_name: dto.display_name,
@@ -512,19 +527,21 @@ export class BackendApiService {
       visibility: dto.visibility,
       version: dto.version || 0,
     }
-    
+
     const [error, response] = await this.put<IAssistantModel>(
       `/api/model/${encodeURIComponent(key)}`,
       {
         body: JSON.stringify(updateInput),
       },
     )
-    
+
     if (error) {
       return [error, undefined] as ApiResult<IAssistantModel>
     }
-    
-    const transformedModel = this.#modelTransformer.toFrontend(response as unknown as ModelDTO)
+
+    const transformedModel = this.#modelTransformer.toFrontend(
+      response as unknown as ModelDTO,
+    )
     return [null, transformedModel]
   }
 
@@ -537,31 +554,30 @@ export class BackendApiService {
     const [error, response] = await this.get<IAssistantModel>(
       `/api/model/${encodeURIComponent(key)}`,
     )
-    
+
     if (error) {
       return [error, undefined] as ApiResult<IAssistantModel>
     }
-    
-    const transformedModel = this.#modelTransformer.toFrontend(response as unknown as ModelDTO)
+
+    const transformedModel = this.#modelTransformer.toFrontend(
+      response as unknown as ModelDTO,
+    )
     return [null, transformedModel]
   }
 
   async getAllModels(): Promise<ApiResult<IAssistantModel[]>> {
-    const [error, response] = await this.get<{ models: IAssistantModel[] }>(
-      '/api/model',
-    )
-    
+    const [error, response] = await this.get<{ models: IAssistantModel[] }>('/api/model')
+
     if (error) {
       return [error, undefined] as ApiResult<IAssistantModel[]>
     }
-    
+
     const transformedModels = response.models.map((model) =>
       this.#modelTransformer.toFrontend(model as unknown as ModelDTO),
     )
-    
+
     return [null, transformedModels]
   }
-
 }
 
 export class BackendApiServiceFactory {

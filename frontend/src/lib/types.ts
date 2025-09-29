@@ -172,12 +172,17 @@ export interface IBackendApiSettings {
   }
 }
 
+export interface ICollectionDocument {
+  name: string
+  type: string
+  state: string
+}
+
 export interface ICollection {
   id: string
   label: string
   embedding_model: string
-  files: ICollectionFiles[]
-  urls: string[]
+  documents: ICollectionDocument[]
 }
 
 export interface ICollectionFiles {
