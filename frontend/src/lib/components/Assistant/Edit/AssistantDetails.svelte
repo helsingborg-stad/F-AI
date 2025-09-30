@@ -1,6 +1,6 @@
 <script lang="ts">
   import { m } from '$lib/paraglide/messages.js'
-  import type { IAssistant, IAssistantModel } from '$lib/types.js'
+  import type { IAssistant, IAssistantModel, ICollection } from '$lib/types.js'
   import ActionButtons from '$lib/components/Form/ActionButtons.svelte'
   import AccessSection from '$lib/components/Assistant/Edit/AccessSection.svelte'
   import ToolsSection from '$lib/components/Assistant/Edit/ToolsSection/ToolsSection.svelte'
@@ -10,6 +10,7 @@
 
   interface Props {
     assistant?: IAssistant
+    collections: ICollection[]
     models?: IAssistantModel[]
     canCreate?: boolean
     canEdit?: boolean
@@ -19,6 +20,7 @@
 
   let {
     assistant,
+    collections,
     models = [],
     canCreate = false,
     canEdit = false,
@@ -128,7 +130,7 @@
       class="space-y-4 pb-8"
     >
       <input type="hidden" name="assistant_id" value={assistant.id} />
-      <input type="hidden" name="collection_id" value={collectionId} />
+      <!--      <input type="hidden" name="collection_id" value={collectionId} />-->
 
       <AvatarSection
         avatarBase64={assistant.avatarBase64}
@@ -194,7 +196,7 @@
           {canEdit}
           assistantId={assistant.id}
           {collectionId}
-          collection={assistant.collection}
+          {collections}
           maxCollectionResult={assistant.maxCollectionResults}
           enableSearch={assistant.enableSearch}
           enableReasoning={assistant.enableReasoning}

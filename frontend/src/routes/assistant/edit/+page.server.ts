@@ -13,17 +13,14 @@ import {
   updateAssistantAvatar,
 } from '$lib/utils/assistant.js'
 import { handleApiError } from '$lib/utils/handle-api-errors.js'
-import {
-  createCollection,
-  getCollections,
-  replaceContextCollection,
-} from '$lib/utils/collection.js'
+import { getCollections } from '$lib/utils/collection.js'
 import {
   userCanReadAssistants,
   userCanReadCollections,
   userCanWriteAssistant,
   userCanWriteCollections,
 } from '$lib/utils/scopes.js'
+import { BackendApiServiceFactory } from '$lib/backendApi/backendApi.js'
 
 function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAssistant {
   const id = formData.get('assistant_id') as string
@@ -56,7 +53,7 @@ function getAssistantFormValues(formData: FormData, overwrite = {}): IBackendAss
       enable_image_generation: enableImageGeneration,
     },
     model: model,
-    collection_id: collectionId === '' ? null : collectionId,
+    collection_id: collectionId,
     instructions: instructions,
     max_collection_results: maxCollectionResults,
     ...overwrite,
@@ -88,7 +85,7 @@ export const load: PageServerLoad = async (event) => {
       enableSearch: assistant.meta?.enable_search === true,
       enableReasoning: assistant.meta?.enable_reasoning === true,
       enableImageGeneration: assistant.meta?.enable_image_generation === true,
-      enableFileUpload: false
+      enableFileUpload: false,
     }))
   }
 
@@ -107,7 +104,7 @@ export const load: PageServerLoad = async (event) => {
       enableSearch: assistantData.meta?.enable_search === true,
       enableReasoning: assistantData.meta?.enable_reasoning === true,
       enableImageGeneration: assistantData.meta?.enable_image_generation === true,
-      enableFileUpload: canWriteCollections
+      enableFileUpload: canWriteCollections,
     }
 
     if (canReadCollections && assistantData.collection_id) {
@@ -124,9 +121,17 @@ export const load: PageServerLoad = async (event) => {
 
   const models = await fetchAssistantModels(event)
 
+  const api = new BackendApiServiceFactory().get(event)
+  const [apiError, collections] = await api.getCollections()
+
+  if (apiError) {
+    return handleApiError(apiError)
+  }
+
   return {
     assistants,
     activeAssistant,
+    collections,
     models,
     canCreateAssistant: canCreateAssistant,
     canEditActiveAssistant: canEditAssistant,
@@ -202,52 +207,5 @@ export const actions = {
     }
 
     redirect(303, `/assistant/edit?assistant_id=${assistantId}`)
-  },
-
-  uploadFiles: async (event) => {
-    const formData = await event.request.formData()
-    const assistantId = formData.get('assistant_id') as string
-    const files = formData.getAll('files') as File[]
-    const label = (formData.get('collection') as string) || 'collection'
-    const embeddingModel = (formData.get('embedding_model') as string) || 'default'
-    const urls = ['']
-    let collectionId = ''
-
-    try {
-      collectionId = await createCollection(event, label, embeddingModel)
-    } catch (error) {
-      return handleApiError(error)
-    }
-
-    try {
-      await replaceContextCollection(event, collectionId, files)
-    } catch (error) {
-      return handleApiError(error)
-    }
-
-    try {
-      const updateData = { collection_id: collectionId }
-      await updateAssistant(assistantId, updateData, event)
-    } catch (error) {
-      return handleApiError(error)
-    }
-
-    const fileMetadata = files.map((file) => ({
-      name: file.name,
-      size: file.size,
-      type: file.type,
-    }))
-
-    const collection: ICollection = {
-      id: collectionId,
-      label: label,
-      files: fileMetadata,
-      urls: urls,
-      embedding_model: embeddingModel,
-    }
-
-    return {
-      collection,
-    }
   },
 }

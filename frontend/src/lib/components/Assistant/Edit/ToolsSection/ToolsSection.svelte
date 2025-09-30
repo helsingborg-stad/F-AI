@@ -5,15 +5,12 @@
   import InfoTooltip from '$lib/components/InfoTooltip/InfoTooltip.svelte'
   import Section from '$lib/components/Form/Section.svelte'
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
-  import FileUploadModal from '$lib/components/Assistant/Edit/FileUploadModal.svelte'
-  import type { ICollection, IAssistantModel } from '$lib/types.js'
-  import FilesSettings from '$lib/components/Assistant/Edit/ToolsSection/FilesSettings.svelte'
+  import type { IAssistantModel } from '$lib/types.js'
 
   interface Props {
     canEdit: boolean
-    assistantId: string
     collectionId: string
-    collection?: ICollection
+    collections: { id: string; label: string }[]
     maxCollectionResult: string
     enableSearch: boolean
     enableReasoning: boolean
@@ -24,37 +21,39 @@
 
   let {
     canEdit,
-    assistantId,
     collectionId,
     collection,
-    maxCollectionResult,
+    collections,
     enableSearch,
     enableReasoning,
     enableImageGeneration,
-    enableFileUpload,
-    model
+    model,
   }: Props = $props()
-  let fileModal: FileUploadModal
+
   let currentCollectionId = $state(collectionId)
   let currentFiles = $state(collection?.files || [])
-
-  function openFilesModal() {
-    if (fileModal) fileModal.showModal()
-  }
-
-  let attachingFiles = $state(false)
   let enableSearchValue = $state(enableSearch)
   let enableReasoningValue = $state(enableReasoning)
   let enableImageGenerationValue = $state(enableImageGeneration)
 
   let supportsWebSearch = $derived(model?.meta?.capabilities?.supportsWebSearch ?? false)
   let supportsReasoning = $derived(model?.meta?.capabilities?.supportsReasoning ?? false)
-  let supportsImageGeneration = $derived(model?.meta?.capabilities?.supportsImagegen ?? false)
+  let supportsImageGeneration = $derived(
+    model?.meta?.capabilities?.supportsImagegen ?? false,
+  )
 </script>
 
-<input type="hidden" name="enable_search" value={supportsWebSearch ? enableSearchValue : false} />
+<input
+  type="hidden"
+  name="enable_search"
+  value={supportsWebSearch ? enableSearchValue : false}
+/>
 
-<input type="hidden" name="enable_reasoning" value={supportsReasoning ? enableReasoningValue : false} />
+<input
+  type="hidden"
+  name="enable_reasoning"
+  value={supportsReasoning ? enableReasoningValue : false}
+/>
 
 <input
   type="hidden"
@@ -63,32 +62,20 @@
 />
 
 <Section title={m.assistant_edit_tools_section_title()}>
-  <div class="flex flex-row place-content-between items-center">
-    <div class="flex items-center gap-2">
-      {#if collectionId}
-        <button type="button" class="btn btn-xs" disabled={!canEdit || !enableFileUpload}>
-          <Icon icon={icons['database']} width={16} height={16} />
-        </button>
-      {/if}
-      {#if attachingFiles}
-        <span class="loading loading-spinner loading-xs"></span>
-      {/if}
-      {#if !attachingFiles && collectionId}
-        <span class="text-xs">Attached vector store {currentCollectionId}</span>
-      {/if}
-    </div>
-    <div>
-      <FilesSettings maxCollection={maxCollectionResult} />
-      <button
-        type="button"
-        class="btn btn-sm"
-        disabled={!canEdit || !enableFileUpload}
-        onclick={openFilesModal}
-      >
-        <Icon icon={icons['plus']} width={16} height={16} />
-        <span class="text-s">Files</span>
-      </button>
-    </div>
+  <div class="flex flex-row place-content-between items-center gap-2">
+    <label for="collection_id">Documents</label>
+    <select
+      name="collection_id"
+      id="collection_id"
+      class="select select-bordered select-sm text-sm"
+    >
+      <option value="">(No documents)</option>
+      {#each collections as collection (collection.id)}
+        <option value={collection.id} selected={currentCollectionId === collection.id}
+          >{collection.label}</option
+        >
+      {/each}
+    </select>
   </div>
   <div class="flex flex-row place-content-between items-center">
     <div class="overflow-x-auto">
@@ -202,11 +189,3 @@
   </div>
   <HorizontalDivider />
 </Section>
-
-<FileUploadModal
-  bind:this={fileModal}
-  {assistantId}
-  bind:uploadingFiles={attachingFiles}
-  bind:collectionId={currentCollectionId}
-  bind:files={currentFiles}
-/>

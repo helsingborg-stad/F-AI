@@ -177,8 +177,10 @@ class MongoAssistantService(IAssistantService):
         self._add_to_dict_unless_none(update_dict, 'llm_api_key', llm_api_key)
         self._add_to_dict_unless_none(update_dict, 'instructions', instructions)
         self._add_to_dict_unless_none(update_dict, 'extra_llm_params', extra_llm_params)
-        self._add_to_dict_unless_none(update_dict, 'collection_id', collection_id)
         self._add_to_dict_unless_none(update_dict, 'max_collection_results', max_collection_results)
+
+        if collection_id is not None:
+            update_dict['collection_id'] = collection_id if len(collection_id) > 0 else None
 
         result = await self._database['assistants'].update_one(
             {'_id': ObjectId(assistant_id), 'owner': as_uid},
