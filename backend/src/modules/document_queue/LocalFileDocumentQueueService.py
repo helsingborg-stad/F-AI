@@ -75,7 +75,7 @@ class LocalFileDocumentQueueService(IDocumentQueueService):
 
                         full_path = os.path.join(self._queue_dir, real_filename)
                         chunker = self._chunker_factory.get(full_path)
-                        chunks = chunker.chunk(full_path)
+                        chunks = chunker.chunk(full_path, name=metadata.source_name)
 
                         print(f"DocumentQueue chunking {real_filename} using {chunker}")
                         documents = [VectorDocument(

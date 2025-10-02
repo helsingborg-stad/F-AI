@@ -7,7 +7,7 @@ from src.modules.document_chunker.protocols.IDocumentChunker import IDocumentChu
 
 
 class ExcelDocumentChunker(IDocumentChunker):
-    def chunk(self, path_or_url: str) -> list[Chunk]:
+    def chunk(self, path_or_url: str, name: str | None = None) -> list[Chunk]:
         if is_url(path_or_url):
             elements = partition_xlsx(
                 url=path_or_url,
@@ -17,4 +17,4 @@ class ExcelDocumentChunker(IDocumentChunker):
         else:
             elements = partition_xlsx(filename=path_or_url, unique_element_ids=True)
 
-        return [unstructured_element_to_chunk(element) for element in elements]
+        return [unstructured_element_to_chunk(element, name) for element in elements]

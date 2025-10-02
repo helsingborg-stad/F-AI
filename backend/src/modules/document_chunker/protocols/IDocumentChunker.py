@@ -4,5 +4,5 @@ from src.modules.document_chunker.models.Chunk import Chunk
 
 
 class IDocumentChunker(Protocol):
-    def chunk(self, path_or_url: str) -> list[Chunk]:
+    def chunk(self, path_or_url: str, name: str | None = None) -> list[Chunk]:
         ...
