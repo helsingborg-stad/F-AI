@@ -43,14 +43,14 @@ class MongoCollectionService(ICollectionService):
 
         result = await self._database['collections'].find_one({'_id': ObjectId(collection_id)},
                                                               projection=['_id', 'label', 'embedding_model',
-                                                                          'documents'])
+                                                                          'documents', 'files', 'urls'])
         if result is None:
             return None
 
         return self._doc_to_collection_metadata(result)
 
     async def get_collections(self) -> list[CollectionMetadata]:
-        cursor = self._database['collections'].find(projection=['_id', 'label', 'embedding_model', 'documents'])
+        cursor = self._database['collections'].find(projection=['_id', 'label', 'embedding_model', 'documents', 'files', 'urls'])
         return [self._doc_to_collection_metadata(doc) async for doc in cursor]
 
     async def set_collection_label(self, collection_id: str, label: str) -> bool:
@@ -150,9 +150,15 @@ class MongoCollectionService(ICollectionService):
 
     @staticmethod
     def _doc_to_collection_metadata(doc: Mapping[str, Any]) -> CollectionMetadata:
+        # migration stuff from slightly older structure
+        old_files = [CollectionDocument(id=d['name'], name=d['name'], type='file', state='ready') for d in
+                     (doc['files'] if 'files' in doc else [])]
+        old_urls = [CollectionDocument(id=d, name=d, type='url', state='ready') for d in
+                    (doc['urls'] if 'urls' in doc else [])]
+
         return CollectionMetadata(
             id=str(doc['_id']),
             label=doc['label'],
             embedding_model=doc['embedding_model'],
-            documents=doc['documents'] if 'documents' in doc else [],
+            documents=(doc['documents'] if 'documents' in doc else []) + old_files + old_urls,
         )
