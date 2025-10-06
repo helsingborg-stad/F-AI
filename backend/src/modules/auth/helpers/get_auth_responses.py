@@ -47,8 +47,9 @@ _auth_responses = {
 
 
 def get_auth_responses(
-        additional_400_description: str | None = None,
-        optional_404_description: str | None = None
+        additional_400_description: str | None,
+        optional_404_description: str | None,
+        additional_responses: dict[int, dict] | None,
 ) -> dict[int, dict]:
     result = copy.deepcopy(_auth_responses)
 
@@ -61,5 +62,10 @@ def get_auth_responses(
             "model": CommonHTTPErrorResponse,
             "content": {"application/json": {"example": CommonHTTPErrorResponse(detail="Not Found")}}
         }
+
+    additional = additional_responses or {}
+    for status_code, response in additional.items():
+        if status_code not in result:
+            result[status_code] = response
 
     return result

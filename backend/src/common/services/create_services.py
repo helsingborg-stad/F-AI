@@ -18,6 +18,7 @@ from src.modules.document_queue.factory import DocumentQueueServiceFactory
 from src.modules.groups.factory import GroupServiceFactory
 from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.login.factory import LoginServiceFactory
+from src.modules.metrics.factory import MetricsServiceFactory
 from src.modules.models.factory import ModelServiceFactory
 from src.modules.notification.factory import NotificationServiceFactory
 from src.modules.resources.factory import ResourceServiceFactory
@@ -60,6 +61,9 @@ async def create_services() -> Services:
         queue_service=document_queue_service
     ).get()
 
+    # setup metrics
+    metrics_service = MetricsServiceFactory().get()
+
     return Services(
         authentication_factory=AuthenticationServiceFactory(
             supported_auth_methods=[
@@ -99,5 +103,6 @@ async def create_services() -> Services:
         token_factory=TokenServiceFactory(assistant_service=assistant_service,
                                           conversation_service=conversation_service),
         resource_service=resource_service,
+        metrics_service=metrics_service,
         document_queue_service=document_queue_service,
     )

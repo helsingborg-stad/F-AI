@@ -13,6 +13,7 @@ from src.modules.document_queue.protocols.IDocumentQueueService import IDocument
 from src.modules.groups.protocols.IGroupService import IGroupService
 from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.login.protocols.ILoginService import ILoginService
+from src.modules.metrics.protocols.IMetricsService import IMetricsService
 from src.modules.models.protocols.IModelService import IModelService
 from src.modules.notification.protocols.INotificationService import INotificationService
 from src.modules.resources.protocols.IResourceService import IResourceService
@@ -41,4 +42,5 @@ class Services:
     message_store_service: IMessageStoreService
     token_factory: TokenServiceFactory
     resource_service: IResourceService
+    metrics_service: IMetricsService
     document_queue_service: IDocumentQueueService

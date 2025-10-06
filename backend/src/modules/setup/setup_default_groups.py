@@ -38,6 +38,7 @@ async def setup_default_groups(group_service: IGroupService):
             'group.read',
             'group.write',
             'ai.run',
+            'metrics.read',
             'model.read',
             'model.write',
             'settings.read',
