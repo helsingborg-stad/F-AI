@@ -2,9 +2,11 @@ import hashlib
 import random
 import secrets
 import datetime
+import time
 
 from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
+from pymongo.errors import DuplicateKeyError
 
 from src.common.hashing import hash_secret, verify_hash
 from src.common.mongo import ensure_expiry_index
@@ -13,13 +15,15 @@ from src.modules.auth.helpers.user_jwt import create_user_jwt
 from src.modules.login.models.ConfirmedLogin import ConfirmedLogin
 from src.modules.login.models.StoredOTP import StoredOTP
 from src.modules.login.protocols.ILoginService import ILoginService
+from src.modules.metrics.models.Metric import Metric, MetricValue
+from src.modules.metrics.protocols.IMetricsProvider import IMetricsProvider
 from src.modules.notification.models.NotificationPayload import NotificationPayload
 from src.modules.notification.protocols.INotificationService import INotificationService
 from src.modules.settings.protocols.ISettingsService import ISettingsService
 from src.modules.settings.settings import SettingKey
 
 
-class MongoOTPLoginService(ILoginService):
+class MongoOTPLoginService(ILoginService, IMetricsProvider):
     def __init__(
             self,
             notification_service: INotificationService,
@@ -41,6 +45,9 @@ class MongoOTPLoginService(ILoginService):
 
         await ensure_expiry_index(self._database['login_otp'], otp_expire_seconds)
         await ensure_expiry_index(self._database['refresh_tokens'], refresh_token_expire_seconds)
+        await self._database['login_metrics_logins'].create_index("uid")
+        await self._database['login_metrics_logins'].create_index("timestamp")
+        await self._database['login_metrics_logins'].create_index([("uid", 1), ("timestamp", 1)])
 
     async def initiate_login(self, user_id: str) -> str:
         otp = self._generate_otp(await self._settings_service.get_setting(SettingKey.FIXED_OTP.key))
@@ -121,6 +128,8 @@ class MongoOTPLoginService(ILoginService):
             'created_at': refresh_token_created_at
         })
 
+        await self._analytics_track_login(user_id)
+
         return ConfirmedLogin(
             user_id=user_id,
             access_token=jwt,
@@ -142,3 +151,58 @@ class MongoOTPLoginService(ILoginService):
 <html><head></head><body><p>Hello,</p><p>Login with this pin: {otp}</p></body></html>
 """
         )
+
+    async def get_metrics(self) -> list[Metric]:
+        unique_users_result = await self._database['login_metrics_logins'].aggregate([
+            {"$group": {"_id": "$uid"}},
+            {"$count": "total_users"}
+        ])
+
+        unique_result_list = await unique_users_result.to_list()
+        unique_users_count = unique_result_list[0]['total_users'] if len(unique_result_list) > 0 else 0
+
+        start_of_today = datetime.datetime.now(datetime.UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_today = start_of_today + datetime.timedelta(days=1)
+
+        dau_result = await self._database['login_metrics_logins'].aggregate([
+            {"$match": {"timestamp": {"$gte": start_of_today, "$lt": end_of_today}}},
+            {"$group": {"_id": "$uid"}},
+            {"$count": "total_users"}
+        ])
+
+        dau_result_list = await dau_result.to_list()
+        dau_count = dau_result_list[0]['total_users'] if len(dau_result_list) > 0 else 0
+
+        return [
+            Metric(
+                name="login_unique_users_total",
+                help="Total number of unique users who have logged in",
+                type="counter",
+                values=[MetricValue(
+                    timestamp_s=int(time.time()),
+                    value=unique_users_count,
+                    attributes={})]
+            ),
+            Metric(
+                name="login_dau",
+                help="DAU for today",
+                type="gauge",
+                values=[MetricValue(
+                    timestamp_s=int(time.time()),
+                    value=dau_count,
+                    attributes={})]
+            )
+        ]
+
+    async def _analytics_track_login(self, uid: str):
+        try:
+            hashed_id = hashlib.sha1(uid.encode('utf-8')).hexdigest()
+            await self._database['login_metrics_logins'].insert_one({
+                "_id": ObjectId(),
+                "uid": hashed_id,
+                "timestamp": datetime.datetime.now(datetime.UTC)
+            })
+        except DuplicateKeyError:
+            pass
+        except Exception as e:
+            print(e)

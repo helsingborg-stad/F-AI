@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from pymongo import AsyncMongoClient
 
@@ -19,6 +20,7 @@ from src.modules.groups.factory import GroupServiceFactory
 from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.login.factory import LoginServiceFactory
 from src.modules.metrics.factory import MetricsServiceFactory
+from src.modules.metrics.protocols.IMetricsProvider import IMetricsProvider
 from src.modules.models.factory import ModelServiceFactory
 from src.modules.notification.factory import NotificationServiceFactory
 from src.modules.resources.factory import ResourceServiceFactory
@@ -61,8 +63,22 @@ async def create_services() -> Services:
         queue_service=document_queue_service
     ).get()
 
+    login_service = await LoginServiceFactory(
+        mongo_database=mongo_database,
+        authorization_service=authorization_service,
+        notification_service=notification_service,
+        settings_service=settings_service,
+    ).get()
+
     # setup metrics
     metrics_service = MetricsServiceFactory().get()
+
+    def try_add_metrics_provider(potential_provider: Any):
+        if isinstance(potential_provider, IMetricsProvider):
+            print(f"Adding metrics provider: {potential_provider}")
+            metrics_service.add_metrics_provider(potential_provider)
+
+    try_add_metrics_provider(login_service)
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
@@ -82,12 +98,7 @@ async def create_services() -> Services:
         vector_service=vector_service,
         collection_service=collection_service,
         notification_service=notification_service,
-        login_service=await LoginServiceFactory(
-            mongo_database=mongo_database,
-            authorization_service=authorization_service,
-            notification_service=notification_service,
-            settings_service=settings_service,
-        ).get(),
+        login_service=login_service,
         group_service=group_service,
         settings_service=settings_service,
         assistant_service=assistant_service,
