@@ -8,7 +8,7 @@ class TestOpenMetricsSerializer:
         serializer = OpenMetricsSerializer()
         result = serializer.serialize([])
 
-        assert result == 'EOF\n'
+        assert result == '# EOF\n'
 
     @staticmethod
     def test_basic():
@@ -27,7 +27,7 @@ class TestOpenMetricsSerializer:
         assert result == ('# HELP requests_total My test metric\n'
                           '# TYPE requests_total counter\n'
                           'requests_total{method="GET"} 5 12345\n'
-                          'EOF\n')
+                          '# EOF\n')
 
     @staticmethod
     def test_multiple_values():
@@ -48,7 +48,7 @@ class TestOpenMetricsSerializer:
                           '# TYPE requests_total counter\n'
                           'requests_total{method="GET",endpoint="/api/v1/test"} 5 12345\n'
                           'requests_total{method="POST",endpoint="/api/v1/test"} 10 12346\n'
-                          'EOF\n')
+                          '# EOF\n')
 
     @staticmethod
     def test_multiple_metrics():
@@ -80,7 +80,7 @@ class TestOpenMetricsSerializer:
                           '# HELP users_logged_in_count Amount of logged in users\n'
                           '# TYPE users_logged_in_count gauge\n'
                           'users_logged_in_count 50 12345\n'
-                          'EOF\n')
+                          '# EOF\n')
 
     @staticmethod
     def test_float_value():
@@ -99,4 +99,4 @@ class TestOpenMetricsSerializer:
         assert result == ('# HELP cpu_used Processor utilization\n'
                           '# TYPE cpu_used gauge\n'
                           'cpu_used 42.069 12345\n'
-                          'EOF\n')
+                          '# EOF\n')

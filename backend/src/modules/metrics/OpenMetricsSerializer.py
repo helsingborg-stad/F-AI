@@ -5,12 +5,12 @@ from src.modules.metrics.protocols.IMetricsSerializer import IMetricsSerializer
 class OpenMetricsSerializer(IMetricsSerializer):
     def serialize(self, metrics: list[Metric]) -> str:
         if len(metrics) == 0:
-            return "EOF\n"
+            return "# EOF\n"
         outputs = [
             OpenMetricsSerializer._metric_to_string(metric)
             for metric in metrics
         ]
-        return "\n".join(outputs) + "\nEOF\n"
+        return "\n".join(outputs) + "\n# EOF\n"
 
     @staticmethod
     def _metric_to_string(metric: Metric) -> str:
