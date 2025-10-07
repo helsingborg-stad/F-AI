@@ -1,4 +1,5 @@
 import base64
+import time
 from typing import Mapping, Any
 
 import gridfs
@@ -9,10 +10,12 @@ from src.common.mongo import is_valid_mongo_id
 from src.modules.assistants.models.Assistant import Assistant
 from src.modules.assistants.models.AssistantInfo import AssistantInfo
 from src.modules.assistants.protocols.IAssistantService import IAssistantService
+from src.modules.metrics.models.Metric import Metric, MetricValue
+from src.modules.metrics.protocols.IMetricsProvider import IMetricsProvider
 from src.modules.resources.protocols.IResourceService import IResourceService
 
 
-class MongoAssistantService(IAssistantService):
+class MongoAssistantService(IAssistantService, IMetricsProvider):
     def __init__(self, database: AsyncDatabase, resource_service: IResourceService):
         self._database = database
         self._resource_service = resource_service
@@ -299,3 +302,23 @@ class MongoAssistantService(IAssistantService):
     @staticmethod
     def _redact_key(key: str) -> str | None:
         return key[:2] + "..." + key[-2:] if key else None
+
+    async def get_metrics(self) -> list[Metric]:
+        assistants_result = await self._database['assistants'].aggregate([
+            {"$match": {"model": {"$ne": ""}}},
+            {"$group": {"_id": "$model", "count": {"$sum": 1}}}
+        ])
+
+        assistants_counts = await assistants_result.to_list()
+
+        return [Metric(
+            name='assistant_count',
+            help='Number of assistants per model',
+            type='gauge',
+            values=[MetricValue(
+                timestamp_s=int(time.time()),
+                value=assistant['count'],
+                attributes={'model': assistant['_id']})
+                for assistant in assistants_counts
+            ]
+        )]

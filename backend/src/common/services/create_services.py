@@ -49,7 +49,8 @@ async def create_services() -> Services:
         mongo_database=mongo_database,
         resource_service=resource_service
     ).get()
-    conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
+    conversation_service = ConversationServiceFactory(mongo_database=mongo_database,
+                                                      assistant_service=assistant_service).get()
     image_generator_factory = ImageGeneratorServiceFactory()
     completions_tools_factory = CompletionsToolsFactory(image_generator_factory=image_generator_factory)
     completions_factory = CompletionsServiceFactory(setting_service=settings_service,
@@ -79,6 +80,8 @@ async def create_services() -> Services:
             metrics_service.add_metrics_provider(potential_provider)
 
     try_add_metrics_provider(login_service)
+    try_add_metrics_provider(conversation_service)
+    try_add_metrics_provider(assistant_service)
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
