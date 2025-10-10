@@ -20,7 +20,7 @@ class OpenMetricsResponse(Response):
         "content": {
             "application/json": None,
             "application/openmetrics-text; version=1.0.0; charset=utf-8": {
-                "example": "# HELP api_requests_total Total number of API requests per endpoint\n# TYPE api_requests_total counter\napi_requests_total{endpoint=\"/metrics\"} 42 12345\nEOF\n"
+                "example": "# HELP api_requests_total Total number of API requests per endpoint\n# TYPE api_requests_total counter\napi_requests_total{endpoint=\"/metrics\"} 42 12345\n# EOF\n"
             }
         }
     }
