@@ -3,12 +3,13 @@
   import HorizontalDivider from '$lib/components/Divider/HorizontalDivider.svelte'
   import VerticalDivider from '$lib/components/Divider/VerticalDivider.svelte'
   import AssistantTable from '$lib/components/Assistant/Table/AssistantTable.svelte'
-  import type { IAssistant, IAssistantModel } from '$lib/types.js'
+  import type { IAssistant, IAssistantModel, ICollection } from '$lib/types.js'
   import AssistantDetails from '$lib/components/Assistant/Edit/AssistantDetails.svelte'
   import { onMount } from 'svelte'
 
   interface Props {
     assistants?: IAssistant[]
+    collections: ICollection[]
     activeAssistant?: IAssistant
     models?: IAssistantModel[]
     canCreateAssistant?: boolean
@@ -17,6 +18,7 @@
 
   let {
     assistants = [],
+    collections,
     activeAssistant,
     models = [],
     canCreateAssistant = false,
@@ -75,6 +77,7 @@
       <div bind:this={detailsContent}>
         <AssistantDetails
           assistant={activeAssistant}
+          {collections}
           canEdit={canEditActiveAssistant}
           canCreate={canCreateAssistant}
           {models}

@@ -136,9 +136,9 @@ class MongoGroupService(IGroupService):
     def _doc_to_group(doc: Mapping[str, Any]) -> Group:
         return Group(
             id=str(doc['_id']),
-            owner=doc['owner'],
-            label=doc['label'],
-            members=doc['members'],
-            scopes=doc['scopes'],
-            resources=doc['resources']
+            owner=doc['owner'] if 'owner' in doc else '',
+            label=doc['label'] if 'label' in doc else '',
+            members=doc['members'] if 'members' in doc else [],
+            scopes=doc['scopes'] if 'scopes' in doc else [],
+            resources=doc['resources'] if 'resources' in doc else []
         )

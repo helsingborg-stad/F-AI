@@ -3,10 +3,10 @@ from unstructured.documents.elements import Element
 from src.modules.document_chunker.models.Chunk import Chunk
 
 
-def unstructured_element_to_chunk(element: Element) -> Chunk:
+def unstructured_element_to_chunk(element: Element, name_override: str | None) -> Chunk:
     return Chunk(
         id=element.id,
         content=element.text,
-        source=element.metadata.filename or element.metadata.url,
+        source=name_override or element.metadata.filename or element.metadata.url,
         page_number=element.metadata.page_number,
     )

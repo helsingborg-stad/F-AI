@@ -14,6 +14,7 @@ from src.modules.chat.factory import ChatServiceFactory, MessageStoreServiceFact
 from src.modules.collections.factory import CollectionServiceFactory
 from src.modules.conversations.factory import ConversationServiceFactory
 from src.modules.document_chunker.factory import DocumentChunkerFactory
+from src.modules.document_queue.factory import DocumentQueueServiceFactory
 from src.modules.groups.factory import GroupServiceFactory
 from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.login.factory import LoginServiceFactory
@@ -42,7 +43,7 @@ async def create_services() -> Services:
     resource_service = ResourceServiceFactory(group_service=group_service).get()
     model_service = ModelServiceFactory(mongo_database=mongo_database).get()
     assistant_service = AssistantServiceFactory(
-        mongo_database=mongo_database, 
+        mongo_database=mongo_database,
         resource_service=resource_service
     ).get()
     conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
@@ -50,10 +51,14 @@ async def create_services() -> Services:
     completions_tools_factory = CompletionsToolsFactory(image_generator_factory=image_generator_factory)
     completions_factory = CompletionsServiceFactory(setting_service=settings_service,
                                                     completions_tools_factory=completions_tools_factory)
+    document_queue_service = DocumentQueueServiceFactory(chunker_factory=document_chunker_factory,
+                                                         vector_service=vector_service).get()
     collection_service = CollectionServiceFactory(
         mongo_database=mongo_database,
         vector_service=vector_service,
-        chunker_factory=document_chunker_factory).get()
+        chunker_factory=document_chunker_factory,
+        queue_service=document_queue_service
+    ).get()
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
@@ -94,4 +99,5 @@ async def create_services() -> Services:
         token_factory=TokenServiceFactory(assistant_service=assistant_service,
                                           conversation_service=conversation_service),
         resource_service=resource_service,
+        document_queue_service=document_queue_service,
     )

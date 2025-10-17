@@ -5,6 +5,7 @@
   let { data } = $props<{ assistants: IAssistant[]; models: IAssistantModel[] }>()
 
   const assistants = data.assistants
+  const collections = data.collections
   const activeAssistant = data.activeAssistant
   const models = data.models
   const canCreateAssistant = data.canCreateAssistant
@@ -13,6 +14,7 @@
 
 <MainPage
   {assistants}
+  {collections}
   {activeAssistant}
   {models}
   {canCreateAssistant}

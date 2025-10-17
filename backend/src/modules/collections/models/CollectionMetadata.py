@@ -1,11 +1,10 @@
 from pydantic import BaseModel
 
-from src.modules.collections.models.CollectionFile import CollectionFile
+from src.modules.collections.models.CollectionDocument import CollectionDocument
 
 
 class CollectionMetadata(BaseModel):
     id: str
     label: str
     embedding_model: str
-    files: list[CollectionFile]
-    urls: list[str]
+    documents: list[CollectionDocument]

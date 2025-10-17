@@ -5,6 +5,7 @@ import {
   userCanChat,
   userCanReadAssistants,
   userCanReadSettings,
+  userCanWriteCollections,
 } from '$lib/utils/scopes.js'
 
 export async function load(event: RequestEvent) {
@@ -23,6 +24,10 @@ export async function load(event: RequestEvent) {
 
   if (canReadAssistants) {
     navbarMenu.push({ label: m.nav_menu_assistants(), path: '/assistant' })
+  }
+
+  if (await userCanWriteCollections(event)) {
+    navbarMenu.push({ label: 'Documents', path: '/document' })
   }
 
   const canReadSettings = await userCanReadSettings(event)

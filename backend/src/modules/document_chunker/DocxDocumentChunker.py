@@ -7,7 +7,7 @@ from src.modules.document_chunker.protocols.IDocumentChunker import IDocumentChu
 
 
 class DocxDocumentChunker(IDocumentChunker):
-    def chunk(self, path_or_url: str) -> list[Chunk]:
+    def chunk(self, path_or_url: str, name: str | None = None) -> list[Chunk]:
         if is_url(path_or_url):
             elements = partition_docx(
                 url=path_or_url,
@@ -18,4 +18,4 @@ class DocxDocumentChunker(IDocumentChunker):
         else:
             elements = partition_docx(filename=path_or_url, chunking_strategy='basic', unique_element_ids=True)
 
-        return [unstructured_element_to_chunk(element) for element in elements]
+        return [unstructured_element_to_chunk(element, name) for element in elements]
