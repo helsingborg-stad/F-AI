@@ -1,157 +1,188 @@
-import asyncio
 import os
-import threading
-from unittest.mock import Mock, patch, AsyncMock
+import shutil
+import tempfile
+import typing
+from unittest.mock import AsyncMock
+
 import pytest
 
 from src.modules.document_chunker.factory import DocumentChunkerFactory
+from src.modules.document_chunker.models.Chunk import Chunk
+from src.modules.document_chunker.protocols.IDocumentChunker import IDocumentChunker
 from src.modules.document_queue.LocalFileDocumentQueueService import LocalFileDocumentQueueService
 from src.modules.document_queue.models.DocumentMeta import DocumentMeta
+from src.modules.document_queue.models.DocumentStateUpdate import DocumentStateUpdate
+from src.modules.vector.models.VectorDocument import VectorDocument
+from src.modules.vector.models.VectorSpace import VectorSpace
 from src.modules.vector.protocols.IVectorService import IVectorService
 
 
-@pytest.mark.asyncio
-async def test_file_cleanup_failure_causes_reprocessing(tmp_path):
-    """
-    Test if os.remove() fails on the meta file, the same file gets reprocessed infinitely.
-    """
-    temp_dir = str(tmp_path)
+class MockChunker(IDocumentChunker):
+    def __init__(self, should_fail: bool):
+        self._should_fail = should_fail
 
-    mock_vector_service = Mock(spec=IVectorService)
-    mock_vector_service.add_documents_to_vector_space = AsyncMock()
-
-    mock_chunker = Mock()
-    mock_chunker.chunk = Mock(side_effect=Exception("Simulated chunking error"))
-
-    mock_chunker_factory = Mock(spec=DocumentChunkerFactory)
-    mock_chunker_factory.get = Mock(return_value=mock_chunker)
-
-    service = LocalFileDocumentQueueService(
-        chunker_factory=mock_chunker_factory,
-        vector_service=mock_vector_service
-    )
-    service._queue_dir = temp_dir
-
-    test_file = os.path.join(temp_dir, "test_input.txt")
-    with open(test_file, "w") as f:
-        f.write("test content")
-
-    meta = DocumentMeta(
-        space_id="test_space",
-        document_id="test_doc",
-        embedding_model="test_model",
-        source_name="test.txt"
-    )
-
-    await service.add_to_queue(test_file, meta)
-
-    processing_attempts = []
-
-    original_remove = os.remove
-
-    def mock_remove(path):
-        """Mock os.remove to fail on meta file removal"""
-        if path.endswith('.meta'):
-            processing_attempts.append(path)
-            raise PermissionError(f"Simulated permission denied on {path}")
-        else:
-            return original_remove(path)
-
-    stop_event = threading.Event()
-
-    with patch('os.remove', side_effect=mock_remove):
-        task = asyncio.create_task(service.run_queue_loop(stop_event))
-
-        for _ in range(50):
-            await asyncio.sleep(0.1)
-            if len(processing_attempts) >= 3:
-                break
-
-        stop_event.set()
-
-        try:
-            await asyncio.wait_for(task, timeout=2.0)
-        except asyncio.TimeoutError:
-            task.cancel()
-            try:
-                await task
-            except asyncio.CancelledError:
-                pass
-
-    assert len(processing_attempts) >= 2, \
-        f"Expected file to be reprocessed at least twice, but got {len(processing_attempts)} attempts"
-
-    assert len(set(processing_attempts)) == 1, \
-        "All processing attempts should be for the same meta file"
-
-    print(f"✓ Issue confirmed: File was reprocessed {len(processing_attempts)} times due to cleanup failure")
+    def chunk(self, path_or_url: str, name: str | None = None) -> list[Chunk]:
+        if self._should_fail:
+            raise Exception("Mock chunker failed")
+        return []
 
 
-@pytest.mark.asyncio
-async def test_file_cleanup_failure_leaves_files_in_queue(tmp_path):
-    """
-    Test that demonstrates files remain in queue when cleanup fails.
-    """
-    temp_dir = str(tmp_path)
+class MockChunkerFactory:
+    def __init__(self, should_fail: bool):
+        self._should_fail = should_fail
 
-    mock_vector_service = Mock(spec=IVectorService)
-    mock_vector_service.add_documents_to_vector_space = AsyncMock()
+    def get(self, _path_or_url: str) -> IDocumentChunker:
+        return MockChunker(self._should_fail)
 
-    mock_chunker = Mock()
-    mock_chunker.chunk = Mock(side_effect=Exception("Simulated error"))
 
-    mock_chunker_factory = Mock(spec=DocumentChunkerFactory)
-    mock_chunker_factory.get = Mock(return_value=mock_chunker)
+class MockVectorService(IVectorService):
+    def __init__(self, should_fail: bool):
+        self._should_fail = should_fail
 
-    service = LocalFileDocumentQueueService(
-        chunker_factory=mock_chunker_factory,
-        vector_service=mock_vector_service
-    )
-    service._queue_dir = temp_dir
+    async def create_vector_space(self, space: str, embedding_model: str):
+        pass
 
-    test_file = os.path.join(temp_dir, "test_input.txt")
-    with open(test_file, "w") as f:
-        f.write("test content")
+    async def add_documents_to_vector_space(self, space: str, embedding_model: str, documents: list[VectorDocument]):
+        if self._should_fail:
+            raise Exception("Mock vector service failed")
 
-    meta = DocumentMeta(
-        space_id="test_space",
-        document_id="test_doc",
-        embedding_model="test_model",
-        source_name="test.txt"
-    )
+    async def delete_vector_space(self, space: str):
+        pass
 
-    await service.add_to_queue(test_file, meta)
+    async def get_vector_spaces(self) -> list[VectorSpace]:
+        return []
 
-    meta_files_before = [f for f in os.listdir(temp_dir) if f.endswith('.meta')]
-    assert len(meta_files_before) == 1
+    async def query_vector_space(
+            self,
+            space: str,
+            embedding_model: str,
+            query: str,
+            max_results: int
+    ) -> list[VectorDocument]:
+        return []
 
-    original_remove = os.remove
 
-    def mock_remove(path):
-        if path.endswith('.meta'):
-            raise PermissionError("Cannot remove meta file")
-        return original_remove(path)
+@pytest.fixture
+def tmp_dir():
+    return tempfile.mkdtemp()
 
-    stop_event = threading.Event()
 
-    with patch('os.remove', side_effect=mock_remove):
-        task = asyncio.create_task(service.run_queue_loop(stop_event))
+@pytest.fixture
+def document_service(tmp_dir: str):
+    try:
+        service = LocalFileDocumentQueueService(
+            chunker_factory=typing.cast(DocumentChunkerFactory,
+                                        typing.cast(object, MockChunkerFactory(should_fail=False))),
+            vector_service=MockVectorService(should_fail=False),
+            queue_dir=os.path.join(tmp_dir, "_service")
+        )
+        yield service
+    finally:
+        shutil.rmtree(tmp_dir)
 
-        await asyncio.sleep(0.5)
 
-        stop_event.set()
+@pytest.fixture
+def document_service_bad_chunk(tmp_dir: str):
+    try:
+        service = LocalFileDocumentQueueService(
+            chunker_factory=typing.cast(DocumentChunkerFactory,
+                                        typing.cast(object, MockChunkerFactory(should_fail=True))),
+            vector_service=MockVectorService(should_fail=False),
+            queue_dir=os.path.join(tmp_dir, "_service")
+        )
+        yield service
+    finally:
+        shutil.rmtree(tmp_dir)
 
-        try:
-            await asyncio.wait_for(task, timeout=2.0)
-        except asyncio.TimeoutError:
-            task.cancel()
-            try:
-                await task
-            except asyncio.CancelledError:
-                pass
 
-    meta_files_after = [f for f in os.listdir(temp_dir) if f.endswith('.meta')]
-    assert len(meta_files_after) == 1, \
-        "Meta file should still exist in queue after cleanup failure"
+@pytest.fixture
+def document_service_bad_vector(tmp_dir: str):
+    try:
+        service = LocalFileDocumentQueueService(
+            chunker_factory=typing.cast(DocumentChunkerFactory,
+                                        typing.cast(object, MockChunkerFactory(should_fail=False))),
+            vector_service=MockVectorService(should_fail=True),
+            queue_dir=os.path.join(tmp_dir, "_service")
+        )
+        yield service
+    finally:
+        shutil.rmtree(tmp_dir)
 
-    print("✓ Issue confirmed: Files remain in queue when cleanup fails")
+
+async def setup_test(tmp_dir: str, document_service: LocalFileDocumentQueueService):
+    tmp_file = os.path.join(tmp_dir, 'testfile.txt')
+    with open(tmp_file, 'w') as f:
+        f.write('test content')
+
+    callback_mock = AsyncMock()
+    document_service.add_document_callback(callback_mock)
+
+    await document_service.add_to_queue(tmp_file, DocumentMeta(
+        space_id='testspace',
+        document_id='testfile',
+        embedding_model='default',
+        source_name='testfile.txt'
+    ))
+
+    return callback_mock
+
+
+class TestLocalFileDocumentQueueService:
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_queued_document_is_processed(tmp_dir: str, document_service: LocalFileDocumentQueueService):
+        callback_mock = await setup_test(tmp_dir, document_service)
+
+        assert len([f for f in os.scandir(document_service.get_queue_dir()) if f.is_file()]) == 2
+
+        was_document_processed = await document_service.try_process_next_document()
+
+        callback_mock.assert_any_call(DocumentStateUpdate(
+            space_id='testspace',
+            document_id='testfile',
+            status='processing'
+        ))
+        callback_mock.assert_any_call(DocumentStateUpdate(
+            space_id='testspace',
+            document_id='testfile',
+            status='ready'
+        ))
+
+        assert was_document_processed is True
+        assert len([f for f in os.scandir(document_service.get_queue_dir()) if f.is_file()]) == 0
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_handle_bad_chunk(tmp_dir: str, document_service_bad_chunk: LocalFileDocumentQueueService):
+        callback_mock = await setup_test(tmp_dir, document_service_bad_chunk)
+
+        first_try = await document_service_bad_chunk.try_process_next_document()
+        second_try = await document_service_bad_chunk.try_process_next_document()
+
+        assert first_try is True
+        assert second_try is False
+        assert callback_mock.call_count == 2
+        callback_mock.assert_called_with(DocumentStateUpdate(
+            space_id='testspace',
+            document_id='testfile',
+            status='error'
+        ))
+        assert len([f for f in os.scandir(document_service_bad_chunk.get_queue_dir()) if f.is_file()]) == 0
+
+    @staticmethod
+    @pytest.mark.asyncio
+    async def test_handle_bad_vector(tmp_dir: str, document_service_bad_vector: LocalFileDocumentQueueService):
+        callback_mock = await setup_test(tmp_dir, document_service_bad_vector)
+
+        first_try = await document_service_bad_vector.try_process_next_document()
+        second_try = await document_service_bad_vector.try_process_next_document()
+
+        assert first_try is True
+        assert second_try is False
+        callback_mock.assert_called_with(DocumentStateUpdate(
+            space_id='testspace',
+            document_id='testfile',
+            status='error'
+        ))
+        assert callback_mock.call_count == 2
+        assert len([f for f in os.scandir(document_service_bad_vector.get_queue_dir()) if f.is_file()]) == 0
