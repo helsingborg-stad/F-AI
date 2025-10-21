@@ -15,7 +15,9 @@ def _extract_bearer_token(
         ))]
 ) -> AuthenticationSourceCredentials:
     return AuthenticationSourceCredentials(
-        auth_type=AuthenticationType.BEARER_TOKEN,
+        auth_type=AuthenticationType.API_KEY
+        if token and token.credentials.startswith('fai-')
+        else AuthenticationType.BEARER_TOKEN,
         credentials=token.credentials if token else None
     )
 

@@ -26,11 +26,12 @@ class AuthRouterDecorator:
             response_400_description: str | None = None,
             response_404_description: str | None = None,
             status_code: int | None = None,
+            additional_responses: dict[int, dict] | None = None,
     ):
         if required_scopes is None:
             required_scopes = []
 
-        responses = get_auth_responses(response_400_description, response_404_description)
+        responses = get_auth_responses(response_400_description, response_404_description, additional_responses)
 
         def inner_decorator(func):
             security_dependency = Security(auth_route_dependency, scopes=required_scopes)
@@ -65,6 +66,7 @@ class AuthRouterDecorator:
             response_400_description: str | None = None,
             response_404_description: str | None = None,
             status_code: int | None = None,
+            additional_responses: dict[int, dict] | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.get,
@@ -77,6 +79,7 @@ class AuthRouterDecorator:
             response_400_description=response_400_description,
             response_404_description=response_404_description,
             status_code=status_code,
+            additional_responses=additional_responses
         )
 
     def post(
@@ -90,6 +93,7 @@ class AuthRouterDecorator:
             response_400_description: str | None = None,
             response_404_description: str | None = None,
             status_code: int | None = None,
+            additional_responses: dict[int, dict] | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.post,
@@ -102,6 +106,7 @@ class AuthRouterDecorator:
             response_400_description=response_400_description,
             response_404_description=response_404_description,
             status_code=status_code,
+            additional_responses=additional_responses
         )
 
     def put(
@@ -115,6 +120,7 @@ class AuthRouterDecorator:
             response_400_description: str | None = None,
             response_404_description: str | None = None,
             status_code: int | None = None,
+            additional_responses: dict[int, dict] | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.put,
@@ -127,6 +133,7 @@ class AuthRouterDecorator:
             response_400_description=response_400_description,
             response_404_description=response_404_description,
             status_code=status_code,
+            additional_responses=additional_responses
         )
 
     def patch(
@@ -140,6 +147,7 @@ class AuthRouterDecorator:
             response_400_description: str | None = None,
             response_404_description: str | None = None,
             status_code: int | None = None,
+            additional_responses: dict[int, dict] | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.patch,
@@ -152,6 +160,7 @@ class AuthRouterDecorator:
             response_400_description=response_400_description,
             response_404_description=response_404_description,
             status_code=status_code,
+            additional_responses=additional_responses
         )
 
     def delete(
@@ -165,6 +174,7 @@ class AuthRouterDecorator:
             response_400_description: str | None = None,
             response_404_description: str | None = None,
             status_code: int | None = None,
+            additional_responses: dict[int, dict] | None = None,
     ):
         return AuthRouterDecorator.route(
             router_method=self.api_router.delete,
@@ -177,4 +187,5 @@ class AuthRouterDecorator:
             response_400_description=response_400_description,
             response_404_description=response_404_description,
             status_code=status_code,
+            additional_responses=additional_responses
         )

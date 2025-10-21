@@ -1,18 +1,24 @@
 import datetime
+import os
+import time
 
 import pymongo
 from bson import ObjectId
 from pymongo.asynchronous.database import AsyncDatabase
 
 from src.common.mongo import is_valid_mongo_id
+from src.modules.assistants.protocols.IAssistantService import IAssistantService
 from src.modules.conversations.models.Conversation import Conversation
 from src.modules.conversations.models.Message import Message
 from src.modules.conversations.protocols.IConversationService import IConversationService
+from src.modules.metrics.models.Metric import Metric, MetricValue
+from src.modules.metrics.protocols.IMetricsProvider import IMetricsProvider
 
 
-class MongoConversationService(IConversationService):
-    def __init__(self, database: AsyncDatabase):
+class MongoConversationService(IConversationService, IMetricsProvider):
+    def __init__(self, database: AsyncDatabase, assistant_service: IAssistantService):
         self._database = database
+        self._assistant_service = assistant_service
 
     async def create_conversation(self, as_uid: str, assistant_id: str) -> str:
         new_id = ObjectId()
@@ -107,3 +113,37 @@ class MongoConversationService(IConversationService):
                 Message(**m)
                 for m in doc['messages']
             ])
+
+    async def get_metrics(self) -> list[Metric]:
+        assistant_count_result = await self._database['conversations'].aggregate([
+            {"$group": {
+                "_id": "$assistant_id",
+                "count": {"$sum": 1}
+            }},
+        ])
+
+        assistant_counts = await assistant_count_result.to_list()
+
+        assistant_name_cache = {}
+        for assistant_count in assistant_counts:
+            if assistant_count['_id'] not in assistant_name_cache:
+                info = await self._assistant_service.get_assistant_info(as_uid=os.environ['SETUP_ADMIN'],
+                                                                        assistant_id=assistant_count['_id'])
+                if info:
+                    assistant_name_cache[assistant_count['_id']] = info.meta['name'] if 'name' in info.meta else \
+                    assistant_count['_id']
+            assistant_count['name'] = assistant_name_cache[assistant_count['_id']] if assistant_count[
+                                                                                          '_id'] in assistant_name_cache else \
+            assistant_count['_id']
+
+        return [Metric(
+            name='conversation_count',
+            help='Number of conversations per assistant',
+            type='gauge',
+            values=[MetricValue(
+                timestamp_s=int(time.time()),
+                value=assistant_count['count'],
+                attributes={"assistant": assistant_count['name'].replace('"', '\\"')})
+                for assistant_count in assistant_counts
+            ]
+        )]

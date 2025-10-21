@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from pymongo import AsyncMongoClient
 
@@ -18,6 +19,8 @@ from src.modules.document_queue.factory import DocumentQueueServiceFactory
 from src.modules.groups.factory import GroupServiceFactory
 from src.modules.ai.completions.factory import CompletionsServiceFactory
 from src.modules.login.factory import LoginServiceFactory
+from src.modules.metrics.factory import MetricsServiceFactory
+from src.modules.metrics.protocols.IMetricsProvider import IMetricsProvider
 from src.modules.models.factory import ModelServiceFactory
 from src.modules.notification.factory import NotificationServiceFactory
 from src.modules.resources.factory import ResourceServiceFactory
@@ -46,7 +49,8 @@ async def create_services() -> Services:
         mongo_database=mongo_database,
         resource_service=resource_service
     ).get()
-    conversation_service = ConversationServiceFactory(mongo_database=mongo_database).get()
+    conversation_service = ConversationServiceFactory(mongo_database=mongo_database,
+                                                      assistant_service=assistant_service).get()
     image_generator_factory = ImageGeneratorServiceFactory()
     completions_tools_factory = CompletionsToolsFactory(image_generator_factory=image_generator_factory)
     completions_factory = CompletionsServiceFactory(setting_service=settings_service,
@@ -59,6 +63,25 @@ async def create_services() -> Services:
         chunker_factory=document_chunker_factory,
         queue_service=document_queue_service
     ).get()
+
+    login_service = await LoginServiceFactory(
+        mongo_database=mongo_database,
+        authorization_service=authorization_service,
+        notification_service=notification_service,
+        settings_service=settings_service,
+    ).get()
+
+    # setup metrics
+    metrics_service = MetricsServiceFactory().get()
+
+    def try_add_metrics_provider(potential_provider: Any):
+        if isinstance(potential_provider, IMetricsProvider):
+            print(f"Adding metrics provider: {potential_provider}")
+            metrics_service.add_metrics_provider(potential_provider)
+
+    try_add_metrics_provider(login_service)
+    try_add_metrics_provider(conversation_service)
+    try_add_metrics_provider(assistant_service)
 
     return Services(
         authentication_factory=AuthenticationServiceFactory(
@@ -78,12 +101,7 @@ async def create_services() -> Services:
         vector_service=vector_service,
         collection_service=collection_service,
         notification_service=notification_service,
-        login_service=await LoginServiceFactory(
-            mongo_database=mongo_database,
-            authorization_service=authorization_service,
-            notification_service=notification_service,
-            settings_service=settings_service,
-        ).get(),
+        login_service=login_service,
         group_service=group_service,
         settings_service=settings_service,
         assistant_service=assistant_service,
@@ -99,5 +117,6 @@ async def create_services() -> Services:
         token_factory=TokenServiceFactory(assistant_service=assistant_service,
                                           conversation_service=conversation_service),
         resource_service=resource_service,
+        metrics_service=metrics_service,
         document_queue_service=document_queue_service,
     )

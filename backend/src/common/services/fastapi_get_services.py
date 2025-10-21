@@ -9,4 +9,4 @@ def get_services(request: Request) -> Services:
     return services
 
 
-ServicesDependency = Annotated[Services, Depends(get_services)]
+ServicesDependency: type[Services] = Annotated[Services, Depends(get_services)]
