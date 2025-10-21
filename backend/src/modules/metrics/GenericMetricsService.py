@@ -5,10 +5,11 @@ from src.modules.metrics.protocols.IMetricsService import IMetricsService
 
 
 class GenericMetricsService(IMetricsService):
-    _providers: list[IMetricsProvider] = []
+    _providers: list[IMetricsProvider]
 
     def __init__(self, serializer: IMetricsSerializer):
         self._serializer = serializer
+        self._providers = []
 
     def add_metrics_provider(self, provider: IMetricsProvider):
         self._providers.append(provider)
